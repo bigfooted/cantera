@@ -278,12 +278,12 @@ public:
      * resolved is an ongoing issue within Cantera. The minimum mole fraction
      * must be in the range 0 to 0.9.
      *
-     * @param xmolSolventMIN  Input double containing the minimum mole fraction
+     * @param xmolSolventMIN  Input CanteraDouble containing the minimum mole fraction
      */
-    void setMoleFSolventMin(double xmolSolventMIN);
+    void setMoleFSolventMin(CanteraDouble xmolSolventMIN);
 
     //! Returns the minimum mole fraction in the molality formulation.
-    double moleFSolventMin() const;
+    CanteraDouble moleFSolventMin() const;
 
     //! Calculates the molality of all species and stores the result internally.
     /*!
@@ -318,7 +318,7 @@ public:
      *
      * @param molal       Output vector of molalities. Length: m_kk.
      */
-    void getMolalities(double* const molal) const;
+    void getMolalities(CanteraDouble* const molal) const;
 
     //! Set the molalities of the solutes in a phase
     /*!
@@ -352,7 +352,7 @@ public:
      *
      * @param molal   Input vector of molalities. Length: m_kk.
      */
-    void setMolalities(const double* const molal);
+    void setMolalities(const CanteraDouble* const molal);
 
     //! Set the molalities of a phase
     /*!
@@ -386,8 +386,8 @@ public:
      */
     int activityConvention() const override;
 
-    void getActivityConcentrations(double* c) const override;
-    double standardConcentration(size_t k=0) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
 
     //! Get the array of non-dimensional activities (molality based for this
     //! class and classes that derive from it) at the current solution
@@ -405,7 +405,7 @@ public:
      *
      * @param ac     Output vector of molality-based activities. Length: m_kk.
      */
-    void getActivities(double* ac) const override;
+    void getActivities(CanteraDouble* ac) const override;
 
     //! Get the array of non-dimensional activity coefficients at
     //! the current solution temperature, pressure, and solution concentration.
@@ -436,7 +436,7 @@ public:
      * @param ac  Output vector containing the mole-fraction based activity
      *            coefficients. length: m_kk.
      */
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
     //! Get the array of non-dimensional molality based activity coefficients at
     //! the current solution temperature, pressure, and solution concentration.
@@ -467,7 +467,7 @@ public:
      * @param acMolality Output vector containing the molality based activity
      *                   coefficients. length: m_kk.
      */
-    virtual void getMolalityActivityCoefficients(double* acMolality) const;
+    virtual void getMolalityActivityCoefficients(CanteraDouble* acMolality) const;
 
     //! Calculate the osmotic coefficient
     /*!
@@ -482,7 +482,7 @@ public:
      *
      *  units = dimensionless
      */
-    virtual double osmoticCoefficient() const;
+    virtual CanteraDouble osmoticCoefficient() const;
 
     //! @}
 
@@ -507,7 +507,7 @@ public:
      * @param molalities  Input vector of molalities of the solutes.
      *                    Length: m_kk.
      */
-    void setState_TPM(double t, double p, const double* const molalities);
+    void setState_TPM(CanteraDouble t, CanteraDouble p, const CanteraDouble* const molalities);
 
     //! Set the temperature (K), pressure (Pa), and molalities.
     /*!
@@ -515,7 +515,7 @@ public:
      * @param p           Pressure (Pa)
      * @param m           Composition containing the molalities
      */
-    void setState_TPM(double t, double p, const Composition& m);
+    void setState_TPM(CanteraDouble t, CanteraDouble p, const Composition& m);
 
     //! Set the temperature (K), pressure (Pa), and molalities.
     /*!
@@ -524,7 +524,7 @@ public:
      * @param m           String which gets translated into a composition
      *                    map for the molalities of the solutes.
      */
-    void setState_TPM(double t, double p, const string& m);
+    void setState_TPM(CanteraDouble t, CanteraDouble p, const string& m);
 
     //! @copydoc ThermoPhase::setState
     /*!
@@ -532,15 +532,15 @@ public:
      */
     void setState(const AnyMap& state) override;
 
-    void getdlnActCoeffdlnN(const size_t ld, double* const dlnActCoeffdlnN) override {
+    void getdlnActCoeffdlnN(const size_t ld, CanteraDouble* const dlnActCoeffdlnN) override {
         getdlnActCoeffdlnN_numderiv(ld, dlnActCoeffdlnN);
     }
 
-    string report(bool show_thermo=true, double threshold=1e-14) const override;
+    string report(bool show_thermo=true, CanteraDouble threshold=1e-14) const override;
 
 protected:
     void getCsvReportData(vector<string>& names,
-                          vector<vector<double>>& data) const override;
+                          vector<vector<CanteraDouble>>& data) const override;
 
     //! Get the array of unscaled non-dimensional molality based activity
     //! coefficients at the current solution temperature, pressure, and solution
@@ -554,7 +554,7 @@ protected:
      * @param acMolality Output vector containing the molality based activity
      *                   coefficients. length: m_kk.
      */
-    virtual void getUnscaledMolalityActivityCoefficients(double* acMolality) const;
+    virtual void getUnscaledMolalityActivityCoefficients(CanteraDouble* acMolality) const;
 
     //! Apply the current phScale to a set of activity Coefficients or
     //! activities
@@ -564,7 +564,7 @@ protected:
      * @param acMolality input/Output vector containing the molality based
      *                   activity coefficients. length: m_kk.
      */
-    virtual void applyphScale(double* acMolality) const;
+    virtual void applyphScale(CanteraDouble* acMolality) const;
 
 private:
     //! Returns the index of the Cl- species.
@@ -598,7 +598,7 @@ protected:
     size_t m_indexCLM = npos;
 
     //! Molecular weight of the Solvent
-    double m_weightSolvent = 18.01528;
+    CanteraDouble m_weightSolvent = 18.01528;
 
     /**
      * In any molality implementation, it makes sense to have a minimum solvent
@@ -607,16 +607,16 @@ protected:
      * the molality definition to ensure that molal_solvent = 0 when
      * xmol_solvent = 0.
      */
-    double m_xmolSolventMIN = 0.01;
+    CanteraDouble m_xmolSolventMIN = 0.01;
 
     //! This is the multiplication factor that goes inside log expressions
     //! involving the molalities of species. It's equal to Wt_0 / 1000, where
     //! Wt_0 = weight of solvent (kg/kmol)
-    double m_Mnaught = 18.01528E-3;
+    CanteraDouble m_Mnaught = 18.01528E-3;
 
     //! Current value of the molalities of the species in the phase. Note this
     //! vector is a mutable quantity. units are (kg/kmol)
-    mutable vector<double> m_molalities;
+    mutable vector<CanteraDouble> m_molalities;
 };
 
 }

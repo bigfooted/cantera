@@ -34,18 +34,18 @@ public:
     //! Type definition for the iterator class that is can be used by Array2D
     //! types.
     /*!
-     * This is just equal to vector<double>::iterator.
+     * This is just equal to vector<CanteraDouble>::iterator.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    typedef vector<double>::iterator iterator;
+    typedef vector<CanteraDouble>::iterator iterator;
 
     //! Type definition for the const_iterator class that is can be used by
     //! Array2D types.
     /*!
-     * This is just equal to vector<double>::const_iterator.
+     * This is just equal to vector<CanteraDouble>::const_iterator.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    typedef vector<double>::const_iterator const_iterator;
+    typedef vector<CanteraDouble>::const_iterator const_iterator;
 
     /**
      * Default constructor. Create an empty array.
@@ -60,7 +60,7 @@ public:
      * @param n   Number of columns
      * @param v   Default fill value. The default is 0.0
      */
-    Array2D(const size_t m, const size_t n, const double v=0.0);
+    Array2D(const size_t m, const size_t n, const CanteraDouble v=0.0);
 
     //! Constructor.
     /*!
@@ -72,7 +72,7 @@ public:
      * @param values Initial values of the array. Must be of length m*n, and
      *     stored in column-major order.
      */
-    Array2D(const size_t m, const size_t n, const double* values);
+    Array2D(const size_t m, const size_t n, const CanteraDouble* values);
 
     Array2D(const Array2D& y);
 
@@ -86,7 +86,7 @@ public:
      * @param m  This is the number of columns in the new matrix
      * @param v  Default fill value -> defaults to zero.
      */
-    virtual void resize(size_t n, size_t m, double v=0.0);
+    virtual void resize(size_t n, size_t m, CanteraDouble v=0.0);
 
     //! Append a column to the existing matrix using a std vector
     /*!
@@ -95,7 +95,7 @@ public:
      * @param c  This vector is the entries in the column to be added. It must
      *           have a length equal to m_nrows or greater.
      */
-    void appendColumn(const vector<double>& c);
+    void appendColumn(const vector<CanteraDouble>& c);
 
     //! Append a column to the existing matrix
     /*!
@@ -104,14 +104,14 @@ public:
      * @param c  This vector of doubles is the entries in the column to be
      *           added. It must have a length equal to m_nrows or greater.
      */
-    void appendColumn(const double* const c);
+    void appendColumn(const CanteraDouble* const c);
 
     //! Set the nth row to array rw
     /*!
      * @param  n   Index of the row to be changed
      * @param  rw  Vector for the row. Must have a length of m_ncols.
      */
-    void setRow(size_t n, const double* const rw);
+    void setRow(size_t n, const CanteraDouble* const rw);
 
     //! Get the nth row and return it in a vector
     /*!
@@ -119,7 +119,7 @@ public:
      * @param rw   Return Vector for the operation. Must have a length of
      *             m_ncols.
      */
-    void getRow(size_t n, double* const rw);
+    void getRow(size_t n, CanteraDouble* const rw);
 
     //! Set the values in column m to those in array col
     /*!
@@ -128,7 +128,7 @@ public:
      * @param m   Column to set
      * @param col pointer to a col vector. Vector must have a length of m_nrows.
      */
-    void setColumn(size_t m, double* const col);
+    void setColumn(size_t m, CanteraDouble* const col);
 
     //! Get the values in column m
     /*!
@@ -137,7 +137,7 @@ public:
      * @param m    Column to set
      * @param col  pointer to a col vector that will be returned
      */
-    void getColumn(size_t m, double* const col);
+    void getColumn(size_t m, CanteraDouble* const col);
 
     //! Set all of the entries to zero
     void zero() {
@@ -150,7 +150,7 @@ public:
      *  @param  j            column index.
      *  @returns a reference to A(i,j) which may be assigned.
      */
-    double& operator()(size_t i, size_t j) {
+    CanteraDouble& operator()(size_t i, size_t j) {
         return value(i,j);
     }
 
@@ -160,7 +160,7 @@ public:
      * @param j   Index for the column to be retrieved.
      * @returns the value of the matrix entry
      */
-    double operator()(size_t i, size_t j) const {
+    CanteraDouble operator()(size_t i, size_t j) const {
         return value(i,j);
     }
 
@@ -173,7 +173,7 @@ public:
      * @param j   The column index
      * @returns a changeable reference to the matrix entry
      */
-    double& value(size_t i, size_t j) {
+    CanteraDouble& value(size_t i, size_t j) {
         return m_data[m_nrows*j + i];
     }
 
@@ -184,7 +184,7 @@ public:
      * @param i   The row index
      * @param j   The column index
      */
-    double value(size_t i, size_t j) const {
+    CanteraDouble value(size_t i, size_t j) const {
         return m_data[m_nrows*j + i];
     }
 
@@ -215,16 +215,16 @@ public:
     const_iterator end() const;
 
     //! Return a reference to the data vector
-    vector<double>& data() {
+    vector<CanteraDouble>& data() {
         return m_data;
     }
 
     //! Return a const reference to the data vector
-    const vector<double>& data() const {
+    const vector<CanteraDouble>& data() const {
         return m_data;
     }
 
-    void operator*=(double a);
+    void operator*=(CanteraDouble a);
 
     //! Return a pointer to the top of column j, columns are contiguous
     //! in memory
@@ -232,7 +232,7 @@ public:
      * @param j   Value of the column
      * @returns a pointer to the top of the column
      */
-    double* ptrColumn(size_t j) {
+    CanteraDouble* ptrColumn(size_t j) {
         return &m_data[m_nrows*j];
     }
 
@@ -242,13 +242,13 @@ public:
      * @param j   Value of the column
      * @returns a const pointer to the top of the column
      */
-    const double* ptrColumn(size_t j) const {
+    const CanteraDouble* ptrColumn(size_t j) const {
         return &m_data[m_nrows*j];
     }
 
 protected:
     //! Data stored in a single array
-    vector<double> m_data;
+    vector<CanteraDouble> m_data;
 
     //! Number of rows
     size_t m_nrows = 0;
@@ -276,7 +276,7 @@ std::ostream& operator<<(std::ostream& s, const Array2D& m);
  * @param m   Matrix
  * @param a   scalar
  */
-void operator*=(Array2D& m, double a);
+void operator*=(Array2D& m, CanteraDouble a);
 
 }
 

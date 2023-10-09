@@ -36,7 +36,7 @@ bool ReactionDataDelegator::update(const ThermoPhase& phase, const Kinetics& kin
             m_wrappedSolution = ExtensionManager::wrapSolution(wrapperType, soln);
         }
     }
-    double needsUpdate = m_update(m_wrappedSolution->get());
+    CanteraDouble needsUpdate = m_update(m_wrappedSolution->get());
     return needsUpdate != 0.0;
 }
 

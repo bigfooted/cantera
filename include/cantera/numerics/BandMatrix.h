@@ -52,7 +52,7 @@ public:
      * @param ku  band size on the upper portion of the matrix
      * @param v   initial value of all matrix components.
      */
-    BandMatrix(size_t n, size_t kl, size_t ku, double v = 0.0);
+    BandMatrix(size_t n, size_t kl, size_t ku, CanteraDouble v = 0.0);
 
     BandMatrix(const BandMatrix& y);
     BandMatrix& operator=(const BandMatrix& y);
@@ -66,16 +66,16 @@ public:
      * @param ku  band size on the upper portion of the matrix
      * @param v   initial value of all matrix components.
      */
-    void resize(size_t n, size_t kl, size_t ku, double v = 0.0);
+    void resize(size_t n, size_t kl, size_t ku, CanteraDouble v = 0.0);
 
     //! Fill or zero the matrix
     /*!
      *  @param v  Fill value, defaults to zero.
      */
-    void bfill(double v = 0.0);
+    void bfill(CanteraDouble v = 0.0);
 
-    double& operator()(size_t i, size_t j) override;
-    double operator()(size_t i, size_t j) const override;
+    CanteraDouble& operator()(size_t i, size_t j) override;
+    CanteraDouble operator()(size_t i, size_t j) const override;
 
     //! Return a changeable reference to element (i,j).
     /*!
@@ -86,7 +86,7 @@ public:
      * @param j  column
      * @returns a reference to the value of the matrix entry
      */
-    double& value(size_t i, size_t j);
+    CanteraDouble& value(size_t i, size_t j);
 
     //! Return the value of element (i,j).
     /*!
@@ -95,7 +95,7 @@ public:
      * @param j  column
      * @returns the value of the matrix entry
      */
-    double value(size_t i, size_t j) const;
+    CanteraDouble value(size_t i, size_t j) const;
 
     //! Returns the location in the internal 1D array corresponding to the (i,j)
     //! element in the banded array
@@ -115,7 +115,7 @@ public:
      * @param j  column
      * @returns the value of the matrix entry
      */
-    double _value(size_t i, size_t j) const;
+    CanteraDouble _value(size_t i, size_t j) const;
 
     size_t nRows() const override;
 
@@ -132,8 +132,8 @@ public:
     size_t ldim() const;
 
     //! Multiply A*b and write result to @c prod.
-    void mult(const double* b, double* prod) const override;
-    void leftMult(const double* const b, double* const prod) const override;
+    void mult(const CanteraDouble* b, CanteraDouble* prod) const override;
+    void leftMult(const CanteraDouble* const b, CanteraDouble* const prod) const override;
 
     //! Perform an LU decomposition, the LAPACK routine DGBTRF is used.
     /*!
@@ -151,7 +151,7 @@ public:
      * @return a success flag. 0 indicates a success; ~0 indicates some error
      *     occurred, see the LAPACK documentation
      */
-    int solve(const double* const b, double* const x);
+    int solve(const CanteraDouble* const b, CanteraDouble* const x);
 
     //! Solve the matrix problem Ax = b
     /*!
@@ -162,35 +162,35 @@ public:
      * @returns a success flag. 0 indicates a success; ~0 indicates some error
      *     occurred, see the LAPACK documentation
      */
-    int solve(double* b, size_t nrhs=1, size_t ldb=0) override;
+    int solve(CanteraDouble* b, size_t nrhs=1, size_t ldb=0) override;
 
     //! Returns an iterator for the start of the band storage data
     /*!
      * Iterator points to the beginning of the data, and it is changeable.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    vector<double>::iterator begin() override;
+    vector<CanteraDouble>::iterator begin() override;
 
     //! Returns an iterator for the end of the band storage data
     /*!
      * Iterator points to the end of the data, and it is changeable.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    vector<double>::iterator end();
+    vector<CanteraDouble>::iterator end();
 
     //! Returns a const iterator for the start of the band storage data
     /*!
      * Iterator points to the beginning of the data, and it is not changeable.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    vector<double>::const_iterator begin() const override;
+    vector<CanteraDouble>::const_iterator begin() const override;
 
     //! Returns a const iterator for the end of the band storage data
     /*!
      * Iterator points to the end of the data, and it is not changeable.
      * @deprecated Unused. To be removed after %Cantera 3.0.
      */
-    vector<double>::const_iterator end() const;
+    vector<CanteraDouble>::const_iterator end() const;
 
     void zero() override;
 
@@ -201,14 +201,14 @@ public:
      * @param a1norm Norm of the matrix
      * @returns the inverse of the condition number
      */
-    double rcond(double a1norm) override;
+    CanteraDouble rcond(CanteraDouble a1norm) override;
 
     //! Returns the factor algorithm used.  This method will always return 0
     //! (LU) for band matrices.
     int factorAlgorithm() const override;
 
     //! Returns the one norm of the matrix
-    double oneNorm() const override;
+    CanteraDouble oneNorm() const override;
 
     //! Return a pointer to the top of column j
     /*!
@@ -226,13 +226,13 @@ public:
      *
      * So to address the (i,j) position, you use the following indexing:
      *
-     *     double *colP_j = matrix.ptrColumn(j);
-     *     double a_i_j = colP_j[kl + ku + i - j];
+     *     CanteraDouble *colP_j = matrix.ptrColumn(j);
+     *     CanteraDouble a_i_j = colP_j[kl + ku + i - j];
      *
      *  @param j   Value of the column
      *  @returns a pointer to the top of the column
      */
-    double* ptrColumn(size_t j) override;
+    CanteraDouble* ptrColumn(size_t j) override;
 
     //! Return a vector of const pointers to the columns
     /*!
@@ -241,7 +241,7 @@ public:
      *
      * @returns a vector of pointers to the top of the columns of the matrices.
      */
-    double* const* colPts() override;
+    CanteraDouble* const* colPts() override;
 
     //! Check to see if we have any zero rows in the Jacobian
     /*!
@@ -251,7 +251,7 @@ public:
      * @param valueSmall  OUTPUT value of the largest coefficient in the smallest row
      * @return index of the row that is most nearly zero
      */
-    size_t checkRows(double& valueSmall) const override;
+    size_t checkRows(CanteraDouble& valueSmall) const override;
 
     //! Check to see if we have any zero columns in the Jacobian
     /*!
@@ -261,17 +261,17 @@ public:
      * @param valueSmall  OUTPUT value of the largest coefficient in the smallest column
      * @return index of the column that is most nearly zero
      */
-    size_t checkColumns(double& valueSmall) const override;
+    size_t checkColumns(CanteraDouble& valueSmall) const override;
 
     //! LAPACK "info" flag after last factor/solve operation
     int info() const { return m_info; };
 
 protected:
     //! Matrix data
-    vector<double> data;
+    vector<CanteraDouble> data;
 
     //! Factorized data
-    vector<double> ludata;
+    vector<CanteraDouble> ludata;
 
     //! Number of rows and columns of the matrix
     size_t m_n = 0;
@@ -283,7 +283,7 @@ protected:
     size_t m_ku = 0;
 
     //! value of zero
-    double m_zero = 0;
+    CanteraDouble m_zero = 0;
 
     struct PivData; // pImpl wrapper class
 
@@ -291,14 +291,14 @@ protected:
     unique_ptr<PivData> m_ipiv;
 
     //! Vector of column pointers
-    vector<double*> m_colPtrs;
-    vector<double*> m_lu_col_ptrs;
+    vector<CanteraDouble*> m_colPtrs;
+    vector<CanteraDouble*> m_lu_col_ptrs;
 
     //! Extra work array needed - size = n
     vector<int> iwork_;
 
     //! Extra dp work array needed - size = 3n
-    vector<double> work_;
+    vector<CanteraDouble> work_;
 
     int m_info = 0;
 };

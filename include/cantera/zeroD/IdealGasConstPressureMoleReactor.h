@@ -32,25 +32,25 @@ public:
 
     void setThermoMgr(ThermoPhase& thermo) override;
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
-    void eval(double t, double* LHS, double* RHS) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     //! Calculate an approximate Jacobian to accelerate preconditioned solvers
 
     //! Neglects derivatives with respect to mole fractions that would generate a
     //! fully-dense Jacobian. Currently also neglects terms related to interactions
     //! between reactors, for example via inlets and outlets.
-    Eigen::SparseMatrix<double> jacobian() override;
+    Eigen::SparseMatrix<CanteraDouble> jacobian() override;
 
     bool preconditionerSupported() const override { return true; };
 
 protected:
-    vector<double> m_hk; //!< Species molar enthalpies
+    vector<CanteraDouble> m_hk; //!< Species molar enthalpies
 };
 
 }

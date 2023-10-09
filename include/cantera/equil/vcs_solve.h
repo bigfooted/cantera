@@ -156,8 +156,8 @@ public:
      * - `m_phaseParticipation(iphase,irxn)`: This is 1 if the phase, iphase,
      *   participates in the formation reaction, irxn, and zero otherwise.
      */
-    int vcs_basopt(const bool doJustComponents, double aw[], double sa[], double sm[],
-                   double ss[], double test, bool* const usedZeroedSpecies);
+    int vcs_basopt(const bool doJustComponents, CanteraDouble aw[], CanteraDouble sa[], CanteraDouble sm[],
+                   CanteraDouble ss[], CanteraDouble test, bool* const usedZeroedSpecies);
 
     //!  Choose a species to test for the next component
     /*!
@@ -170,7 +170,7 @@ public:
      *     of molNum[].
      * @param n       Length of molNum[]
      */
-    size_t vcs_basisOptMax(const double* const molNum, const size_t j, const size_t n);
+    size_t vcs_basisOptMax(const CanteraDouble* const molNum, const size_t j, const size_t n);
 
     //! Evaluate the species category for the indicated species
     /*!
@@ -381,7 +381,7 @@ public:
      * Also updates the variable m_totalMolNum and Reconciles Phase existence
      * flags with total moles in each phase.
      */
-    double vcs_tmoles();
+    CanteraDouble vcs_tmoles();
 
     void check_tmoles() const;
 
@@ -438,7 +438,7 @@ public:
     /*!
      * @param iph Phase id of the deleted phase
      */
-    double vcs_phaseStabilityTest(const size_t iph);
+    CanteraDouble vcs_phaseStabilityTest(const size_t iph);
 
     //! Solve an equilibrium problem at a particular fixed temperature
     //! and pressure
@@ -465,7 +465,7 @@ public:
      * * -1 = Maximum number of iterations is exceeded. Convergence was not
      *   found.
      */
-    int vcs_TP(int ipr, int ip1, int maxit, double T, double pres);
+    int vcs_TP(int ipr, int ip1, int maxit, CanteraDouble T, CanteraDouble pres);
 
     /**
      * Evaluate the standard state free energies at the current temperature
@@ -477,7 +477,7 @@ public:
      * @param  Temp  Temperature (Kelvin)
      * @param  pres  Pressure (Pascal)
      */
-    int vcs_evalSS_TP(int ipr, int ip1, double Temp, double pres);
+    int vcs_evalSS_TP(int ipr, int ip1, CanteraDouble Temp, CanteraDouble pres);
 
     //! Initialize the chemical potential of single species phases
     /*!
@@ -501,8 +501,8 @@ public:
      *                      partial molar volumes units of M**3 / kmol.
      * @returns the total volume of the entire system in units of m**3.
      */
-    double vcs_VolTotal(const double tkelvin, const double pres,
-                        const double w[], double volPM[]);
+    CanteraDouble vcs_VolTotal(const CanteraDouble tkelvin, const CanteraDouble pres,
+                        const CanteraDouble w[], CanteraDouble volPM[]);
 
     //! This routine is mostly concerned with changing the private data to be
     //! consistent with what's needed for solution. It is called one time for
@@ -570,8 +570,8 @@ public:
      *  @param sm   QR matrix work space (ne*ne in length)
      *  @param ss   Gram-Schmidt orthog work space (ne in length)
      */
-    int vcs_elem_rearrange(double* const aw, double* const sa,
-                           double* const sm, double* const ss);
+    int vcs_elem_rearrange(CanteraDouble* const aw, CanteraDouble* const sa,
+                           CanteraDouble* const sm, CanteraDouble* const ss);
 
     //! Swaps the indices for all of the global data for two elements, ipos
     //! and jpos.
@@ -593,14 +593,14 @@ public:
      * We allow the diagonal to be decreased to 1/3 of the ideal solution
      * value, but no more -> it must remain positive.
      */
-    double vcs_Hessian_diag_adj(size_t irxn, double hessianDiag_Ideal);
+    CanteraDouble vcs_Hessian_diag_adj(size_t irxn, CanteraDouble hessianDiag_Ideal);
 
     //! Calculates the diagonal contribution to the Hessian due to
     //! the dependence of the activity coefficients on the mole numbers.
     /*!
      * (See framemaker notes, Eqn. 20 - VCS Equations document)
      */
-    double vcs_Hessian_actCoeff_diag(size_t irxn);
+    CanteraDouble vcs_Hessian_actCoeff_diag(size_t irxn);
 
     //! Recalculate all of the activity coefficients in all of the phases
     //! based on input mole numbers
@@ -609,7 +609,7 @@ public:
      *
      * NOTE: This routine needs to be regulated.
      */
-    void vcs_CalcLnActCoeffJac(const double* const moleSpeciesVCS);
+    void vcs_CalcLnActCoeffJac(const CanteraDouble* const moleSpeciesVCS);
 
     //! Print out a report on the state of the equilibrium problem to
     //! standard output.
@@ -657,7 +657,7 @@ public:
      * numbers of species are taken from the current value in
      * m_molNumSpecies_old[].
      */
-    void vcs_elabPhase(size_t iphase, double* const elemAbundPhase);
+    void vcs_elabPhase(size_t iphase, CanteraDouble* const elemAbundPhase);
 
     /**
      * This subroutine corrects for element abundances. At the end of the
@@ -691,7 +691,7 @@ public:
      *
      *  Still need to check out when we do loops over nc vs. ne.
      */
-    int vcs_elcorr(double aa[], double x[]);
+    int vcs_elcorr(CanteraDouble aa[], CanteraDouble x[]);
 
     //! Create an initial estimate of the solution to the thermodynamic
     //! equilibrium problem.
@@ -721,7 +721,7 @@ public:
      * zero. Note, for this algorithm this function should be monotonically
      * decreasing.
      */
-    double vcs_Total_Gibbs(double* w, double* fe, double* tPhMoles);
+    CanteraDouble vcs_Total_Gibbs(CanteraDouble* w, CanteraDouble* fe, CanteraDouble* tPhMoles);
 
     //! Calculate the total dimensionless Gibbs free energy of a single phase
     /*!
@@ -733,8 +733,8 @@ public:
      * @param fe       vector of partial molar free energies of all of the
      *                 species
      */
-    double vcs_GibbsPhase(size_t iphase, const double* const w,
-                          const double* const fe);
+    CanteraDouble vcs_GibbsPhase(size_t iphase, const CanteraDouble* const w,
+                          const CanteraDouble* const fe);
 
     //! Transfer the results of the equilibrium calculation back from VCS_SOLVE
     void vcs_prob_update();
@@ -801,7 +801,7 @@ private:
      *     1: succeeded without change of dx
      *     0: Had to adjust dx, perhaps to zero, in order to do the delta.
      */
-    int delta_species(const size_t kspec, double* const delta_ptr);
+    int delta_species(const size_t kspec, CanteraDouble* const delta_ptr);
 
     //! Provide an estimate for the deleted species in phases that are not
     //! zeroed out
@@ -868,7 +868,7 @@ private:
      *                         from the current set of active species.
      * @param[out] ANOTE  Buffer used for debug annotations
      */
-    double vcs_minor_alt_calc(size_t kspec, size_t irxn, bool* do_delete,
+    CanteraDouble vcs_minor_alt_calc(size_t kspec, size_t irxn, bool* do_delete,
                               char* ANOTE=0) const;
 
     //! This routine optimizes the minimization of the total Gibbs free energy
@@ -899,9 +899,9 @@ private:
      *
      * @param dg Vector of local delta G's.
      */
-    double l2normdg(double dg[]) const;
+    CanteraDouble l2normdg(CanteraDouble dg[]) const;
 
-    void checkDelta1(double* const ds, double* const delTPhMoles, size_t kspec);
+    void checkDelta1(CanteraDouble* const ds, CanteraDouble* const delTPhMoles, size_t kspec);
 
     //! Estimate equilibrium compositions
     /*!
@@ -915,8 +915,8 @@ private:
      * @param ss   ss[j] = Gram-Schmidt orthog work space (ne in length)
      * @param test This is a small negative number.
      */
-    void vcs_inest(double* const aw, double* const sa, double* const sm,
-                   double* const ss, double test);
+    void vcs_inest(CanteraDouble* const aw, CanteraDouble* const sa, CanteraDouble* const sm,
+                   CanteraDouble* const ss, CanteraDouble test);
 
     //! Calculate the status of single species phases.
     void vcs_SSPhase();
@@ -974,11 +974,11 @@ private:
                                    int& rangeErrorFound);
 
     // data used by vcs_solve_TP and it's helper functions
-    vector<double> m_sm;
-    vector<double> m_ss;
-    vector<double> m_sa;
-    vector<double> m_aw;
-    vector<double> m_wx;
+    vector<CanteraDouble> m_sm;
+    vector<CanteraDouble> m_ss;
+    vector<CanteraDouble> m_sa;
+    vector<CanteraDouble> m_aw;
+    vector<CanteraDouble> m_wx;
 
 public:
     //! Print level for print routines
@@ -1102,14 +1102,14 @@ public:
      *                handled by the alt_min treatment or should be handled as a
      *                major species.
      */
-    vector<double> m_scSize;
+    vector<CanteraDouble> m_scSize;
 
     //! total size of the species
     /*!
      *  This is used as a multiplier to the mole number in figuring out which
      *  species should be components.
      */
-    vector<double> m_spSize;
+    vector<CanteraDouble> m_spSize;
 
     //! Standard state chemical potentials for species K at the current
     //! temperature and pressure.
@@ -1117,14 +1117,14 @@ public:
      *  The first NC entries are for components. The following NR entries are
      *  for the current non-component species in the mechanism.
      */
-    vector<double> m_SSfeSpecies;
+    vector<CanteraDouble> m_SSfeSpecies;
 
     //! Free energy vector from the start of the current iteration
     /*!
      *  The free energies are saved at the start of the current iteration.
      *  Length = number of species
      */
-    vector<double> m_feSpecies_old;
+    vector<CanteraDouble> m_feSpecies_old;
 
     //! Dimensionless new free energy for all the species in the mechanism
     //! at the new tentative T, P, and mole numbers.
@@ -1133,7 +1133,7 @@ public:
      *   NR entries are for the current non-component species in the mechanism.
      *  Length = number of species
      */
-    vector<double> m_feSpecies_new;
+    vector<CanteraDouble> m_feSpecies_new;
 
     //! Setting for whether to do an initial estimate
     /*!
@@ -1150,7 +1150,7 @@ public:
      *  Total number of moles of the kth species.
      *  Length = Total number of species = m
      */
-    vector<double> m_molNumSpecies_old;
+    vector<CanteraDouble> m_molNumSpecies_old;
 
     //! Specifies the species unknown type
     /*!
@@ -1177,11 +1177,11 @@ public:
     Array2D m_phaseParticipation;
 
     //! electric potential of the iph phase
-    vector<double> m_phasePhi;
+    vector<CanteraDouble> m_phasePhi;
 
     //! Tentative value of the mole number vector. It's also used to store the
     //! mole fraction vector.
-    vector<double> m_molNumSpecies_new;
+    vector<CanteraDouble> m_molNumSpecies_new;
 
     //! Delta G(irxn) for the noncomponent species in the mechanism.
     /*!
@@ -1191,27 +1191,27 @@ public:
      * mechanism. It starts with the first current noncomponent species in the
      * mechanism.
      */
-    vector<double> m_deltaGRxn_new;
+    vector<CanteraDouble> m_deltaGRxn_new;
 
     //!  Last deltag[irxn] from the previous step
-    vector<double> m_deltaGRxn_old;
+    vector<CanteraDouble> m_deltaGRxn_old;
 
     //! Last deltag[irxn] from the previous step with additions for
     //! possible births of zeroed phases.
-    vector<double> m_deltaGRxn_Deficient;
+    vector<CanteraDouble> m_deltaGRxn_Deficient;
 
     //! Temporary vector of Rxn DeltaG's
     /*!
      *  This is used from time to time, for printing purposes
      */
-    vector<double> m_deltaGRxn_tmp;
+    vector<CanteraDouble> m_deltaGRxn_tmp;
 
     //! Reaction Adjustments for each species during the current step
     /*!
      *  delta Moles for each species during the current step.
      *  Length = number of species
      */
-    vector<double> m_deltaMolNumSpecies;
+    vector<CanteraDouble> m_deltaMolNumSpecies;
 
     //! Element abundances vector
     /*!
@@ -1220,7 +1220,7 @@ public:
      *  constraint conditions are added to this vector. This is input from the
      *  input file and is considered a constant from thereon. units = kmoles
      */
-    vector<double> m_elemAbundances;
+    vector<CanteraDouble> m_elemAbundances;
 
     //! Element abundances vector Goals
     /*!
@@ -1229,14 +1229,14 @@ public:
      * added to this vector. This is input from the input file and is considered
      * a constant from thereon. units = kmoles
      */
-    vector<double> m_elemAbundancesGoal;
+    vector<CanteraDouble> m_elemAbundancesGoal;
 
     //! Total number of kmoles in all phases
     /*!
      * This number includes the inerts.
      *            -> Don't use this except for scaling purposes
      */
-    double m_totalMolNum = 0.0;
+    CanteraDouble m_totalMolNum = 0.0;
 
     //! Total kmols of species in each phase
     /*!
@@ -1244,7 +1244,7 @@ public:
      *
      * Length = number of phases
      */
-    vector<double> m_tPhaseMoles_old;
+    vector<CanteraDouble> m_tPhaseMoles_old;
 
     //! total kmols of species in each phase in the tentative soln vector
     /*!
@@ -1253,44 +1253,44 @@ public:
      *
      * Length = number of phases
      */
-    vector<double> m_tPhaseMoles_new;
+    vector<CanteraDouble> m_tPhaseMoles_new;
 
     //! Temporary vector of length NPhase
-    mutable vector<double> m_TmpPhase;
+    mutable vector<CanteraDouble> m_TmpPhase;
 
     //! Temporary vector of length NPhase
-    mutable vector<double> m_TmpPhase2;
+    mutable vector<CanteraDouble> m_TmpPhase2;
 
     //! Change in the total moles in each phase
     /*!
      *  Length number of phases.
      */
-    vector<double> m_deltaPhaseMoles;
+    vector<CanteraDouble> m_deltaPhaseMoles;
 
     //! Temperature (Kelvin)
-    double m_temperature;
+    CanteraDouble m_temperature;
 
     //! Pressure
-    double m_pressurePA;
+    CanteraDouble m_pressurePA;
 
     //! Total kmoles of inert to add to each phase
     /*!
      * TPhInertMoles[iph] = Total kmoles of inert to add to each phase
      * length = number of phases
      */
-    vector<double> TPhInertMoles;
+    vector<CanteraDouble> TPhInertMoles;
 
     //! Tolerance requirement for major species
-    double m_tolmaj= 1e-8;
+    CanteraDouble m_tolmaj= 1e-8;
 
     //! Tolerance requirements for minor species
-    double m_tolmin = 1e-6;
+    CanteraDouble m_tolmin = 1e-6;
 
     //! Below this, major species aren't refined any more
-    double m_tolmaj2 = 1e-10;
+    CanteraDouble m_tolmaj2 = 1e-10;
 
     //! Below this, minor species aren't refined any more
-    double m_tolmin2 = 1e-8;
+    CanteraDouble m_tolmin2 = 1e-8;
 
     //! Index vector that keeps track of the species vector rearrangement
     /*!
@@ -1417,18 +1417,18 @@ public:
      * For molar based activity conventions this will be equal to 0.0.
      * length = number of species.
      */
-    vector<double> m_lnMnaughtSpecies;
+    vector<CanteraDouble> m_lnMnaughtSpecies;
 
     //! Molar-based Activity Coefficients for Species.
     //! Length = number of species
-    vector<double> m_actCoeffSpecies_new;
+    vector<CanteraDouble> m_actCoeffSpecies_new;
 
     //! Molar-based Activity Coefficients for Species based on old mole numbers
     /*!
      * These activity coefficients are based on the m_molNumSpecies_old
      * values Molar based activity coefficients. Length = number of species
      */
-    vector<double> m_actCoeffSpecies_old;
+    vector<CanteraDouble> m_actCoeffSpecies_old;
 
     //! Change in the log of the activity coefficient with respect to the mole
     //! number multiplied by the phase mole number
@@ -1446,10 +1446,10 @@ public:
      *
      * note: this is a candidate for removal. I don't think we use it.
      */
-    vector<double> m_wtSpecies;
+    vector<CanteraDouble> m_wtSpecies;
 
     //! Charge of each species. Length = number of species.
-    vector<double> m_chargeSpecies;
+    vector<CanteraDouble> m_chargeSpecies;
 
     vector<vector<size_t>> phasePopProblemLists_;
 
@@ -1469,17 +1469,17 @@ public:
     int m_useActCoeffJac = 0;
 
     //! Total volume of all phases. Units are m^3
-    double m_totalVol;
+    CanteraDouble m_totalVol;
 
     //! Partial molar volumes of the species
     /*!
      *  units = mks (m^3/kmol)
      *  Length = number of species
      */
-    vector<double> m_PMVolumeSpecies;
+    vector<CanteraDouble> m_PMVolumeSpecies;
 
     //! dimensionless value of Faraday's constant, F / RT  (1/volt)
-    double m_Faraday_dim;
+    CanteraDouble m_Faraday_dim;
 
     //! Timing and iteration counters for the vcs object
     VCS_COUNTERS* m_VCount = nullptr;

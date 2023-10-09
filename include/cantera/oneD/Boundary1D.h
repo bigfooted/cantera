@@ -54,12 +54,12 @@ public:
     }
 
     //! Set the temperature.
-    virtual void setTemperature(double t) {
+    virtual void setTemperature(CanteraDouble t) {
         m_temp = t;
     }
 
     //! Temperature [K].
-    virtual double temperature() {
+    virtual CanteraDouble temperature() {
         return m_temp;
     }
 
@@ -73,38 +73,38 @@ public:
     }
 
     //! Set the mole fractions by specifying an array.
-    virtual void setMoleFractions(const double* xin) {
+    virtual void setMoleFractions(const CanteraDouble* xin) {
         throw NotImplementedError("Boundary1D::setMoleFractions");
     }
 
     //! Mass fraction of species k.
-    virtual double massFraction(size_t k) {
+    virtual CanteraDouble massFraction(size_t k) {
         throw NotImplementedError("Boundary1D::massFraction");
     }
 
     //! Set the total mass flow rate.
-    virtual void setMdot(double mdot) {
+    virtual void setMdot(CanteraDouble mdot) {
         m_mdot = mdot;
     }
 
     //! Set tangential velocity gradient [1/s] at this boundary.
-    virtual void setSpreadRate(double V0) {
+    virtual void setSpreadRate(CanteraDouble V0) {
         throw NotImplementedError("Boundary1D::setSpreadRate");
     }
 
     //! Tangential velocity gradient [1/s] at this boundary.
-    virtual double spreadRate() {
+    virtual CanteraDouble spreadRate() {
         throw NotImplementedError("Boundary1D::spreadRate");
     }
 
     //! The total mass flow rate [kg/m2/s].
-    virtual double mdot() {
+    virtual CanteraDouble mdot() {
         return m_mdot;
     }
 
-    void setupGrid(size_t n, const double* z) override {}
+    void setupGrid(size_t n, const CanteraDouble* z) override {}
 
-    void fromArray(SolutionArray& arr, double* soln) override;
+    void fromArray(SolutionArray& arr, CanteraDouble* soln) override;
 
 protected:
     void _init(size_t n);
@@ -125,8 +125,8 @@ protected:
     size_t m_start_right = 0;
     ThermoPhase* m_phase_left = nullptr;
     ThermoPhase* m_phase_right = nullptr;
-    double m_temp = 0.0;
-    double m_mdot = 0.0;
+    CanteraDouble m_temp = 0.0;
+    CanteraDouble m_mdot = 0.0;
 };
 
 
@@ -146,33 +146,33 @@ public:
         return "inlet";
     }
 
-    void setSpreadRate(double V0) override;
+    void setSpreadRate(CanteraDouble V0) override;
 
-    double spreadRate() override {
+    CanteraDouble spreadRate() override {
         return m_V0;
     }
 
-    void show(const double* x) override;
+    void show(const CanteraDouble* x) override;
 
     size_t nSpecies() override {
         return m_nsp;
     }
 
     void setMoleFractions(const string& xin) override;
-    void setMoleFractions(const double* xin) override;
-    double massFraction(size_t k) override {
+    void setMoleFractions(const CanteraDouble* xin) override;
+    CanteraDouble massFraction(size_t k) override {
         return m_yin[k];
     }
     void init() override;
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
-    void fromArray(SolutionArray& arr, double* soln) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
+    void fromArray(SolutionArray& arr, CanteraDouble* soln) override;
 
 protected:
     int m_ilr;
-    double m_V0 = 0.0;
+    CanteraDouble m_V0 = 0.0;
     size_t m_nsp = 0;
-    vector<double> m_yin;
+    vector<CanteraDouble> m_yin;
     string m_xstr;
     StFlow* m_flow = nullptr;
 };
@@ -196,13 +196,13 @@ public:
         return "empty";
     }
 
-    void show(const double* x) override {}
+    void show(const CanteraDouble* x) override {}
 
     void init() override;
 
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
 
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
 };
 
 /**
@@ -227,9 +227,9 @@ public:
 
     void init() override;
 
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
 
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
 };
 
 
@@ -255,9 +255,9 @@ public:
 
     void init() override;
 
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
 
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
 };
 
 
@@ -276,26 +276,26 @@ public:
         return "outlet-reservoir";
     }
 
-    void show(const double* x) override {}
+    void show(const CanteraDouble* x) override {}
 
     size_t nSpecies() override {
         return m_nsp;
     }
 
     void setMoleFractions(const string& xin) override;
-    void setMoleFractions(const double* xin) override;
-    double massFraction(size_t k) override {
+    void setMoleFractions(const CanteraDouble* xin) override;
+    CanteraDouble massFraction(size_t k) override {
         return m_yres[k];
     }
 
     void init() override;
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
-    void fromArray(SolutionArray& arr, double* soln) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
+    void fromArray(SolutionArray& arr, CanteraDouble* soln) override;
 
 protected:
     size_t m_nsp = 0;
-    vector<double> m_yres;
+    vector<CanteraDouble> m_yres;
     string m_xstr;
     StFlow* m_flow = nullptr;
 };
@@ -323,14 +323,14 @@ public:
 
     void init() override;
 
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
 
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
-    void fromArray(SolutionArray& arr, double* soln) override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
+    void fromArray(SolutionArray& arr, CanteraDouble* soln) override;
 
-    void show(std::ostream& s, const double* x) override;
+    void show(std::ostream& s, const CanteraDouble* x) override;
 
-    void show(const double* x) override;
+    void show(const CanteraDouble* x) override;
 };
 
 /**
@@ -362,22 +362,22 @@ public:
     string componentName(size_t n) const override;
 
     void init() override;
-    void resetBadValues(double* xg) override;
+    void resetBadValues(CanteraDouble* xg) override;
 
-    void eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt) override;
+    void eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt) override;
 
-    shared_ptr<SolutionArray> asArray(const double* soln) const override;
-    void fromArray(SolutionArray& arr, double* soln) override;
+    shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const override;
+    void fromArray(SolutionArray& arr, CanteraDouble* soln) override;
 
-    void _getInitialSoln(double* x) override {
+    void _getInitialSoln(CanteraDouble* x) override {
         m_sphase->getCoverages(x);
     }
 
-    void _finalize(const double* x) override {
+    void _finalize(const CanteraDouble* x) override {
         std::copy(x, x+m_nsp, m_fixed_cov.begin());
     }
 
-    void show(const double* x) override;
+    void show(const CanteraDouble* x) override;
 
 protected:
     InterfaceKinetics* m_kin = nullptr;
@@ -385,8 +385,8 @@ protected:
     size_t m_surfindex = 0;
     size_t m_nsp = 0;
     bool m_enabled = false;
-    vector<double> m_work;
-    vector<double> m_fixed_cov;
+    vector<CanteraDouble> m_work;
+    vector<CanteraDouble> m_fixed_cov;
 };
 
 //! @} End of bdryGroup

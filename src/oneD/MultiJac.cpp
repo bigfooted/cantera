@@ -20,20 +20,20 @@ MultiJac::MultiJac(OneDim& r)
     m_mask.resize(m_size);
 }
 
-void MultiJac::updateTransient(double rdt, integer* mask)
+void MultiJac::updateTransient(CanteraDouble rdt, integer* mask)
 {
     for (size_t n = 0; n < m_size; n++) {
         value(n,n) = m_ssdiag[n] - mask[n]*rdt;
     }
 }
 
-void MultiJac::incrementDiagonal(int j, double d)
+void MultiJac::incrementDiagonal(int j, CanteraDouble d)
 {
     m_ssdiag[j] += d;
     value(j,j) = m_ssdiag[j];
 }
 
-void MultiJac::eval(double* x0, double* resid0, double rdt)
+void MultiJac::eval(CanteraDouble* x0, CanteraDouble* resid0, CanteraDouble rdt)
 {
     m_nevals++;
     clock_t t0 = clock();
@@ -44,8 +44,8 @@ void MultiJac::eval(double* x0, double* resid0, double rdt)
         size_t nv = m_resid->nVars(j);
         for (size_t n = 0; n < nv; n++) {
             // perturb x(n); preserve sign(x(n))
-            double xsave = x0[ipt];
-            double dx;
+            CanteraDouble xsave = x0[ipt];
+            CanteraDouble dx;
             if (xsave >= 0) {
                 dx = xsave*m_rtol + m_atol;
             } else {
@@ -53,7 +53,7 @@ void MultiJac::eval(double* x0, double* resid0, double rdt)
             }
             x0[ipt] = xsave + dx;
             dx = x0[ipt] - xsave;
-            double rdx = 1.0/dx;
+            CanteraDouble rdx = 1.0/dx;
 
             // calculate perturbed residual
             m_resid->eval(j, x0, m_r1.data(), rdt, 0);
@@ -77,7 +77,7 @@ void MultiJac::eval(double* x0, double* resid0, double rdt)
         m_ssdiag[n] = value(n,n);
     }
 
-    m_elapsed += double(clock() - t0)/CLOCKS_PER_SEC;
+    m_elapsed += CanteraDouble(clock() - t0)/CLOCKS_PER_SEC;
     m_age = 0;
 }
 

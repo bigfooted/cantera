@@ -227,7 +227,7 @@ public:
     /**
      * The viscosity in Pa-s.
      */
-    virtual double viscosity() {
+    virtual CanteraDouble viscosity() {
         throw NotImplementedError("Transport::viscosity",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -238,7 +238,7 @@ public:
      *
      * @param visc   Vector of viscosities
      */
-    virtual void getSpeciesViscosities(double* const visc) {
+    virtual void getSpeciesViscosities(CanteraDouble* const visc) {
         throw NotImplementedError("Transport::getSpeciesViscosities",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -249,14 +249,14 @@ public:
      * managers either overload this method to return zero, or do not implement
      * it, in which case an exception is thrown if called.
      */
-    virtual double bulkViscosity() {
+    virtual CanteraDouble bulkViscosity() {
         throw NotImplementedError("Transport::bulkViscosity",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! The ionic conductivity in 1/ohm/m.
     //! @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
-    virtual double ionConductivity() {
+    virtual CanteraDouble ionConductivity() {
         throw NotImplementedError("Transport::ionConductivity",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -269,7 +269,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
-    virtual void getSpeciesIonConductivity(double* const ionCond) {
+    virtual void getSpeciesIonConductivity(CanteraDouble* const ionCond) {
         throw NotImplementedError("Transport::getSpeciesIonConductivity",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -291,7 +291,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
-    virtual void mobilityRatio(double* mobRat) {
+    virtual void mobilityRatio(CanteraDouble* mobRat) {
         throw NotImplementedError("Transport::mobilityRatio",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -304,7 +304,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
-    virtual void getSpeciesMobilityRatio(double** mobRat) {
+    virtual void getSpeciesMobilityRatio(CanteraDouble** mobRat) {
         throw NotImplementedError("Transport::getSpeciesMobilityRatio",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -315,13 +315,13 @@ public:
      *
      * @returns thermal conductivity in W/m/K.
      */
-    virtual double thermalConductivity() {
+    virtual CanteraDouble thermalConductivity() {
         throw NotImplementedError("Transport::thermalConductivity",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! The electrical conductivity (Siemens/m).
-    virtual double electricalConductivity() {
+    virtual CanteraDouble electricalConductivity() {
         throw NotImplementedError("Transport::electricalConductivity",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -342,7 +342,7 @@ public:
      *               mobil_e. The array must be dimensioned at least as large as
      *               the number of species.
      */
-    virtual void getMobilities(double* const mobil_e) {
+    virtual void getMobilities(CanteraDouble* const mobil_e) {
         throw NotImplementedError("Transport::getMobilities",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -366,7 +366,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
-    virtual void getFluidMobilities(double* const mobil_f) {
+    virtual void getFluidMobilities(CanteraDouble* const mobil_f) {
         throw NotImplementedError("Transport::getFluidMobilities",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -392,7 +392,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0. Replaced by electricalConductivity()
      */
-    virtual double getElectricConduct() {
+    virtual CanteraDouble getElectricConduct() {
         throw NotImplementedError("Transport::getElectricConduct",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -413,12 +413,12 @@ public:
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
     virtual void getElectricCurrent(int ndim,
-                                    const double* grad_T,
+                                    const CanteraDouble* grad_T,
                                     int ldx,
-                                    const double* grad_X,
+                                    const CanteraDouble* grad_X,
                                     int ldf,
-                                    const double* grad_V,
-                                    double* current) {
+                                    const CanteraDouble* grad_V,
+                                    CanteraDouble* current) {
         throw NotImplementedError("Transport::getElectricCurrent",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -442,9 +442,9 @@ public:
      * @param fluxes     Output of the diffusive mass fluxes. Flat vector with
      *                   the m_nsp in the inner loop. length = ldx * ndim
      */
-    virtual void getSpeciesFluxes(size_t ndim, const double* const grad_T,
-                                  size_t ldx, const double* const grad_X,
-                                  size_t ldf, double* const fluxes) {
+    virtual void getSpeciesFluxes(size_t ndim, const CanteraDouble* const grad_T,
+                                  size_t ldx, const CanteraDouble* const grad_X,
+                                  size_t ldf, CanteraDouble* const fluxes) {
         throw NotImplementedError("Transport::getSpeciesFluxes",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -470,12 +470,12 @@ public:
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
     virtual void getSpeciesFluxesES(size_t ndim,
-                                    const double* grad_T,
+                                    const CanteraDouble* grad_T,
                                     size_t ldx,
-                                    const double* grad_X,
+                                    const CanteraDouble* grad_X,
                                     size_t ldf,
-                                    const double* grad_Phi,
-                                    double* fluxes) {
+                                    const CanteraDouble* grad_Phi,
+                                    CanteraDouble* fluxes) {
         getSpeciesFluxes(ndim, grad_T, ldx, grad_X, ldf, fluxes);
     }
 
@@ -497,11 +497,11 @@ public:
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
     virtual void getSpeciesVdiff(size_t ndim,
-                                 const double* grad_T,
+                                 const CanteraDouble* grad_T,
                                  int ldx,
-                                 const double* grad_X,
+                                 const CanteraDouble* grad_X,
                                  int ldf,
-                                 double* Vdiff) {
+                                 CanteraDouble* Vdiff) {
         throw NotImplementedError("Transport::getSpeciesVdiff",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -527,12 +527,12 @@ public:
      * @deprecated To be removed after %Cantera 3.0. Not implemented by any model.
      */
     virtual void getSpeciesVdiffES(size_t ndim,
-                                   const double* grad_T,
+                                   const CanteraDouble* grad_T,
                                    int ldx,
-                                   const double* grad_X,
+                                   const CanteraDouble* grad_X,
                                    int ldf,
-                                   const double* grad_Phi,
-                                   double* Vdiff) {
+                                   const CanteraDouble* grad_Phi,
+                                   CanteraDouble* Vdiff) {
         getSpeciesVdiff(ndim, grad_T, ldx, grad_X, ldf, Vdiff);
     }
 
@@ -549,9 +549,9 @@ public:
      *               m_nsp in the inner loop. length = ldx * ndim. Units are
      *               [kmol/m^2/s].
      */
-    virtual void getMolarFluxes(const double* const state1,
-                                const double* const state2, const double delta,
-                                double* const cfluxes) {
+    virtual void getMolarFluxes(const CanteraDouble* const state1,
+                                const CanteraDouble* const state2, const CanteraDouble delta,
+                                CanteraDouble* const cfluxes) {
         throw NotImplementedError("Transport::getMolarFluxes",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -569,9 +569,9 @@ public:
      *               m_nsp in the inner loop. length = ldx * ndim. Units are
      *               [kg/m^2/s].
      */
-    virtual void getMassFluxes(const double* state1,
-                               const double* state2, double delta,
-                               double* mfluxes) {
+    virtual void getMassFluxes(const CanteraDouble* state1,
+                               const CanteraDouble* state2, CanteraDouble delta,
+                               CanteraDouble* mfluxes) {
         throw NotImplementedError("Transport::getMassFluxes",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -592,7 +592,7 @@ public:
      *           coefficients.  Dimension dt at least as large as the number of
      *           species. Units are kg/m/s.
      */
-    virtual void getThermalDiffCoeffs(double* const dt) {
+    virtual void getThermalDiffCoeffs(CanteraDouble* const dt) {
         throw NotImplementedError("Transport::getThermalDiffCoeffs",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -604,7 +604,7 @@ public:
      * @param[out] d   Diffusion coefficient matrix (must be at least m_k * m_k
      *                 in length.
      */
-    virtual void getBinaryDiffCoeffs(const size_t ld, double* const d) {
+    virtual void getBinaryDiffCoeffs(const size_t ld, CanteraDouble* const d) {
         throw NotImplementedError("Transport::getBinaryDiffCoeffs",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -621,7 +621,7 @@ public:
      *            coefficient for species i due to concentration gradients in
      *            species j). Units: m^2/s
      */
-    virtual void getMultiDiffCoeffs(const size_t ld, double* const d) {
+    virtual void getMultiDiffCoeffs(const size_t ld, CanteraDouble* const d) {
         throw NotImplementedError("Transport::getMultiDiffCoeffs",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -636,73 +636,73 @@ public:
      * @param d  Return vector of mixture averaged diffusion coefficients
      *           Units = m2/s. Length = n_sp
      */
-    virtual void getMixDiffCoeffs(double* const d) {
+    virtual void getMixDiffCoeffs(CanteraDouble* const d) {
         throw NotImplementedError("Transport::getMixDiffCoeffs",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Returns a vector of mixture averaged diffusion coefficients
-    virtual void getMixDiffCoeffsMole(double* const d) {
+    virtual void getMixDiffCoeffsMole(CanteraDouble* const d) {
         throw NotImplementedError("Transport::getMixDiffCoeffsMole",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Returns a vector of mixture averaged diffusion coefficients
-    virtual void getMixDiffCoeffsMass(double* const d) {
+    virtual void getMixDiffCoeffsMass(CanteraDouble* const d) {
         throw NotImplementedError("Transport::getMixDiffCoeffsMass",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Return the polynomial fits to the viscosity of species i
-    virtual void getViscosityPolynomial(size_t i, double* coeffs) const{
+    virtual void getViscosityPolynomial(size_t i, CanteraDouble* coeffs) const{
         throw NotImplementedError("Transport::getViscosityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Return the temperature fits of the heat conductivity of species i
-    virtual void getConductivityPolynomial(size_t i, double* coeffs) const{
+    virtual void getConductivityPolynomial(size_t i, CanteraDouble* coeffs) const{
         throw NotImplementedError("Transport::getConductivityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Return the polynomial fits to the binary diffusivity of species pair (i, j)
-    virtual void getBinDiffusivityPolynomial(size_t i, size_t j, double* coeffs) const{
+    virtual void getBinDiffusivityPolynomial(size_t i, size_t j, CanteraDouble* coeffs) const{
         throw NotImplementedError("Transport::getBinDiffusivityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Return the polynomial fits to the collision integral of species pair (i, j)
     virtual void getCollisionIntegralPolynomial(size_t i, size_t j,
-                                                double* astar_coeffs,
-                                                double* bstar_coeffs,
-                                                double* cstar_coeffs) const{
+                                                CanteraDouble* astar_coeffs,
+                                                CanteraDouble* bstar_coeffs,
+                                                CanteraDouble* cstar_coeffs) const{
         throw NotImplementedError("Transport::getCollisionIntegralPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Modify the polynomial fits to the viscosity of species i
-    virtual void setViscosityPolynomial(size_t i, double* coeffs){
+    virtual void setViscosityPolynomial(size_t i, CanteraDouble* coeffs){
         throw NotImplementedError("Transport::setViscosityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Modify the temperature fits of the heat conductivity of species i
-    virtual void setConductivityPolynomial(size_t i, double* coeffs){
+    virtual void setConductivityPolynomial(size_t i, CanteraDouble* coeffs){
         throw NotImplementedError("Transport::setConductivityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Modify the polynomial fits to the binary diffusivity of species pair (i, j)
-    virtual void setBinDiffusivityPolynomial(size_t i, size_t j, double* coeffs){
+    virtual void setBinDiffusivityPolynomial(size_t i, size_t j, CanteraDouble* coeffs){
         throw NotImplementedError("Transport::setBinDiffusivityPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
 
     //! Modify the polynomial fits to the collision integral of species pair (i, j)
     virtual void setCollisionIntegralPolynomial(size_t i, size_t j,
-                                                double* astar_coeffs,
-                                                double* bstar_coeffs,
-                                                double* cstar_coeffs, bool flag){
+                                                CanteraDouble* astar_coeffs,
+                                                CanteraDouble* bstar_coeffs,
+                                                CanteraDouble* cstar_coeffs, bool flag){
         throw NotImplementedError("Transport::setCollisionIntegralPolynomial",
             "Not implemented for transport model '{}'.", transportModel());
     }
@@ -723,7 +723,7 @@ public:
      *                 the parameterization
      * @deprecated To be removed after %Cantera 3.0.
      */
-    virtual void setParameters(const int type, const int k, const double* const p) {
+    virtual void setParameters(const int type, const int k, const CanteraDouble* const p) {
         throw NotImplementedError("Transport::setParameters",
             "Not implemented for transport model '{}'.", transportModel());
     }

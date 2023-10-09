@@ -57,7 +57,7 @@ public:
      * @param coeffs  Vector of coefficients used to set the parameters for the
      *                standard state, in the order [a0,a1,a2,a3,a4,a5,a6]
      */
-    NasaPoly1(double tlow, double thigh, double pref, const double* coeffs)
+    NasaPoly1(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs)
         : SpeciesThermoInterpType(tlow, thigh, pref)
         , m_coeff(coeffs, coeffs+7)
     {
@@ -65,7 +65,7 @@ public:
     }
 
     //! Set array of 7 polynomial coefficients
-    void setParameters(const vector<double>& coeffs) {
+    void setParameters(const vector<CanteraDouble>& coeffs) {
         if (coeffs.size() != 7) {
             throw CanteraError("NasaPoly1::setParameters", "Array must contain "
                 "7 coefficients, but {} were given.", coeffs.size());
@@ -80,7 +80,7 @@ public:
 
     size_t temperaturePolySize() const override { return 6; }
 
-    void updateTemperaturePoly(double T, double* T_poly) const override {
+    void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const override {
         T_poly[0] = T;
         T_poly[1] = T * T;
         T_poly[2] = T_poly[1] * T;
@@ -100,15 +100,15 @@ public:
      *  tt[4] = 1.0/t;
      *  tt[5] = std::log(t);
      */
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override {
-        double ct0 = m_coeff[0]; // a0
-        double ct1 = m_coeff[1]*tt[0]; // a1 * T
-        double ct2 = m_coeff[2]*tt[1]; // a2 * T^2
-        double ct3 = m_coeff[3]*tt[2]; // a3 * T^3
-        double ct4 = m_coeff[4]*tt[3]; // a4 * T^4
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override {
+        CanteraDouble ct0 = m_coeff[0]; // a0
+        CanteraDouble ct1 = m_coeff[1]*tt[0]; // a1 * T
+        CanteraDouble ct2 = m_coeff[2]*tt[1]; // a2 * T^2
+        CanteraDouble ct3 = m_coeff[3]*tt[2]; // a3 * T^3
+        CanteraDouble ct4 = m_coeff[4]*tt[3]; // a4 * T^4
 
-        double cp, h, s;
+        CanteraDouble cp, h, s;
         cp = ct0 + ct1 + ct2 + ct3 + ct4;
         h = ct0 + 0.5*ct1 + 1.0/3.0*ct2 + 0.25*ct3 + 0.2*ct4
             + m_coeff[5]*tt[4]; // last term is a5/T
@@ -121,15 +121,15 @@ public:
         *s_R = s;
     }
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override {
-        double tPoly[6];
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override {
+        CanteraDouble tPoly[6];
         updateTemperaturePoly(temp, tPoly);
         updateProperties(tPoly, cp_R, h_RT, s_R);
     }
 
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override {
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override {
         n = 0;
         type = NASA1;
         tlow = m_lowT;
@@ -141,32 +141,32 @@ public:
     void getParameters(AnyMap& thermo) const override {
         // NasaPoly1 is only used as an embedded model within NasaPoly2, so all
         // that needs to be added here are the polynomial coefficients
-        thermo["data"].asVector<vector<double>>().push_back(m_coeff);
+        thermo["data"].asVector<vector<CanteraDouble>>().push_back(m_coeff);
     }
 
-    double reportHf298(double* const h298=nullptr) const override {
-        double tt[6];
-        double temp = 298.15;
+    CanteraDouble reportHf298(CanteraDouble* const h298=nullptr) const override {
+        CanteraDouble tt[6];
+        CanteraDouble temp = 298.15;
         updateTemperaturePoly(temp, tt);
-        double ct0 = m_coeff[0]; // a0
-        double ct1 = m_coeff[1]*tt[0]; // a1 * T
-        double ct2 = m_coeff[2]*tt[1]; // a2 * T^2
-        double ct3 = m_coeff[3]*tt[2]; // a3 * T^3
-        double ct4 = m_coeff[4]*tt[3]; // a4 * T^4
+        CanteraDouble ct0 = m_coeff[0]; // a0
+        CanteraDouble ct1 = m_coeff[1]*tt[0]; // a1 * T
+        CanteraDouble ct2 = m_coeff[2]*tt[1]; // a2 * T^2
+        CanteraDouble ct3 = m_coeff[3]*tt[2]; // a3 * T^3
+        CanteraDouble ct4 = m_coeff[4]*tt[3]; // a4 * T^4
 
-        double h_RT = ct0 + 0.5*ct1 + 1.0/3.0*ct2 + 0.25*ct3 + 0.2*ct4
+        CanteraDouble h_RT = ct0 + 0.5*ct1 + 1.0/3.0*ct2 + 0.25*ct3 + 0.2*ct4
                       + m_coeff[5]*tt[4]; // last t
 
-        double h = h_RT * GasConstant * temp;
+        CanteraDouble h = h_RT * GasConstant * temp;
         if (h298) {
             *h298 = h;
         }
         return h;
     }
 
-    void modifyOneHf298(const size_t k, const double Hf298New) override {
-        double hcurr = reportHf298(0);
-        double delH = Hf298New - hcurr;
+    void modifyOneHf298(const size_t k, const CanteraDouble Hf298New) override {
+        CanteraDouble hcurr = reportHf298(0);
+        CanteraDouble delH = Hf298New - hcurr;
         m_coeff[5] += (delH) / GasConstant;
     }
 
@@ -176,9 +176,9 @@ public:
 
 protected:
     //! array of polynomial coefficients, stored in the order [a0, ..., a6]
-    vector<double> m_coeff;
+    vector<CanteraDouble> m_coeff;
 
-    double m_coeff5_orig;
+    CanteraDouble m_coeff5_orig;
 };
 
 }

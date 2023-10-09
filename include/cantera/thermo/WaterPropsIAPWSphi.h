@@ -43,35 +43,35 @@ public:
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double phi(double tau, double delta);
+    CanteraDouble phi(CanteraDouble tau, CanteraDouble delta);
 
     //! Calculate derivative of phi wrt delta
     /*!
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double phi_d(double tau, double delta);
+    CanteraDouble phi_d(CanteraDouble tau, CanteraDouble delta);
 
     //! 2nd derivative of phi wrt delta
     /*!
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double phi_dd(double tau, double delta);
+    CanteraDouble phi_dd(CanteraDouble tau, CanteraDouble delta);
 
     //! First derivative of phi wrt tau
     /*!
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double phi_t(double tau, double delta);
+    CanteraDouble phi_t(CanteraDouble tau, CanteraDouble delta);
 
     //! Second derivative of phi wrt tau
     /*!
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double phi_tt(double tau, double delta);
+    CanteraDouble phi_tt(CanteraDouble tau, CanteraDouble delta);
 
     //! Calculate the dimensionless pressure at tau and delta;
     /*!
@@ -82,7 +82,7 @@ public:
      *
      * note: this is done so much, we have a separate routine.
      */
-    double pressureM_rhoRT(double tau, double delta);
+    CanteraDouble pressureM_rhoRT(CanteraDouble tau, CanteraDouble delta);
 
     //! Dimensionless derivative of p wrt rho at constant T
     /*!
@@ -92,7 +92,7 @@ public:
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double dimdpdrho(double tau, double delta);
+    CanteraDouble dimdpdrho(CanteraDouble tau, CanteraDouble delta);
 
     //! Dimensionless derivative of p wrt T at constant rho
     /*!
@@ -102,7 +102,7 @@ public:
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    double dimdpdT(double tau, double delta);
+    CanteraDouble dimdpdT(CanteraDouble tau, CanteraDouble delta);
 
     /**
      * This function computes the reduced density, given the reduced pressure
@@ -116,25 +116,25 @@ public:
      *
      * @returns the dimensionless density.
      */
-    double dfind(double p_red, double tau, double deltaGuess);
+    CanteraDouble dfind(CanteraDouble p_red, CanteraDouble tau, CanteraDouble deltaGuess);
 
     //! Calculate the dimensionless Gibbs free energy
-    double gibbs_RT() const;
+    CanteraDouble gibbs_RT() const;
 
     //! Calculate the dimensionless enthalpy, h/RT
-    double enthalpy_RT() const;
+    CanteraDouble enthalpy_RT() const;
 
     //! Calculate the dimensionless entropy, s/R
-    double entropy_R() const;
+    CanteraDouble entropy_R() const;
 
     //! Calculate the dimensionless internal energy, u/RT
-    double intEnergy_RT() const;
+    CanteraDouble intEnergy_RT() const;
 
     //! Calculate the dimensionless constant volume heat capacity, Cv/R
-    double cv_R() const;
+    CanteraDouble cv_R() const;
 
     //! Calculate the dimensionless constant pressure heat capacity, Cv/R
-    double cp_R() const;
+    CanteraDouble cp_R() const;
 
     //! Calculates internal polynomials in tau and delta.
     /*!
@@ -144,55 +144,55 @@ public:
      * @param tau     Dimensionless temperature = T_c/T
      * @param delta   Dimensionless density =  delta = rho / Rho_c
      */
-    void tdpolycalc(double tau, double delta);
+    void tdpolycalc(CanteraDouble tau, CanteraDouble delta);
 
     /**
      * Calculate Equation 6.6 for phiR, the residual part of the
      * dimensionless Helmholtz free energy.
      */
-    double phiR() const;
+    CanteraDouble phiR() const;
 
 protected:
     //! Calculate Equation 6.5 for phi0, the ideal gas part of the
     //! dimensionless Helmholtz free energy.
-    double phi0() const;
+    CanteraDouble phi0() const;
     //! Calculate d_phiR_d(delta), the first derivative of phiR wrt delta
-    double phiR_d() const;
+    CanteraDouble phiR_d() const;
     //! Calculate d_phi0_d(delta), the first derivative of phi0 wrt delta
-    double phi0_d() const;
+    CanteraDouble phi0_d() const;
     //! Calculate d2_phiR_dd(delta), the second derivative of phiR wrt delta
-    double phiR_dd() const;
+    CanteraDouble phiR_dd() const;
     //! Calculate d2_phi0_dd(delta), the second derivative of phi0 wrt delta
-    double phi0_dd() const;
+    CanteraDouble phi0_dd() const;
     //! Calculate d_phi0/d(tau)
-    double phi0_t() const;
+    CanteraDouble phi0_t() const;
     //! Calculate Equation 6.6 for dphiRdtau, the derivative residual part of
     //! the dimensionless Helmholtz free energy wrt temperature
-    double phiR_t() const;
+    CanteraDouble phiR_t() const;
     //! Calculate Equation 6.6 for dphiRdtau, the second derivative residual
     //! part of the dimensionless Helmholtz free energy wrt temperature
-    double phiR_tt() const;
+    CanteraDouble phiR_tt() const;
     //! Calculate d2_phi0/dtau2
-    double phi0_tt() const;
+    CanteraDouble phi0_tt() const;
     //! Calculate the mixed derivative d2_phiR/(dtau ddelta)
-    double phiR_dt() const;
+    CanteraDouble phiR_dt() const;
     //! Calculate the mixed derivative d2_phi0/(dtau ddelta)
-    double phi0_dt() const;
+    CanteraDouble phi0_dt() const;
 
     //! Value of internally calculated polynomials of powers of TAU
-    double TAUp[52];
+    CanteraDouble TAUp[52];
 
     //! Value of internally calculated polynomials of powers of delta
-    double DELTAp[16];
+    CanteraDouble DELTAp[16];
 
     //! Last tau that was used to calculate polynomials
-    double TAUsave = -1.0;
+    CanteraDouble TAUsave = -1.0;
 
     //! sqrt of TAU
-    double TAUsqrt = -1.0;
+    CanteraDouble TAUsqrt = -1.0;
 
     //! Last delta that was used to calculate polynomials
-    double DELTAsave = -1.0;
+    CanteraDouble DELTAsave = -1.0;
 };
 
 } // namespace Cantera

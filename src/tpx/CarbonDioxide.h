@@ -21,15 +21,15 @@ public:
         m_formula="CO2";
     }
 
-    double MolWt() override;
-    double Tcrit() override;
-    double Pcrit() override;
-    double Vcrit() override;
-    double Tmin() override;
-    double Tmax() override;
+    CanteraDouble MolWt() override;
+    CanteraDouble Tcrit() override;
+    CanteraDouble Pcrit() override;
+    CanteraDouble Vcrit() override;
+    CanteraDouble Tmin() override;
+    CanteraDouble Tmax() override;
 
     //! Pressure. Equation P-3 in Reynolds. P(rho, T).
-    double Pp() override;
+    CanteraDouble Pp() override;
 
     /**
      * internal energy. See Reynolds eqn (15) section 2
@@ -37,17 +37,17 @@ public:
      *  u = (the integral from T to To of co(T)dT) +
      *         sum from i to N ([C(i) - T*Cprime(i)] + uo
      */
-    double up() override;
+    CanteraDouble up() override;
 
     //! entropy. See Reynolds eqn (16) section 2
-    double sp() override;
+    CanteraDouble sp() override;
 
     //! Pressure at Saturation. Equation S-2 in Reynolds.
-    double Psat() override;
+    CanteraDouble Psat() override;
 
 private:
     //! Liquid density. Equation D2 in Reynolds.
-    double ldens() override;
+    CanteraDouble ldens() override;
 
     /**
      * C returns a multiplier in each term of the sum in P-3, used in
@@ -57,16 +57,16 @@ private:
      * - j=1 is the third...
      * (this part does not include the multiplier rho^n)
      */
-    double C(int jm, double, double, double, double);
+    CanteraDouble C(int jm, CanteraDouble, CanteraDouble, CanteraDouble, CanteraDouble);
 
     //! Derivative of C(i)
-    double Cprime(int i, double, double, double);
+    CanteraDouble Cprime(int i, CanteraDouble, CanteraDouble, CanteraDouble);
 
     /**
      * I = integral from o-rho { 1/(rho^2) * H(i, rho) d rho }
      * ( see section 2 of Reynolds TPSI )
      */
-    double I(int i, double, double);
+    CanteraDouble I(int i, CanteraDouble, CanteraDouble);
 
     /**
      * H returns a multiplier in each term of the sum in P-3. This is used in
@@ -75,7 +75,7 @@ private:
      * - i=0 is the second additive in the formula in reynolds
      * - i=1 is the third ...
      */
-    double H(int i, double egrho);
+    CanteraDouble H(int i, CanteraDouble egrho);
 };
 
 }

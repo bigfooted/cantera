@@ -10,7 +10,7 @@ using namespace Cantera;
 
 namespace tpx
 {
-static const double M = 28.01348,
+static const CanteraDouble M = 28.01348,
                     Tmn = 63.15,
                     Tmx = 2000.0,
                     Tc = 126.200,
@@ -23,7 +23,7 @@ static const double M = 28.01348,
                     u0 = 150877.551,
                     s0 = 214.9352518;
 
-static const double Ann[] = {
+static const CanteraDouble Ann[] = {
     1.75889959256970e-1,  1.38197604384933e1,  -3.14918412133921e2,
     4.40300150239380e3,  -5.45358971644916e5, 4.84413320182919e-4,
     -5.18964416491365e-2,  6.57265859197103e-4 ,8.51299771713314e4 ,
@@ -38,25 +38,25 @@ static const double Ann[] = {
     9.06544823455730e-22
 };
 
-static const double Fnn[]= {
+static const CanteraDouble Fnn[]= {
     8.3944094440e3, -1.8785191705e3, -7.2822291650,
     1.0228509660e-2, 5.5560638250e-4,
     -5.9445446620e-6, 2.7154339320e-8,
     -4.8795359040e-11, 5.0953608240e2
 };
 
-static const double Dnn[] = {
+static const CanteraDouble Dnn[] = {
     3.1402991e2, 4.4111015e2, 9.4622994e2 ,
     -2.9067111e3, 4.4785979e3, -2.2746914e3
 };
 
-static const double Gnn[] = {
+static const CanteraDouble Gnn[] = {
     -2.18203473713518e5, 1.01573580096247e4, -1.65504721657240e2,
     7.43175999190430e2, -5.14605623546025e-3,
     5.18347156760489e-6, -1.05922170493616e-9, 2.98389393363817e2
 };
 
-double nitrogen::C(int i, double rt, double rt2)
+CanteraDouble nitrogen::C(int i, CanteraDouble rt, CanteraDouble rt2)
 {
     switch (i) {
     case 0:
@@ -93,7 +93,7 @@ double nitrogen::C(int i, double rt, double rt2)
     }
 }
 
-double nitrogen::Cprime(int i, double rt, double rt2, double rt3)
+CanteraDouble nitrogen::Cprime(int i, CanteraDouble rt, CanteraDouble rt2, CanteraDouble rt3)
 {
     switch (i) {
     case 0:
@@ -129,30 +129,30 @@ double nitrogen::Cprime(int i, double rt, double rt2, double rt3)
     }
 }
 
-double nitrogen::W(int n, double egrho)
+CanteraDouble nitrogen::W(int n, CanteraDouble egrho)
 {
     return (n == 0 ? (1.0 - egrho)/(2.0*Gamma) :
             (n*W(n-1, egrho) - 0.5*pow(Rho,2*n)*egrho)/Gamma);
 }
 
-double nitrogen::H(int i, double egrho)
+CanteraDouble nitrogen::H(int i, CanteraDouble egrho)
 {
     return (i < 8 ? pow(Rho,i+2) : pow(Rho,2*i-13)*egrho);
 }
 
-double nitrogen::I(int i, double egrho)
+CanteraDouble nitrogen::I(int i, CanteraDouble egrho)
 {
-    return (i < 8 ? pow(Rho,i+1)/double(i+1) : W(i-8, egrho));
+    return (i < 8 ? pow(Rho,i+1)/CanteraDouble(i+1) : W(i-8, egrho));
 }
 
-double nitrogen::up()
+CanteraDouble nitrogen::up()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (int i=0; i<14; i++) {
         sum += (C(i,rt,rt2) - T*Cprime(i,rt,rt2,rt3))*I(i,egrho);
     }
@@ -164,14 +164,14 @@ double nitrogen::up()
     return sum;
 }
 
-double nitrogen::sp()
+CanteraDouble nitrogen::sp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     sum = s0 + m_entropy_offset - R*log(Rho);
     for (int i=0; i<14; i++) {
         sum -= Cprime(i,rt,rt2,rt3)*I(i,egrho);
@@ -183,22 +183,22 @@ double nitrogen::sp()
     return sum;
 }
 
-double nitrogen::Pp()
+CanteraDouble nitrogen::Pp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<14; i++) {
         P += C(i,rt,rt2)*H(i,egrho);
     }
     return P;
 }
 
-double nitrogen::Psat()
+CanteraDouble nitrogen::Psat()
 {
-    double lnp;
+    CanteraDouble lnp;
     int i;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("nitrogen::Psat",
@@ -215,40 +215,40 @@ double nitrogen::Psat()
     return exp(lnp);
 }
 
-double nitrogen::ldens()
+CanteraDouble nitrogen::ldens()
 {
-    double xx=1-T/Tc, sum=0;
+    CanteraDouble xx=1-T/Tc, sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("nitrogen::ldens",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=0; i<=5; i++) {
-        sum+=Dnn[i]*pow(xx,double(i)/3.0);
+        sum+=Dnn[i]*pow(xx,CanteraDouble(i)/3.0);
     }
     return sum;
 }
 
-double nitrogen::Tcrit()
+CanteraDouble nitrogen::Tcrit()
 {
     return Tc;
 }
-double nitrogen::Pcrit()
+CanteraDouble nitrogen::Pcrit()
 {
     return Pc;
 }
-double nitrogen::Vcrit()
+CanteraDouble nitrogen::Vcrit()
 {
     return 1.0/Roc;
 }
-double nitrogen::Tmin()
+CanteraDouble nitrogen::Tmin()
 {
     return Tmn;
 }
-double nitrogen::Tmax()
+CanteraDouble nitrogen::Tmax()
 {
     return Tmx;
 }
-double nitrogen::MolWt()
+CanteraDouble nitrogen::MolWt()
 {
     return M;
 }

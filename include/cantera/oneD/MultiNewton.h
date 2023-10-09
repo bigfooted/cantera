@@ -34,14 +34,14 @@ public:
 
     //! Compute the undamped Newton step.  The residual function is evaluated
     //! at `x`, but the Jacobian is not recomputed.
-    void step(double* x, double* step, OneDim& r, MultiJac& jac, int loglevel);
+    void step(CanteraDouble* x, CanteraDouble* step, OneDim& r, MultiJac& jac, int loglevel);
 
     /**
      * Return the factor by which the undamped Newton step 'step0'
      * must be multiplied in order to keep all solution components in
      * all domains between their specified lower and upper bounds.
      */
-    double boundStep(const double* x0, const double* step0,
+    CanteraDouble boundStep(const CanteraDouble* x0, const CanteraDouble* step0,
                      const OneDim& r, int loglevel);
 
     /**
@@ -51,18 +51,18 @@ public:
      * successful, the new solution after taking the damped step is returned in
      * x1, and the undamped step at x1 is returned in step1.
      */
-    int dampStep(const double* x0, const double* step0, double* x1, double* step1,
-                 double& s1, OneDim& r, MultiJac& jac, int loglevel, bool writetitle);
+    int dampStep(const CanteraDouble* x0, const CanteraDouble* step0, CanteraDouble* x1, CanteraDouble* step1,
+                 CanteraDouble& s1, OneDim& r, MultiJac& jac, int loglevel, bool writetitle);
 
     //! Compute the weighted 2-norm of `step`.
-    double norm2(const double* x, const double* step, OneDim& r) const;
+    CanteraDouble norm2(const CanteraDouble* x, const CanteraDouble* step, OneDim& r) const;
 
     /**
      * Find the solution to F(X) = 0 by damped Newton iteration. On entry, x0
      * contains an initial estimate of the solution. On successful return, x1
      * contains the converged solution.
      */
-    int solve(double* x0, double* x1, OneDim& r, MultiJac& jac, int loglevel);
+    int solve(CanteraDouble* x0, CanteraDouble* x1, OneDim& r, MultiJac& jac, int loglevel);
 
     //! Set options.
     void setOptions(int maxJacAge = 5) {
@@ -74,14 +74,14 @@ public:
 
 protected:
     //! Work arrays of size #m_n used in solve().
-    vector<double> m_x, m_stp, m_stp1;
+    vector<CanteraDouble> m_x, m_stp, m_stp1;
 
     int m_maxAge = 5;
 
     //! number of variables
     size_t m_n;
 
-    double m_elapsed = 0.0;
+    CanteraDouble m_elapsed = 0.0;
 };
 }
 

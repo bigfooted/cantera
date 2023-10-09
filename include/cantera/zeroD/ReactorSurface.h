@@ -26,10 +26,10 @@ public:
     ReactorSurface& operator=(const ReactorSurface&) = delete;
 
     //! Returns the surface area [m^2]
-    double area() const;
+    CanteraDouble area() const;
 
     //! Set the surface area [m^2]
-    void setArea(double a);
+    void setArea(CanteraDouble a);
 
     //! Accessor for the SurfPhase object
     SurfPhase* thermo() {
@@ -55,7 +55,7 @@ public:
 
     //! Set the surface coverages. Array `cov` has length equal to the number of
     //! surface species.
-    void setCoverages(const double* cov);
+    void setCoverages(const CanteraDouble* cov);
 
     //! Set the surface coverages by name
     void setCoverages(const Composition& cov);
@@ -65,7 +65,7 @@ public:
 
     //! Get the surface coverages. Array `cov` should have length equal to the
     //! number of surface species.
-    void getCoverages(double* cov) const;
+    void getCoverages(CanteraDouble* cov) const;
 
     //! Set the coverages and temperature in the surface phase object to the
     //! values for this surface. The temperature is set to match the bulk phase
@@ -79,7 +79,7 @@ public:
     //! Set reaction rate multipliers. `params` is the global vector of
     //! sensitivity parameters. This function is called within
     //! ReactorNet::eval() before the reaction rates are evaluated.
-    void setSensitivityParameters(const double* params);
+    void setSensitivityParameters(const CanteraDouble* params);
 
     //! Set reaction rate multipliers back to their initial values. This
     //! function is called within ReactorNet::eval() after all rates have been
@@ -87,12 +87,12 @@ public:
     void resetSensitivityParameters();
 
 protected:
-    double m_area = 1.0;
+    CanteraDouble m_area = 1.0;
 
     SurfPhase* m_thermo = nullptr;
     Kinetics* m_kinetics = nullptr;
     ReactorBase* m_reactor = nullptr;
-    vector<double> m_cov;
+    vector<CanteraDouble> m_cov;
     vector<SensitivityParameter> m_params;
 };
 

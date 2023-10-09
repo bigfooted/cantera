@@ -30,15 +30,15 @@ public:
     VCS_SPECIES_THERMO* SpeciesThermo = nullptr;
 
     //! Molecular Weight of the species (gm/mol)
-    double WtSpecies = 0.0;
+    CanteraDouble WtSpecies = 0.0;
 
     //! Column of the formula matrix, comprising the
     //! element composition of the species
-    vector<double> FormulaMatrixCol;
+    vector<CanteraDouble> FormulaMatrixCol;
 
     //! Charge state of the species -> This may be duplication of what's in the
     //! FormulaMatrixCol entries. However, it's prudent to separate it out.
-    double Charge = 0.0;
+    CanteraDouble Charge = 0.0;
 
     //! True if this species belongs to a surface phase
     int SurfaceSpecies = 0;
@@ -49,12 +49,12 @@ public:
      */
 
     //! Partial molar volume of the species
-    double VolPM = 0.0;
+    CanteraDouble VolPM = 0.0;
 
     //! Representative value of the mole fraction of this species in a phase.
     //! This value is used for convergence issues and for calculation of
     //! numerical derivatives
-    double ReferenceMoleFraction = 1e-6;
+    CanteraDouble ReferenceMoleFraction = 1e-6;
 
     vcs_SpeciesProperties(size_t indexPhase, size_t indexSpeciesPhase,
                           vcs_VolPhase* owning)

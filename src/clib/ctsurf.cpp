@@ -20,7 +20,7 @@ template<> ThermoCabinet* ThermoCabinet::s_storage; // defined in ct.cpp
 
 extern "C" {
 
-    int surf_setSiteDensity(int i, double s0)
+    int surf_setSiteDensity(int i, CanteraDouble s0)
     {
         try {
             ThermoCabinet::get<SurfPhase>(i).setSiteDensity(s0);
@@ -30,7 +30,7 @@ extern "C" {
         }
     }
 
-    double surf_siteDensity(int i)
+    CanteraDouble surf_siteDensity(int i)
     {
         try {
             return ThermoCabinet::get<SurfPhase>(i).siteDensity();
@@ -39,7 +39,7 @@ extern "C" {
         }
     }
 
-    int surf_setCoverages(int i, const double* c, int norm)
+    int surf_setCoverages(int i, const CanteraDouble* c, int norm)
     {
         try {
             if(norm){
@@ -63,7 +63,7 @@ extern "C" {
         }
     }
 
-    int surf_getCoverages(int i, double* c)
+    int surf_getCoverages(int i, CanteraDouble* c)
     {
         try {
             ThermoCabinet::get<SurfPhase>(i).getCoverages(c);
@@ -73,7 +73,7 @@ extern "C" {
         }
     }
 
-    int surf_setConcentrations(int i, const double* c)
+    int surf_setConcentrations(int i, const CanteraDouble* c)
     {
         try {
             ThermoCabinet::get<SurfPhase>(i).setConcentrations(c);
@@ -83,7 +83,7 @@ extern "C" {
         }
     }
 
-    int surf_getConcentrations(int i, double* c)
+    int surf_getConcentrations(int i, CanteraDouble* c)
     {
         try {
             ThermoCabinet::get<SurfPhase>(i).getConcentrations(c);

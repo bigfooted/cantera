@@ -39,7 +39,7 @@ public:
      * does nothing (that is, constant volume), but may be overloaded.
      * @deprecated To be removed after %Cantera 3.0; replaceable by expansionRate.
      */
-    virtual double vdot(double t) {
+    virtual CanteraDouble vdot(CanteraDouble t) {
         warn_deprecated("WallBase::vdot",
             "To be removed after Cantera 3.0; replaceable by 'expansionRate'.");
         return 0.0;
@@ -52,7 +52,7 @@ public:
      * does nothing (that is, constant volume), but may be overloaded.
      * @since New in %Cantera 3.0.
      */
-    virtual double expansionRate() {
+    virtual CanteraDouble expansionRate() {
         return 0.0;
     }
 
@@ -62,7 +62,7 @@ public:
      * does nothing (that is, an adiabatic wall), but may be overloaded.
      * @deprecated To be removed after %Cantera 3.0; replaceable by heatRate.
      */
-    virtual double Q(double t) {
+    virtual CanteraDouble Q(CanteraDouble t) {
         warn_deprecated("WallBase::Q",
             "To be removed after Cantera 3.0; replaceable by 'heatRate'.");
         return 0.0;
@@ -74,17 +74,17 @@ public:
      * does nothing (that is, an adiabatic wall), but may be overloaded.
      * @since New in %Cantera 3.0.
      */
-    virtual double heatRate() {
+    virtual CanteraDouble heatRate() {
         return 0.0;
     }
 
     //! Area in (m^2).
-    double area() {
+    CanteraDouble area() {
         return m_area;
     }
 
     //! Set the area [m^2].
-    virtual void setArea(double a);
+    virtual void setArea(CanteraDouble a);
 
     //! Install the wall between two reactors or reservoirs
     bool install(ReactorBase& leftReactor, ReactorBase& rightReactor);
@@ -111,7 +111,7 @@ public:
     /*!
      * @since New in %Cantera 3.0.
      */
-    void setSimTime(double time) {
+    void setSimTime(CanteraDouble time) {
         m_time = time;
     }
 
@@ -120,9 +120,9 @@ protected:
     ReactorBase* m_right = nullptr;
 
     //! current reactor network time
-    double m_time = 0.0;
+    CanteraDouble m_time = 0.0;
 
-    double m_area = 1.0;
+    CanteraDouble m_area = 1.0;
 };
 
 //! Represents a wall between between two ReactorBase objects.
@@ -144,7 +144,7 @@ public:
 
     //! Wall velocity @f$ v(t) @f$ at current reactor network time.
     //! @since New in %Cantera 3.0.
-    double velocity() const;
+    CanteraDouble velocity() const;
 
     //! Set the wall velocity to a specified function of time, @f$ v(t) @f$.
     void setVelocity(Func1* f=0) {
@@ -166,7 +166,7 @@ public:
      * @deprecated Still used by traditional MATLAB toolbox; replaceable by
      *      expansionRate.
      */
-    double vdot(double t) override;
+    CanteraDouble vdot(CanteraDouble t) override;
 
     //! Rate of volume change (m^3/s) for the adjacent reactors.
     /*!
@@ -180,11 +180,11 @@ public:
      * reactor on left, and decreases in the volume of the reactor on the right.
      * @since New in %Cantera 3.0.
      */
-    double expansionRate() override;
+    CanteraDouble expansionRate() override;
 
     //! Heat flux function @f$ q_0(t) @f$ evaluated at current reactor network time.
     //! @since New in %Cantera 3.0.
-    double heatFlux() const;
+    CanteraDouble heatFlux() const;
 
     //! Specify the heat flux function @f$ q_0(t) @f$.
     void setHeatFlux(Func1* q) {
@@ -202,7 +202,7 @@ public:
      * from left to right.
      * @deprecated Still used by traditional MATLAB toolbox; replaceable by heatRate.
      */
-    double Q(double t) override;
+    CanteraDouble Q(CanteraDouble t) override;
 
     //! Heat flow rate through the wall (W).
     /*!
@@ -215,24 +215,24 @@ public:
      * time. Positive values denote a flux from left to right.
      * @since New in %Cantera 3.0.
      */
-    double heatRate() override;
+    CanteraDouble heatRate() override;
 
-    void setThermalResistance(double Rth) {
+    void setThermalResistance(CanteraDouble Rth) {
         m_rrth = 1.0/Rth;
     }
 
     //! Set the overall heat transfer coefficient [W/m^2/K].
-    void setHeatTransferCoeff(double U) {
+    void setHeatTransferCoeff(CanteraDouble U) {
         m_rrth = U;
     }
 
     //! Get the overall heat transfer coefficient [W/m^2/K].
-    double getHeatTransferCoeff() const {
+    CanteraDouble getHeatTransferCoeff() const {
         return m_rrth;
     }
 
     //! Set the emissivity.
-    void setEmissivity(double epsilon) {
+    void setEmissivity(CanteraDouble epsilon) {
         if (epsilon > 1.0 || epsilon < 0.0) {
             throw CanteraError("WallBase::setEmissivity",
                                "emissivity must be between 0.0 and 1.0");
@@ -241,30 +241,30 @@ public:
     }
 
     //! Get the emissivity.
-    double getEmissivity() const {
+    CanteraDouble getEmissivity() const {
         return m_emiss;
     }
 
     //! Set the expansion rate coefficient.
-    void setExpansionRateCoeff(double k) {
+    void setExpansionRateCoeff(CanteraDouble k) {
         m_k = k;
     }
 
     //! Get the expansion rate coefficient
-    double getExpansionRateCoeff() const {
+    CanteraDouble getExpansionRateCoeff() const {
         return m_k;
     }
 
 protected:
 
     //! expansion rate coefficient
-    double m_k = 0.0;
+    CanteraDouble m_k = 0.0;
 
     //! heat transfer coefficient
-    double m_rrth = 0.0;
+    CanteraDouble m_rrth = 0.0;
 
     //! emissivity
-    double m_emiss = 0.0;
+    CanteraDouble m_emiss = 0.0;
 
     //! Velocity function
     Func1* m_vf = nullptr;

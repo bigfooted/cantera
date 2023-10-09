@@ -25,7 +25,7 @@ void PDSS_IonsFromNeutral::setParent(VPStandardStateTP* phase, size_t k)
     neutralMoleculePhase_ = dynamic_cast<IonsFromNeutralVPSSTP&>(*phase).getNeutralMoleculePhase();
 }
 
-void PDSS_IonsFromNeutral::setNeutralSpeciesMultiplier(const string& species, double mult)
+void PDSS_IonsFromNeutral::setNeutralSpeciesMultiplier(const string& species, CanteraDouble mult)
 {
     neutralSpeciesMultipliers_[species] = mult;
     numMult_++;
@@ -54,7 +54,7 @@ void PDSS_IonsFromNeutral::initThermo()
         setSpecialSpecies();
     }
     if (m_input.hasKey("multipliers")) {
-        for (const auto& [species, multiplier] : m_input["multipliers"].asMap<double>()) {
+        for (const auto& [species, multiplier] : m_input["multipliers"].asMap<CanteraDouble>()) {
             setNeutralSpeciesMultiplier(species, multiplier);
         }
     }
@@ -69,10 +69,10 @@ void PDSS_IonsFromNeutral::initThermo()
     }
 }
 
-double PDSS_IonsFromNeutral::enthalpy_RT() const
+CanteraDouble PDSS_IonsFromNeutral::enthalpy_RT() const
 {
     neutralMoleculePhase_->getEnthalpy_RT(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -80,15 +80,15 @@ double PDSS_IonsFromNeutral::enthalpy_RT() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::intEnergy_mole() const
+CanteraDouble PDSS_IonsFromNeutral::intEnergy_mole() const
 {
     return (m_h0_RT - 1.0) * GasConstant * m_temp;
 }
 
-double PDSS_IonsFromNeutral::entropy_R() const
+CanteraDouble PDSS_IonsFromNeutral::entropy_R() const
 {
     neutralMoleculePhase_->getEntropy_R(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -99,10 +99,10 @@ double PDSS_IonsFromNeutral::entropy_R() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::gibbs_RT() const
+CanteraDouble PDSS_IonsFromNeutral::gibbs_RT() const
 {
     neutralMoleculePhase_->getGibbs_RT(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -113,10 +113,10 @@ double PDSS_IonsFromNeutral::gibbs_RT() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::cp_R() const
+CanteraDouble PDSS_IonsFromNeutral::cp_R() const
 {
     neutralMoleculePhase_->getCp_R(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -124,10 +124,10 @@ double PDSS_IonsFromNeutral::cp_R() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::molarVolume() const
+CanteraDouble PDSS_IonsFromNeutral::molarVolume() const
 {
     neutralMoleculePhase_->getStandardVolumes(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -135,15 +135,15 @@ double PDSS_IonsFromNeutral::molarVolume() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::density() const
+CanteraDouble PDSS_IonsFromNeutral::density() const
 {
     return (m_pres * m_mw / (GasConstant * m_temp));
 }
 
-double PDSS_IonsFromNeutral::gibbs_RT_ref() const
+CanteraDouble PDSS_IonsFromNeutral::gibbs_RT_ref() const
 {
     neutralMoleculePhase_->getGibbs_RT_ref(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -154,10 +154,10 @@ double PDSS_IonsFromNeutral::gibbs_RT_ref() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::enthalpy_RT_ref() const
+CanteraDouble PDSS_IonsFromNeutral::enthalpy_RT_ref() const
 {
     neutralMoleculePhase_->getEnthalpy_RT_ref(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -165,10 +165,10 @@ double PDSS_IonsFromNeutral::enthalpy_RT_ref() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::entropy_R_ref() const
+CanteraDouble PDSS_IonsFromNeutral::entropy_R_ref() const
 {
     neutralMoleculePhase_->getEntropy_R_ref(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -179,10 +179,10 @@ double PDSS_IonsFromNeutral::entropy_R_ref() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::cp_R_ref() const
+CanteraDouble PDSS_IonsFromNeutral::cp_R_ref() const
 {
     neutralMoleculePhase_->getCp_R_ref(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -190,10 +190,10 @@ double PDSS_IonsFromNeutral::cp_R_ref() const
     return val;
 }
 
-double PDSS_IonsFromNeutral::molarVolume_ref() const
+CanteraDouble PDSS_IonsFromNeutral::molarVolume_ref() const
 {
     neutralMoleculePhase_->getStandardVolumes_ref(tmpNM.data());
-    double val = 0.0;
+    CanteraDouble val = 0.0;
     for (size_t i = 0; i < numMult_; i++) {
         size_t jNeut = idNeutralMoleculeVec[i];
         val += factorVec[i] * tmpNM[jNeut];
@@ -201,7 +201,7 @@ double PDSS_IonsFromNeutral::molarVolume_ref() const
     return val;
 }
 
-void PDSS_IonsFromNeutral::setState_TP(double temp, double pres)
+void PDSS_IonsFromNeutral::setState_TP(CanteraDouble temp, CanteraDouble pres)
 {
     neutralMoleculePhase_->setState_TP(temp, pres);
     m_pres = pres;

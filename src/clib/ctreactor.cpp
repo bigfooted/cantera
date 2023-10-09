@@ -59,7 +59,7 @@ extern "C" {
         }
     }
 
-    int reactor_setInitialVolume(int i, double v)
+    int reactor_setInitialVolume(int i, CanteraDouble v)
     {
         try {
             ReactorCabinet::item(i).setInitialVolume(v);
@@ -99,7 +99,7 @@ extern "C" {
         }
     }
 
-    double reactor_mass(int i)
+    CanteraDouble reactor_mass(int i)
     {
         try {
             return ReactorCabinet::item(i).mass();
@@ -108,7 +108,7 @@ extern "C" {
         }
     }
 
-    double reactor_volume(int i)
+    CanteraDouble reactor_volume(int i)
     {
         try {
             return ReactorCabinet::item(i).volume();
@@ -117,7 +117,7 @@ extern "C" {
         }
     }
 
-    double reactor_density(int i)
+    CanteraDouble reactor_density(int i)
     {
         try {
             return ReactorCabinet::item(i).density();
@@ -126,7 +126,7 @@ extern "C" {
         }
     }
 
-    double reactor_temperature(int i)
+    CanteraDouble reactor_temperature(int i)
     {
         try {
             return ReactorCabinet::item(i).temperature();
@@ -135,7 +135,7 @@ extern "C" {
         }
     }
 
-    double reactor_enthalpy_mass(int i)
+    CanteraDouble reactor_enthalpy_mass(int i)
     {
         try {
             return ReactorCabinet::item(i).enthalpy_mass();
@@ -144,7 +144,7 @@ extern "C" {
         }
     }
 
-    double reactor_intEnergy_mass(int i)
+    CanteraDouble reactor_intEnergy_mass(int i)
     {
         try {
             return ReactorCabinet::item(i).intEnergy_mass();
@@ -153,7 +153,7 @@ extern "C" {
         }
     }
 
-    double reactor_pressure(int i)
+    CanteraDouble reactor_pressure(int i)
     {
         try {
             return ReactorCabinet::item(i).pressure();
@@ -162,7 +162,7 @@ extern "C" {
         }
     }
 
-    double reactor_massFraction(int i, int k)
+    CanteraDouble reactor_massFraction(int i, int k)
     {
         try {
             return ReactorCabinet::item(i).massFraction(k);
@@ -191,7 +191,7 @@ extern "C" {
         }
     }
 
-    int flowReactor_setMassFlowRate(int i, double mdot)
+    int flowReactor_setMassFlowRate(int i, CanteraDouble mdot)
     {
         try {
             ReactorCabinet::get<FlowReactor>(i).setMassFlowRate(mdot);
@@ -241,7 +241,7 @@ extern "C" {
         }
     }
 
-    int reactornet_setInitialTime(int i, double t)
+    int reactornet_setInitialTime(int i, CanteraDouble t)
     {
         try {
             NetworkCabinet::item(i).setInitialTime(t);
@@ -251,7 +251,7 @@ extern "C" {
         }
     }
 
-    int reactornet_setMaxTimeStep(int i, double maxstep)
+    int reactornet_setMaxTimeStep(int i, CanteraDouble maxstep)
     {
         try {
             NetworkCabinet::item(i).setMaxTimeStep(maxstep);
@@ -261,7 +261,7 @@ extern "C" {
         }
     }
 
-    int reactornet_setTolerances(int i, double rtol, double atol)
+    int reactornet_setTolerances(int i, CanteraDouble rtol, CanteraDouble atol)
     {
         try {
             NetworkCabinet::item(i).setTolerances(rtol, atol);
@@ -271,7 +271,7 @@ extern "C" {
         }
     }
 
-    int reactornet_setSensitivityTolerances(int i, double rtol, double atol)
+    int reactornet_setSensitivityTolerances(int i, CanteraDouble rtol, CanteraDouble atol)
     {
         try {
             NetworkCabinet::item(i).setSensitivityTolerances(rtol, atol);
@@ -292,7 +292,7 @@ extern "C" {
         }
     }
 
-    int reactornet_advance(int i, double t)
+    int reactornet_advance(int i, CanteraDouble t)
     {
         try {
             NetworkCabinet::item(i).advance(t);
@@ -302,7 +302,7 @@ extern "C" {
         }
     }
 
-    double reactornet_step(int i)
+    CanteraDouble reactornet_step(int i)
     {
         try {
             return NetworkCabinet::item(i).step();
@@ -311,7 +311,7 @@ extern "C" {
         }
     }
 
-    double reactornet_time(int i)
+    CanteraDouble reactornet_time(int i)
     {
         try {
             return NetworkCabinet::item(i).time();
@@ -320,7 +320,7 @@ extern "C" {
         }
     }
 
-    double reactornet_rtol(int i)
+    CanteraDouble reactornet_rtol(int i)
     {
         try {
             return NetworkCabinet::item(i).rtol();
@@ -329,7 +329,7 @@ extern "C" {
         }
     }
 
-    double reactornet_atol(int i)
+    CanteraDouble reactornet_atol(int i)
     {
         try {
             return NetworkCabinet::item(i).atol();
@@ -338,7 +338,7 @@ extern "C" {
         }
     }
 
-    double reactornet_sensitivity(int i, const char* v, int p, int r)
+    CanteraDouble reactornet_sensitivity(int i, const char* v, int p, int r)
     {
         try {
             return NetworkCabinet::item(i).sensitivity(v, p, r);
@@ -405,7 +405,7 @@ extern "C" {
         }
     }
 
-    double flowdev_massFlowRate(int i)
+    CanteraDouble flowdev_massFlowRate(int i)
     {
         try {
             return FlowDeviceCabinet::item(i).massFlowRate();
@@ -414,7 +414,7 @@ extern "C" {
         }
     }
 
-    int flowdev_setMassFlowCoeff(int i, double v)
+    int flowdev_setMassFlowCoeff(int i, CanteraDouble v)
     {
         try {
             FlowDeviceCabinet::get<MassFlowController>(i).setMassFlowCoeff(v);
@@ -424,7 +424,7 @@ extern "C" {
         }
     }
 
-    int flowdev_setValveCoeff(int i, double v)
+    int flowdev_setValveCoeff(int i, CanteraDouble v)
     {
         try {
             FlowDeviceCabinet::get<Valve>(i).setValveCoeff(v);
@@ -434,7 +434,7 @@ extern "C" {
         }
     }
 
-    int flowdev_setPressureCoeff(int i, double v)
+    int flowdev_setPressureCoeff(int i, CanteraDouble v)
     {
         try {
             FlowDeviceCabinet::get<PressureController>(i).setPressureCoeff(v);
@@ -496,7 +496,7 @@ extern "C" {
         }
     }
 
-    double wall_vdot(int i, double t)
+    CanteraDouble wall_vdot(int i, CanteraDouble t)
     {
         try {
             return WallCabinet::item(i).vdot(t);
@@ -505,7 +505,7 @@ extern "C" {
         }
     }
 
-    double wall_expansionRate(int i)
+    CanteraDouble wall_expansionRate(int i)
     {
         try {
             return WallCabinet::item(i).expansionRate();
@@ -514,7 +514,7 @@ extern "C" {
         }
     }
 
-    double wall_Q(int i, double t)
+    CanteraDouble wall_Q(int i, CanteraDouble t)
     {
         try {
             return WallCabinet::item(i).Q(t);
@@ -523,7 +523,7 @@ extern "C" {
         }
     }
 
-    double wall_heatRate(int i)
+    CanteraDouble wall_heatRate(int i)
     {
         try {
             return WallCabinet::item(i).heatRate();
@@ -532,7 +532,7 @@ extern "C" {
         }
     }
 
-    double wall_area(int i)
+    CanteraDouble wall_area(int i)
     {
         try {
             return WallCabinet::item(i).area();
@@ -541,7 +541,7 @@ extern "C" {
         }
     }
 
-    int wall_setArea(int i, double v)
+    int wall_setArea(int i, CanteraDouble v)
     {
         try {
             WallCabinet::item(i).setArea(v);
@@ -551,7 +551,7 @@ extern "C" {
         }
     }
 
-    int wall_setThermalResistance(int i, double rth)
+    int wall_setThermalResistance(int i, CanteraDouble rth)
     {
         try {
             WallCabinet::get<Wall>(i).setThermalResistance(rth);
@@ -561,7 +561,7 @@ extern "C" {
         }
     }
 
-    int wall_setHeatTransferCoeff(int i, double u)
+    int wall_setHeatTransferCoeff(int i, CanteraDouble u)
     {
         try {
             WallCabinet::get<Wall>(i).setHeatTransferCoeff(u);
@@ -581,7 +581,7 @@ extern "C" {
         }
     }
 
-    int wall_setExpansionRateCoeff(int i, double k)
+    int wall_setExpansionRateCoeff(int i, CanteraDouble k)
     {
         try {
             WallCabinet::get<Wall>(i).setExpansionRateCoeff(k);
@@ -601,7 +601,7 @@ extern "C" {
         }
     }
 
-    int wall_setEmissivity(int i, double epsilon)
+    int wall_setEmissivity(int i, CanteraDouble epsilon)
     {
         try {
             WallCabinet::get<Wall>(i).setEmissivity(epsilon);
@@ -661,7 +661,7 @@ extern "C" {
         }
     }
 
-    double reactorsurface_area(int i)
+    CanteraDouble reactorsurface_area(int i)
     {
         try {
             return ReactorSurfaceCabinet::item(i).area();
@@ -670,7 +670,7 @@ extern "C" {
         }
     }
 
-    int reactorsurface_setArea(int i, double v)
+    int reactorsurface_setArea(int i, CanteraDouble v)
     {
         try {
             ReactorSurfaceCabinet::item(i).setArea(v);

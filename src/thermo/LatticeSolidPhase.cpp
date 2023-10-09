@@ -23,7 +23,7 @@ namespace ba = boost::algorithm;
 namespace Cantera
 {
 
-double LatticeSolidPhase::minTemp(size_t k) const
+CanteraDouble LatticeSolidPhase::minTemp(size_t k) const
 {
     if (k != npos) {
         for (size_t n = 0; n < m_lattice.size(); n++) {
@@ -32,14 +32,14 @@ double LatticeSolidPhase::minTemp(size_t k) const
             }
         }
     }
-    double mm = 0;
+    CanteraDouble mm = 0;
     for (auto& lattice : m_lattice) {
         mm = std::max(mm, lattice->minTemp());
     }
     return mm;
 }
 
-double LatticeSolidPhase::maxTemp(size_t k) const
+CanteraDouble LatticeSolidPhase::maxTemp(size_t k) const
 {
     if (k != npos) {
         for (size_t n = 0; n < m_lattice.size(); n++) {
@@ -48,62 +48,62 @@ double LatticeSolidPhase::maxTemp(size_t k) const
             }
         }
     }
-    double mm = BigNumber;
+    CanteraDouble mm = BigNumber;
     for (auto& lattice : m_lattice) {
         mm = std::min(mm, lattice->maxTemp());
     }
     return mm;
 }
 
-double LatticeSolidPhase::refPressure() const
+CanteraDouble LatticeSolidPhase::refPressure() const
 {
     return m_lattice[0]->refPressure();
 }
 
-double LatticeSolidPhase::enthalpy_mole() const
+CanteraDouble LatticeSolidPhase::enthalpy_mole() const
 {
     _updateThermo();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->enthalpy_mole();
     }
     return sum;
 }
 
-double LatticeSolidPhase::intEnergy_mole() const
+CanteraDouble LatticeSolidPhase::intEnergy_mole() const
 {
     _updateThermo();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->intEnergy_mole();
     }
     return sum;
 }
 
-double LatticeSolidPhase::entropy_mole() const
+CanteraDouble LatticeSolidPhase::entropy_mole() const
 {
     _updateThermo();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->entropy_mole();
     }
     return sum;
 }
 
-double LatticeSolidPhase::gibbs_mole() const
+CanteraDouble LatticeSolidPhase::gibbs_mole() const
 {
     _updateThermo();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->gibbs_mole();
     }
     return sum;
 }
 
-double LatticeSolidPhase::cp_mole() const
+CanteraDouble LatticeSolidPhase::cp_mole() const
 {
     _updateThermo();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->cp_mole();
     }
@@ -115,7 +115,7 @@ Units LatticeSolidPhase::standardConcentrationUnits() const
     return Units(1.0);
 }
 
-void LatticeSolidPhase::getActivityConcentrations(double* c) const
+void LatticeSolidPhase::getActivityConcentrations(CanteraDouble* c) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -125,24 +125,24 @@ void LatticeSolidPhase::getActivityConcentrations(double* c) const
     }
 }
 
-void LatticeSolidPhase::getActivityCoefficients(double* ac) const
+void LatticeSolidPhase::getActivityCoefficients(CanteraDouble* ac) const
 {
     for (size_t k = 0; k < m_kk; k++) {
         ac[k] = 1.0;
     }
 }
 
-double LatticeSolidPhase::standardConcentration(size_t k) const
+CanteraDouble LatticeSolidPhase::standardConcentration(size_t k) const
 {
     return 1.0;
 }
 
-double LatticeSolidPhase::logStandardConc(size_t k) const
+CanteraDouble LatticeSolidPhase::logStandardConc(size_t k) const
 {
     return 0.0;
 }
 
-void LatticeSolidPhase::setPressure(double p)
+void LatticeSolidPhase::setPressure(CanteraDouble p)
 {
     m_press = p;
     for (size_t n = 0; n < m_lattice.size(); n++) {
@@ -151,9 +151,9 @@ void LatticeSolidPhase::setPressure(double p)
     calcDensity();
 }
 
-double LatticeSolidPhase::calcDensity()
+CanteraDouble LatticeSolidPhase::calcDensity()
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         sum += theta_[n] * m_lattice[n]->density();
     }
@@ -161,7 +161,7 @@ double LatticeSolidPhase::calcDensity()
     return sum;
 }
 
-void LatticeSolidPhase::setMoleFractions(const double* const x)
+void LatticeSolidPhase::setMoleFractions(const CanteraDouble* const x)
 {
     size_t strt = 0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
@@ -176,14 +176,14 @@ void LatticeSolidPhase::setMoleFractions(const double* const x)
     calcDensity();
 }
 
-void LatticeSolidPhase::getMoleFractions(double* const x) const
+void LatticeSolidPhase::getMoleFractions(CanteraDouble* const x) const
 {
     size_t strt = 0;
     // the ifdef block should be the way we calculate this.!!!!!
     Phase::getMoleFractions(x);
     for (size_t n = 0; n < m_lattice.size(); n++) {
         size_t nsp = m_lattice[n]->nSpecies();
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t k = 0; k < nsp; k++) {
             sum += (x + strt)[k];
         }
@@ -204,7 +204,7 @@ void LatticeSolidPhase::getMoleFractions(double* const x) const
     }
 }
 
-void LatticeSolidPhase::getChemPotentials(double* mu) const
+void LatticeSolidPhase::getChemPotentials(CanteraDouble* mu) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -215,7 +215,7 @@ void LatticeSolidPhase::getChemPotentials(double* mu) const
     }
 }
 
-void LatticeSolidPhase::getPartialMolarEnthalpies(double* hbar) const
+void LatticeSolidPhase::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -226,7 +226,7 @@ void LatticeSolidPhase::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void LatticeSolidPhase::getPartialMolarEntropies(double* sbar) const
+void LatticeSolidPhase::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -237,7 +237,7 @@ void LatticeSolidPhase::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void LatticeSolidPhase::getPartialMolarCp(double* cpbar) const
+void LatticeSolidPhase::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -248,7 +248,7 @@ void LatticeSolidPhase::getPartialMolarCp(double* cpbar) const
     }
 }
 
-void LatticeSolidPhase::getPartialMolarVolumes(double* vbar) const
+void LatticeSolidPhase::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -259,7 +259,7 @@ void LatticeSolidPhase::getPartialMolarVolumes(double* vbar) const
     }
 }
 
-void LatticeSolidPhase::getStandardChemPotentials(double* mu0) const
+void LatticeSolidPhase::getStandardChemPotentials(CanteraDouble* mu0) const
 {
     _updateThermo();
     size_t strt = 0;
@@ -269,7 +269,7 @@ void LatticeSolidPhase::getStandardChemPotentials(double* mu0) const
     }
 }
 
-void LatticeSolidPhase::getGibbs_RT_ref(double* grt) const
+void LatticeSolidPhase::getGibbs_RT_ref(CanteraDouble* grt) const
 {
     _updateThermo();
     for (size_t n = 0; n < m_lattice.size(); n++) {
@@ -277,7 +277,7 @@ void LatticeSolidPhase::getGibbs_RT_ref(double* grt) const
     }
 }
 
-void LatticeSolidPhase::getGibbs_ref(double* g) const
+void LatticeSolidPhase::getGibbs_ref(CanteraDouble* g) const
 {
     getGibbs_RT_ref(g);
     for (size_t k = 0; k < m_kk; k++) {
@@ -295,7 +295,7 @@ void LatticeSolidPhase::setParameters(const AnyMap& phaseNode,
 void LatticeSolidPhase::initThermo()
 {
     if (m_input.hasKey("composition")) {
-        Composition composition = m_input["composition"].asMap<double>();
+        Composition composition = m_input["composition"].asMap<CanteraDouble>();
         for (auto& [name, stoich] : composition) {
             AnyMap& node = m_rootNode["phases"].getMapWhere("name", name);
             addLattice(newThermo(node, m_rootNode));
@@ -362,8 +362,8 @@ void LatticeSolidPhase::addLattice(shared_ptr<ThermoPhase> lattice)
 
     for (size_t k = 0; k < lattice->nSpecies(); k++) {
         ThermoPhase::addSpecies(lattice->species(k));
-        vector<double> constArr(lattice->nElements());
-        const vector<double>& aws = lattice->atomicWeights();
+        vector<CanteraDouble> constArr(lattice->nElements());
+        const vector<CanteraDouble>& aws = lattice->atomicWeights();
         for (size_t es = 0; es < lattice->nElements(); es++) {
             addElement(lattice->elementName(es), aws[es], lattice->atomicNumber(es),
                        lattice->entropyElement298(es), lattice->elementType(es));
@@ -395,7 +395,7 @@ void LatticeSolidPhase::setLatticeStoichiometry(const Composition& comp)
 
 void LatticeSolidPhase::_updateThermo() const
 {
-    double tnow = temperature();
+    CanteraDouble tnow = temperature();
     if (m_tlast != tnow) {
         getMoleFractions(m_x.data());
         size_t strt = 0;
@@ -415,7 +415,7 @@ void LatticeSolidPhase::setLatticeMoleFractionsByName(int nn, const string& x)
     size_t loc = 0;
     for (size_t n = 0; n < m_lattice.size(); n++) {
         size_t nsp = m_lattice[n]->nSpecies();
-        double ndens = m_lattice[n]->molarDensity();
+        CanteraDouble ndens = m_lattice[n]->molarDensity();
         for (size_t k = 0; k < nsp; k++) {
             m_x[loc] = ndens * m_lattice[n]->moleFraction(k);
             loc++;
@@ -424,7 +424,7 @@ void LatticeSolidPhase::setLatticeMoleFractionsByName(int nn, const string& x)
     setMoleFractions(m_x.data());
 }
 
-void LatticeSolidPhase::modifyOneHf298SS(const size_t k, const double Hf298New)
+void LatticeSolidPhase::modifyOneHf298SS(const size_t k, const CanteraDouble Hf298New)
 {
     for (size_t n = 0; n < m_lattice.size(); n++) {
         if (lkstart_[n+1] < k) {

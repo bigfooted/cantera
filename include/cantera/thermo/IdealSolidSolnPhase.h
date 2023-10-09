@@ -82,7 +82,7 @@ public:
      * property manager. They are polynomial functions of temperature.
      * @see MultiSpeciesThermo
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
     /**
      * Molar entropy of the solution. Units: J/kmol/K. For an ideal, constant
@@ -97,7 +97,7 @@ public:
      * pressure since the volume expansivities are equal to zero.
      * @see MultiSpeciesThermo
      */
-    double entropy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
     /**
      * Molar Gibbs free energy of the solution. Units: J/kmol. For an ideal,
@@ -112,7 +112,7 @@ public:
      * @f$ \hat g^0_k(T,P) @f$ are computed by the member function, gibbs_RT().
      * @see MultiSpeciesThermo
      */
-    double gibbs_mole() const override;
+    CanteraDouble gibbs_mole() const override;
 
     /**
      * Molar heat capacity at constant pressure of the solution.
@@ -127,7 +127,7 @@ public:
      * species thermodynamic property manager.
      * @see MultiSpeciesThermo
      */
-    double cp_mole() const override;
+    CanteraDouble cp_mole() const override;
 
     /**
      * Molar heat capacity at constant volume of the solution. Units: J/kmol/K.
@@ -136,7 +136,7 @@ public:
      * @f[ \hat c_v(T,P) = \hat c_p(T,P) @f]
      * The two heat capacities are equal.
      */
-    double cv_mole() const override {
+    CanteraDouble cv_mole() const override {
         return cp_mole();
     }
 
@@ -154,7 +154,7 @@ public:
      * Pressure. Units: Pa. For this incompressible system, we return the
      * internally stored independent value of the pressure.
      */
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_Pcurrent;
     }
 
@@ -165,7 +165,7 @@ public:
      *
      * @param p   Input Pressure (Pa)
      */
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
     /**
      * Calculate the density of the mixture using the partial molar volumes and
@@ -253,7 +253,7 @@ public:
      * @param c  Pointer to array of doubles of length m_kk, which on exit
      *           will contain the generalized concentrations.
      */
-    void getActivityConcentrations(double* c) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
     /**
      * The standard concentration @f$ C^0_k @f$ used to normalize the
@@ -265,13 +265,13 @@ public:
      * @param k Species number: this is a require parameter, a change from the
      *     ThermoPhase base class, where it was an optional parameter.
      */
-    double standardConcentration(size_t k) const override;
+    CanteraDouble standardConcentration(size_t k) const override;
 
     //! Get the array of species activity coefficients
     /*!
      * @param ac output vector of activity coefficients. Length: m_kk
      */
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
     /**
      * Get the species chemical potentials. Units: J/kmol.
@@ -289,7 +289,7 @@ public:
      *
      * @param mu  Output vector of chemical potentials.
      */
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     /**
      * Get the array of non-dimensional species solution
@@ -306,7 +306,7 @@ public:
      *             Length = m_kk.
      * @deprecated To be removed after %Cantera 3.0. Use getChemPotentials() instead.
      */
-    void getChemPotentials_RT(double* mu) const override;
+    void getChemPotentials_RT(CanteraDouble* mu) const override;
 
     //! @}
     //! @name  Partial Molar Properties of the Solution
@@ -329,7 +329,7 @@ public:
      * @param hbar Output vector containing partial molar enthalpies.
      *             Length: m_kk.
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     /**
      * Returns an array of partial molar entropies of the species in the
@@ -348,7 +348,7 @@ public:
      * @param sbar Output vector containing partial molar entropies.
      *             Length: m_kk.
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
     /**
      * Returns an array of partial molar Heat Capacities at constant pressure of
@@ -357,7 +357,7 @@ public:
      *
      * @param cpbar  Output vector of partial heat capacities. Length: m_kk.
      */
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
     /**
      * returns an array of partial molar volumes of the species
@@ -368,7 +368,7 @@ public:
      *
      * @param vbar  Output vector of partial molar volumes. Length: m_kk.
      */
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     //! @}
     //! @name  Properties of the Standard State of the Species in the Solution
@@ -387,7 +387,7 @@ public:
      * @param mu0   Output vector of standard state chemical potentials.
      *              Length: m_kk.
      */
-    void getStandardChemPotentials(double* mu0) const override {
+    void getStandardChemPotentials(CanteraDouble* mu0) const override {
         getPureGibbs(mu0);
     }
 
@@ -405,7 +405,7 @@ public:
      * @param hrt Vector of length m_kk, which on return hrt[k] will contain the
      *            nondimensional standard state enthalpy of species k.
      */
-    void getEnthalpy_RT(double* hrt) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
 
     //! Get the nondimensional Entropies for the species standard states at the
     //! current T and P of the solution.
@@ -416,7 +416,7 @@ public:
      * @param sr Vector of length m_kk, which on return sr[k] will contain the
      *           nondimensional standard state entropy for species k.
      */
-    void getEntropy_R(double* sr) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
 
     /**
      * Get the nondimensional Gibbs function for the species standard states at
@@ -432,7 +432,7 @@ public:
      * @param grt Vector of length m_kk, which on return sr[k] will contain the
      *           nondimensional standard state Gibbs function for species k.
      */
-    void getGibbs_RT(double* grt) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
 
     /**
      * Get the Gibbs functions for the pure species at the current *T* and *P*
@@ -447,9 +447,9 @@ public:
      *
      * @param gpure  Output vector of Gibbs functions for species. Length: m_kk.
      */
-    void getPureGibbs(double* gpure) const override;
+    void getPureGibbs(CanteraDouble* gpure) const override;
 
-    void getIntEnergy_RT(double* urt) const override;
+    void getIntEnergy_RT(CanteraDouble* urt) const override;
 
     /**
      * Get the nondimensional heat capacity at constant pressure function for
@@ -464,20 +464,20 @@ public:
      * @param cpr Vector of length m_kk, which on return cpr[k] will contain the
      *           nondimensional constant pressure heat capacity for species k.
      */
-    void getCp_R(double* cpr) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
 
-    void getStandardVolumes(double* vol) const override;
+    void getStandardVolumes(CanteraDouble* vol) const override;
 
     //! @}
     //! @name Thermodynamic Values for the Species Reference States
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getIntEnergy_RT_ref(double* urt) const override;
-    void getCp_R_ref(double* cprt) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getIntEnergy_RT_ref(CanteraDouble* urt) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
 
     /**
      * Returns a reference to the vector of nondimensional enthalpies of the
@@ -485,7 +485,7 @@ public:
      * is that it also checks to see if a recalculation of the reference
      * thermodynamics functions needs to be done.
      */
-    const vector<double>& enthalpy_RT_ref() const;
+    const vector<CanteraDouble>& enthalpy_RT_ref() const;
 
     /**
      * Returns a reference to the vector of nondimensional enthalpies of the
@@ -493,7 +493,7 @@ public:
      * is that it also checks to see if a recalculation of the reference
      * thermodynamics functions needs to be done.
      */
-    const vector<double>& gibbs_RT_ref() const {
+    const vector<CanteraDouble>& gibbs_RT_ref() const {
         _updateThermo();
         return m_g0_RT;
     }
@@ -504,7 +504,7 @@ public:
      * is that it also checks to see if a recalculation of the reference
      * thermodynamics functions needs to be done.
      */
-    const vector<double>& entropy_R_ref() const;
+    const vector<CanteraDouble>& entropy_R_ref() const;
 
     /**
      * Returns a reference to the vector of nondimensional enthalpies of the
@@ -512,7 +512,7 @@ public:
      * is that it also checks to see if a recalculation of the reference
      * thermodynamics functions needs to be done.
      */
-    const vector<double>& cp_R_ref() const {
+    const vector<CanteraDouble>& cp_R_ref() const {
         _updateThermo();
         return m_cp0_R;
     }
@@ -525,7 +525,7 @@ public:
     void initThermo() override;
     void getParameters(AnyMap& phaseNode) const override;
     void getSpeciesParameters(const string& name, AnyMap& speciesNode) const override;
-    void setToEquilState(const double* mu_RT) override;
+    void setToEquilState(const CanteraDouble* mu_RT) override;
 
     //! Set the form for the standard and generalized concentrations
     /*!
@@ -550,7 +550,7 @@ public:
      *
      * @param  k species index
      */
-    double speciesMolarVolume(int k) const;
+    CanteraDouble speciesMolarVolume(int k) const;
 
     /**
      * Fill in a return vector containing the species molar volumes.
@@ -560,7 +560,7 @@ public:
      * @param smv  output vector containing species molar volumes.
      *             Length: m_kk.
      */
-    void getSpeciesMolarVolumes(double* smv) const;
+    void getSpeciesMolarVolumes(CanteraDouble* smv) const;
 
     //! @}
 
@@ -580,7 +580,7 @@ protected:
      * because this is a single value, all species are required to have the same
      * reference pressure.
      */
-    double m_Pref = OneAtm;
+    CanteraDouble m_Pref = OneAtm;
 
     /**
      * m_Pcurrent = The current pressure
@@ -589,34 +589,34 @@ protected:
      * The density variable which is inherited as part of the State class,
      * m_dens, is always kept current whenever T, P, or X[] change.
      */
-    double m_Pcurrent = OneAtm;
+    CanteraDouble m_Pcurrent = OneAtm;
 
     //! Vector of molar volumes for each species in the solution
     /**
      * Species molar volumes (@f$ m^3 kmol^-1 @f$) at the current mixture state.
      * For the IdealSolidSolnPhase class, these are constant.
      */
-    mutable vector<double> m_speciesMolarVolume;
+    mutable vector<CanteraDouble> m_speciesMolarVolume;
 
     //! Vector containing the species reference enthalpies at T = m_tlast
-    mutable vector<double> m_h0_RT;
+    mutable vector<CanteraDouble> m_h0_RT;
 
     //! Vector containing the species reference constant pressure heat
     //! capacities at T = m_tlast
-    mutable vector<double> m_cp0_R;
+    mutable vector<CanteraDouble> m_cp0_R;
 
     //! Vector containing the species reference Gibbs functions at T = m_tlast
-    mutable vector<double> m_g0_RT;
+    mutable vector<CanteraDouble> m_g0_RT;
 
     //! Vector containing the species reference entropies at T = m_tlast
-    mutable vector<double> m_s0_R;
+    mutable vector<CanteraDouble> m_s0_R;
 
     //! Vector containing the species reference exp(-G/RT) functions at
     //! T = m_tlast
-    mutable vector<double> m_expg0_RT;
+    mutable vector<CanteraDouble> m_expg0_RT;
 
     //! Temporary array used in equilibrium calculations
-    mutable vector<double> m_pp;
+    mutable vector<CanteraDouble> m_pp;
 
 private:
     //! @name Utility Functions

@@ -209,11 +209,11 @@ AnyMap readH5Attributes(const h5::Group& sub, bool recursive)
         h5::DataTypeClass dclass = dtype.getClass();
         if (dclass == h5::DataTypeClass::Float) {
             if (attr.getSpace().getElementCount() > 1) {
-                vector<double> values;
+                vector<CanteraDouble> values;
                 attr.read(values);
                 out[name] = values;
             } else {
-                double value;
+                CanteraDouble value;
                 attr.read(value);
                 out[name] = value;
             }
@@ -309,9 +309,9 @@ void writeH5Attributes(h5::Group sub, const AnyMap& meta)
             h5::Attribute attr = sub.createAttribute<long int>(
                 name, h5::DataSpace::From(value));
             attr.write(value);
-        } else if (item.is<double>()) {
-            double value = item.asDouble();
-            h5::Attribute attr = sub.createAttribute<double>(
+        } else if (item.is<CanteraDouble>()) {
+            CanteraDouble value = item.asDouble();
+            h5::Attribute attr = sub.createAttribute<CanteraDouble>(
                 name, h5::DataSpace::From(value));
             attr.write(value);
         } else if (item.is<string>()) {
@@ -331,9 +331,9 @@ void writeH5Attributes(h5::Group sub, const AnyMap& meta)
             h5::Attribute attr = sub.createAttribute<long int>(
                 name, h5::DataSpace::From(values));
             attr.write(values);
-        } else if (item.is<vector<double>>()) {
-            auto values = item.as<vector<double>>();
-            h5::Attribute attr = sub.createAttribute<double>(
+        } else if (item.is<vector<CanteraDouble>>()) {
+            auto values = item.as<vector<CanteraDouble>>();
+            h5::Attribute attr = sub.createAttribute<CanteraDouble>(
                 name, h5::DataSpace::From(values));
             attr.write(values);
         } else if (item.is<vector<string>>()) {
@@ -429,11 +429,11 @@ AnyValue Storage::readData(const string& id,
     if (datatype == h5::DataTypeClass::Float) {
         try {
             if (ndim == 1) {
-                vector<double> data;
+                vector<CanteraDouble> data;
                 dataset.read(data);
                 out = data;
             } else { // ndim == 2
-                vector<vector<double>> data;
+                vector<vector<CanteraDouble>> data;
                 dataset.read(data);
                 out = data;
             }
@@ -511,9 +511,9 @@ void Storage::writeData(const string& id, const string& name, const AnyValue& da
         dataset.write(data.asVector<long int>());
         return;
     }
-    if (data.isVector<double>()) {
-        h5::DataSet dataset = sub.createDataSet<double>(name, h5::DataSpace(dims));
-        dataset.write(data.asVector<double>());
+    if (data.isVector<CanteraDouble>()) {
+        h5::DataSet dataset = sub.createDataSet<CanteraDouble>(name, h5::DataSpace(dims));
+        dataset.write(data.asVector<CanteraDouble>());
         return;
     }
     if (data.isVector<string>()) {
@@ -540,9 +540,9 @@ void Storage::writeData(const string& id, const string& name, const AnyValue& da
         if (data.isVector<vector<long int>>()) {
             h5::DataSet dataset = sub.createDataSet<long int>(name, space, props);
             dataset.write(data.asVector<vector<long int>>());
-        } else if (data.isVector<vector<double>>()) {
-            h5::DataSet dataset = sub.createDataSet<double>(name, space, props);
-            dataset.write(data.asVector<vector<double>>());
+        } else if (data.isVector<vector<CanteraDouble>>()) {
+            h5::DataSet dataset = sub.createDataSet<CanteraDouble>(name, space, props);
+            dataset.write(data.asVector<vector<CanteraDouble>>());
         } else if (data.isVector<vector<string>>()) {
             h5::DataSet dataset = sub.createDataSet<string>(name, space, props);
             dataset.write(data.asVector<vector<string>>());
@@ -556,9 +556,9 @@ void Storage::writeData(const string& id, const string& name, const AnyValue& da
         if (data.isVector<vector<long int>>()) {
             h5::DataSet dataset = sub.createDataSet<long int>(name, space);
             dataset.write(data.asVector<vector<long int>>());
-        } else if (data.isVector<vector<double>>()) {
-            h5::DataSet dataset = sub.createDataSet<double>(name, space);
-            dataset.write(data.asVector<vector<double>>());
+        } else if (data.isVector<vector<CanteraDouble>>()) {
+            h5::DataSet dataset = sub.createDataSet<CanteraDouble>(name, space);
+            dataset.write(data.asVector<vector<CanteraDouble>>());
         } else if (data.isVector<vector<string>>()) {
             h5::DataSet dataset = sub.createDataSet<string>(name, space);
             dataset.write(data.asVector<vector<string>>());

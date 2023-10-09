@@ -330,7 +330,7 @@ class PDSS_Water;
  * B_{Debye} @f$ are needed. The DebyeHuckel object uses two methods for
  * specifying these quantities. The default method is to assume that @f$
  * A_{Debye} @f$  is a constant, given in the initialization process, and stored
- * in the member double, m_A_Debye. Optionally, a full water treatment may be
+ * in the member CanteraDouble, m_A_Debye. Optionally, a full water treatment may be
  * employed that makes @f$ A_{Debye} @f$ a full function of *T* and *P*.
  *
  * @f[
@@ -435,7 +435,7 @@ public:
     //! @name  Molar Thermodynamic Properties of the Solution
     //! @{
 
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
     //! Molar entropy. Units: J/kmol/K.
     /**
@@ -452,10 +452,10 @@ public:
      * temperature since the volume expansivities are equal to zero.
      * @see MultiSpeciesThermo
      */
-    double entropy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
-    double gibbs_mole() const override;
-    double cp_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
@@ -481,7 +481,7 @@ public:
     //! to be molality-based here.
     //! @{
 
-    void getActivityConcentrations(double* c) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
     //! Return the standard concentration for the kth species
     /*!
@@ -497,7 +497,7 @@ public:
      *         assume this refers to species 0.
      * @return the standard Concentration in units of m^3/kmol
      */
-    double standardConcentration(size_t k=0) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
 
     //! Get the array of non-dimensional activities at the current solution
     //! temperature, pressure, and solution concentration.
@@ -506,7 +506,7 @@ public:
      *
      * @param ac  Output vector of activities. Length: m_kk.
      */
-    void getActivities(double* ac) const override;
+    void getActivities(CanteraDouble* ac) const override;
 
     //! Get the array of non-dimensional molality-based activity coefficients at
     //! the current solution temperature, pressure, and solution concentration.
@@ -519,7 +519,7 @@ public:
      * @param acMolality Vector of Molality-based activity coefficients
      *                   Length: m_kk
      */
-    void getMolalityActivityCoefficients(double* acMolality) const override;
+    void getMolalityActivityCoefficients(CanteraDouble* acMolality) const override;
 
     //! @}
     //! @name Partial Molar Properties of the Solution
@@ -538,7 +538,7 @@ public:
      * @param mu  Output vector of species chemical
      *            potentials. Length: m_kk. Units: J/kmol
      */
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     //! Returns an array of partial molar enthalpies for the species
     //! in the mixture. Units (J/kmol)
@@ -561,7 +561,7 @@ public:
      * @param hbar    Output vector of species partial molar enthalpies.
      *                Length: m_kk. units are J/kmol.
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     //! Returns an array of partial molar entropies of the species in the
     //! solution. Units: J/kmol/K.
@@ -591,9 +591,9 @@ public:
      *  @param sbar    Output vector of species partial molar entropies.
      *                 Length = m_kk. units are J/kmol/K.
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
     //! Return an array of partial molar volumes for the species in the mixture.
     //! Units: m^3/kmol.
@@ -611,7 +611,7 @@ public:
      *  @param vbar   Output vector of species partial molar volumes.
      *                Length = m_kk. units are m^3/kmol.
      */
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     //! @}
 
@@ -628,7 +628,7 @@ public:
     //! and pressure (Units = sqrt(kg/gmol))
     /*!
      *  The default is to assume that it is constant, given in the
-     *  initialization process, and stored in the member double, m_A_Debye.
+     *  initialization process, and stored in the member CanteraDouble, m_A_Debye.
      *  Optionally, a full water treatment may be employed that makes
      *  @f$ A_{Debye} @f$ a full function of T and P.
      *
@@ -667,8 +667,8 @@ public:
      * @param pressure Pressure (Pa). Defaults to -1, in which
      *                    case the pressure of the phase is assumed.
      */
-    virtual double A_Debye_TP(double temperature = -1.0,
-                              double pressure = -1.0) const;
+    virtual CanteraDouble A_Debye_TP(CanteraDouble temperature = -1.0,
+                              CanteraDouble pressure = -1.0) const;
 
     //! Value of the derivative of the Debye Huckel constant with
     //! respect to temperature.
@@ -683,8 +683,8 @@ public:
      * @param pressure Pressure (Pa). Defaults to -1, in which
      *                    case the pressure of the phase is assumed.
      */
-    virtual double dA_DebyedT_TP(double temperature = -1.0,
-                                 double pressure = -1.0) const;
+    virtual CanteraDouble dA_DebyedT_TP(CanteraDouble temperature = -1.0,
+                                 CanteraDouble pressure = -1.0) const;
 
     //! Value of the 2nd derivative of the Debye Huckel constant with
     //! respect to temperature as a function of temperature and pressure.
@@ -699,8 +699,8 @@ public:
      * @param pressure Pressure (Pa). Defaults to -1, in which
      *                    case the pressure of the phase is assumed.
      */
-    virtual double d2A_DebyedT2_TP(double temperature = -1.0,
-                                   double pressure = -1.0) const;
+    virtual CanteraDouble d2A_DebyedT2_TP(CanteraDouble temperature = -1.0,
+                                   CanteraDouble pressure = -1.0) const;
 
     //! Value of the derivative of the Debye Huckel constant with
     //! respect to pressure, as a function of temperature and pressure.
@@ -715,14 +715,14 @@ public:
      * @param pressure Pressure (Pa). Defaults to -1, in which
      *                    case the pressure of the phase is assumed.
      */
-    virtual double dA_DebyedP_TP(double temperature = -1.0,
-                                 double pressure = -1.0) const;
+    virtual CanteraDouble dA_DebyedP_TP(CanteraDouble temperature = -1.0,
+                                 CanteraDouble pressure = -1.0) const;
 
     //! Reports the ionic radius of the kth species
     /*!
      * @param k  species index.
      */
-    double AionicRadius(int k = 0) const;
+    CanteraDouble AionicRadius(int k = 0) const;
 
     //! Set the DebyeHuckel parameterization form. Must be one of
     //! 'dilute-limit', 'B-dot-with-variable-a', 'B-dot-with-common-a',
@@ -736,18 +736,18 @@ public:
 
     //! Set the A_Debye parameter. If a negative value is provided, enables
     //! calculation of A_Debye using the detailed water equation of state.
-    void setA_Debye(double A);
+    void setA_Debye(CanteraDouble A);
 
-    void setB_Debye(double B) { m_B_Debye = B; }
-    void setB_dot(double bdot);
-    void setMaxIonicStrength(double Imax) { m_maxIionicStrength = Imax; }
+    void setB_Debye(CanteraDouble B) { m_B_Debye = B; }
+    void setB_dot(CanteraDouble bdot);
+    void setMaxIonicStrength(CanteraDouble Imax) { m_maxIionicStrength = Imax; }
     void useHelgesonFixedForm(bool mode=true) { m_useHelgesonFixedForm = mode; }
 
     //! Set the default ionic radius [m] for each species
-    void setDefaultIonicRadius(double value);
+    void setDefaultIonicRadius(CanteraDouble value);
 
     //! Set the value for the beta interaction between species sp1 and sp2.
-    void setBeta(const string& sp1, const string& sp2, double value);
+    void setBeta(const string& sp1, const string& sp2, CanteraDouble value);
 
     //! Returns a reference to M_Beta_ij
     Array2D& get_Beta_ij() {
@@ -762,21 +762,21 @@ private:
      *
      * @param IionicMolality Value of the ionic molality (sqrt(gmol/kg))
      */
-    static double _nonpolarActCoeff(double IionicMolality);
+    static CanteraDouble _nonpolarActCoeff(CanteraDouble IionicMolality);
 
     //! Formula for the osmotic coefficient that occurs in the GWB.
     /*!
      *  It is originally from Helgeson for a variable NaCl brine. It's to be
      *  used with extreme caution.
      */
-    double _osmoticCoeffHelgesonFixedForm() const;
+    CanteraDouble _osmoticCoeffHelgesonFixedForm() const;
 
     //! Formula for the log of the water activity that occurs in the GWB.
     /*!
      *  It is originally from Helgeson for a variable NaCl brine. It's to be
      *  used with extreme caution.
      */
-    double _lnactivityWaterHelgesonFixedForm() const;
+    CanteraDouble _lnactivityWaterHelgesonFixedForm() const;
 
 protected:
     //! form of the Debye-Huckel parameterization used in the model.
@@ -807,17 +807,17 @@ protected:
     vector<int> m_electrolyteSpeciesType;
 
     //! a_k = Size of the ionic species in the DH formulation. units = meters
-    vector<double> m_Aionic;
+    vector<CanteraDouble> m_Aionic;
 
     //! Default ionic radius for species where it is not specified
-    double m_Aionic_default = NAN;
+    CanteraDouble m_Aionic_default = NAN;
 
     //! Current value of the ionic strength on the molality scale
-    mutable double m_IionicMolality = 0.0;
+    mutable CanteraDouble m_IionicMolality = 0.0;
 
     //! Maximum value of the ionic strength allowed in the calculation of the
     //! activity coefficients.
-    double m_maxIionicStrength;
+    CanteraDouble m_maxIionicStrength;
 
 public:
     //! If true, then the fixed for of Helgeson's activity for water is used
@@ -827,7 +827,7 @@ public:
     bool m_useHelgesonFixedForm = false;
 protected:
     //! Stoichiometric ionic strength on the molality scale
-    mutable double m_IionicMolalityStoich = 0.0;
+    mutable CanteraDouble m_IionicMolalityStoich = 0.0;
 
 public:
     /**
@@ -868,7 +868,7 @@ protected:
      *
      *            note in Pitzer's nomenclature, A_phi = A_Debye/3.0
      */
-    mutable double m_A_Debye;
+    mutable CanteraDouble m_A_Debye;
 
     //! Current value of the constant that appears in the denominator
     /**
@@ -886,7 +886,7 @@ protected:
      *                           (water at 25C)
      *                    T = 298.15 K
      */
-    double m_B_Debye;
+    CanteraDouble m_B_Debye;
 
     //! Array of B_Dot values
     /**
@@ -894,7 +894,7 @@ protected:
      *  in some formulations to extend DH to higher molalities. B_dot is
      *  specific to the major ionic pair.
      */
-    vector<double> m_B_Dot;
+    vector<CanteraDouble> m_B_Dot;
 
     //! Pointer to the Water standard state object
     /*!
@@ -906,13 +906,13 @@ protected:
     /*!
      * Density depends on temperature and pressure.
      */
-    double m_densWaterSS = 1000.0;
+    CanteraDouble m_densWaterSS = 1000.0;
 
     //! Pointer to the water property calculator
     unique_ptr<WaterProps> m_waterProps;
 
     //! vector of size m_kk, used as a temporary holding area.
-    mutable vector<double> m_tmpV;
+    mutable vector<CanteraDouble> m_tmpV;
 
     /**
      * Stoichiometric species charge -> This is for calculations
@@ -926,7 +926,7 @@ protected:
      * For species that aren't ion pairs, it's equal to the
      * m_speciesCharge[] value.
      */
-    vector<double> m_speciesCharge_Stoich;
+    vector<CanteraDouble> m_speciesCharge_Stoich;
 
     /**
      *  Array of 2D data used in the DHFORM_BETAIJ formulation
@@ -941,16 +941,16 @@ protected:
      *  mutable because we change this if the composition or temperature or
      *  pressure changes.
      */
-    mutable vector<double> m_lnActCoeffMolal;
+    mutable vector<CanteraDouble> m_lnActCoeffMolal;
 
     //! Derivative of log act coeff wrt T
-    mutable vector<double> m_dlnActCoeffMolaldT;
+    mutable vector<CanteraDouble> m_dlnActCoeffMolaldT;
 
     //! 2nd Derivative of log act coeff wrt T
-    mutable vector<double> m_d2lnActCoeffMolaldT2;
+    mutable vector<CanteraDouble> m_d2lnActCoeffMolaldT2;
 
     //! Derivative of log act coeff wrt P
-    mutable vector<double> m_dlnActCoeffMolaldP;
+    mutable vector<CanteraDouble> m_dlnActCoeffMolaldP;
 
 private:
     //! Calculate the log activity coefficients

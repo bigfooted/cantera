@@ -11,24 +11,24 @@
 namespace Cantera
 {
 
-SpeciesThermoInterpType::SpeciesThermoInterpType(double tlow,
-                                                 double thigh,
-                                                 double pref) :
+SpeciesThermoInterpType::SpeciesThermoInterpType(CanteraDouble tlow,
+                                                 CanteraDouble thigh,
+                                                 CanteraDouble pref) :
     m_lowT(tlow),
     m_highT(thigh),
     m_Pref(pref)
 {
 }
 
-void SpeciesThermoInterpType::updateProperties(const double* tempPoly,
-        double* cp_R, double* h_RT, double* s_R) const
+void SpeciesThermoInterpType::updateProperties(const CanteraDouble* tempPoly,
+        CanteraDouble* cp_R, CanteraDouble* h_RT, CanteraDouble* s_R) const
 {
-    double T = tempPoly[0];
+    CanteraDouble T = tempPoly[0];
     updatePropertiesTemp(T, cp_R, h_RT, s_R);
 }
 
-void SpeciesThermoInterpType::updatePropertiesTemp(const double temp,
-        double* cp_R, double* h_RT, double* s_R) const
+void SpeciesThermoInterpType::updatePropertiesTemp(const CanteraDouble temp,
+        CanteraDouble* cp_R, CanteraDouble* h_RT, CanteraDouble* s_R) const
 {
     throw NotImplementedError("SpeciesThermoInterpType::updatePropertiesTemp");
 }
@@ -39,8 +39,8 @@ size_t SpeciesThermoInterpType::nCoeffs() const
 }
 
 void SpeciesThermoInterpType::reportParameters(size_t& index, int& type,
-        double& minTemp, double& maxTemp, double& refPressure,
-        double* const coeffs) const
+        CanteraDouble& minTemp, CanteraDouble& maxTemp, CanteraDouble& refPressure,
+        CanteraDouble* const coeffs) const
 {
     throw NotImplementedError("SpeciesThermoInterpType::reportParameters");
 }
@@ -62,12 +62,12 @@ void SpeciesThermoInterpType::getParameters(AnyMap& thermo) const
     }
 }
 
-double SpeciesThermoInterpType::reportHf298(double* const h298) const
+CanteraDouble SpeciesThermoInterpType::reportHf298(CanteraDouble* const h298) const
 {
     throw NotImplementedError("SpeciesThermoInterpType::reportHf298");
 }
 
-void SpeciesThermoInterpType::modifyOneHf298(const size_t k, const double Hf298New)
+void SpeciesThermoInterpType::modifyOneHf298(const size_t k, const CanteraDouble Hf298New)
 {
     throw NotImplementedError("SpeciesThermoInterpType::modifyOneHf298");
 }

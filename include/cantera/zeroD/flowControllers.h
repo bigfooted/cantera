@@ -27,7 +27,7 @@ public:
     }
 
     //! Set the fixed mass flow rate (kg/s) through the mass flow controller.
-    void setMassFlowRate(double mdot);
+    void setMassFlowRate(CanteraDouble mdot);
 
     //! Set the mass flow coefficient.
     /*!
@@ -37,12 +37,12 @@ public:
      * If no function is specified, the mass flow rate defaults to:
      * @f[\dot{m} = m @f]
      */
-    void setMassFlowCoeff(double m) {
+    void setMassFlowCoeff(CanteraDouble m) {
         m_coeff = m;
     }
 
     //! Get the mass flow coefficient.
-    double getMassFlowCoeff() {
+    CanteraDouble getMassFlowCoeff() {
         return m_coeff;
     }
 
@@ -53,7 +53,7 @@ public:
     //! If a function of time has been specified for mdot, then update the
     //! stored mass flow rate. Otherwise, mdot is a constant, and does not
     //! need updating.
-    void updateMassFlowRate(double time) override;
+    void updateMassFlowRate(CanteraDouble time) override;
 };
 
 /**
@@ -100,16 +100,16 @@ public:
      * rate defaults to:
      * @f[\dot{m} = \dot{m}_{primary} + c \Delta P @f]
      */
-    void setPressureCoeff(double c) {
+    void setPressureCoeff(CanteraDouble c) {
         m_coeff = c;
     }
 
     //! Get the pressure coefficient.
-    double getPressureCoeff() {
+    CanteraDouble getPressureCoeff() {
         return m_coeff;
     }
 
-    void updateMassFlowRate(double time) override;
+    void updateMassFlowRate(CanteraDouble time) override;
 
 protected:
     FlowDevice* m_primary = nullptr;
@@ -142,17 +142,17 @@ public:
      * specified, the mass flow rate defaults to:
      * @f[\dot{m} = c \Delta P @f]
      */
-    void setValveCoeff(double c) {
+    void setValveCoeff(CanteraDouble c) {
         m_coeff = c;
     }
 
     //! Get the valve coefficient.
-    double getValveCoeff() {
+    CanteraDouble getValveCoeff() {
         return m_coeff;
     }
 
     //! Compute the current mass flow rate, based on the pressure difference.
-    void updateMassFlowRate(double time) override;
+    void updateMassFlowRate(CanteraDouble time) override;
 };
 
 }

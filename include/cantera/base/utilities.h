@@ -34,10 +34,10 @@ namespace Cantera
  *
  * @param x   first reference to the templated class V
  * @param y   second reference to the templated class V
- * @return This class returns a hard-coded type, double.
+ * @return This class returns a hard-coded type, CanteraDouble.
  */
 template<class V>
-inline double dot4(const V& x, const V& y)
+inline CanteraDouble dot4(const V& x, const V& y)
 {
     return x[0]*y[0] + x[1]*y[1] + x[2]*y[2] + x[3]*y[3];
 }
@@ -49,10 +49,10 @@ inline double dot4(const V& x, const V& y)
  *
  * @param x   first reference to the templated class V
  * @param y   second reference to the templated class V
- * @return This class returns a hard-coded type, double.
+ * @return This class returns a hard-coded type, CanteraDouble.
  */
 template<class V>
-inline double dot5(const V& x, const V& y)
+inline CanteraDouble dot5(const V& x, const V& y)
 {
     return x[0]*y[0] + x[1]*y[1] + x[2]*y[2] + x[3]*y[3] +
            x[4]*y[4];
@@ -61,13 +61,13 @@ inline double dot5(const V& x, const V& y)
 //! Function that calculates a templated inner product.
 /*!
  * This inner product is templated twice. The output variable is hard coded
- * to return a double.
+ * to return a CanteraDouble.
  *
  * template<class InputIter, class InputIter2>
  *
  * @code
- *     double x[8], y[8];
- *     double dsum = dot<double *,double *>(x, &x+7, y);
+ *     CanteraDouble x[8], y[8];
+ *     CanteraDouble dsum = dot<CanteraDouble *,CanteraDouble *>(x, &x+7, y);
  * @endcode
  *
  * @param x_begin  Iterator pointing to the beginning, belonging to the
@@ -76,10 +76,10 @@ inline double dot5(const V& x, const V& y)
  *                 iterator class InputIter.
  * @param y_begin Iterator pointing to the beginning of y, belonging to the
  *               iterator class InputIter2.
- * @return The return is hard-coded to return a double.
+ * @return The return is hard-coded to return a CanteraDouble.
  */
 template<class InputIter, class InputIter2>
-inline double dot(InputIter x_begin, InputIter x_end, InputIter2 y_begin)
+inline CanteraDouble dot(InputIter x_begin, InputIter x_end, InputIter2 y_begin)
 {
     return std::inner_product(x_begin, x_end, y_begin, 0.0);
 }
@@ -87,7 +87,7 @@ inline double dot(InputIter x_begin, InputIter x_end, InputIter2 y_begin)
 //! Multiply elements of an array by a scale factor.
 /*!
  * @code
- * vector<double> in(8, 1.0), out(8);
+ * vector<CanteraDouble> in(8, 1.0), out(8);
  * scale(in.begin(), in.end(), out.begin(), factor);
  * @endcode
  *
@@ -105,7 +105,7 @@ inline void scale(InputIter begin, InputIter end,
                   OutputIter out, S scale_factor)
 {
     std::transform(begin, end, out,
-        [scale_factor](double x) { return x * scale_factor; });
+        [scale_factor](CanteraDouble x) { return x * scale_factor; });
 }
 
 //! Templated evaluation of a polynomial of order 6
@@ -170,7 +170,7 @@ R poly3(D x, R* c)
 //! @}
 
 //! Check to see that a number is finite (not NaN, +Inf or -Inf)
-void checkFinite(const double tmp);
+void checkFinite(const CanteraDouble tmp);
 
 //! Check to see that all elements in an array are finite
 /*!
@@ -179,7 +179,7 @@ void checkFinite(const double tmp);
  * @param values  Array of *N* values to be checked
  * @param N       Number of elements in *values*
  */
-void checkFinite(const string& name, double* values, size_t N);
+void checkFinite(const string& name, CanteraDouble* values, size_t N);
 
 //! Const accessor for a value in a map.
 /*

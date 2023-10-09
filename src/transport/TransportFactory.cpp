@@ -77,7 +77,7 @@ Transport* TransportFactory::newTransport(const string& transportModel,
             "new '{}' object", transportModel);
     }
 
-    vector<double> state;
+    vector<CanteraDouble> state;
     Transport* tr = 0;
     phase->saveState(state);
 

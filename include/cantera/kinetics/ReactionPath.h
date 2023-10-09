@@ -35,7 +35,7 @@ public:
     // public attributes
     size_t number = npos; //!< Species number
     string name; //!< Label on graph
-    double value = 0.0; //!< May be used to set node appearance
+    CanteraDouble value = 0.0; //!< May be used to set node appearance
     bool visible = false; //!< Visible on graph;
 
     //! @name References
@@ -59,21 +59,21 @@ public:
     //! add a path to or from this node
     void addPath(Path* path);
 
-    double outflow() {
+    CanteraDouble outflow() {
         return m_out;
     }
-    double inflow() {
+    CanteraDouble inflow() {
         return m_in;
     }
-    double netOutflow() {
+    CanteraDouble netOutflow() {
         return m_out - m_in;
     }
 
     void printPaths();
 
 protected:
-    double m_in = 0.0;
-    double m_out = 0.0;
+    CanteraDouble m_in = 0.0;
+    CanteraDouble m_out = 0.0;
     vector<Path*> m_paths;
 };
 
@@ -81,7 +81,7 @@ protected:
 class Path
 {
 public:
-    typedef map<size_t, double> rxn_path_map;
+    typedef map<size_t, CanteraDouble> rxn_path_map;
 
     /**
      *  Constructor. Construct a one-way path from @c begin to @c end.
@@ -95,7 +95,7 @@ public:
      * Add a reaction to the path. Increment the flow from this reaction, the
      * total flow, and the flow associated with this label.
      */
-    void addReaction(size_t rxnNumber, double value, const string& label = "");
+    void addReaction(size_t rxnNumber, CanteraDouble value, const string& label = "");
 
     //! Upstream node.
     const SpeciesNode* begin() const {
@@ -122,10 +122,10 @@ public:
     }
 
     //! The total flow in this path
-    double flow() {
+    CanteraDouble flow() {
         return m_total;
     }
-    void setFlow(double v) {
+    void setFlow(CanteraDouble v) {
         m_total = v;
     }
 
@@ -143,13 +143,13 @@ public:
      * Write the label for a path connecting two species, indicating
      * the percent of the total flow due to each reaction.
      */
-    void writeLabel(std::ostream& s, double threshold = 0.005);
+    void writeLabel(std::ostream& s, CanteraDouble threshold = 0.005);
 
 protected:
-    map<string, double> m_label;
+    map<string, CanteraDouble> m_label;
     SpeciesNode* m_a, *m_b;
     rxn_path_map m_rxn;
-    double m_total = 0.0;
+    CanteraDouble m_total = 0.0;
 };
 
 
@@ -167,17 +167,17 @@ public:
     virtual ~ReactionPathDiagram();
 
     //! The largest one-way flow value in any path
-    double maxFlow() {
+    CanteraDouble maxFlow() {
         return m_flxmax;
     }
 
     //! The net flow from node @c k1 to node @c k2
-    double netFlow(size_t k1, size_t k2) {
+    CanteraDouble netFlow(size_t k1, size_t k2) {
         return flow(k1, k2) - flow(k2, k1);
     }
 
     //! The one-way flow from node @c k1 to node @c k2
-    double flow(size_t k1, size_t k2) {
+    CanteraDouble flow(size_t k1, size_t k2) {
         return (m_paths[k1][k2] ? m_paths[k1][k2]->flow() : 0.0);
     }
 
@@ -219,13 +219,13 @@ public:
         return m_nodes.size();
     }
 
-    void addNode(size_t k, const string& nm, double x = 0.0);
+    void addNode(size_t k, const string& nm, CanteraDouble x = 0.0);
 
     void displayOnly(size_t k=npos) {
         m_local = k;
     }
 
-    void linkNodes(size_t k1, size_t k2, size_t rxn, double value, string legend = "");
+    void linkNodes(size_t k1, size_t k2, size_t rxn, CanteraDouble value, string legend = "");
 
     void include(const string& aaname) {
         m_include.push_back(aaname);
@@ -251,7 +251,7 @@ public:
     }
     vector<size_t> species();
     vector<int> reactions();
-    void findMajorPaths(double threshold, size_t lda, double* a);
+    void findMajorPaths(CanteraDouble threshold, size_t lda, CanteraDouble* a);
     void setFont(const string& font) {
         m_font = font;
     }
@@ -263,22 +263,22 @@ public:
     string dashed_color = "gray";
     string element;
     string m_font = "Helvetica";
-    double threshold = 0.005;
-    double bold_min = 0.2;
-    double dashed_max = 0.0;
-    double label_min = 0.0;
-    double x_size = -1.0;
-    double y_size = -1.0;
+    CanteraDouble threshold = 0.005;
+    CanteraDouble bold_min = 0.2;
+    CanteraDouble dashed_max = 0.0;
+    CanteraDouble label_min = 0.0;
+    CanteraDouble x_size = -1.0;
+    CanteraDouble y_size = -1.0;
     string name = "reaction_paths";
     string dot_options = "center=1;";
     flow_t flow_type = NetFlow;
-    double scale = -1;
-    double arrow_width = -5.0;
+    CanteraDouble scale = -1;
+    CanteraDouble arrow_width = -5.0;
     bool show_details = false;
-    double arrow_hue = 0.6666;
+    CanteraDouble arrow_hue = 0.6666;
 
 protected:
-    double m_flxmax = 0.0;
+    CanteraDouble m_flxmax = 0.0;
     map<size_t, map<size_t, Path*>> m_paths;
 
     //! map of species index to SpeciesNode
@@ -314,9 +314,9 @@ protected:
     size_t m_nr;
     size_t m_ns;
     size_t m_nel;
-    vector<double> m_ropf;
-    vector<double> m_ropr;
-    vector<double> m_x;
+    vector<CanteraDouble> m_ropf;
+    vector<CanteraDouble> m_ropr;
+    vector<CanteraDouble> m_x;
     vector<vector<size_t>> m_reac;
     vector<vector<size_t>> m_prod;
     DenseMatrix m_elatoms;

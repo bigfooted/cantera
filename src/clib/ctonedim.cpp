@@ -133,7 +133,7 @@ extern "C" {
         }
     }
 
-    double domain_grid(int i, int n)
+    CanteraDouble domain_grid(int i, int n)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -144,7 +144,7 @@ extern "C" {
         }
     }
 
-    int domain_setBounds(int i, int n, double lower, double upper)
+    int domain_setBounds(int i, int n, CanteraDouble lower, CanteraDouble upper)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -156,7 +156,7 @@ extern "C" {
         }
     }
 
-    double domain_upperBound(int i, int n)
+    CanteraDouble domain_upperBound(int i, int n)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -167,7 +167,7 @@ extern "C" {
         }
     }
 
-    double domain_lowerBound(int i, int n)
+    CanteraDouble domain_lowerBound(int i, int n)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -178,8 +178,8 @@ extern "C" {
         }
     }
 
-    int domain_setSteadyTolerances(int i, int n, double rtol,
-                                   double atol)
+    int domain_setSteadyTolerances(int i, int n, CanteraDouble rtol,
+                                   CanteraDouble atol)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -191,8 +191,8 @@ extern "C" {
         }
     }
 
-    int domain_setTransientTolerances(int i, int n, double rtol,
-                                      double atol)
+    int domain_setTransientTolerances(int i, int n, CanteraDouble rtol,
+                                      CanteraDouble atol)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -204,7 +204,7 @@ extern "C" {
         }
     }
 
-    double domain_rtol(int i, int n)
+    CanteraDouble domain_rtol(int i, int n)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -215,7 +215,7 @@ extern "C" {
         }
     }
 
-    double domain_atol(int i, int n)
+    CanteraDouble domain_atol(int i, int n)
     {
         try {
             Domain1D& dom = DomainCabinet::item(i);
@@ -226,7 +226,7 @@ extern "C" {
         }
     }
 
-    int domain_setupGrid(int i, size_t npts, const double* grid)
+    int domain_setupGrid(int i, size_t npts, const CanteraDouble* grid)
     {
         try {
             DomainCabinet::item(i).setupGrid(npts, grid);
@@ -300,7 +300,7 @@ extern "C" {
         }
     }
 
-    int bdry_setMdot(int i, double mdot)
+    int bdry_setMdot(int i, CanteraDouble mdot)
     {
         try {
             DomainCabinet::as<Boundary1D>(i)->setMdot(mdot);
@@ -310,7 +310,7 @@ extern "C" {
         }
     }
 
-    int bdry_setTemperature(int i, double t)
+    int bdry_setTemperature(int i, CanteraDouble t)
     {
         try {
             DomainCabinet::as<Boundary1D>(i)->setTemperature(t);
@@ -320,7 +320,7 @@ extern "C" {
         }
     }
 
-    int bdry_setSpreadRate(int i, double v)
+    int bdry_setSpreadRate(int i, CanteraDouble v)
     {
         try {
             DomainCabinet::as<Boundary1D>(i)->setSpreadRate(v);
@@ -340,7 +340,7 @@ extern "C" {
         }
     }
 
-    double bdry_temperature(int i)
+    CanteraDouble bdry_temperature(int i)
     {
         try {
             return DomainCabinet::as<Boundary1D>(i)->temperature();
@@ -349,7 +349,7 @@ extern "C" {
         }
     }
 
-    double bdry_spreadRate(int i)
+    CanteraDouble bdry_spreadRate(int i)
     {
         try {
             return DomainCabinet::as<Boundary1D>(i)->spreadRate();
@@ -358,7 +358,7 @@ extern "C" {
         }
     }
 
-    double bdry_massFraction(int i, int k)
+    CanteraDouble bdry_massFraction(int i, int k)
     {
         try {
             return DomainCabinet::get<Boundary1D>(i).massFraction(k);
@@ -367,7 +367,7 @@ extern "C" {
         }
     }
 
-    double bdry_mdot(int i)
+    CanteraDouble bdry_mdot(int i)
     {
         try {
             return DomainCabinet::get<Boundary1D>(i).mdot();
@@ -397,7 +397,7 @@ extern "C" {
         }
     }
 
-    int inlet_setSpreadRate(int i, double v)
+    int inlet_setSpreadRate(int i, CanteraDouble v)
     {
         try {
             DomainCabinet::get<Inlet1D>(i).setSpreadRate(v);
@@ -450,7 +450,7 @@ extern "C" {
         }
     }
 
-    int stflow_setPressure(int i, double p)
+    int stflow_setPressure(int i, CanteraDouble p)
     {
         try {
             DomainCabinet::get<StFlow>(i).setPressure(p);
@@ -460,7 +460,7 @@ extern "C" {
         }
     }
 
-    double stflow_pressure(int i)
+    CanteraDouble stflow_pressure(int i)
     {
         try {
             return DomainCabinet::get<StFlow>(i).pressure();
@@ -469,11 +469,11 @@ extern "C" {
         }
     }
 
-    int stflow_setFixedTempProfile(int i, size_t n, const double* pos,
-                                   size_t m, const double* temp)
+    int stflow_setFixedTempProfile(int i, size_t n, const CanteraDouble* pos,
+                                   size_t m, const CanteraDouble* temp)
     {
         try {
-            vector<double> vpos(n), vtemp(n);
+            vector<CanteraDouble> vpos(n), vtemp(n);
             for (size_t j = 0; j < n; j++) {
                 vpos[j] = pos[j];
                 vtemp[j] = temp[j];
@@ -524,7 +524,7 @@ extern "C" {
         }
     }
 
-    int sim1D_setValue(int i, int dom, int comp, int localPoint, double value)
+    int sim1D_setValue(int i, int dom, int comp, int localPoint, CanteraDouble value)
     {
         try {
             SimCabinet::item(i).setValue(dom, comp, localPoint, value);
@@ -534,14 +534,14 @@ extern "C" {
         }
     }
 
-    int sim1D_setProfile(int i, int dom, int comp, size_t np, const double* pos,
-                         size_t nv, const double* v)
+    int sim1D_setProfile(int i, int dom, int comp, size_t np, const CanteraDouble* pos,
+                         size_t nv, const CanteraDouble* v)
     {
         try {
             Sim1D& sim = SimCabinet::item(i);
             sim.checkDomainIndex(dom);
             sim.domain(dom).checkComponentIndex(comp);
-            vector<double> vv, pv;
+            vector<CanteraDouble> vv, pv;
             for (size_t n = 0; n < np; n++) {
                 vv.push_back(v[n]);
                 pv.push_back(pos[n]);
@@ -553,7 +553,7 @@ extern "C" {
         }
     }
 
-    int sim1D_setFlatProfile(int i, int dom, int comp, double v)
+    int sim1D_setFlatProfile(int i, int dom, int comp, CanteraDouble v)
     {
         try {
             Sim1D& sim = SimCabinet::item(i);
@@ -598,7 +598,7 @@ extern "C" {
         }
     }
 
-    int sim1D_setTimeStep(int i, double stepsize, size_t ns, const int* nsteps)
+    int sim1D_setTimeStep(int i, CanteraDouble stepsize, size_t ns, const int* nsteps)
     {
         try {
             SimCabinet::item(i).setTimeStep(stepsize, ns, nsteps);
@@ -639,8 +639,8 @@ extern "C" {
         }
     }
 
-    int sim1D_setRefineCriteria(int i, int dom, double ratio,
-                                double slope, double curve, double prune)
+    int sim1D_setRefineCriteria(int i, int dom, CanteraDouble ratio,
+                                CanteraDouble slope, CanteraDouble curve, CanteraDouble prune)
     {
         try {
             SimCabinet::item(i).setRefineCriteria(dom, ratio, slope, curve, prune);
@@ -650,7 +650,7 @@ extern "C" {
         }
     }
 
-    int sim1D_setGridMin(int i, int dom, double gridmin)
+    int sim1D_setGridMin(int i, int dom, CanteraDouble gridmin)
     {
         try {
             SimCabinet::item(i).setGridMin(dom, gridmin);
@@ -699,7 +699,7 @@ extern "C" {
         }
     }
 
-    double sim1D_value(int i, int idom, int icomp, int localPoint)
+    CanteraDouble sim1D_value(int i, int idom, int icomp, int localPoint)
     {
         try {
             Sim1D& sim = SimCabinet::item(i);
@@ -711,7 +711,7 @@ extern "C" {
         }
     }
 
-    double sim1D_workValue(int i, int idom, int icomp, int localPoint)
+    CanteraDouble sim1D_workValue(int i, int idom, int icomp, int localPoint)
     {
         try {
             Sim1D& sim = SimCabinet::item(i);
@@ -723,7 +723,7 @@ extern "C" {
         }
     }
 
-    int sim1D_eval(int i, double rdt, int count)
+    int sim1D_eval(int i, CanteraDouble rdt, int count)
     {
         try {
             SimCabinet::item(i).eval(rdt, count);
@@ -743,7 +743,7 @@ extern "C" {
         }
     }
 
-    int sim1D_setFixedTemperature(int i, double temp)
+    int sim1D_setFixedTemperature(int i, CanteraDouble temp)
     {
         try {
             SimCabinet::item(i).setFixedTemperature(temp);

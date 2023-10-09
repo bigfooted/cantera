@@ -9,7 +9,7 @@
 
 namespace Cantera
 {
-ResidJacEval::ResidJacEval(double atol) :
+ResidJacEval::ResidJacEval(CanteraDouble atol) :
     m_atol(atol)
 {
     warn_deprecated("class ResidJacEval", "To be removed after Cantera 3.0");
@@ -20,7 +20,7 @@ int ResidJacEval::nEquations() const
     return neq_;
 }
 
-void ResidJacEval::setAtol(double atol)
+void ResidJacEval::setAtol(CanteraDouble atol)
 {
     m_atol = atol;
     if (m_atol <= 0.0) {
@@ -29,8 +29,8 @@ void ResidJacEval::setAtol(double atol)
     }
 }
 
-int ResidJacEval::getInitialConditions(double t0, double* const y,
-                                       double* const ydot)
+int ResidJacEval::getInitialConditions(CanteraDouble t0, CanteraDouble* const y,
+                                       CanteraDouble* const ydot)
 {
     for (int i = 0; i < neq_; i++) {
         y[i] = 0.0;
@@ -43,31 +43,31 @@ int ResidJacEval::getInitialConditions(double t0, double* const y,
     return 1;
 }
 
-void ResidJacEval::user_out2(const int ifunc, const double t,
-                             const double deltaT, const double* y,
-                             const double* ydot)
+void ResidJacEval::user_out2(const int ifunc, const CanteraDouble t,
+                             const CanteraDouble deltaT, const CanteraDouble* y,
+                             const CanteraDouble* ydot)
 {
 }
 
-void ResidJacEval::user_out(const int ifunc, const double t,
-                            const double* y, const double* ydot)
+void ResidJacEval::user_out(const int ifunc, const CanteraDouble t,
+                            const CanteraDouble* y, const CanteraDouble* ydot)
 {
     user_out2(ifunc, t, 0.0, y, ydot);
 }
 
-int ResidJacEval::evalTimeTrackingEqns(const double t,
-                                       const double delta_t,
-                                       const double* y,
-                                       const double* ydot)
+int ResidJacEval::evalTimeTrackingEqns(const CanteraDouble t,
+                                       const CanteraDouble delta_t,
+                                       const CanteraDouble* y,
+                                       const CanteraDouble* ydot)
 {
     return 1;
 }
 
-int ResidJacEval::calcDeltaSolnVariables(const double t,
-                                         const double* const ySoln,
-                                         const double* const ySolnDot,
-                                         double* const deltaYSoln,
-                                         const double* const solnWeights)
+int ResidJacEval::calcDeltaSolnVariables(const CanteraDouble t,
+                                         const CanteraDouble* const ySoln,
+                                         const CanteraDouble* const ySolnDot,
+                                         CanteraDouble* const deltaYSoln,
+                                         const CanteraDouble* const solnWeights)
 {
     if (!solnWeights) {
         for (int i = 0; i < neq_; i++) {
@@ -81,10 +81,10 @@ int ResidJacEval::calcDeltaSolnVariables(const double t,
     return 1;
 }
 
-void ResidJacEval::calcSolnScales(const double t,
-                                  const double* const ysoln,
-                                  const double* const ysolnOld,
-                                  double* const ysolnScales)
+void ResidJacEval::calcSolnScales(const CanteraDouble t,
+                                  const CanteraDouble* const ysoln,
+                                  const CanteraDouble* const ysolnOld,
+                                  CanteraDouble* const ysolnScales)
 {
     if (ysolnScales && ysolnScales[0] == 0.0) {
         for (int i = 0; i < neq_; i++) {
@@ -93,61 +93,61 @@ void ResidJacEval::calcSolnScales(const double t,
     }
 }
 
-double ResidJacEval::filterNewStep(double t, const double* const ybase, double* const step)
+CanteraDouble ResidJacEval::filterNewStep(CanteraDouble t, const CanteraDouble* const ybase, CanteraDouble* const step)
 {
     return 0.0;
 }
 
-double ResidJacEval::filterSolnPrediction(double t, double* const y)
+CanteraDouble ResidJacEval::filterSolnPrediction(CanteraDouble t, CanteraDouble* const y)
 {
     return 0.0;
 }
 
-bool ResidJacEval::evalStoppingCritera(const double t,
-                                       const double delta_t,
-                                       const double* const y,
-                                       const double* const ydot)
+bool ResidJacEval::evalStoppingCritera(const CanteraDouble t,
+                                       const CanteraDouble delta_t,
+                                       const CanteraDouble* const y,
+                                       const CanteraDouble* const ydot)
 {
     return false;
 }
 
-int ResidJacEval::matrixConditioning(double* const matrix, const int nrows,
-                                     double* const rhs)
+int ResidJacEval::matrixConditioning(CanteraDouble* const matrix, const int nrows,
+                                     CanteraDouble* const rhs)
 {
     return 1;
 }
 
-int ResidJacEval::evalResidNJ(const double t, const double deltaT,
-                              const double* y, const double* ydot,
-                              double* const resid,
+int ResidJacEval::evalResidNJ(const CanteraDouble t, const CanteraDouble deltaT,
+                              const CanteraDouble* y, const CanteraDouble* ydot,
+                              CanteraDouble* const resid,
                               const ResidEval_Type_Enum evalType,
-                              const int id_x, const double delta_x)
+                              const int id_x, const CanteraDouble delta_x)
 {
     throw NotImplementedError("ResidJacEval::evalResidNJ");
 }
 
-int ResidJacEval::eval(const double t, const double* const y, const double* const ydot,
-                       double* const r)
+int ResidJacEval::eval(const CanteraDouble t, const CanteraDouble* const y, const CanteraDouble* const ydot,
+                       CanteraDouble* const r)
 {
-    double deltaT = -1.0;
+    CanteraDouble deltaT = -1.0;
     return evalResidNJ(t, deltaT, y, ydot, r);
 }
 
-int ResidJacEval::evalJacobian(const double t, const double delta_t,
-                               double cj, const double* const y,
-                               const double* const ydot, DenseMatrix& J,
-                               double* const resid)
+int ResidJacEval::evalJacobian(const CanteraDouble t, const CanteraDouble delta_t,
+                               CanteraDouble cj, const CanteraDouble* const y,
+                               const CanteraDouble* const ydot, DenseMatrix& J,
+                               CanteraDouble* const resid)
 {
-    double* const* jac_colPts = J.colPts();
+    CanteraDouble* const* jac_colPts = J.colPts();
     return evalJacobianDP(t, delta_t, cj, y, ydot, jac_colPts, resid);
 }
 
-int ResidJacEval::evalJacobianDP(const double t, const double delta_t,
-                                 const double c_j,
-                                 const double* const y,
-                                 const double* const ydot,
-                                 double* const* jac_colPts,
-                                 double* const resid)
+int ResidJacEval::evalJacobianDP(const CanteraDouble t, const CanteraDouble delta_t,
+                                 const CanteraDouble c_j,
+                                 const CanteraDouble* const y,
+                                 const CanteraDouble* const ydot,
+                                 CanteraDouble* const* jac_colPts,
+                                 CanteraDouble* const resid)
 {
     throw NotImplementedError("ResidJacEval::evalJacobianDP");
 }

@@ -80,8 +80,8 @@ public:
      * @param h_RT    Dimensionless enthalpy
      * @param s_R     Dimensionless entropy
      */
-    virtual void update_single(size_t k, double T, double* cp_R,
-                               double* h_RT, double* s_R) const;
+    virtual void update_single(size_t k, CanteraDouble T, CanteraDouble* cp_R,
+                               CanteraDouble* h_RT, CanteraDouble* s_R) const;
 
     //! Compute the reference-state properties for all species.
     /*!
@@ -94,7 +94,7 @@ public:
      * @param h_RT    Vector of Dimensionless enthalpies. (length m_kk).
      * @param s_R     Vector of Dimensionless entropies. (length m_kk).
      */
-    virtual void update(double T, double* cp_R, double* h_RT, double* s_R) const;
+    virtual void update(CanteraDouble T, CanteraDouble* cp_R, CanteraDouble* h_RT, CanteraDouble* s_R) const;
 
     //! Minimum temperature.
     /*!
@@ -105,7 +105,7 @@ public:
      *
      * @param k    Species index
      */
-    virtual double minTemp(size_t k=npos) const;
+    virtual CanteraDouble minTemp(size_t k=npos) const;
 
     //! Maximum temperature.
     /*!
@@ -116,7 +116,7 @@ public:
      *
      * @param k  Species Index
      */
-    virtual double maxTemp(size_t k=npos) const;
+    virtual CanteraDouble maxTemp(size_t k=npos) const;
 
     //! The reference-state pressure for species k.
     /*!
@@ -128,7 +128,7 @@ public:
      * @deprecated The species index parameter is deprecated and will be removed after
      *     %Cantera 3.0. All species in a phase must have the same reference pressure.
      */
-    virtual double refPressure(size_t k=npos) const;
+    virtual CanteraDouble refPressure(size_t k=npos) const;
 
     //! This utility function reports the type of parameterization used for the
     //! species with index number *index*.
@@ -148,8 +148,8 @@ public:
      * @param maxTemp   output - Maximum temperature
      * @param refPressure output - reference pressure (Pa).
      */
-    virtual void reportParams(size_t index, int& type, double* const c, double& minTemp,
-                              double& maxTemp, double& refPressure) const;
+    virtual void reportParams(size_t index, int& type, CanteraDouble* const c, CanteraDouble& minTemp,
+                              CanteraDouble& maxTemp, CanteraDouble& refPressure) const;
 
     //! Report the 298 K Heat of Formation of the standard state of one species
     //! (J kmol-1)
@@ -161,7 +161,7 @@ public:
      * @param k    species index
      * @returns the current value of the Heat of Formation at 298K and 1 bar
      */
-    virtual double reportOneHf298(const size_t k) const;
+    virtual CanteraDouble reportOneHf298(const size_t k) const;
 
     //! Modify the value of the 298 K Heat of Formation of the standard state of
     //! one species in the phase (J kmol-1)
@@ -174,7 +174,7 @@ public:
      * @param  Hf298New    Specify the new value of the Heat of Formation at
      *                     298K and 1 bar. units = J/kmol.
      */
-    virtual void modifyOneHf298(const size_t k, const double Hf298New);
+    virtual void modifyOneHf298(const size_t k, const CanteraDouble Hf298New);
 
     //! Restore the original heat of formation of one or more species
     /*!
@@ -201,7 +201,7 @@ protected:
 
     typedef pair<size_t, shared_ptr<SpeciesThermoInterpType>> index_STIT;
     typedef map<int, vector<index_STIT>> STIT_map;
-    typedef map<int, vector<double>> tpoly_map;
+    typedef map<int, vector<CanteraDouble>> tpoly_map;
 
     //! This is the main data structure, which contains the
     //! SpeciesThermoInterpType objects, sorted by the parameterization type.
@@ -218,13 +218,13 @@ protected:
     map<size_t, pair<int, size_t>> m_speciesLoc;
 
     //! Maximum value of the lowest temperature
-    double m_tlow_max = 0.0;
+    CanteraDouble m_tlow_max = 0.0;
 
     //! Minimum value of the highest temperature
-    double m_thigh_min = 1e+30;
+    CanteraDouble m_thigh_min = 1e+30;
 
     //! reference pressure (Pa)
-    double m_p0 = 0.0;
+    CanteraDouble m_p0 = 0.0;
 
     //! indicates if data for species has been installed
     vector<bool> m_installed;

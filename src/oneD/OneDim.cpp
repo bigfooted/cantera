@@ -25,7 +25,7 @@ OneDim::OneDim(vector<shared_ptr<Domain1D>>& domains)
 {
     // create a Newton iterator, and add each domain.
     m_newt = make_unique<MultiNewton>(1);
-    m_state = make_shared<vector<double>>();
+    m_state = make_shared<vector<CanteraDouble>>();
     for (auto& dom : domains) {
         addDomain(dom);
     }
@@ -41,7 +41,7 @@ OneDim::OneDim(vector<Domain1D*> domains)
 
     // create a Newton iterator, and add each domain.
     m_newt = make_unique<MultiNewton>(1);
-    m_state = make_shared<vector<double>>();
+    m_state = make_shared<vector<CanteraDouble>>();
     for (size_t i = 0; i < domains.size(); i++) {
         addDomain(domains[i]);
     }
@@ -255,7 +255,7 @@ void OneDim::resize()
     }
 }
 
-int OneDim::solve(double* x, double* xnew, int loglevel)
+int OneDim::solve(CanteraDouble* x, CanteraDouble* xnew, int loglevel)
 {
     if (!m_jac_ok) {
         eval(npos, x, xnew, 0.0, 0);
@@ -267,9 +267,9 @@ int OneDim::solve(double* x, double* xnew, int loglevel)
     return m_newt->solve(x, xnew, *this, *m_jac, loglevel);
 }
 
-void OneDim::evalSSJacobian(double* x, double* xnew)
+void OneDim::evalSSJacobian(CanteraDouble* x, CanteraDouble* xnew)
 {
-    double rdt_save = m_rdt;
+    CanteraDouble rdt_save = m_rdt;
     m_jac_ok = false;
     setSteadyMode();
     eval(npos, x, xnew, 0.0, 0);
@@ -289,7 +289,7 @@ Domain1D* OneDim::pointDomain(size_t i)
     return 0;
 }
 
-void OneDim::eval(size_t j, double* x, double* r, double rdt, int count)
+void OneDim::eval(size_t j, CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt, int count)
 {
     clock_t t0 = clock();
     if (m_interrupt) {
@@ -316,24 +316,24 @@ void OneDim::eval(size_t j, double* x, double* r, double rdt, int count)
     // increment counter and time
     if (count) {
         clock_t t1 = clock();
-        m_evaltime += double(t1 - t0)/CLOCKS_PER_SEC;
+        m_evaltime += CanteraDouble(t1 - t0)/CLOCKS_PER_SEC;
         m_nevals++;
     }
 }
 
-double OneDim::ssnorm(double* x, double* r)
+CanteraDouble OneDim::ssnorm(CanteraDouble* x, CanteraDouble* r)
 {
     eval(npos, x, r, 0.0, 0);
-    double ss = 0.0;
+    CanteraDouble ss = 0.0;
     for (size_t i = 0; i < m_size; i++) {
         ss = std::max(fabs(r[i]),ss);
     }
     return ss;
 }
 
-void OneDim::initTimeInteg(double dt, double* x)
+void OneDim::initTimeInteg(CanteraDouble dt, CanteraDouble* x)
 {
-    double rdt_old = m_rdt;
+    CanteraDouble rdt_old = m_rdt;
     m_rdt = 1.0/dt;
 
     // if the stepsize has changed, then update the transient part of the
@@ -379,7 +379,7 @@ void OneDim::init()
     m_init = true;
 }
 
-double OneDim::timeStep(int nsteps, double dt, double* x, double* r, int loglevel)
+CanteraDouble OneDim::timeStep(int nsteps, CanteraDouble dt, CanteraDouble* x, CanteraDouble* r, int loglevel)
 {
     // set the Jacobian age parameter to the transient value
     newton().setOptions(m_ts_jac_age);
@@ -392,7 +392,7 @@ double OneDim::timeStep(int nsteps, double dt, double* x, double* r, int logleve
 
     while (n < nsteps) {
         if (loglevel > 0) {
-            double ss = ssnorm(x, r);
+            CanteraDouble ss = ssnorm(x, r);
             writelog(" {:>4d}  {:10.4g}  {:10.4g}", n, dt, log10(ss));
         }
 
@@ -446,14 +446,14 @@ double OneDim::timeStep(int nsteps, double dt, double* x, double* r, int logleve
     return dt;
 }
 
-void OneDim::resetBadValues(double* x)
+void OneDim::resetBadValues(CanteraDouble* x)
 {
     for (auto dom : m_dom) {
         dom->resetBadValues(x);
     }
 }
 
-AnyMap OneDim::serialize(const double* soln) const
+AnyMap OneDim::serialize(const CanteraDouble* soln) const
 {
     warn_deprecated("OneDim::serialize",
         "To be removed after Cantera 3.0; unused.");

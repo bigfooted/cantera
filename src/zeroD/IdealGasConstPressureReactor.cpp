@@ -24,7 +24,7 @@ void IdealGasConstPressureReactor::setThermoMgr(ThermoPhase& thermo)
     Reactor::setThermoMgr(thermo);
 }
 
-void IdealGasConstPressureReactor::getState(double* y)
+void IdealGasConstPressureReactor::getState(CanteraDouble* y)
 {
     if (m_thermo == 0) {
         throw CanteraError("IdealGasConstPressureReactor::getState",
@@ -46,13 +46,13 @@ void IdealGasConstPressureReactor::getState(double* y)
     getSurfaceInitialConditions(y + m_nsp + 2);
 }
 
-void IdealGasConstPressureReactor::initialize(double t0)
+void IdealGasConstPressureReactor::initialize(CanteraDouble t0)
 {
     ConstPressureReactor::initialize(t0);
     m_hk.resize(m_nsp, 0.0);
 }
 
-void IdealGasConstPressureReactor::updateState(double* y)
+void IdealGasConstPressureReactor::updateState(CanteraDouble* y)
 {
     // The components of y are [0] the total mass, [1] the temperature,
     // [2...K+2) are the mass fractions of each species, and [K+2...] are the
@@ -65,11 +65,11 @@ void IdealGasConstPressureReactor::updateState(double* y)
     updateSurfaceState(y + m_nsp + 2);
 }
 
-void IdealGasConstPressureReactor::eval(double time, double* LHS, double* RHS)
+void IdealGasConstPressureReactor::eval(CanteraDouble time, CanteraDouble* LHS, CanteraDouble* RHS)
 {
-    double& dmdt = RHS[0]; // dm/dt (gas phase)
-    double& mcpdTdt = RHS[1]; // m * c_p * dT/dt
-    double* mdYdt = RHS + 2; // mass * dY/dt
+    CanteraDouble& dmdt = RHS[0]; // dm/dt (gas phase)
+    CanteraDouble& mcpdTdt = RHS[1]; // m * c_p * dT/dt
+    CanteraDouble* mdYdt = RHS + 2; // mass * dY/dt
 
     dmdt = 0.0;
     mcpdTdt = 0.0;
@@ -77,11 +77,11 @@ void IdealGasConstPressureReactor::eval(double time, double* LHS, double* RHS)
     evalWalls(time);
 
     m_thermo->restoreState(m_state);
-    const vector<double>& mw = m_thermo->molecularWeights();
-    const double* Y = m_thermo->massFractions();
+    const vector<CanteraDouble>& mw = m_thermo->molecularWeights();
+    const CanteraDouble* Y = m_thermo->massFractions();
 
     evalSurfaces(LHS + m_nsp + 2, RHS + m_nsp + 2, m_sdot.data());
-    double mdot_surf = dot(m_sdot.begin(), m_sdot.end(), mw.begin());
+    CanteraDouble mdot_surf = dot(m_sdot.begin(), m_sdot.end(), mw.begin());
     dmdt += mdot_surf;
 
     m_thermo->getPartialMolarEnthalpies(&m_hk[0]);
@@ -112,11 +112,11 @@ void IdealGasConstPressureReactor::eval(double time, double* LHS, double* RHS)
 
     // add terms for inlets
     for (auto inlet : m_inlet) {
-        double mdot = inlet->massFlowRate();
+        CanteraDouble mdot = inlet->massFlowRate();
         dmdt += mdot; // mass flow into system
         mcpdTdt += inlet->enthalpy_mass() * mdot;
         for (size_t n = 0; n < m_nsp; n++) {
-            double mdot_spec = inlet->outletSpeciesMassFlowRate(n);
+            CanteraDouble mdot_spec = inlet->outletSpeciesMassFlowRate(n);
             // flow of species into system and dilution by other species
             mdYdt[n] += mdot_spec - mdot * Y[n];
             mcpdTdt -= m_hk[n] / mw[n] * mdot_spec;

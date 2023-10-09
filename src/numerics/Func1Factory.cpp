@@ -13,43 +13,43 @@ std::mutex Func1Factory::s_mutex;
 
 Func1Factory::Func1Factory()
 {
-    reg("functor", [](const vector<double>& params) {
+    reg("functor", [](const vector<CanteraDouble>& params) {
         return new Func1();
     });
-    reg("sin", [](const vector<double>& params) {
+    reg("sin", [](const vector<CanteraDouble>& params) {
         return new Sin1(params);
     });
-    reg("cos", [](const vector<double>& params) {
+    reg("cos", [](const vector<CanteraDouble>& params) {
         return new Cos1(params);
     });
-    reg("exp", [](const vector<double>& params) {
+    reg("exp", [](const vector<CanteraDouble>& params) {
         return new Exp1(params);
     });
-    reg("log", [](const vector<double>& params) {
+    reg("log", [](const vector<CanteraDouble>& params) {
         return new Log1(params);
     });
-    reg("pow", [](const vector<double>& params) {
+    reg("pow", [](const vector<CanteraDouble>& params) {
         return new Pow1(params);
     });
-    reg("constant", [](const vector<double>& params) {
+    reg("constant", [](const vector<CanteraDouble>& params) {
         return new Const1(params);
     });
-    reg("polynomial", [](const vector<double>& params) {
+    reg("polynomial", [](const vector<CanteraDouble>& params) {
         return new Poly1(params);
     });
-    reg("Fourier", [](const vector<double>& params) {
+    reg("Fourier", [](const vector<CanteraDouble>& params) {
         return new Fourier1(params);
     });
-    reg("Gaussian", [](const vector<double>& params) {
+    reg("Gaussian", [](const vector<CanteraDouble>& params) {
         return new Gaussian1(params);
     });
-    reg("Arrhenius", [](const vector<double>& params) {
+    reg("Arrhenius", [](const vector<CanteraDouble>& params) {
         return new Arrhenius1(params);
     });
-    reg("tabulated-linear", [](const vector<double>& params) {
+    reg("tabulated-linear", [](const vector<CanteraDouble>& params) {
         return new Tabulated1(params);
     });
-    reg("tabulated-previous", [](const vector<double>& params) {
+    reg("tabulated-previous", [](const vector<CanteraDouble>& params) {
         auto fcn = new Tabulated1(params);
         fcn->setMethod("previous");
         return fcn;
@@ -115,13 +115,13 @@ std::mutex Math1FactoryB::s_mutex;
 
 Math1FactoryB::Math1FactoryB()
 {
-    reg("times-constant", [](const shared_ptr<Func1> f, double c) {
+    reg("times-constant", [](const shared_ptr<Func1> f, CanteraDouble c) {
         return new TimesConstant1(f, c);
     });
-    reg("plus-constant", [](const shared_ptr<Func1> f, double c) {
+    reg("plus-constant", [](const shared_ptr<Func1> f, CanteraDouble c) {
         return new PlusConstant1(f, c);
     });
-    reg("periodic", [](const shared_ptr<Func1> f, double c) {
+    reg("periodic", [](const shared_ptr<Func1> f, CanteraDouble c) {
         return new Periodic1(f, c);
     });
 }
@@ -142,13 +142,13 @@ void Math1FactoryB::deleteFactory()
     s_factory = 0;
 }
 
-shared_ptr<Func1> newFunc1(const string& func1Type, double coeff)
+shared_ptr<Func1> newFunc1(const string& func1Type, CanteraDouble coeff)
 {
     return shared_ptr<Func1>(
         Func1Factory::factory()->create(func1Type, {coeff}));
 }
 
-shared_ptr<Func1> newFunc1(const string& func1Type, const vector<double>& params)
+shared_ptr<Func1> newFunc1(const string& func1Type, const vector<CanteraDouble>& params)
 {
     return shared_ptr<Func1>(
         Func1Factory::factory()->create(func1Type, params));
@@ -162,7 +162,7 @@ shared_ptr<Func1> newFunc1(const string& func1Type, const shared_ptr<Func1> f1,
 }
 
 shared_ptr<Func1> newFunc1(const string& func1Type,
-                           const shared_ptr<Func1> f, double coeff)
+                           const shared_ptr<Func1> f, CanteraDouble coeff)
 {
     return shared_ptr<Func1>(
         Math1FactoryB::factory()->create(func1Type, f, coeff));

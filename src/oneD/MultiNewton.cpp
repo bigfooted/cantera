@@ -32,26 +32,26 @@ public:
  * Newton step between specified lower and upper bounds. This function only
  * considers one domain.
  */
-double bound_step(const double* x, const double* step, Domain1D& r, int loglevel)
+CanteraDouble bound_step(const CanteraDouble* x, const CanteraDouble* step, Domain1D& r, int loglevel)
 {
     size_t np = r.nPoints();
     size_t nv = r.nComponents();
     Indx index(nv, np);
-    double fbound = 1.0;
+    CanteraDouble fbound = 1.0;
     bool wroteTitle = false;
     for (size_t m = 0; m < nv; m++) {
-        double above = r.upperBound(m);
-        double below = r.lowerBound(m);
+        CanteraDouble above = r.upperBound(m);
+        CanteraDouble below = r.lowerBound(m);
 
         for (size_t j = 0; j < np; j++) {
-            double val = x[index(m,j)];
+            CanteraDouble val = x[index(m,j)];
             if (loglevel > 0 && (val > above + 1.0e-12 || val < below - 1.0e-12)) {
                 writelog("\nERROR: solution out of bounds.\n");
                 writelog("domain {:d}: {:>20s}({:d}) = {:10.3e} ({:10.3e}, {:10.3e})\n",
                          r.domainIndex(), r.componentName(m), j, val, below, above);
             }
 
-            double newval = val + step[index(m,j)];
+            CanteraDouble newval = val + step[index(m,j)];
 
             if (newval > above) {
                 fbound = std::max(0.0, std::min(fbound,
@@ -98,21 +98,21 @@ double bound_step(const double* x, const double* step, Domain1D& r, int loglevel
  * The second term, @f$ \epsilon_{a,n} @f$, is the absolute error tolerance for
  * component n.
  */
-double norm_square(const double* x, const double* step, Domain1D& r)
+CanteraDouble norm_square(const CanteraDouble* x, const CanteraDouble* step, Domain1D& r)
 {
-    double sum = 0.0;
-    double f2max = 0.0;
+    CanteraDouble sum = 0.0;
+    CanteraDouble f2max = 0.0;
     size_t nv = r.nComponents();
     size_t np = r.nPoints();
 
     for (size_t n = 0; n < nv; n++) {
-        double esum = 0.0;
+        CanteraDouble esum = 0.0;
         for (size_t j = 0; j < np; j++) {
             esum += fabs(x[nv*j + n]);
         }
-        double ewt = r.rtol(n)*esum/np + r.atol(n);
+        CanteraDouble ewt = r.rtol(n)*esum/np + r.atol(n);
         for (size_t j = 0; j < np; j++) {
-            double f = step[nv*j + n]/ewt;
+            CanteraDouble f = step[nv*j + n]/ewt;
             sum += f*f;
             f2max = std::max(f*f, f2max);
         }
@@ -124,7 +124,7 @@ double norm_square(const double* x, const double* step, Domain1D& r)
 
 
 // constants
-const double DampFactor = sqrt(2.0);
+const CanteraDouble DampFactor = sqrt(2.0);
 const size_t NDAMP = 7;
 
 // ---------------- MultiNewton methods ----------------
@@ -142,19 +142,19 @@ void MultiNewton::resize(size_t sz)
     m_stp1.resize(m_n);
 }
 
-double MultiNewton::norm2(const double* x, const double* step, OneDim& r) const
+CanteraDouble MultiNewton::norm2(const CanteraDouble* x, const CanteraDouble* step, OneDim& r) const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     size_t nd = r.nDomains();
     for (size_t n = 0; n < nd; n++) {
-        double f = norm_square(x + r.start(n), step + r.start(n), r.domain(n));
+        CanteraDouble f = norm_square(x + r.start(n), step + r.start(n), r.domain(n));
         sum += f;
     }
     sum /= r.size();
     return sqrt(sum);
 }
 
-void MultiNewton::step(double* x, double* step, OneDim& r, MultiJac& jac, int loglevel)
+void MultiNewton::step(CanteraDouble* x, CanteraDouble* step, OneDim& r, MultiJac& jac, int loglevel)
 {
     r.eval(npos, x, step);
     for (size_t n = 0; n < r.size(); n++) {
@@ -187,10 +187,10 @@ void MultiNewton::step(double* x, double* step, OneDim& r, MultiJac& jac, int lo
     }
 }
 
-double MultiNewton::boundStep(const double* x0, const double* step0, const OneDim& r,
+CanteraDouble MultiNewton::boundStep(const CanteraDouble* x0, const CanteraDouble* step0, const OneDim& r,
                               int loglevel)
 {
-    double fbound = 1.0;
+    CanteraDouble fbound = 1.0;
     for (size_t i = 0; i < r.nDomains(); i++) {
         fbound = std::min(fbound,
                           bound_step(x0 + r.start(i), step0 + r.start(i),
@@ -199,8 +199,8 @@ double MultiNewton::boundStep(const double* x0, const double* step0, const OneDi
     return fbound;
 }
 
-int MultiNewton::dampStep(const double* x0, const double* step0,
-                          double* x1, double* step1, double& s1,
+int MultiNewton::dampStep(const CanteraDouble* x0, const CanteraDouble* step0,
+                          CanteraDouble* x1, CanteraDouble* step1, CanteraDouble& s1,
                           OneDim& r, MultiJac& jac, int loglevel, bool writetitle)
 {
     // write header
@@ -215,10 +215,10 @@ int MultiNewton::dampStep(const double* x0, const double* step0,
     }
 
     // compute the weighted norm of the undamped step size step0
-    double s0 = norm2(x0, step0, r);
+    CanteraDouble s0 = norm2(x0, step0, r);
 
     // compute the multiplier to keep all components in bounds
-    double fbound = boundStep(x0, step0, r, loglevel-1);
+    CanteraDouble fbound = boundStep(x0, step0, r, loglevel-1);
 
     // if fbound is very small, then x0 is already close to the boundary and
     // step0 points out of the allowed domain. In this case, the Newton
@@ -231,10 +231,10 @@ int MultiNewton::dampStep(const double* x0, const double* step0,
     // ---------- Attempt damped step ----------
 
     // damping coefficient starts at 1.0
-    double damp = 1.0;
+    CanteraDouble damp = 1.0;
     size_t m;
     for (m = 0; m < NDAMP; m++) {
-        double ff = fbound*damp;
+        CanteraDouble ff = fbound*damp;
 
         // step the solution by the damped step size
         for (size_t j = 0; j < m_n; j++) {
@@ -249,7 +249,7 @@ int MultiNewton::dampStep(const double* x0, const double* step0,
 
         // write log information
         if (loglevel > 0) {
-            double ss = r.ssnorm(x1,step1);
+            CanteraDouble ss = r.ssnorm(x1,step1);
             writelog("\n{:d}  {:9.5f}   {:9.5f}   {:9.5f}   {:9.5f}   {:9.5f} {:4d}  {:d}/{:d}",
                      m, damp, fbound, log10(ss+SmallNumber),
                      log10(s0+SmallNumber), log10(s1+SmallNumber),
@@ -280,17 +280,17 @@ int MultiNewton::dampStep(const double* x0, const double* step0,
     }
 }
 
-int MultiNewton::solve(double* x0, double* x1, OneDim& r, MultiJac& jac, int loglevel)
+int MultiNewton::solve(CanteraDouble* x0, CanteraDouble* x1, OneDim& r, MultiJac& jac, int loglevel)
 {
     clock_t t0 = clock();
     int m = 0;
     bool forceNewJac = false;
-    double s1=1.e30;
+    CanteraDouble s1=1.e30;
 
     copy(x0, x0 + m_n, &m_x[0]);
 
     bool frst = true;
-    double rdt = r.rdt();
+    CanteraDouble rdt = r.rdt();
     int j0 = jac.nEvals();
     int nJacReeval = 0;
 
@@ -324,7 +324,7 @@ int MultiNewton::solve(double* x0, double* x1, OneDim& r, MultiJac& jac, int log
                          "log10(ss)","log10(s1)","N_jac");
                 writelog("\n    ------------------------------------");
             }
-            double ss = r.ssnorm(&m_x[0], &m_stp[0]);
+            CanteraDouble ss = r.ssnorm(&m_x[0], &m_stp[0]);
             writelog("\n    {:10.4f}    {:10.4f}       {:d}",
                      log10(ss),log10(s1),jac.nEvals());
         }

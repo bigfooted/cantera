@@ -36,7 +36,7 @@ public:
     }
 
     //! Mass flow rate (kg/s).
-    double massFlowRate() {
+    CanteraDouble massFlowRate() {
         if (m_mdot == Undef) {
             throw CanteraError("FlowDevice::massFlowRate",
                                "Flow device is not ready. Try initializing the reactor network.");
@@ -47,14 +47,14 @@ public:
 
     //! Update the mass flow rate at time 'time'. This must be overloaded in
     //! subclasses to update m_mdot.
-    virtual void updateMassFlowRate(double time) {}
+    virtual void updateMassFlowRate(CanteraDouble time) {}
 
     //! Mass flow rate (kg/s) of outlet species k. Returns zero if this species
     //! is not present in the upstream mixture.
-    double outletSpeciesMassFlowRate(size_t k);
+    CanteraDouble outletSpeciesMassFlowRate(size_t k);
 
     //! specific enthalpy
-    double enthalpy_mass();
+    CanteraDouble enthalpy_mass();
 
     //! Install a flow device between two reactors.
     /*!
@@ -85,7 +85,7 @@ public:
      * The calculation of mass flow rate depends to the flow device.
      * @since New in %Cantera 3.0.
      */
-    double evalPressureFunction();
+    CanteraDouble evalPressureFunction();
 
     //! Set a function of pressure that is used in determining the
     //! mass flow rate through the device. The evaluation of mass flow
@@ -99,7 +99,7 @@ public:
      * The calculation of mass flow rate depends on the flow device.
      * @since New in %Cantera 3.0.
      */
-    double evalTimeFunction();
+    CanteraDouble evalTimeFunction();
 
     //! Set a function of time that is used in determining
     //! the mass flow rate through the device. The evaluation of mass flow
@@ -110,12 +110,12 @@ public:
     /*!
      * @since New in %Cantera 3.0.
      */
-    void setSimTime(double time) {
+    void setSimTime(CanteraDouble time) {
         m_time = time;
     }
 
 protected:
-    double m_mdot = Undef;
+    CanteraDouble m_mdot = Undef;
 
     //! Function set by setPressureFunction; used by updateMassFlowRate
     Func1* m_pfunc = nullptr;
@@ -124,10 +124,10 @@ protected:
     Func1* m_tfunc = nullptr;
 
     //! Coefficient set by derived classes; used by updateMassFlowRate
-    double m_coeff = 1.0;
+    CanteraDouble m_coeff = 1.0;
 
     //! Current reactor network time
-    double m_time = 0.;
+    CanteraDouble m_time = 0.;
 
 private:
     size_t m_nspin = 0;

@@ -126,14 +126,14 @@ public:
      *
      * \see MultiSpeciesThermo
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
     //! Return the Molar Internal Energy. Units: J/kmol
     /**
      * For a surface phase, the pressure is not a relevant thermodynamic
      * variable, and so the Enthalpy is equal to the Internal Energy.
      */
-    double intEnergy_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
 
     //! Return the Molar Entropy. Units: J/kmol-K
     /**
@@ -141,17 +141,17 @@ public:
      *  \hat s(T,P) = \sum_k X_k (\hat s^0_k(T) - R \ln \theta_k)
      * @f]
      */
-    double entropy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
 
-    void getChemPotentials(double* mu) const override;
-    void getPartialMolarEnthalpies(double* hbar) const override;
-    void getPartialMolarEntropies(double* sbar) const override;
-    void getPartialMolarCp(double* cpbar) const override;
-    void getPartialMolarVolumes(double* vbar) const override;
-    void getStandardChemPotentials(double* mu0) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
+    void getStandardChemPotentials(CanteraDouble* mu0) const override;
 
     //! Return a vector of activity concentrations for each species
     /*!
@@ -177,7 +177,7 @@ public:
      *
      * @param c vector of activity concentration (kmol m-2).
      */
-    void getActivityConcentrations(double* c) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
     //! Return the standard concentration for the kth species
     /*!
@@ -196,8 +196,8 @@ public:
      * @return the standard concentration in units of kmol/m^2 for surface phases or
      *     kmol/m for edge phases.
      */
-    double standardConcentration(size_t k=0) const override;
-    double logStandardConc(size_t k=0) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
+    CanteraDouble logStandardConc(size_t k=0) const override;
 
     void initThermo() override;
     void getParameters(AnyMap& phaseNode) const override;
@@ -205,25 +205,25 @@ public:
     bool addSpecies(shared_ptr<Species> spec) override;
 
     //! Since interface phases have no volume, this returns 0.0.
-    double molarVolume() const override {
+    CanteraDouble molarVolume() const override {
         return 0.0;
     }
 
     //! Since interface phases have no volume, setting this to a value other than 0.0
     //! raises an exception.
     //! @deprecated Unused. To be removed after %Cantera 3.0
-    void setMolarDensity(const double vm) override;
+    void setMolarDensity(const CanteraDouble vm) override;
 
     //! Returns the site density
     /*!
      * Site density kmol m-2
      */
-    double siteDensity() const {
+    CanteraDouble siteDensity() const {
         return m_n0;
     }
 
     //! Returns the number of sites occupied by one molecule of species *k*.
-    double size(size_t k) const {
+    CanteraDouble size(size_t k) const {
         return m_speciesSize[k];
     }
 
@@ -231,16 +231,16 @@ public:
     /*!
      *  @param n0 Site density of the surface phase (kmol m-2)
      */
-    void setSiteDensity(double n0);
+    void setSiteDensity(CanteraDouble n0);
 
-    void getGibbs_RT(double* grt) const override;
-    void getEnthalpy_RT(double* hrt) const override;
-    void getEntropy_R(double* sr) const override;
-    void getCp_R(double* cpr) const override;
-    void getStandardVolumes(double* vol) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
+    void getStandardVolumes(CanteraDouble* vol) const override;
 
     //! Return the thermodynamic pressure (Pa).
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_press;
     }
 
@@ -249,15 +249,15 @@ public:
     /*!
      *  @param p input Pressure (Pa)
      */
-    void setPressure(double p) override {
+    void setPressure(CanteraDouble p) override {
         m_press = p;
     }
 
-    void getPureGibbs(double* g) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getCp_R_ref(double* cprt) const override;
+    void getPureGibbs(CanteraDouble* g) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
 
     //! Set the surface site fractions to a specified state.
     /*!
@@ -271,7 +271,7 @@ public:
      *
      * This routine normalizes the theta's to 1, before application
      */
-    void setCoverages(const double* theta);
+    void setCoverages(const CanteraDouble* theta);
 
     //! Set the surface site fractions to a specified state.
     /*!
@@ -283,7 +283,7 @@ public:
      * @param theta    This is the surface site fraction for the kth species in
      *                 the surface phase. This is a dimensionless quantity.
      */
-    void setCoveragesNoNorm(const double* theta);
+    void setCoveragesNoNorm(const CanteraDouble* theta);
 
     //! Set the coverages from a string of colon-separated name:value pairs.
     /*!
@@ -301,7 +301,7 @@ public:
      * @param theta Array theta must be at least as long as the number of
      *              species.
      */
-    void getCoverages(double* theta) const;
+    void getCoverages(CanteraDouble* theta) const;
 
     //! @copydoc ThermoPhase::setState
     /*!
@@ -313,38 +313,38 @@ protected:
     void compositionChanged() override;
 
     //! Surface site density (kmol m-2)
-    double m_n0 = 1.0;
+    CanteraDouble m_n0 = 1.0;
 
     //! Vector of species sizes (number of sites occupied). length m_kk.
-    vector<double> m_speciesSize;
+    vector<CanteraDouble> m_speciesSize;
 
     //! log of the surface site density
-    double m_logn0;
+    CanteraDouble m_logn0;
 
     //! Current value of the pressure (Pa)
-    double m_press = OneAtm;
+    CanteraDouble m_press = OneAtm;
 
     //! Temporary storage for the reference state enthalpies
-    mutable vector<double> m_h0;
+    mutable vector<CanteraDouble> m_h0;
 
     //! Temporary storage for the reference state entropies
-    mutable vector<double> m_s0;
+    mutable vector<CanteraDouble> m_s0;
 
     //! Temporary storage for the reference state heat capacities
-    mutable vector<double> m_cp0;
+    mutable vector<CanteraDouble> m_cp0;
 
     //! Temporary storage for the reference state Gibbs energies
-    mutable vector<double> m_mu0;
+    mutable vector<CanteraDouble> m_mu0;
 
     //! Temporary work array
-    mutable vector<double> m_work;
+    mutable vector<CanteraDouble> m_work;
 
     //! vector storing the log of the size of each species.
     /*!
      * The size of each species is defined as the number of surface sites each
      * species occupies.
      */
-    mutable vector<double> m_logsize;
+    mutable vector<CanteraDouble> m_logsize;
 
     //! Update the species reference state thermodynamic functions
     /*!

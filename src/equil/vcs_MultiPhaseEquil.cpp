@@ -26,11 +26,11 @@ vcs_MultiPhaseEquil::vcs_MultiPhaseEquil(MultiPhase* mix, int printLvl) :
 {
 }
 
-int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEquil,
-                                        int printLvl, double err,
+int vcs_MultiPhaseEquil::equilibrate_TV(int XY, CanteraDouble xtarget, int estimateEquil,
+                                        int printLvl, CanteraDouble err,
                                         int maxsteps, int loglevel)
 {
-    double Vtarget = m_mix->volume();
+    CanteraDouble Vtarget = m_mix->volume();
     if ((XY != TV) && (XY != HV) && (XY != UV) && (XY != SV)) {
         throw CanteraError("vcs_MultiPhaseEquil::equilibrate_TV",
                            "Wrong XY flag: {}", XY);
@@ -41,15 +41,15 @@ int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEqui
         m_mix->setTemperature(xtarget);
     }
     int strt = estimateEquil;
-    double P1 = 0.0;
-    double V1 = 0.0;
-    double V2 = 0.0;
-    double P2 = 0.0;
-    double Tlow = 0.5 * m_mix->minTemp();
-    double Thigh = 2.0 * m_mix->maxTemp();
+    CanteraDouble P1 = 0.0;
+    CanteraDouble V1 = 0.0;
+    CanteraDouble V2 = 0.0;
+    CanteraDouble P2 = 0.0;
+    CanteraDouble Tlow = 0.5 * m_mix->minTemp();
+    CanteraDouble Thigh = 2.0 * m_mix->maxTemp();
     int printLvlSub = std::max(0, printLvl - 1);
     for (int n = 0; n < maxiter; n++) {
-        double Pnow = m_mix->pressure();
+        CanteraDouble Pnow = m_mix->pressure();
 
         switch (XY) {
         case TV:
@@ -71,7 +71,7 @@ int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEqui
             break;
         }
         strt = false;
-        double Vnow = m_mix->volume();
+        CanteraDouble Vnow = m_mix->volume();
         if (n == 0) {
             V2 = Vnow;
             P2 = Pnow;
@@ -85,14 +85,14 @@ int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEqui
             V1 = Vnow;
         }
 
-        double Verr = fabs((Vtarget - Vnow)/Vtarget);
+        CanteraDouble Verr = fabs((Vtarget - Vnow)/Vtarget);
         if (Verr < err) {
             return iSuccess;
         }
-        double Pnew;
+        CanteraDouble Pnew;
         // find dV/dP
         if (n > 1) {
-            double dVdP = (V2 - V1) / (P2 - P1);
+            CanteraDouble dVdP = (V2 - V1) / (P2 - P1);
             if (dVdP == 0.0) {
                 throw CanteraError("vcs_MultiPhase::equilibrate_TV",
                                    "dVdP == 0.0");
@@ -107,7 +107,7 @@ int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEqui
             }
         } else {
             m_mix->setPressure(Pnow*1.01);
-            double dVdP = (m_mix->volume() - Vnow)/(0.01*Pnow);
+            CanteraDouble dVdP = (m_mix->volume() - Vnow)/(0.01*Pnow);
             Pnew = Pnow + 0.5*(Vtarget - Vnow)/dVdP;
             if (Pnew < 0.5* Pnow) {
                 Pnew = 0.5 * Pnow;
@@ -122,8 +122,8 @@ int vcs_MultiPhaseEquil::equilibrate_TV(int XY, double xtarget, int estimateEqui
                        "No convergence for V");
 }
 
-int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
-    double Thigh, int estimateEquil, int printLvl, double err, int maxsteps,
+int vcs_MultiPhaseEquil::equilibrate_HP(CanteraDouble Htarget, int XY, CanteraDouble Tlow,
+    CanteraDouble Thigh, int estimateEquil, int printLvl, CanteraDouble err, int maxsteps,
     int loglevel)
 {
     int maxiter = 100;
@@ -143,10 +143,10 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
         Thigh = 2.0 * m_mix->maxTemp();
     }
 
-    double cpb = 1.0;
-    double Hlow = Undef;
-    double Hhigh = Undef;
-    double Tnow = m_mix->temperature();
+    CanteraDouble cpb = 1.0;
+    CanteraDouble Hlow = Undef;
+    CanteraDouble Hhigh = Undef;
+    CanteraDouble Tnow = m_mix->temperature();
     int printLvlSub = std::max(printLvl - 1, 0);
 
     for (int n = 0; n < maxiter; n++) {
@@ -156,11 +156,11 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
             Tnow = m_mix->temperature();
             iSuccess = equilibrate_TP(strt, printLvlSub, err, maxsteps, loglevel);
             strt = 0;
-            double Hnow = (XY == UP) ? m_mix->IntEnergy() : m_mix->enthalpy();
-            double pmoles[10];
+            CanteraDouble Hnow = (XY == UP) ? m_mix->IntEnergy() : m_mix->enthalpy();
+            CanteraDouble pmoles[10];
             pmoles[0] = m_mix->phaseMoles(0);
-            double Tmoles = pmoles[0];
-            double HperMole = Hnow/Tmoles;
+            CanteraDouble Tmoles = pmoles[0];
+            CanteraDouble HperMole = Hnow/Tmoles;
             if (printLvl > 0) {
                 plogf("T = %g, Hnow = %g ,Tmoles = %g,  HperMole = %g\n",
                       Tnow, Hnow, Tmoles, HperMole);
@@ -182,23 +182,23 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
                     Hhigh = Hnow;
                 }
             }
-            double dT;
+            CanteraDouble dT;
             if (Hlow != Undef && Hhigh != Undef) {
                 cpb = (Hhigh - Hlow)/(Thigh - Tlow);
                 dT = (Htarget - Hnow)/cpb;
-                double dTa = fabs(dT);
-                double dTmax = 0.5*fabs(Thigh - Tlow);
+                CanteraDouble dTa = fabs(dT);
+                CanteraDouble dTmax = 0.5*fabs(Thigh - Tlow);
                 if (dTa > dTmax) {
                     dT *= dTmax/dTa;
                 }
             } else {
-                double Tnew = sqrt(Tlow*Thigh);
+                CanteraDouble Tnew = sqrt(Tlow*Thigh);
                 dT = clip(Tnew - Tnow, -200.0, 200.0);
             }
-            double acpb = std::max(fabs(cpb), 1.0E-6);
-            double denom = std::max(fabs(Htarget), acpb);
-            double Herr = Htarget - Hnow;
-            double HConvErr = fabs((Herr)/denom);
+            CanteraDouble acpb = std::max(fabs(cpb), 1.0E-6);
+            CanteraDouble denom = std::max(fabs(Htarget), acpb);
+            CanteraDouble Herr = Htarget - Hnow;
+            CanteraDouble HConvErr = fabs((Herr)/denom);
             if (printLvl > 0) {
                 plogf("   equilibrate_HP: It = %d, Tcurr  = %g Hcurr = %g, Htarget = %g\n",
                       n, Tnow, Hnow, Htarget);
@@ -215,7 +215,7 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
                 }
                 return iSuccess;
             }
-            double Tnew = Tnow + dT;
+            CanteraDouble Tnew = Tnow + dT;
             if (Tnew < 0.0) {
                 Tnew = 0.5*Tnow;
             }
@@ -224,7 +224,7 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
             if (!estimateEquil) {
                 strt = -1;
             } else {
-                double Tnew = 0.5*(Tnow + Thigh);
+                CanteraDouble Tnew = 0.5*(Tnow + Thigh);
                 if (fabs(Tnew - Tnow) < 1.0) {
                     Tnew = Tnow + 1.0;
                 }
@@ -236,8 +236,8 @@ int vcs_MultiPhaseEquil::equilibrate_HP(double Htarget, int XY, double Tlow,
                        "No convergence for T");
 }
 
-int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thigh,
-    int estimateEquil, int printLvl, double err, int maxsteps, int loglevel)
+int vcs_MultiPhaseEquil::equilibrate_SP(CanteraDouble Starget, CanteraDouble Tlow, CanteraDouble Thigh,
+    int estimateEquil, int printLvl, CanteraDouble err, int maxsteps, int loglevel)
 {
     int maxiter = 100;
     int strt = estimateEquil;
@@ -251,10 +251,10 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
         Thigh = 2.0 * m_mix->maxTemp();
     }
 
-    double cpb = 1.0, dT;
-    double Slow = Undef;
-    double Shigh = Undef;
-    double Tnow = m_mix->temperature();
+    CanteraDouble cpb = 1.0, dT;
+    CanteraDouble Slow = Undef;
+    CanteraDouble Shigh = Undef;
+    CanteraDouble Tnow = m_mix->temperature();
     Tlow = std::min(Tnow, Tlow);
     Thigh = std::max(Tnow, Thigh);
     int printLvlSub = std::max(printLvl - 1, 0);
@@ -266,11 +266,11 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
             Tnow = m_mix->temperature();
             int iSuccess = equilibrate_TP(strt, printLvlSub, err, maxsteps, loglevel);
             strt = 0;
-            double Snow = m_mix->entropy();
-            double pmoles[10];
+            CanteraDouble Snow = m_mix->entropy();
+            CanteraDouble pmoles[10];
             pmoles[0] = m_mix->phaseMoles(0);
-            double Tmoles = pmoles[0];
-            double SperMole = Snow/Tmoles;
+            CanteraDouble Tmoles = pmoles[0];
+            CanteraDouble SperMole = Snow/Tmoles;
             if (printLvl > 0) {
                 plogf("T = %g, Snow = %g ,Tmoles = %g,  SperMole = %g\n",
                       Tnow, Snow, Tmoles, SperMole);
@@ -303,9 +303,9 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
             if (Slow != Undef && Shigh != Undef) {
                 cpb = (Shigh - Slow)/(Thigh - Tlow);
                 dT = (Starget - Snow)/cpb;
-                double Tnew = Tnow + dT;
-                double dTa = fabs(dT);
-                double dTmax = 0.5*fabs(Thigh - Tlow);
+                CanteraDouble Tnew = Tnow + dT;
+                CanteraDouble dTa = fabs(dT);
+                CanteraDouble dTmax = 0.5*fabs(Thigh - Tlow);
                 if (Tnew > Thigh || Tnew < Tlow) {
                     dTmax = 1.5*fabs(Thigh - Tlow);
                 }
@@ -314,14 +314,14 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
                     dT *= dTmax/dTa;
                 }
             } else {
-                double Tnew = sqrt(Tlow*Thigh);
+                CanteraDouble Tnew = sqrt(Tlow*Thigh);
                 dT = Tnew - Tnow;
             }
 
-            double acpb = std::max(fabs(cpb), 1.0E-6);
-            double denom = std::max(fabs(Starget), acpb);
-            double Serr = Starget - Snow;
-            double SConvErr = fabs((Serr)/denom);
+            CanteraDouble acpb = std::max(fabs(cpb), 1.0E-6);
+            CanteraDouble denom = std::max(fabs(Starget), acpb);
+            CanteraDouble Serr = Starget - Snow;
+            CanteraDouble SConvErr = fabs((Serr)/denom);
             if (printLvl > 0) {
                 plogf("   equilibrate_SP: It = %d, Tcurr  = %g Scurr = %g, Starget = %g\n",
                       n, Tnow, Snow, Starget);
@@ -338,7 +338,7 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
                 }
                 return iSuccess;
             }
-            double Tnew = Tnow + dT;
+            CanteraDouble Tnew = Tnow + dT;
             if (Tnew < 0.0) {
                 Tnew = 0.5*Tnow;
             }
@@ -347,7 +347,7 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
             if (!estimateEquil) {
                 strt = -1;
             } else {
-                double Tnew = 0.5*(Tnow + Thigh);
+                CanteraDouble Tnew = 0.5*(Tnow + Thigh);
                 if (fabs(Tnew - Tnow) < 1.0) {
                     Tnew = Tnow + 1.0;
                 }
@@ -360,9 +360,9 @@ int vcs_MultiPhaseEquil::equilibrate_SP(double Starget, double Tlow, double Thig
 }
 
 int vcs_MultiPhaseEquil::equilibrate(int XY, int estimateEquil, int printLvl,
-                                     double err, int maxsteps, int loglevel)
+                                     CanteraDouble err, int maxsteps, int loglevel)
 {
-    double xtarget;
+    CanteraDouble xtarget;
     if (XY == TP) {
         return equilibrate_TP(estimateEquil, printLvl, err, maxsteps, loglevel);
     } else if (XY == HP || XY == UP) {
@@ -371,14 +371,14 @@ int vcs_MultiPhaseEquil::equilibrate(int XY, int estimateEquil, int printLvl,
         } else {
             xtarget = m_mix->IntEnergy();
         }
-        double Tlow = 0.5 * m_mix->minTemp();
-        double Thigh = 2.0 * m_mix->maxTemp();
+        CanteraDouble Tlow = 0.5 * m_mix->minTemp();
+        CanteraDouble Thigh = 2.0 * m_mix->maxTemp();
         return equilibrate_HP(xtarget, XY, Tlow, Thigh,
                               estimateEquil, printLvl, err, maxsteps, loglevel);
     } else if (XY == SP) {
         xtarget = m_mix->entropy();
-        double Tlow = 0.5 * m_mix->minTemp();
-        double Thigh = 2.0 * m_mix->maxTemp();
+        CanteraDouble Tlow = 0.5 * m_mix->minTemp();
+        CanteraDouble Thigh = 2.0 * m_mix->maxTemp();
         return equilibrate_SP(xtarget, Tlow, Thigh,
                               estimateEquil, printLvl, err, maxsteps, loglevel);
     } else if (XY == TV) {
@@ -403,7 +403,7 @@ int vcs_MultiPhaseEquil::equilibrate(int XY, int estimateEquil, int printLvl,
     }
 }
 
-int vcs_MultiPhaseEquil::equilibrate_TP(int estimateEquil, int printLvl, double err,
+int vcs_MultiPhaseEquil::equilibrate_TP(int estimateEquil, int printLvl, CanteraDouble err,
                                         int maxsteps, int loglevel)
 {
     int maxit = maxsteps;
@@ -433,9 +433,9 @@ int vcs_MultiPhaseEquil::equilibrate_TP(int estimateEquil, int printLvl, double 
     }
     int iSuccess = m_vsolve.vcs(ipr, ip1, maxit);
 
-    double te = tickTock.secondsWC();
+    CanteraDouble te = tickTock.secondsWC();
     if (printLvl > 0) {
-        vector<double> mu(m_mix->nSpecies());
+        vector<CanteraDouble> mu(m_mix->nSpecies());
         m_mix->getChemPotentials(mu.data());
         plogf("\n Results from vcs:\n");
         if (iSuccess != 0) {
@@ -489,14 +489,14 @@ void vcs_MultiPhaseEquil::reportCSV(const string& reportFile)
         throw CanteraError("vcs_MultiPhaseEquil::reportCSV",
                            "Failure to open file");
     }
-    vector<double> VolPM;
-    vector<double> activity;
-    vector<double> ac;
-    vector<double> mu;
-    vector<double> mu0;
-    vector<double> molalities;
+    vector<CanteraDouble> VolPM;
+    vector<CanteraDouble> activity;
+    vector<CanteraDouble> ac;
+    vector<CanteraDouble> mu;
+    vector<CanteraDouble> mu0;
+    vector<CanteraDouble> molalities;
 
-    double vol = 0.0;
+    CanteraDouble vol = 0.0;
     for (size_t iphase = 0; iphase < nphase; iphase++) {
         ThermoPhase& tref = m_mix->phase(iphase);
         size_t nSpecies = tref.nSpecies();
@@ -504,8 +504,8 @@ void vcs_MultiPhaseEquil::reportCSV(const string& reportFile)
         tref.getPartialMolarVolumes(&VolPM[0]);
         vcs_VolPhase* volP = m_vsolve.m_VolPhaseList[iphase].get();
 
-        double TMolesPhase = volP->totalMoles();
-        double VolPhaseVolumes = 0.0;
+        CanteraDouble TMolesPhase = volP->totalMoles();
+        CanteraDouble VolPhaseVolumes = 0.0;
         for (size_t k = 0; k < nSpecies; k++) {
             VolPhaseVolumes += VolPM[k] * tref.moleFraction(k);
         }
@@ -525,7 +525,7 @@ void vcs_MultiPhaseEquil::reportCSV(const string& reportFile)
         ThermoPhase& tref = m_mix->phase(iphase);
         string phaseName = tref.name();
         vcs_VolPhase* volP = m_vsolve.m_VolPhaseList[iphase].get();
-        double TMolesPhase = volP->totalMoles();
+        CanteraDouble TMolesPhase = volP->totalMoles();
         size_t nSpecies = tref.nSpecies();
         activity.resize(nSpecies, 0.0);
         ac.resize(nSpecies, 0.0);
@@ -539,7 +539,7 @@ void vcs_MultiPhaseEquil::reportCSV(const string& reportFile)
         tref.getStandardChemPotentials(&mu0[0]);
         tref.getPartialMolarVolumes(&VolPM[0]);
         tref.getChemPotentials(&mu[0]);
-        double VolPhaseVolumes = 0.0;
+        CanteraDouble VolPhaseVolumes = 0.0;
         for (size_t k = 0; k < nSpecies; k++) {
             VolPhaseVolumes += VolPM[k] * tref.moleFraction(k);
         }

@@ -34,8 +34,8 @@ public:
 
     //! @name Molar Thermodynamic properties
     //! @{
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
     //! @}
     //! @name Mechanical Properties
     //! @{
@@ -50,7 +50,7 @@ public:
      *    P = \frac{RT}{v-b_{mix}} - \frac{a_{mix}}{T^{0.5} v \left( v + b_{mix} \right) }
      * @f]
      */
-    double pressure() const override;
+    CanteraDouble pressure() const override;
 
     //! @}
 
@@ -70,7 +70,7 @@ public:
      * @return
      *   Returns the standard Concentration in units of m3 kmol-1.
      */
-    double standardConcentration(size_t k=0) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
 
     //! Get the array of non-dimensional activity coefficients at the current
     //! solution temperature, pressure, and solution concentration.
@@ -81,7 +81,7 @@ public:
      *
      * @param ac Output vector of activity coefficients. Length: m_kk.
      */
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
     //! @name  Partial Molar Properties of the Solution
     //! @{
@@ -99,16 +99,16 @@ public:
      *              Length: m_kk.
      * @deprecated To be removed after %Cantera 3.0. Use getChemPotentials() instead.
      */
-    void getChemPotentials_RT(double* mu) const override;
+    void getChemPotentials_RT(CanteraDouble* mu) const override;
 
-    void getChemPotentials(double* mu) const override;
-    void getPartialMolarEnthalpies(double* hbar) const override;
-    void getPartialMolarEntropies(double* sbar) const override;
-    void getPartialMolarIntEnergies(double* ubar) const override;
-    void getPartialMolarCp(double* cpbar) const override {
+    void getChemPotentials(CanteraDouble* mu) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
+    void getPartialMolarIntEnergies(CanteraDouble* ubar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override {
         throw NotImplementedError("RedlichKwongMFTP::getPartialMolarCp");
     }
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
     //! @}
 
 public:
@@ -137,7 +137,7 @@ public:
      *      "a" parameter of the specified species [Pa-m^6/kmol^2/K]
      *  @param b         "b" parameter in the Redlich-Kwong model [m^3/kmol]
      */
-    void setSpeciesCoeffs(const string& species, double a0, double a1, double b);
+    void setSpeciesCoeffs(const string& species, CanteraDouble a0, CanteraDouble a1, CanteraDouble b);
 
     //! Set values for the interaction parameter between two species
     /*!
@@ -155,25 +155,25 @@ public:
      *      [Pa-m^6/kmol^2/K]
      */
     void setBinaryCoeffs(const string& species_i,
-                         const string& species_j, double a0, double a1);
+                         const string& species_j, CanteraDouble a0, CanteraDouble a1);
     //! @}
 
 protected:
     // Special functions inherited from MixtureFugacityTP
-    double sresid() const override;
-    double hresid() const override;
+    CanteraDouble sresid() const override;
+    CanteraDouble hresid() const override;
 
 public:
-    double liquidVolEst(double TKelvin, double& pres) const override;
-    double densityCalc(double T, double pressure, int phase, double rhoguess) override;
+    CanteraDouble liquidVolEst(CanteraDouble TKelvin, CanteraDouble& pres) const override;
+    CanteraDouble densityCalc(CanteraDouble T, CanteraDouble pressure, int phase, CanteraDouble rhoguess) override;
 
-    double densSpinodalLiquid() const override;
-    double densSpinodalGas() const override;
-    double dpdVCalc(double TKelvin, double molarVol, double& presCalc) const override;
+    CanteraDouble densSpinodalLiquid() const override;
+    CanteraDouble densSpinodalGas() const override;
+    CanteraDouble dpdVCalc(CanteraDouble TKelvin, CanteraDouble molarVol, CanteraDouble& presCalc) const override;
 
-    double isothermalCompressibility() const override;
-    double thermalExpansionCoeff() const override;
-    double soundSpeed() const override;
+    CanteraDouble isothermalCompressibility() const override;
+    CanteraDouble thermalExpansionCoeff() const override;
+    CanteraDouble soundSpeed() const override;
 
     //! Calculate dpdV and dpdT at the current conditions
     /*!
@@ -198,16 +198,16 @@ public:
      * @param aCalc (output)  Returns the a value
      * @param bCalc (output)  Returns the b value.
      */
-    void calculateAB(double temp, double& aCalc, double& bCalc) const;
+    void calculateAB(CanteraDouble temp, CanteraDouble& aCalc, CanteraDouble& bCalc) const;
 
     // Special functions not inherited from MixtureFugacityTP
 
-    double da_dt() const;
+    CanteraDouble da_dt() const;
 
-    void calcCriticalConditions(double& pc, double& tc, double& vc) const override;
+    void calcCriticalConditions(CanteraDouble& pc, CanteraDouble& tc, CanteraDouble& vc) const override;
 
     //! Prepare variables and call the function to solve the cubic equation of state
-    int solveCubic(double T, double pres, double a, double b, double Vroot[3]) const;
+    int solveCubic(CanteraDouble T, CanteraDouble pres, CanteraDouble a, CanteraDouble b, CanteraDouble Vroot[3]) const;
 
 protected:
     //! Form of the temperature parameterization
@@ -221,21 +221,21 @@ protected:
     /*!
      *  m_b is a function of the temperature and the mole fraction.
      */
-    double m_b_current = 0.0;
+    CanteraDouble m_b_current = 0.0;
 
     //! Value of a in the equation of state
     /*!
      *  a_b is a function of the temperature and the mole fraction.
      */
-    double m_a_current = 0.0;
+    CanteraDouble m_a_current = 0.0;
 
-    vector<double> a_vec_Curr_;
-    vector<double> b_vec_Curr_;
+    vector<CanteraDouble> a_vec_Curr_;
+    vector<CanteraDouble> b_vec_Curr_;
 
     Array2D a_coeff_vec;
 
     //! Explicitly-specified binary interaction parameters
-    map<string, map<string, pair<double, double>>> m_binaryParameters;
+    map<string, map<string, pair<CanteraDouble, CanteraDouble>>> m_binaryParameters;
 
     enum class CoeffSource { EoS, CritProps, Database };
     //! For each species, specifies the source of the a and b coefficients
@@ -243,47 +243,47 @@ protected:
 
     int NSolns_ = 0;
 
-    double Vroot_[3] = {0.0, 0.0, 0.0};
+    CanteraDouble Vroot_[3] = {0.0, 0.0, 0.0};
 
     //! Temporary storage - length = m_kk.
-    mutable vector<double> m_pp;
+    mutable vector<CanteraDouble> m_pp;
 
     // Partial molar volumes of the species
-    mutable vector<double> m_partialMolarVolumes;
+    mutable vector<CanteraDouble> m_partialMolarVolumes;
 
     //! The derivative of the pressure wrt the volume
     /*!
      * Calculated at the current conditions. temperature and mole number kept
      * constant
      */
-    mutable double dpdV_ = 0.0;
+    mutable CanteraDouble dpdV_ = 0.0;
 
     //! The derivative of the pressure wrt the temperature
     /*!
      *  Calculated at the current conditions. Total volume and mole number kept
      *  constant
      */
-    mutable double dpdT_ = 0.0;
+    mutable CanteraDouble dpdT_ = 0.0;
 
     //! Vector of derivatives of pressure wrt mole number
     /*!
      *  Calculated at the current conditions. Total volume, temperature and
      *  other mole number kept constant
      */
-    mutable vector<double> dpdni_;
+    mutable vector<CanteraDouble> dpdni_;
 
 private:
     //! Omega constant for a -> value of a in terms of critical properties
     /*!
      *  this was calculated from a small nonlinear solve
      */
-    static const double omega_a;
+    static const CanteraDouble omega_a;
 
     //! Omega constant for b
-    static const double omega_b;
+    static const CanteraDouble omega_b;
 
     //! Omega constant for the critical molar volume
-    static const double omega_vc;
+    static const CanteraDouble omega_vc;
 };
 }
 

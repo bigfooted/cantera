@@ -31,81 +31,81 @@ public:
     }
 
     //! Not implemented; FlowReactor implements getStateDAE() instead.
-    void getState(double* y) override {
+    void getState(CanteraDouble* y) override {
         throw NotImplementedError("FlowReactor::getState");
     }
 
-    void getStateDae(double* y, double* ydot) override;
-    void initialize(double t0=0.0) override;
+    void getStateDae(CanteraDouble* y, CanteraDouble* ydot) override;
+    void initialize(CanteraDouble t0=0.0) override;
     void syncState() override;
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     //! Not implemented; FlowReactor implements evalDae() instead.
-    void eval(double t, double* LHS, double* RHS) override {
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override {
         throw NotImplementedError("FlowReactor::eval");
     }
 
-    void evalDae(double t, double* y, double* ydot, double* residual) override;
+    void evalDae(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* residual) override;
 
-    void getConstraints(double* constraints) override;
+    void getConstraints(CanteraDouble* constraints) override;
 
     //! Set the mass flow rate through the reactor [kg/s]
-    void setMassFlowRate(double mdot);
+    void setMassFlowRate(CanteraDouble mdot);
 
     //! The current gas speed in the reactor [m/s]
-    double speed() const {
+    CanteraDouble speed() const {
         return m_u;
     }
 
     //! The cross-sectional area of the reactor [m^2]
-    double area() const {
+    CanteraDouble area() const {
         return m_area;
     }
 
     //! @deprecated To be removed after %Cantera 3.0. Access distance through the
     //!     ReactorNet object
-    double distance() const;
+    CanteraDouble distance() const;
 
     //! Sets the area of the reactor [m^2]
-    void setArea(double area);
+    void setArea(CanteraDouble area);
 
     //! The ratio of the reactor's surface area to volume ratio [m^-1]
     //! @note If the surface area to volume ratio is unspecified by the user,
     //!       this will be calculated assuming the reactor is a cylinder.
-    double surfaceAreaToVolumeRatio() const;
+    CanteraDouble surfaceAreaToVolumeRatio() const;
 
     //! Set the reactor's surface area to volume ratio [m^-1]
-    void setSurfaceAreaToVolumeRatio(double sa_to_vol) {
+    void setSurfaceAreaToVolumeRatio(CanteraDouble sa_to_vol) {
         m_sa_to_vol = sa_to_vol;
     }
 
     //! Get the steady state tolerances used to determine the initial state for
     //! surface coverages
-    double inletSurfaceAtol() const {
+    CanteraDouble inletSurfaceAtol() const {
         return m_ss_atol;
     }
 
     //! Set the steady state tolerances used to determine the initial state for
     //! surface coverages
-    void setInletSurfaceAtol(double atol) {
+    void setInletSurfaceAtol(CanteraDouble atol) {
         m_ss_atol = atol;
     }
 
     //! Get the steady state tolerances used to determine the initial state for
     //! surface coverages
-    double inletSurfaceRtol() const {
+    CanteraDouble inletSurfaceRtol() const {
         return m_ss_rtol;
     }
 
     //! Set the steady state tolerances used to determine the initial state for
     //! surface coverages
-    void setInletSurfaceRtol(double rtol) {
+    void setInletSurfaceRtol(CanteraDouble rtol) {
         m_ss_rtol = rtol;
     }
 
     //! Get the steady state tolerances used to determine the initial state for
     //! surface coverages
-    double inletSurfaceMaxSteps() const {
+    CanteraDouble inletSurfaceMaxSteps() const {
         return m_max_ss_steps;
     }
 
@@ -117,7 +117,7 @@ public:
 
     //! Get the steady state tolerances used to determine the initial state for
     //! surface coverages
-    double inletSurfaceMaxErrorFailures() const {
+    CanteraDouble inletSurfaceMaxErrorFailures() const {
         return m_max_ss_error_fails;
     }
 
@@ -135,31 +135,31 @@ public:
 
     string componentName(size_t k) override;
 
-    void updateSurfaceState(double* y) override;
+    void updateSurfaceState(CanteraDouble* y) override;
 
 protected:
     //! Density [kg/m^3]. First component of the state vector.
-    double m_rho = NAN;
+    CanteraDouble m_rho = NAN;
     //! Axial velocity [m/s]. Second component of the state vector.
-    double m_u = -1.0;
+    CanteraDouble m_u = -1.0;
     //! Pressure [Pa]. Third component of the state vector.
-    double m_P = NAN;
+    CanteraDouble m_P = NAN;
     //! Temperature [K]. Fourth component of the state vector.
-    double m_T = NAN;
+    CanteraDouble m_T = NAN;
     //! offset to the species equations
     const size_t m_offset_Y = 4;
     //! reactor area [m^2]
-    double m_area = 1.0;
+    CanteraDouble m_area = 1.0;
     //! reactor surface area to volume ratio [m^-1]
-    double m_sa_to_vol = -1.0;
+    CanteraDouble m_sa_to_vol = -1.0;
     //! temporary storage for surface species production rates
-    vector<double> m_sdot_temp;
+    vector<CanteraDouble> m_sdot_temp;
     //! temporary storage for species partial molar enthalpies
-    vector<double> m_hk;
+    vector<CanteraDouble> m_hk;
     //! steady-state relative tolerance, used to determine initial surface coverages
-    double m_ss_rtol = 1e-7;
+    CanteraDouble m_ss_rtol = 1e-7;
     //! steady-state absolute tolerance, used to determine initial surface coverages
-    double m_ss_atol = 1e-14;
+    CanteraDouble m_ss_atol = 1e-14;
     //! maximum number of steady-state coverage integrator-steps
     int m_max_ss_steps = 20000;
     //! maximum number of steady-state integrator error test failures

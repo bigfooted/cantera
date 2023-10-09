@@ -129,7 +129,7 @@ MultiPhaseEquil::MultiPhaseEquil(MultiPhase* mix, bool start, int loglevel) : m_
 
     // Take a very small step in composition space, so that no
     // species has precisely zero moles.
-    vector<double> dxi(nFree(), 1.0e-20);
+    vector<CanteraDouble> dxi(nFree(), 1.0e-20);
     if (!dxi.empty()) {
         multiply(m_N, dxi.data(), m_work.data());
         unsort(m_work);
@@ -152,7 +152,7 @@ MultiPhaseEquil::MultiPhaseEquil(MultiPhase* mix, bool start, int loglevel) : m_
     // has all non-zero mole numbers for the included species.
 }
 
-double MultiPhaseEquil::equilibrate(int XY, double err, int maxsteps, int loglevel)
+CanteraDouble MultiPhaseEquil::equilibrate(int XY, CanteraDouble err, int maxsteps, int loglevel)
 {
     int i;
     m_iter = 0;
@@ -191,9 +191,9 @@ void MultiPhaseEquil::finish()
 
 int MultiPhaseEquil::setInitialMoles(int loglevel)
 {
-    double not_mu = 1.0e12;
+    CanteraDouble not_mu = 1.0e12;
     m_mix->getValidChemPotentials(not_mu, m_mu.data(), true);
-    double dxi_min = 1.0e10;
+    CanteraDouble dxi_min = 1.0e10;
     bool redo = true;
     int iter = 0;
 
@@ -208,7 +208,7 @@ int MultiPhaseEquil::setInitialMoles(int loglevel)
 
         // loop over all reactions
         for (size_t j = 0; j < nFree(); j++) {
-            double dg_rt = 0.0;
+            CanteraDouble dg_rt = 0.0;
             dxi_min = 1.0e10;
             for (size_t ik = 0; ik < m_nsp; ik++) {
                 dg_rt += mu(ik) * m_N(ik,j);
@@ -218,7 +218,7 @@ int MultiPhaseEquil::setInitialMoles(int loglevel)
             int idir = (dg_rt < 0.0 ? 1 : -1);
 
             for (size_t ik = 0; ik < m_nsp; ik++) {
-                double nu = m_N(ik, j);
+                CanteraDouble nu = m_N(ik, j);
 
                 // set max change in progress variable by
                 // non-negativity requirement
@@ -226,7 +226,7 @@ int MultiPhaseEquil::setInitialMoles(int loglevel)
                 //          isn't zero. This causes differences between
                 //          optimized and debug versions of the code
                 if (nu*idir < 0) {
-                    double delta_xi = fabs(0.99*moles(ik)/nu);
+                    CanteraDouble delta_xi = fabs(0.99*moles(ik)/nu);
                     // if a component has nearly zero moles, redo
                     // with a new set of components
                     if (!redo && delta_xi < 1.0e-10 && ik < m_nel) {
@@ -316,7 +316,7 @@ void MultiPhaseEquil::getComponents(const vector<size_t>& order)
             // far (m_A(m,k) != 0), and should be a major species if possible.
             // We'll choose the species with greatest mole fraction that
             // satisfies these criteria.
-            double maxmoles = -999.0;
+            CanteraDouble maxmoles = -999.0;
             size_t kmax = 0;
             for (size_t k = m+1; k < nColumns; k++) {
                 if (m_A(m,k) != 0.0 && fabs(m_moles[m_order[k]]) > maxmoles) {
@@ -336,7 +336,7 @@ void MultiPhaseEquil::getComponents(const vector<size_t>& order)
         }
 
         // scale row m so that the diagonal element is unity
-        double fctr = 1.0/m_A(m,m);
+        CanteraDouble fctr = 1.0/m_A(m,m);
         for (size_t k = 0; k < nColumns; k++) {
             m_A(m,k) *= fctr;
         }
@@ -356,7 +356,7 @@ void MultiPhaseEquil::getComponents(const vector<size_t>& order)
     for (size_t m = std::min(nRows,nColumns)-1; m > 0; m--) {
         for (size_t n = m-1; n != npos; n--) {
             if (m_A(n,m) != 0.0) {
-                double fctr = m_A(n,m);
+                CanteraDouble fctr = m_A(n,m);
                 for (size_t k = m; k < m_nsp; k++) {
                     m_A(n,k) -= fctr*m_A(m,k);
                 }
@@ -389,7 +389,7 @@ void MultiPhaseEquil::getComponents(const vector<size_t>& order)
     }
 }
 
-void MultiPhaseEquil::unsort(vector<double>& x)
+void MultiPhaseEquil::unsort(vector<CanteraDouble>& x)
 {
     m_work2 = x;
     for (size_t k = 0; k < m_nsp; k++) {
@@ -397,7 +397,7 @@ void MultiPhaseEquil::unsort(vector<double>& x)
     }
 }
 
-void MultiPhaseEquil::step(double omega, vector<double>& deltaN, int loglevel)
+void MultiPhaseEquil::step(CanteraDouble omega, vector<CanteraDouble>& deltaN, int loglevel)
 {
     if (omega < 0.0) {
         throw CanteraError("MultiPhaseEquil::step","negative omega");
@@ -422,10 +422,10 @@ void MultiPhaseEquil::step(double omega, vector<double>& deltaN, int loglevel)
     updateMixMoles();
 }
 
-double MultiPhaseEquil::stepComposition(int loglevel)
+CanteraDouble MultiPhaseEquil::stepComposition(int loglevel)
 {
     m_iter++;
-    double grad0 = computeReactionSteps(m_dxi);
+    CanteraDouble grad0 = computeReactionSteps(m_dxi);
 
     // compute the mole fraction changes.
     if (nFree()) {
@@ -436,9 +436,9 @@ double MultiPhaseEquil::stepComposition(int loglevel)
     unsort(m_work);
 
     // scale omega to keep the major species non-negative
-    double FCTR = 0.99;
-    const double MAJOR_THRESHOLD = 1.0e-12;
-    double omegamax = 1.0;
+    CanteraDouble FCTR = 0.99;
+    const CanteraDouble MAJOR_THRESHOLD = 1.0e-12;
+    CanteraDouble omegamax = 1.0;
     for (size_t ik = 0; ik < m_nsp; ik++) {
         size_t k = m_order[ik];
         if (ik < m_nel) {
@@ -457,7 +457,7 @@ double MultiPhaseEquil::stepComposition(int loglevel)
                 if (m_moles[k] < MAJOR_THRESHOLD) {
                     m_force = true;
                 }
-                double omax = m_moles[k]*FCTR/(fabs(m_work[k]) + Tiny);
+                CanteraDouble omax = m_moles[k]*FCTR/(fabs(m_work[k]) + Tiny);
                 if (m_work[k] < 0.0 && omax < omegamax) {
                     omegamax = omax;
                     if (omegamax < 1.0e-5) {
@@ -470,7 +470,7 @@ double MultiPhaseEquil::stepComposition(int loglevel)
             }
         } else {
             if (m_work[k] < 0.0 && m_moles[k] > 0.0) {
-                double omax = -m_moles[k]/m_work[k];
+                CanteraDouble omax = -m_moles[k]/m_work[k];
                 if (omax < omegamax) {
                     omegamax = omax;
                     if (omegamax < 1.0e-5) {
@@ -487,14 +487,14 @@ double MultiPhaseEquil::stepComposition(int loglevel)
     // compute the gradient of G at this new position in the current direction.
     // If it is positive, then we have overshot the minimum. In this case,
     // interpolate back.
-    double not_mu = 1.0e12;
+    CanteraDouble not_mu = 1.0e12;
     m_mix->getValidChemPotentials(not_mu, m_mu.data());
-    double grad1 = 0.0;
+    CanteraDouble grad1 = 0.0;
     for (size_t k = 0; k < m_nsp; k++) {
         grad1 += m_work[k] * m_mu[m_species[k]];
     }
 
-    double omega = omegamax;
+    CanteraDouble omega = omegamax;
     if (grad1 > 0.0) {
         omega *= fabs(grad0) / (grad1 + fabs(grad0));
         for (size_t k = 0; k < m_nsp; k++) {
@@ -505,13 +505,13 @@ double MultiPhaseEquil::stepComposition(int loglevel)
     return omega;
 }
 
-double MultiPhaseEquil::computeReactionSteps(vector<double>& dxi)
+CanteraDouble MultiPhaseEquil::computeReactionSteps(vector<CanteraDouble>& dxi)
 {
-    vector<double> nu;
-    double grad = 0.0;
+    vector<CanteraDouble> nu;
+    CanteraDouble grad = 0.0;
     dxi.resize(nFree());
     computeN();
-    double not_mu = 1.0e12;
+    CanteraDouble not_mu = 1.0e12;
     m_mix->getValidChemPotentials(not_mu, m_mu.data());
 
     for (size_t j = 0; j < nFree(); j++) {
@@ -519,14 +519,14 @@ double MultiPhaseEquil::computeReactionSteps(vector<double>& dxi)
         getStoichVector(j, nu);
 
         // compute Delta G
-        double dg_rt = 0.0;
+        CanteraDouble dg_rt = 0.0;
         for (size_t k = 0; k < m_nsp; k++) {
             dg_rt += m_mu[m_species[k]] * nu[k];
         }
         dg_rt /= (m_temp * GasConstant);
 
         m_deltaG_RT[j] = dg_rt;
-        double fctr = 1.0;
+        CanteraDouble fctr = 1.0;
 
         // if this is a formation reaction for a single-component phase,
         // check whether reaction should be included
@@ -541,24 +541,24 @@ double MultiPhaseEquil::computeReactionSteps(vector<double>& dxi)
             fctr = 1.0;
         } else {
             // component sum
-            double csum = 0.0;
+            CanteraDouble csum = 0.0;
             for (k = 0; k < m_nel; k++) {
                 size_t kc = m_order[k];
-                double nmoles = fabs(m_mix->speciesMoles(m_species[kc])) + Tiny;
+                CanteraDouble nmoles = fabs(m_mix->speciesMoles(m_species[kc])) + Tiny;
                 csum += pow(nu[kc], 2)*m_dsoln[kc]/nmoles;
             }
 
             // noncomponent term
             size_t kc = m_order[j + m_nel];
-            double nmoles = fabs(m_mix->speciesMoles(m_species[kc])) + Tiny;
-            double term1 = m_dsoln[kc]/nmoles;
+            CanteraDouble nmoles = fabs(m_mix->speciesMoles(m_species[kc])) + Tiny;
+            CanteraDouble term1 = m_dsoln[kc]/nmoles;
 
             // sum over solution phases
-            double sum = 0.0;
+            CanteraDouble sum = 0.0;
             for (size_t ip = 0; ip < m_mix->nPhases(); ip++) {
                 ThermoPhase& p = m_mix->phase(ip);
                 if (p.nSpecies() > 1) {
-                    double psum = 0.0;
+                    CanteraDouble psum = 0.0;
                     for (k = 0; k < m_nsp; k++) {
                         kc = m_species[k];
                         if (m_mix->speciesPhaseIndex(kc) == ip) {
@@ -568,7 +568,7 @@ double MultiPhaseEquil::computeReactionSteps(vector<double>& dxi)
                     sum -= psum / (fabs(m_mix->phaseMoles(ip)) + Tiny);
                 }
             }
-            double rfctr = term1 + csum + sum;
+            CanteraDouble rfctr = term1 + csum + sum;
             if (fabs(rfctr) < Tiny) {
                 fctr = 1.0;
             } else {
@@ -591,7 +591,7 @@ double MultiPhaseEquil::computeReactionSteps(vector<double>& dxi)
 void MultiPhaseEquil::computeN()
 {
     // Sort the list of species by mole fraction (decreasing order)
-    vector<pair<double, size_t>> moleFractions(m_nsp);
+    vector<pair<CanteraDouble, size_t>> moleFractions(m_nsp);
     for (size_t k = 0; k < m_nsp; k++) {
         // use -Xk to generate reversed sort order
         moleFractions[k] = {-m_mix->speciesMoles(m_species[k]), k};
@@ -623,9 +623,9 @@ void MultiPhaseEquil::computeN()
     }
 }
 
-double MultiPhaseEquil::error()
+CanteraDouble MultiPhaseEquil::error()
 {
-    double err, maxerr = 0.0;
+    CanteraDouble err, maxerr = 0.0;
 
     // examine every reaction
     for (size_t j = 0; j < nFree(); j++) {
@@ -650,7 +650,7 @@ double MultiPhaseEquil::error()
     return maxerr;
 }
 
-double MultiPhaseEquil::phaseMoles(size_t iph) const
+CanteraDouble MultiPhaseEquil::phaseMoles(size_t iph) const
 {
     return m_mix->phaseMoles(iph);
 }
@@ -661,16 +661,16 @@ void MultiPhaseEquil::reportCSV(const string& reportFile)
     if (!FP) {
         throw CanteraError("MultiPhaseEquil::reportCSV", "Failure to open file");
     }
-    vector<double> mf(m_nsp_mix, 1.0);
-    vector<double> fe(m_nsp_mix, 0.0);
-    vector<double> VolPM;
-    vector<double> activity;
-    vector<double> ac;
-    vector<double> mu;
-    vector<double> mu0;
-    vector<double> molalities;
+    vector<CanteraDouble> mf(m_nsp_mix, 1.0);
+    vector<CanteraDouble> fe(m_nsp_mix, 0.0);
+    vector<CanteraDouble> VolPM;
+    vector<CanteraDouble> activity;
+    vector<CanteraDouble> ac;
+    vector<CanteraDouble> mu;
+    vector<CanteraDouble> mu0;
+    vector<CanteraDouble> molalities;
 
-    double vol = 0.0;
+    CanteraDouble vol = 0.0;
     for (size_t iphase = 0; iphase < m_mix->nPhases(); iphase++) {
         size_t istart = m_mix->speciesIndex(0, iphase);
         ThermoPhase& tref = m_mix->phase(iphase);
@@ -679,8 +679,8 @@ void MultiPhaseEquil::reportCSV(const string& reportFile)
         tref.getMoleFractions(&mf[istart]);
         tref.getPartialMolarVolumes(VolPM.data());
 
-        double TMolesPhase = phaseMoles(iphase);
-        double VolPhaseVolumes = 0.0;
+        CanteraDouble TMolesPhase = phaseMoles(iphase);
+        CanteraDouble VolPhaseVolumes = 0.0;
         for (size_t k = 0; k < nSpecies; k++) {
             VolPhaseVolumes += VolPM[k] * mf[istart + k];
         }
@@ -699,7 +699,7 @@ void MultiPhaseEquil::reportCSV(const string& reportFile)
         ThermoPhase* tp = &tref;
         tp->getMoleFractions(&mf[istart]);
         string phaseName = tref.name();
-        double TMolesPhase = phaseMoles(iphase);
+        CanteraDouble TMolesPhase = phaseMoles(iphase);
         size_t nSpecies = tref.nSpecies();
         activity.resize(nSpecies, 0.0);
         ac.resize(nSpecies, 0.0);
@@ -713,7 +713,7 @@ void MultiPhaseEquil::reportCSV(const string& reportFile)
         tp->getStandardChemPotentials(mu0.data());
         tp->getPartialMolarVolumes(VolPM.data());
         tp->getChemPotentials(mu.data());
-        double VolPhaseVolumes = 0.0;
+        CanteraDouble VolPhaseVolumes = 0.0;
         for (size_t k = 0; k < nSpecies; k++) {
             VolPhaseVolumes += VolPM[k] * mf[istart + k];
         }

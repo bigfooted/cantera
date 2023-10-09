@@ -113,17 +113,17 @@ CVodesIntegrator::~CVodesIntegrator()
 }
 
 
-double& CVodesIntegrator::solution(size_t k)
+CanteraDouble& CVodesIntegrator::solution(size_t k)
 {
     return NV_Ith_S(m_y, k);
 }
 
-double* CVodesIntegrator::solution()
+CanteraDouble* CVodesIntegrator::solution()
 {
     return NV_DATA_S(m_y);
 }
 
-void CVodesIntegrator::setTolerances(double reltol, size_t n, double* abstol)
+void CVodesIntegrator::setTolerances(CanteraDouble reltol, size_t n, CanteraDouble* abstol)
 {
     m_itol = CV_SV;
     m_nabs = n;
@@ -139,14 +139,14 @@ void CVodesIntegrator::setTolerances(double reltol, size_t n, double* abstol)
     m_reltol = reltol;
 }
 
-void CVodesIntegrator::setTolerances(double reltol, double abstol)
+void CVodesIntegrator::setTolerances(CanteraDouble reltol, CanteraDouble abstol)
 {
     m_itol = CV_SS;
     m_reltol = reltol;
     m_abstols = abstol;
 }
 
-void CVodesIntegrator::setSensitivityTolerances(double reltol, double abstol)
+void CVodesIntegrator::setSensitivityTolerances(CanteraDouble reltol, CanteraDouble abstol)
 {
     m_reltolsens = reltol;
     m_abstolsens = abstol;
@@ -181,7 +181,7 @@ void CVodesIntegrator::setMethod(MethodType t)
     }
 }
 
-void CVodesIntegrator::setMaxStepSize(double hmax)
+void CVodesIntegrator::setMaxStepSize(CanteraDouble hmax)
 {
     m_hmax = hmax;
     if (m_cvode_mem) {
@@ -189,7 +189,7 @@ void CVodesIntegrator::setMaxStepSize(double hmax)
     }
 }
 
-void CVodesIntegrator::setMinStepSize(double hmin)
+void CVodesIntegrator::setMinStepSize(CanteraDouble hmin)
 {
     m_hmin = hmin;
     if (m_cvode_mem) {
@@ -218,7 +218,7 @@ void CVodesIntegrator::setMaxErrTestFails(int n)
     }
 }
 
-void CVodesIntegrator::sensInit(double t0, FuncEval& func)
+void CVodesIntegrator::sensInit(CanteraDouble t0, FuncEval& func)
 {
     m_np = func.nparams();
     m_sens_ok = false;
@@ -238,7 +238,7 @@ void CVodesIntegrator::sensInit(double t0, FuncEval& func)
                              CV_STAGGERED, CVSensRhsFn(0), m_yS);
     checkError(flag, "sensInit", "CVodeSensInit");
 
-    vector<double> atol(m_np);
+    vector<CanteraDouble> atol(m_np);
     for (size_t n = 0; n < m_np; n++) {
         // This scaling factor is tuned so that reaction and species enthalpy
         // sensitivities can be computed simultaneously with the same abstol.
@@ -248,7 +248,7 @@ void CVodesIntegrator::sensInit(double t0, FuncEval& func)
     checkError(flag, "sensInit", "CVodeSensSStolerances");
 }
 
-void CVodesIntegrator::initialize(double t0, FuncEval& func)
+void CVodesIntegrator::initialize(CanteraDouble t0, FuncEval& func)
 {
     m_neq = func.neq();
     m_t0 = t0;
@@ -332,7 +332,7 @@ void CVodesIntegrator::initialize(double t0, FuncEval& func)
     applyOptions();
 }
 
-void CVodesIntegrator::reinitialize(double t0, FuncEval& func)
+void CVodesIntegrator::reinitialize(CanteraDouble t0, FuncEval& func)
 {
     m_t0 = t0;
     m_time = t0;
@@ -492,7 +492,7 @@ void CVodesIntegrator::applyOptions()
     }
 }
 
-void CVodesIntegrator::integrate(double tout)
+void CVodesIntegrator::integrate(CanteraDouble tout)
 {
     if (tout == m_time) {
         return;
@@ -530,7 +530,7 @@ void CVodesIntegrator::integrate(double tout)
     m_sens_ok = false;
 }
 
-double CVodesIntegrator::step(double tout)
+CanteraDouble CVodesIntegrator::step(CanteraDouble tout)
 {
     int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
     if (flag != CV_SUCCESS) {
@@ -550,7 +550,7 @@ double CVodesIntegrator::step(double tout)
     return m_time;
 }
 
-double* CVodesIntegrator::derivative(double tout, int n)
+CanteraDouble* CVodesIntegrator::derivative(CanteraDouble tout, int n)
 {
     int flag = CVodeGetDky(m_cvode_mem, tout, n, m_dky);
     checkError(flag, "derivative", "CVodeGetDky");
@@ -630,7 +630,7 @@ AnyMap CVodesIntegrator::solverStats() const
     return stats;
 }
 
-double CVodesIntegrator::sensitivity(size_t k, size_t p)
+CanteraDouble CVodesIntegrator::sensitivity(size_t k, size_t p)
 {
     if (m_time == m_t0) {
         // calls to CVodeGetSens are only allowed after a successful time step.
@@ -660,9 +660,9 @@ string CVodesIntegrator::getErrorInfo(int N)
     CVodeGetErrWeights(m_cvode_mem, errw);
     CVodeGetEstLocalErrors(m_cvode_mem, errs);
 
-    vector<tuple<double, double, size_t>> weightedErrors;
+    vector<tuple<CanteraDouble, CanteraDouble, size_t>> weightedErrors;
     for (size_t i=0; i<m_neq; i++) {
-        double err = NV_Ith_S(errs, i) * NV_Ith_S(errw, i);
+        CanteraDouble err = NV_Ith_S(errs, i) * NV_Ith_S(errw, i);
         weightedErrors.emplace_back(-abs(err), err, i);
     }
     N_VDestroy(errs);

@@ -29,21 +29,21 @@ public:
     virtual void setNEq(size_t n) = 0;
 
     //! Get the net rate of volume change (for example, from moving walls) [m^3/s]
-    virtual double expansionRate() const = 0;
+    virtual CanteraDouble expansionRate() const = 0;
 
     //! Set the net rate of volume change (for example, from moving walls) [m^3/s]
-    virtual void setExpansionRate(double v) = 0;
+    virtual void setExpansionRate(CanteraDouble v) = 0;
 
     //! Get the net heat transfer rate (for example, through walls) into the
     //! reactor [W]. This value is initialized and calculated as part of
     //! Reactor::evalWalls().
-    virtual double heatRate() const = 0;
+    virtual CanteraDouble heatRate() const = 0;
 
     //! Set the net heat transfer rate (for example, through walls) into the
     //! reactor [W]. For a value set using this method to affect the calculations done
     //! by Reactor::eval, this method should be called in either a "replace" or "after"
     //! delegate for Reactor::evalWalls().
-    virtual void setHeatRate(double q) = 0;
+    virtual void setHeatRate(CanteraDouble q) = 0;
 
     //! Set the state of the thermo object to correspond to the state of the reactor
     virtual void restoreThermoState() = 0;
@@ -60,29 +60,29 @@ class ReactorDelegator : public Delegator, public R, public ReactorAccessor
 {
 public:
     ReactorDelegator() {
-        install("initialize", m_initialize, [this](double t0) { R::initialize(t0); });
+        install("initialize", m_initialize, [this](CanteraDouble t0) { R::initialize(t0); });
         install("syncState", m_syncState, [this]() { R::syncState(); });
         install("getState", m_getState,
-            [this](std::array<size_t, 1> sizes, double* y) { R::getState(y); });
+            [this](std::array<size_t, 1> sizes, CanteraDouble* y) { R::getState(y); });
         install("updateState", m_updateState,
-            [this](std::array<size_t, 1> sizes, double* y) { R::updateState(y); });
+            [this](std::array<size_t, 1> sizes, CanteraDouble* y) { R::updateState(y); });
         install("updateSurfaceState", m_updateSurfaceState,
-            [this](std::array<size_t, 1> sizes, double* y) { R::updateSurfaceState(y); });
+            [this](std::array<size_t, 1> sizes, CanteraDouble* y) { R::updateSurfaceState(y); });
         install("getSurfaceInitialConditions", m_getSurfaceInitialConditions,
-            [this](std::array<size_t, 1> sizes, double* y) {
+            [this](std::array<size_t, 1> sizes, CanteraDouble* y) {
                 R::getSurfaceInitialConditions(y);
             }
         );
         install("updateConnected", m_updateConnected,
             [this](bool updatePressure) { R::updateConnected(updatePressure); });
         install("eval", m_eval,
-            [this](std::array<size_t, 2> sizes, double t, double* LHS, double* RHS) {
+            [this](std::array<size_t, 2> sizes, CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) {
                 R::eval(t, LHS, RHS);
             }
         );
-        install("evalWalls", m_evalWalls, [this](double t) { R::evalWalls(t); });
+        install("evalWalls", m_evalWalls, [this](CanteraDouble t) { R::evalWalls(t); });
         install("evalSurfaces", m_evalSurfaces,
-            [this](std::array<size_t, 3> sizes, double* LHS, double* RHS, double* sdot) {
+            [this](std::array<size_t, 3> sizes, CanteraDouble* LHS, CanteraDouble* RHS, CanteraDouble* sdot) {
                 R::evalSurfaces(LHS, RHS, sdot);
             }
         );
@@ -96,7 +96,7 @@ public:
 
     // Overrides of Reactor methods
 
-    void initialize(double t0) override {
+    void initialize(CanteraDouble t0) override {
         m_initialize(t0);
     }
 
@@ -104,22 +104,22 @@ public:
         m_syncState();
     }
 
-    void getState(double* y) override {
+    void getState(CanteraDouble* y) override {
         std::array<size_t, 1> sizes{R::neq()};
         m_getState(sizes, y);
     }
 
-    void updateState(double* y) override {
+    void updateState(CanteraDouble* y) override {
         std::array<size_t, 1> sizes{R::neq()};
         m_updateState(sizes, y);
     }
 
-    void updateSurfaceState(double* y) override {
+    void updateSurfaceState(CanteraDouble* y) override {
         std::array<size_t, 1> sizes{R::m_nv_surf};
         m_updateSurfaceState(sizes, y);
     }
 
-    void getSurfaceInitialConditions(double* y) override {
+    void getSurfaceInitialConditions(CanteraDouble* y) override {
         std::array<size_t, 1> sizes{R::m_nv_surf};
         m_getSurfaceInitialConditions(sizes, y);
     }
@@ -128,16 +128,16 @@ public:
         m_updateConnected(updatePressure);
     }
 
-    void eval(double t, double* LHS, double* RHS) override {
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override {
         std::array<size_t, 2> sizes{R::neq(), R::neq()};
         m_eval(sizes, t, LHS, RHS);
     }
 
-    void evalWalls(double t) override {
+    void evalWalls(CanteraDouble t) override {
         m_evalWalls(t);
     }
 
-    void evalSurfaces(double* LHS, double* RHS, double* sdot) override {
+    void evalSurfaces(CanteraDouble* LHS, CanteraDouble* RHS, CanteraDouble* sdot) override {
         std::array<size_t, 3> sizes{R::m_nv_surf, R::m_nv_surf, R::m_nsp};
         m_evalSurfaces(sizes, LHS, RHS, sdot);
     }
@@ -160,19 +160,19 @@ public:
         R::m_nv = n;
     }
 
-    double expansionRate() const override {
+    CanteraDouble expansionRate() const override {
         return R::m_vdot;
     }
 
-    void setExpansionRate(double v) override {
+    void setExpansionRate(CanteraDouble v) override {
         R::m_vdot = v;
     }
 
-    double heatRate() const override {
+    CanteraDouble heatRate() const override {
         return R::m_Qdot;
     }
 
-    void setHeatRate(double q) override {
+    void setHeatRate(CanteraDouble q) override {
         R::m_Qdot = q;
     }
 
@@ -185,16 +185,16 @@ public:
     }
 
 private:
-    function<void(double)> m_initialize;
+    function<void(CanteraDouble)> m_initialize;
     function<void()> m_syncState;
-    function<void(std::array<size_t, 1>, double*)> m_getState;
-    function<void(std::array<size_t, 1>, double*)> m_updateState;
-    function<void(std::array<size_t, 1>, double*)> m_updateSurfaceState;
-    function<void(std::array<size_t, 1>, double*)> m_getSurfaceInitialConditions;
+    function<void(std::array<size_t, 1>, CanteraDouble*)> m_getState;
+    function<void(std::array<size_t, 1>, CanteraDouble*)> m_updateState;
+    function<void(std::array<size_t, 1>, CanteraDouble*)> m_updateSurfaceState;
+    function<void(std::array<size_t, 1>, CanteraDouble*)> m_getSurfaceInitialConditions;
     function<void(bool)> m_updateConnected;
-    function<void(std::array<size_t, 2>, double, double*, double*)> m_eval;
-    function<void(double)> m_evalWalls;
-    function<void(std::array<size_t, 3>, double*, double*, double*)> m_evalSurfaces;
+    function<void(std::array<size_t, 2>, CanteraDouble, CanteraDouble*, CanteraDouble*)> m_eval;
+    function<void(CanteraDouble)> m_evalWalls;
+    function<void(std::array<size_t, 3>, CanteraDouble*, CanteraDouble*, CanteraDouble*)> m_evalSurfaces;
     function<string(size_t)> m_componentName;
     function<size_t(const string&)> m_componentIndex;
     function<size_t(const string&)> m_speciesIndex;

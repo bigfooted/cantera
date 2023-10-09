@@ -30,13 +30,13 @@ public:
 
     string componentName(size_t k) override;
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
-    void eval(double t, double* LHS, double* RHS) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
 protected:
     const size_t m_sidx = 1;

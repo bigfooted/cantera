@@ -47,7 +47,7 @@ public:
     void resize(size_t components, size_t points) override;
     bool componentActive(size_t n) const override;
 
-    void _finalize(const double* x) override;
+    void _finalize(const CanteraDouble* x) override;
 
     void solveElectricField(size_t j=npos) override;
     void fixElectricField(size_t j=npos) override;
@@ -62,24 +62,24 @@ public:
      * If in the future the class GasTransport is improved, this method may
      * be discarded. This method specifies this profile.
     */
-    void setElectronTransport(vector<double>& tfix,
-                              vector<double>& diff_e,
-                              vector<double>& mobi_e);
+    void setElectronTransport(vector<CanteraDouble>& tfix,
+                              vector<CanteraDouble>& diff_e,
+                              vector<CanteraDouble>& mobi_e);
 
 protected:
     /*!
      * This function overloads the original function. The residual function
      * of electric field is added.
      */
-    void evalResidual(double* x, double* rsd, int* diag,
-                      double rdt, size_t jmin, size_t jmax) override;
-    void updateTransport(double* x, size_t j0, size_t j1) override;
-    void updateDiffFluxes(const double* x, size_t j0, size_t j1) override;
+    void evalResidual(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                      CanteraDouble rdt, size_t jmin, size_t jmax) override;
+    void updateTransport(CanteraDouble* x, size_t j0, size_t j1) override;
+    void updateDiffFluxes(const CanteraDouble* x, size_t j0, size_t j1) override;
     //! Solving phase one: the fluxes of charged species are turned off
-    void frozenIonMethod(const double* x, size_t j0, size_t j1);
+    void frozenIonMethod(const CanteraDouble* x, size_t j0, size_t j1);
     //! Solving phase two: the electric field equation is added coupled
     //! by the electrical drift
-    void electricFieldMethod(const double* x, size_t j0, size_t j1);
+    void electricFieldMethod(const CanteraDouble* x, size_t j0, size_t j1);
     //! flag for solving electric field or not
     vector<bool> m_do_electric_field;
 
@@ -87,7 +87,7 @@ protected:
     bool m_import_electron_transport = false;
 
     //! electrical properties
-    vector<double> m_speciesCharge;
+    vector<CanteraDouble> m_speciesCharge;
 
     //! index of species with charges
     vector<size_t> m_kCharge;
@@ -96,11 +96,11 @@ protected:
     vector<size_t> m_kNeutral;
 
     //! coefficients of polynomial fitting of fixed electron transport profile
-    vector<double> m_mobi_e_fix;
-    vector<double> m_diff_e_fix;
+    vector<CanteraDouble> m_mobi_e_fix;
+    vector<CanteraDouble> m_diff_e_fix;
 
     //! mobility
-    vector<double> m_mobility;
+    vector<CanteraDouble> m_mobility;
 
     //! solving stage
     size_t m_stage = 1;
@@ -109,22 +109,22 @@ protected:
     size_t m_kElectron = npos;
 
     //! electric field
-    double E(const double* x, size_t j) const {
+    CanteraDouble E(const CanteraDouble* x, size_t j) const {
         return x[index(c_offset_E, j)];
     }
 
-    double dEdz(const double* x, size_t j) const {
+    CanteraDouble dEdz(const CanteraDouble* x, size_t j) const {
         return (E(x,j)-E(x,j-1))/(z(j)-z(j-1));
     }
 
     //! number density
-    double ND(const double* x, size_t k, size_t j) const {
+    CanteraDouble ND(const CanteraDouble* x, size_t k, size_t j) const {
         return Avogadro * m_rho[j] * Y(x,k,j) / m_wt[k];
     }
 
     //! total charge density
-    double rho_e(double* x, size_t j) const {
-        double chargeDensity = 0.0;
+    CanteraDouble rho_e(CanteraDouble* x, size_t j) const {
+        CanteraDouble chargeDensity = 0.0;
         for (size_t k : m_kCharge) {
             chargeDensity += m_speciesCharge[k] * ElectronCharge * ND(x,k,j);
         }

@@ -166,121 +166,121 @@ public:
      * @return the species standard state enthalpy in J kmol-1 at the current
      *     temperature and pressure.
      */
-    virtual double enthalpy_mole() const;
+    virtual CanteraDouble enthalpy_mole() const;
 
     //! Return the standard state molar enthalpy divided by RT
     /*!
      * @return The dimensionless species standard state enthalpy divided at
      *     the current temperature and pressure.
      */
-    virtual double enthalpy_RT() const;
+    virtual CanteraDouble enthalpy_RT() const;
 
     //! Return the molar internal Energy in units of J kmol-1
     /*!
      * @return The species standard state internal Energy in J kmol-1 at the
      *     current temperature and pressure.
      */
-    virtual double intEnergy_mole() const;
+    virtual CanteraDouble intEnergy_mole() const;
 
     //! Return the molar entropy in units of J kmol-1 K-1
     /*!
      * @return The species standard state entropy in J kmol-1 K-1 at the
      *     current temperature and pressure.
      */
-    virtual double entropy_mole() const;
+    virtual CanteraDouble entropy_mole() const;
 
     //! Return the standard state entropy divided by RT
     /*!
      * @return The species standard state entropy divided by RT at the current
      *     temperature and pressure.
      */
-    virtual double entropy_R() const;
+    virtual CanteraDouble entropy_R() const;
 
     //! Return the molar Gibbs free energy in units of J kmol-1
     /*!
      * @return The species standard state Gibbs free energy in J kmol-1 at the
      * current temperature and pressure.
      */
-    virtual double gibbs_mole() const;
+    virtual CanteraDouble gibbs_mole() const;
 
     //! Return the molar Gibbs free energy divided by RT
     /*!
      * @return The species standard state Gibbs free energy divided by RT at
      *     the current temperature and pressure.
      */
-    virtual double gibbs_RT() const;
+    virtual CanteraDouble gibbs_RT() const;
 
     //! Return the molar const pressure heat capacity in units of J kmol-1 K-1
     /*!
      * @return The species standard state Cp in J kmol-1 K-1 at the current
      *     temperature and pressure.
      */
-    virtual double cp_mole() const;
+    virtual CanteraDouble cp_mole() const;
 
     //! Return the molar const pressure heat capacity divided by RT
     /*!
      * @return The species standard state Cp divided by RT at the current
      *     temperature and pressure.
      */
-    virtual double cp_R() const;
+    virtual CanteraDouble cp_R() const;
 
     //! Return the molar const volume heat capacity in units of J kmol-1 K-1
     /*!
      * @return The species standard state Cv in J kmol-1 K-1 at the
      * current temperature and pressure.
      */
-    virtual double cv_mole() const;
+    virtual CanteraDouble cv_mole() const;
 
     //! Return the molar volume at standard state
     /*!
      * @return The standard state molar volume at the current temperature and
      *     pressure. Units are m**3 kmol-1.
      */
-    virtual double molarVolume() const;
+    virtual CanteraDouble molarVolume() const;
 
     //! Return the standard state density at standard state
     /*!
      * @return The standard state density at the current temperature and
      *     pressure. units are kg m-3
      */
-    virtual double density() const;
+    virtual CanteraDouble density() const;
 
     //! Get the difference in the standard state enthalpy
     //! between the current pressure and the reference pressure, p0.
     //! @deprecated To be removed after %Cantera 3.0
-    virtual double enthalpyDelp_mole() const;
+    virtual CanteraDouble enthalpyDelp_mole() const;
 
     //! Get the difference in the standard state entropy between
     //! the current pressure and the reference pressure, p0
     //! @deprecated To be removed after %Cantera 3.0
-    virtual double entropyDelp_mole() const;
+    virtual CanteraDouble entropyDelp_mole() const;
 
     //! Get the difference in the standard state Gibbs free energy
     //! between the current pressure and the reference pressure, p0.
     //! @deprecated To be removed after %Cantera 3.0
-    virtual double gibbsDelp_mole() const;
+    virtual CanteraDouble gibbsDelp_mole() const;
 
     //! Get the difference in standard state heat capacity
     //! between the current pressure and the reference pressure, p0.
     //! @deprecated To be removed after %Cantera 3.0
-    virtual double cpDelp_mole() const;
+    virtual CanteraDouble cpDelp_mole() const;
 
     //! @}
     //! @name Properties of the Reference State of the Species in the Solution
     //! @{
 
     //! Return the reference pressure for this phase.
-    double refPressure() const {
+    CanteraDouble refPressure() const {
         return m_p0;
     }
 
     //! return the minimum temperature
-    double minTemp() const {
+    CanteraDouble minTemp() const {
         return m_minTemp;
     }
 
     //! return the minimum temperature
-    double maxTemp() const {
+    CanteraDouble maxTemp() const {
         return m_maxTemp;
     }
 
@@ -289,41 +289,41 @@ public:
      * @return The reference state Gibbs free energy at the current
      *     temperature, divided by RT.
      */
-    virtual double gibbs_RT_ref() const;
+    virtual CanteraDouble gibbs_RT_ref() const;
 
     //! Return the molar enthalpy divided by RT at reference pressure
     /*!
      * @return The species reference state enthalpy at the current
      *     temperature, divided by RT.
      */
-    virtual double enthalpy_RT_ref() const;
+    virtual CanteraDouble enthalpy_RT_ref() const;
 
     //! Return the molar entropy divided by R at reference pressure
     /*!
      * @return The species reference state entropy at the current
      *     temperature, divided by R.
      */
-    virtual double entropy_R_ref() const;
+    virtual CanteraDouble entropy_R_ref() const;
 
     //! Return the molar heat capacity divided by R at reference pressure
     /*!
      * @return The species reference state heat capacity divided by R at the
      * current temperature.
      */
-    virtual double cp_R_ref() const;
+    virtual CanteraDouble cp_R_ref() const;
 
     //! Return the molar volume at reference pressure
     /*!
      * @return The reference state molar volume. units are m**3 kmol-1.
      */
-    virtual double molarVolume_ref() const;
+    virtual CanteraDouble molarVolume_ref() const;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
     //! Returns the pressure (Pa)
-    virtual double pressure() const;
+    virtual CanteraDouble pressure() const;
 
     //! Sets the pressure in the object
     /*!
@@ -332,7 +332,7 @@ public:
      *
      * @param   pres   Pressure to be set (Pascal)
      */
-    virtual void setPressure(double pres);
+    virtual void setPressure(CanteraDouble pres);
 
     //! Return the volumetric thermal expansion coefficient. Units: 1/K.
     /*!
@@ -341,24 +341,24 @@ public:
      *     \beta = \frac{1}{v}\left(\frac{\partial v}{\partial T}\right)_P
      * @f]
      */
-    virtual double thermalExpansionCoeff() const;
+    virtual CanteraDouble thermalExpansionCoeff() const;
     //! @}
 
     //! Set the internal temperature
     /*!
      * @param temp Temperature (Kelvin)
      */
-    virtual void setTemperature(double temp);
+    virtual void setTemperature(CanteraDouble temp);
 
     //! Return the current stored temperature
-    virtual double temperature() const;
+    virtual CanteraDouble temperature() const;
 
     //! Set the internal temperature and pressure
     /*!
      * @param  temp     Temperature (Kelvin)
      * @param  pres     pressure (Pascals)
      */
-    virtual void setState_TP(double temp, double pres);
+    virtual void setState_TP(CanteraDouble temp, CanteraDouble pres);
 
     //! Set the internal temperature and density
     /*!
@@ -366,32 +366,32 @@ public:
      * @param  rho      Density (kg m-3)
      * @deprecated To be removed after %Cantera 3.0
      */
-    virtual void setState_TR(double temp, double rho);
+    virtual void setState_TR(CanteraDouble temp, CanteraDouble rho);
 
     //! critical temperature
-    virtual double critTemperature() const;
+    virtual CanteraDouble critTemperature() const;
 
     //! critical pressure
-    virtual double critPressure() const;
+    virtual CanteraDouble critPressure() const;
 
     //! critical density
-    virtual double critDensity() const;
+    virtual CanteraDouble critDensity() const;
 
     //! saturation pressure
     /*!
      *  @param T Temperature (Kelvin)
      */
-    virtual double satPressure(double T);
+    virtual CanteraDouble satPressure(CanteraDouble T);
 
     //! Return the molecular weight of the species
     //! in units of kg kmol-1
-    double molecularWeight() const;
+    CanteraDouble molecularWeight() const;
 
     //! Set the molecular weight of the species
     /*!
      * @param mw Molecular Weight in kg kmol-1
      */
-    void setMolecularWeight(double mw);
+    void setMolecularWeight(CanteraDouble mw);
 
     //! @name Initialization of the Object
     //! @{
@@ -438,30 +438,30 @@ public:
      * @param refPressure output - reference pressure (Pa).
      * @deprecated To be removed after %Cantera 3.0. Use getParameters() instead.
      */
-    virtual void reportParams(size_t& kindex, int& type, double* const c,
-                              double& minTemp, double& maxTemp,
-                              double& refPressure) const;
+    virtual void reportParams(size_t& kindex, int& type, CanteraDouble* const c,
+                              CanteraDouble& minTemp, CanteraDouble& maxTemp,
+                              CanteraDouble& refPressure) const;
 
     //! @}
 
 protected:
     //! Current temperature used by the PDSS object
-    mutable double m_temp = -1.0;
+    mutable CanteraDouble m_temp = -1.0;
 
     //! State of the system - pressure
-    mutable double m_pres = -1.0;
+    mutable CanteraDouble m_pres = -1.0;
 
     //! Reference state pressure of the species.
-    double m_p0 = -1.0;
+    CanteraDouble m_p0 = -1.0;
 
     //! Minimum temperature
-    double m_minTemp = -1.0;
+    CanteraDouble m_minTemp = -1.0;
 
     //! Maximum temperature
-    double m_maxTemp = 10000.0;
+    CanteraDouble m_maxTemp = 10000.0;
 
     //! Molecular Weight of the species
-    double m_mw = 0.0;
+    CanteraDouble m_mw = 0.0;
 
     //! Input data supplied via setParameters. This may include parameters for
     //! different phase models, which will be used when initThermo() is called.
@@ -476,10 +476,10 @@ protected:
 class PDSS_Molar : public virtual PDSS
 {
 public:
-    double enthalpy_RT() const override;
-    double entropy_R() const override;
-    double gibbs_RT() const override;
-    double cp_R() const override;
+    CanteraDouble enthalpy_RT() const override;
+    CanteraDouble entropy_R() const override;
+    CanteraDouble gibbs_RT() const override;
+    CanteraDouble cp_R() const override;
 };
 
 //! Base class for PDSS classes which compute nondimensional properties directly
@@ -488,34 +488,34 @@ class PDSS_Nondimensional : public virtual PDSS
 public:
     PDSS_Nondimensional();
 
-    double enthalpy_mole() const override;
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
 
-    double enthalpy_RT_ref() const override;
-    double entropy_R_ref() const override;
-    double gibbs_RT_ref() const override;
-    double cp_R_ref() const override;
-    double molarVolume_ref() const override;
-    double enthalpy_RT() const override;
-    double entropy_R() const override;
-    double gibbs_RT() const override;
-    double cp_R() const override;
-    double molarVolume() const override;
-    double density() const override;
+    CanteraDouble enthalpy_RT_ref() const override;
+    CanteraDouble entropy_R_ref() const override;
+    CanteraDouble gibbs_RT_ref() const override;
+    CanteraDouble cp_R_ref() const override;
+    CanteraDouble molarVolume_ref() const override;
+    CanteraDouble enthalpy_RT() const override;
+    CanteraDouble entropy_R() const override;
+    CanteraDouble gibbs_RT() const override;
+    CanteraDouble cp_R() const override;
+    CanteraDouble molarVolume() const override;
+    CanteraDouble density() const override;
 
 protected:
-    double m_h0_RT; //!< Reference state enthalpy divided by RT
-    double m_cp0_R; //!< Reference state heat capacity divided by R
-    double m_s0_R; //!< Reference state entropy divided by R
-    double m_g0_RT; //!< Reference state Gibbs free energy divided by RT
-    double m_V0; //!< Reference state molar volume (m^3/kmol)
-    double m_hss_RT; //!< Standard state enthalpy divided by RT
-    double m_cpss_R; //!< Standard state heat capacity divided by R
-    double m_sss_R; //!< Standard state entropy divided by R
-    double m_gss_RT; //!< Standard state Gibbs free energy divided by RT
-    double m_Vss; //!< Standard State molar volume (m^3/kmol)
+    CanteraDouble m_h0_RT; //!< Reference state enthalpy divided by RT
+    CanteraDouble m_cp0_R; //!< Reference state heat capacity divided by R
+    CanteraDouble m_s0_R; //!< Reference state entropy divided by R
+    CanteraDouble m_g0_RT; //!< Reference state Gibbs free energy divided by RT
+    CanteraDouble m_V0; //!< Reference state molar volume (m^3/kmol)
+    CanteraDouble m_hss_RT; //!< Standard state enthalpy divided by RT
+    CanteraDouble m_cpss_R; //!< Standard state heat capacity divided by R
+    CanteraDouble m_sss_R; //!< Standard state entropy divided by R
+    CanteraDouble m_gss_RT; //!< Standard state Gibbs free energy divided by RT
+    CanteraDouble m_Vss; //!< Standard State molar volume (m^3/kmol)
 };
 
 }

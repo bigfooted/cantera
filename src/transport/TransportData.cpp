@@ -27,9 +27,9 @@ void TransportData::getParameters(AnyMap &transportNode) const
 
 GasTransportData::GasTransportData(
         const string& geometry_,
-        double diameter_, double well_depth_, double dipole_,
-        double polarizability_, double rot_relax, double acentric,
-        double dispersion, double quad_polar)
+        CanteraDouble diameter_, CanteraDouble well_depth_, CanteraDouble dipole_,
+        CanteraDouble polarizability_, CanteraDouble rot_relax, CanteraDouble acentric,
+        CanteraDouble dispersion, CanteraDouble quad_polar)
     : geometry(geometry_)
     , diameter(diameter_)
     , well_depth(well_depth_)
@@ -44,9 +44,9 @@ GasTransportData::GasTransportData(
 
 void GasTransportData::setCustomaryUnits(
         const string& geometry_,
-        double diameter_, double well_depth_, double dipole_,
-        double polarizability_, double rot_relax, double acentric,
-        double dispersion, double quad_polar)
+        CanteraDouble diameter_, CanteraDouble well_depth_, CanteraDouble dipole_,
+        CanteraDouble polarizability_, CanteraDouble rot_relax, CanteraDouble acentric,
+        CanteraDouble dispersion, CanteraDouble quad_polar)
 {
     geometry = geometry_;
     diameter = 1e-10 * diameter_; // convert from Angstroms to m
@@ -61,7 +61,7 @@ void GasTransportData::setCustomaryUnits(
 
 void GasTransportData::validate(const Species& sp)
 {
-    double nAtoms = 0;
+    CanteraDouble nAtoms = 0;
     for (const auto& [eName, stoich] : sp.composition) {
         if (!caseInsensitiveEquals(eName, "E")) {
             nAtoms += stoich;
@@ -161,14 +161,14 @@ void GasTransportData::getParameters(AnyMap& transportNode) const
 void setupGasTransportData(GasTransportData& tr, const AnyMap& node)
 {
     string geometry = node["geometry"].asString();
-    double welldepth = node["well-depth"].asDouble();
-    double diameter = node["diameter"].asDouble();
-    double dipole = node.getDouble("dipole", 0.0);
-    double polar = node.getDouble("polarizability", 0.0);
-    double rot = node.getDouble("rotational-relaxation", 0.0);
-    double acentric = node.getDouble("acentric-factor", 0.0);
-    double dispersion = node.getDouble("dispersion-coefficient", 0.0);
-    double quad = node.getDouble("quadrupole-polarizability", 0.0);
+    CanteraDouble welldepth = node["well-depth"].asDouble();
+    CanteraDouble diameter = node["diameter"].asDouble();
+    CanteraDouble dipole = node.getDouble("dipole", 0.0);
+    CanteraDouble polar = node.getDouble("polarizability", 0.0);
+    CanteraDouble rot = node.getDouble("rotational-relaxation", 0.0);
+    CanteraDouble acentric = node.getDouble("acentric-factor", 0.0);
+    CanteraDouble dispersion = node.getDouble("dispersion-coefficient", 0.0);
+    CanteraDouble quad = node.getDouble("quadrupole-polarizability", 0.0);
 
     tr.setCustomaryUnits(geometry, diameter, welldepth, dipole, polar,
                          rot, acentric, dispersion, quad);

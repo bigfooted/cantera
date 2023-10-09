@@ -131,7 +131,7 @@ public:
     /**
      *  Retrieve a component of the SolutionArray by name.
      *  Returns an AnyValue containing an array with length size() with a type
-     *  specific to the component; in most cases, the type is double, but may differ
+     *  specific to the component; in most cases, the type is CanteraDouble, but may differ
      *  for auxiliary data.
      */
     AnyValue getComponent(const string& name) const;
@@ -139,7 +139,7 @@ public:
     /**
      *  Set a component of the SolutionArray by name.
      *  The passed AnyValue should containing an array with length size() with a type
-     *  specific to the component; in most cases, the type is double, but may differ
+     *  specific to the component; in most cases, the type is CanteraDouble, but may differ
      *  for auxiliary data.
      *
      *  @param name  Name of component (property defining auxiliary variable)
@@ -158,10 +158,10 @@ public:
     void updateState(int loc);
 
     //! Retrieve the state vector for a given location.
-    vector<double> getState(int loc);
+    vector<CanteraDouble> getState(int loc);
 
     //! Set the state vector for a given location.
-    void setState(int loc, const vector<double>& state);
+    void setState(int loc, const vector<CanteraDouble>& state);
 
     //! Normalize mass/mole fractions
     void normalize();
@@ -192,7 +192,7 @@ public:
     void setAuxiliary(int loc, const AnyMap& data);
 
     //! Append location entry at end of SolutionArray.
-    void append(const vector<double>& state, const AnyMap& extra);
+    void append(const vector<CanteraDouble>& state, const AnyMap& extra);
 
     /**
      *  Write header data to a HDF container file.
@@ -385,7 +385,7 @@ protected:
     size_t m_loc = npos; //!< Buffered location within data vector
     vector<long int> m_apiShape; //!< Shape information used by high-level API's
 
-    shared_ptr<vector<double>> m_data; //!< Work vector holding states
+    shared_ptr<vector<CanteraDouble>> m_data; //!< Work vector holding states
 
     //! Auxiliary (extra) components; size of first dimension has to match m_dataSize
     shared_ptr<map<string, AnyValue>> m_extra;

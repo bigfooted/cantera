@@ -24,11 +24,11 @@ namespace Cantera
  * @param tr Reduced temperature @f$ \epsilon/kT @f$
  * @param sqtr square root of tr.
  */
-double Frot(double tr, double sqtr)
+CanteraDouble Frot(CanteraDouble tr, CanteraDouble sqtr)
 {
-    const double c1 = 0.5*sqrt(Pi)*Pi;
-    const double c2 = 0.25*Pi*Pi + 2.0;
-    const double c3 = sqrt(Pi)*Pi;
+    const CanteraDouble c1 = 0.5*sqrt(Pi)*Pi;
+    const CanteraDouble c2 = 0.25*Pi*Pi + 2.0;
+    const CanteraDouble c3 = sqrt(Pi)*Pi;
     return 1.0 + c1*sqtr + c2*tr + c3*sqtr*tr;
 }
 
@@ -77,8 +77,8 @@ void MultiTransport::init(ThermoPhase* thermo, int mode, int log_level)
 
     // precompute and store constant parts of the Parker rotational
     // collision number temperature correction
-    const double sq298 = sqrt(298.0);
-    const double kb298 = Boltzmann * 298.0;
+    const CanteraDouble sq298 = sqrt(298.0);
+    const CanteraDouble kb298 = Boltzmann * 298.0;
     m_sqrt_eps_k.resize(m_nsp);
     for (size_t k = 0; k < m_nsp; k++) {
         m_sqrt_eps_k[k] = sqrt(m_eps[k]/Boltzmann);
@@ -86,26 +86,26 @@ void MultiTransport::init(ThermoPhase* thermo, int mode, int log_level)
     }
 }
 
-double MultiTransport::thermalConductivity()
+CanteraDouble MultiTransport::thermalConductivity()
 {
     solveLMatrixEquation();
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t k = 0; k  < 2*m_nsp; k++) {
         sum += m_b[k + m_nsp] * m_a[k + m_nsp];
     }
     return -4.0*sum;
 }
 
-void MultiTransport::getThermalDiffCoeffs(double* const dt)
+void MultiTransport::getThermalDiffCoeffs(CanteraDouble* const dt)
 {
     solveLMatrixEquation();
-    const double c = 1.6/GasConstant;
+    const CanteraDouble c = 1.6/GasConstant;
     for (size_t k = 0; k < m_nsp; k++) {
         dt[k] = c * m_mw[k] * m_molefracs[k] * m_a[k];
     }
 }
 
-double MultiTransport::pressure_ig()
+CanteraDouble MultiTransport::pressure_ig()
 {
     return m_thermo->molarDensity() * GasConstant * m_thermo->temperature();
 }
@@ -167,9 +167,9 @@ void MultiTransport::solveLMatrixEquation()
     m_l0000_ok = false;
 }
 
-void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
-                                      size_t ldx, const double* const grad_X,
-                                      size_t ldf, double* const fluxes)
+void MultiTransport::getSpeciesFluxes(size_t ndim, const CanteraDouble* const grad_T,
+                                      size_t ldx, const CanteraDouble* const grad_X,
+                                      size_t ldf, CanteraDouble* const fluxes)
 {
     // update the binary diffusion coefficients if necessary
     update_T();
@@ -187,11 +187,11 @@ void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
         getThermalDiffCoeffs(m_spwork.data());
     }
 
-    const double* y = m_thermo->massFractions();
-    double rho = m_thermo->density();
+    const CanteraDouble* y = m_thermo->massFractions();
+    CanteraDouble rho = m_thermo->density();
 
     for (size_t i = 0; i < m_nsp; i++) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t j = 0; j < m_nsp; j++) {
             m_aa(i,j) = m_molefracs[j]*m_molefracs[i]/m_bdiff(i,j);
             sum += m_aa(i,j);
@@ -203,7 +203,7 @@ void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
     // the flux equation with the largest gradx component in the first
     // coordinate direction with the flux balance condition.
     size_t jmax = 0;
-    double gradmax = -1.0;
+    CanteraDouble gradmax = -1.0;
     for (size_t j = 0; j < m_nsp; j++) {
         if (fabs(grad_X[j]) > gradmax) {
             gradmax = fabs(grad_X[j]);
@@ -216,21 +216,21 @@ void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
     for (size_t j = 0; j < m_nsp; j++) {
         m_aa(jmax,j) = y[j];
     }
-    vector<double> gsave(ndim), grx(ldx*m_nsp);
+    vector<CanteraDouble> gsave(ndim), grx(ldx*m_nsp);
     for (size_t n = 0; n < ldx*ndim; n++) {
         grx[n] = grad_X[n];
     }
 
     // copy grad_X to fluxes
     for (size_t n = 0; n < ndim; n++) {
-        const double* gx = grad_X + ldx*n;
+        const CanteraDouble* gx = grad_X + ldx*n;
         copy(gx, gx + m_nsp, fluxes + ldf*n);
         fluxes[jmax + n*ldf] = 0.0;
     }
 
     // solve the equations
     solve(m_aa, fluxes, ndim, ldf);
-    double pp = pressure_ig();
+    CanteraDouble pp = pressure_ig();
 
     // multiply diffusion velocities by rho * V to create mass fluxes, and
     // restore the gradx elements that were modified
@@ -245,7 +245,7 @@ void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
     if (addThermalDiffusion) {
         for (size_t n = 0; n < ndim; n++) {
             size_t offset = n*ldf;
-            double grad_logt = grad_T[n]/m_temp;
+            CanteraDouble grad_logt = grad_T[n]/m_temp;
             for (size_t i = 0; i < m_nsp; i++) {
                 fluxes[i + offset] -= m_spwork[i]*grad_logt;
             }
@@ -253,25 +253,25 @@ void MultiTransport::getSpeciesFluxes(size_t ndim, const double* const grad_T,
     }
 }
 
-void MultiTransport::getMassFluxes(const double* state1, const double* state2,
-                                   double delta, double* fluxes)
+void MultiTransport::getMassFluxes(const CanteraDouble* state1, const CanteraDouble* state2,
+                                   CanteraDouble delta, CanteraDouble* fluxes)
 {
-    double* x1 = m_spwork1.data();
-    double* x2 = m_spwork2.data();
-    double* x3 = m_spwork3.data();
+    CanteraDouble* x1 = m_spwork1.data();
+    CanteraDouble* x2 = m_spwork2.data();
+    CanteraDouble* x3 = m_spwork3.data();
     size_t nsp = m_thermo->nSpecies();
     m_thermo->restoreState(nsp+2, state1);
-    double p1 = m_thermo->pressure();
-    double t1 = state1[0];
+    CanteraDouble p1 = m_thermo->pressure();
+    CanteraDouble t1 = state1[0];
     m_thermo->getMoleFractions(x1);
 
     m_thermo->restoreState(nsp+2, state2);
-    double p2 = m_thermo->pressure();
-    double t2 = state2[0];
+    CanteraDouble p2 = m_thermo->pressure();
+    CanteraDouble t2 = state2[0];
     m_thermo->getMoleFractions(x2);
 
-    double p = 0.5*(p1 + p2);
-    double t = 0.5*(state1[0] + state2[0]);
+    CanteraDouble p = 0.5*(p1 + p2);
+    CanteraDouble t = 0.5*(state1[0] + state2[0]);
 
     for (size_t n = 0; n < nsp; n++) {
         x3[n] = 0.5*(x1[n] + x2[n]);
@@ -291,10 +291,10 @@ void MultiTransport::getMassFluxes(const double* state1, const double* state2,
         getThermalDiffCoeffs(m_spwork.data());
     }
 
-    const double* y = m_thermo->massFractions();
-    double rho = m_thermo->density();
+    const CanteraDouble* y = m_thermo->massFractions();
+    CanteraDouble rho = m_thermo->density();
     for (size_t i = 0; i < m_nsp; i++) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t j = 0; j < m_nsp; j++) {
             m_aa(i,j) = m_molefracs[j]*m_molefracs[i]/m_bdiff(i,j);
             sum += m_aa(i,j);
@@ -306,7 +306,7 @@ void MultiTransport::getMassFluxes(const double* state1, const double* state2,
     // flux equation with the largest gradx component with the flux balance
     // condition.
     size_t jmax = 0;
-    double gradmax = -1.0;
+    CanteraDouble gradmax = -1.0;
     for (size_t j = 0; j < m_nsp; j++) {
         if (fabs(x2[j] - x1[j]) > gradmax) {
             gradmax = fabs(x1[j] - x2[j]);
@@ -325,7 +325,7 @@ void MultiTransport::getMassFluxes(const double* state1, const double* state2,
     // Solve the equations
     solve(m_aa, fluxes);
 
-    double pp = pressure_ig();
+    CanteraDouble pp = pressure_ig();
     // multiply diffusion velocities by rho * Y_k to create
     // mass fluxes, and divide by pressure
     for (size_t i = 0; i < m_nsp; i++) {
@@ -334,17 +334,17 @@ void MultiTransport::getMassFluxes(const double* state1, const double* state2,
 
     // thermal diffusion
     if (addThermalDiffusion) {
-        double grad_logt = (t2 - t1)/m_temp;
+        CanteraDouble grad_logt = (t2 - t1)/m_temp;
         for (size_t i = 0; i < m_nsp; i++) {
             fluxes[i] -= m_spwork[i]*grad_logt;
         }
     }
 }
 
-void MultiTransport::getMolarFluxes(const double* const state1,
-                                    const double* const state2,
-                                    const double delta,
-                                    double* const fluxes)
+void MultiTransport::getMolarFluxes(const CanteraDouble* const state1,
+                                    const CanteraDouble* const state2,
+                                    const CanteraDouble delta,
+                                    CanteraDouble* const fluxes)
 {
     getMassFluxes(state1, state2, delta, fluxes);
     for (size_t k = 0; k < m_thermo->nSpecies(); k++) {
@@ -352,9 +352,9 @@ void MultiTransport::getMolarFluxes(const double* const state1,
     }
 }
 
-void MultiTransport::getMultiDiffCoeffs(const size_t ld, double* const d)
+void MultiTransport::getMultiDiffCoeffs(const size_t ld, CanteraDouble* const d)
 {
-    double p = pressure_ig();
+    CanteraDouble p = pressure_ig();
 
     // update the mole fractions
     update_C();
@@ -378,11 +378,11 @@ void MultiTransport::getMultiDiffCoeffs(const size_t ld, double* const d)
     m_l0000_ok = false; // matrix is overwritten by inverse
     m_lmatrix_soln_ok = false;
 
-    double prefactor = 16.0 * m_temp
+    CanteraDouble prefactor = 16.0 * m_temp
                            * m_thermo->meanMolecularWeight()/(25.0 * p);
     for (size_t i = 0; i < m_nsp; i++) {
         for (size_t j = 0; j < m_nsp; j++) {
-            double c = prefactor/m_mw[j];
+            CanteraDouble c = prefactor/m_mw[j];
             d[ld*j + i] = c*m_molefracs[i]*
                           (m_Lmatrix(i,j) - m_Lmatrix(i,i));
         }
@@ -431,7 +431,7 @@ void MultiTransport::updateThermal_T()
     // evaluate polynomial fits for A*, B*, C*
     for (size_t i = 0; i < m_nsp; i++) {
         for (size_t j = i; j < m_nsp; j++) {
-            double z = m_star_poly_uses_actualT[i][j] == 1 ? m_logt : m_logt - m_log_eps_k(i,j);
+            CanteraDouble z = m_star_poly_uses_actualT[i][j] == 1 ? m_logt : m_logt - m_log_eps_k(i,j);
             int ipoly = m_poly[i][j];
             if (m_mode == CK_Mode) {
                 m_astar(i,j) = poly6(z, m_astar_poly[ipoly].data());
@@ -450,12 +450,12 @@ void MultiTransport::updateThermal_T()
 
     // evaluate the temperature-dependent rotational relaxation rate
     for (size_t k = 0; k < m_nsp; k++) {
-        double tr = m_eps[k]/ m_kbt;
-        double sqtr = m_sqrt_eps_k[k] / m_sqrt_t;
+        CanteraDouble tr = m_eps[k]/ m_kbt;
+        CanteraDouble sqtr = m_sqrt_eps_k[k] / m_sqrt_t;
         m_rotrelax[k] = std::max(1.0,m_zrot[k]) * m_frot_298[k]/Frot(tr, sqtr);
     }
 
-    double c = 1.2*GasConstant*m_temp;
+    CanteraDouble c = 1.2*GasConstant*m_temp;
     for (size_t k = 0; k < m_nsp; k++) {
         m_bdiff(k,k) = c * m_visc[k] * m_astar(k,k)/m_mw[k];
     }
@@ -469,7 +469,7 @@ void MultiTransport::updateThermal_T()
      *       Chemkin has traditionally subtracted 1.5 here (SAND86-8246).
      *       The original Dixon-Lewis paper subtracted 1.5 here.
      */
-    vector<double> cp(m_thermo->nSpecies());
+    vector<CanteraDouble> cp(m_thermo->nSpecies());
     m_thermo->getCp_R_ref(&cp[0]);
     for (size_t k = 0; k < m_nsp; k++) {
         m_cinternal[k] = cp[k] - 2.5;
@@ -478,17 +478,17 @@ void MultiTransport::updateThermal_T()
 }
 
 //! Constant to compare dimensionless heat capacities against zero
-static const double Min_C_Internal = 0.001;
+static const CanteraDouble Min_C_Internal = 0.001;
 
 bool MultiTransport::hasInternalModes(size_t j)
 {
     return (m_cinternal[j] > Min_C_Internal);
 }
 
-void MultiTransport::eval_L0000(const double* const x)
+void MultiTransport::eval_L0000(const CanteraDouble* const x)
 {
-    double prefactor = 16.0*m_temp/25.0;
-    double sum;
+    CanteraDouble prefactor = 16.0*m_temp/25.0;
+    CanteraDouble sum;
     for (size_t i = 0; i < m_nsp; i++) {
         // subtract-off the k=i term to account for the first delta
         // function in Eq. (12.121)
@@ -507,13 +507,13 @@ void MultiTransport::eval_L0000(const double* const x)
     }
 }
 
-void MultiTransport::eval_L0010(const double* const x)
+void MultiTransport::eval_L0010(const CanteraDouble* const x)
 {
-    double prefactor = 1.6*m_temp;
+    CanteraDouble prefactor = 1.6*m_temp;
     for (size_t j = 0; j < m_nsp; j++) {
-        double xj = x[j];
-        double wj = m_mw[j];
-        double sum = 0.0;
+        CanteraDouble xj = x[j];
+        CanteraDouble wj = m_mw[j];
+        CanteraDouble sum = 0.0;
         for (size_t i = 0; i < m_nsp; i++) {
             m_Lmatrix(i,j + m_nsp) = - prefactor * x[i] * xj * m_mw[i] *
                                      (1.2 * m_cstar(j,i) - 1.0) /
@@ -536,25 +536,25 @@ void MultiTransport::eval_L1000()
     }
 }
 
-void MultiTransport::eval_L1010(const double* x)
+void MultiTransport::eval_L1010(const CanteraDouble* x)
 {
-    const double fiveover3pi = 5.0/(3.0*Pi);
-    double prefactor = (16.0*m_temp)/25.0;
+    const CanteraDouble fiveover3pi = 5.0/(3.0*Pi);
+    CanteraDouble prefactor = (16.0*m_temp)/25.0;
 
     for (size_t j = 0; j < m_nsp; j++) {
         // get constant terms that depend on just species "j"
-        double constant1 = prefactor*x[j];
-        double wjsq = m_mw[j]*m_mw[j];
-        double constant2 = 13.75*wjsq;
-        double constant3 = m_crot[j]/m_rotrelax[j];
-        double constant4 = 7.5*wjsq;
-        double fourmj = 4.0*m_mw[j];
-        double threemjsq = 3.0*m_mw[j]*m_mw[j];
-        double sum = 0.0;
+        CanteraDouble constant1 = prefactor*x[j];
+        CanteraDouble wjsq = m_mw[j]*m_mw[j];
+        CanteraDouble constant2 = 13.75*wjsq;
+        CanteraDouble constant3 = m_crot[j]/m_rotrelax[j];
+        CanteraDouble constant4 = 7.5*wjsq;
+        CanteraDouble fourmj = 4.0*m_mw[j];
+        CanteraDouble threemjsq = 3.0*m_mw[j]*m_mw[j];
+        CanteraDouble sum = 0.0;
         for (size_t i = 0; i < m_nsp; i++) {
-            double sumwij = m_mw[i] + m_mw[j];
-            double term1 = m_bdiff(i,j) * sumwij*sumwij;
-            double term2 = fourmj*m_astar(i,j)*(1.0 + fiveover3pi*
+            CanteraDouble sumwij = m_mw[i] + m_mw[j];
+            CanteraDouble term1 = m_bdiff(i,j) * sumwij*sumwij;
+            CanteraDouble term2 = fourmj*m_astar(i,j)*(1.0 + fiveover3pi*
                 (constant3 + (m_crot[i]/m_rotrelax[i]))); //  see Eq. (12.125)
 
             m_Lmatrix(i+m_nsp,j+m_nsp) = constant1*x[i]*m_mw[i] /(m_mw[j]*term1) *
@@ -570,14 +570,14 @@ void MultiTransport::eval_L1010(const double* x)
     }
 }
 
-void MultiTransport::eval_L1001(const double* x)
+void MultiTransport::eval_L1001(const CanteraDouble* x)
 {
-    double prefactor = 32.00*m_temp/(5.00*Pi);
+    CanteraDouble prefactor = 32.00*m_temp/(5.00*Pi);
     for (size_t j = 0; j < m_nsp; j++) {
         // collect terms that depend only on "j"
         if (hasInternalModes(j)) {
-            double constant = prefactor*m_mw[j]*x[j]*m_crot[j]/(m_cinternal[j]*m_rotrelax[j]);
-            double sum = 0.0;
+            CanteraDouble constant = prefactor*m_mw[j]*x[j]*m_crot[j]/(m_cinternal[j]*m_rotrelax[j]);
+            CanteraDouble sum = 0.0;
             for (size_t i = 0; i < m_nsp; i++) {
                 // see Eq. (12.127)
                 m_Lmatrix(i+m_nsp,j+2*m_nsp) = constant * m_astar(j,i) * x[i] /
@@ -620,18 +620,18 @@ void MultiTransport::eval_L0110()
     }
 }
 
-void MultiTransport::eval_L0101(const double* x)
+void MultiTransport::eval_L0101(const CanteraDouble* x)
 {
     for (size_t i = 0; i < m_nsp; i++) {
         if (hasInternalModes(i)) {
             // collect terms that depend only on "i"
-            double constant1 = 4*m_temp*x[i]/m_cinternal[i];
-            double constant2 = 12*m_mw[i]*m_crot[i] /
+            CanteraDouble constant1 = 4*m_temp*x[i]/m_cinternal[i];
+            CanteraDouble constant2 = 12*m_mw[i]*m_crot[i] /
                                (5*Pi*m_cinternal[i]*m_rotrelax[i]);
-            double sum = 0.0;
+            CanteraDouble sum = 0.0;
             for (size_t k = 0; k < m_nsp; k++) {
                 // see Eq. (12.131)
-                double diff_int = m_bdiff(i,k);
+                CanteraDouble diff_int = m_bdiff(i,k);
                 m_Lmatrix(k+2*m_nsp,i+2*m_nsp) = 0.0;
                 sum += x[k]/diff_int;
                 if (k != i) {

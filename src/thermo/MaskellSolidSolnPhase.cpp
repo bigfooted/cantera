@@ -22,7 +22,7 @@ MaskellSolidSolnPhase::MaskellSolidSolnPhase()
     warn_deprecated("class MaskellSolidSolnPhase", "To be removed after Cantera 3.0");
 }
 
-void MaskellSolidSolnPhase::getActivityConcentrations(double* c) const
+void MaskellSolidSolnPhase::getActivityConcentrations(CanteraDouble* c) const
 {
     getActivityCoefficients(c);
     for (size_t sp = 0; sp < m_kk; ++sp) {
@@ -32,25 +32,25 @@ void MaskellSolidSolnPhase::getActivityConcentrations(double* c) const
 
 // Molar Thermodynamic Properties of the Solution
 
-double MaskellSolidSolnPhase::enthalpy_mole() const
+CanteraDouble MaskellSolidSolnPhase::enthalpy_mole() const
 {
-    const double h0 = RT() * mean_X(m_h0_RT);
-    const double r = moleFraction(product_species_index);
-    const double fmval = fm(r);
+    const CanteraDouble h0 = RT() * mean_X(m_h0_RT);
+    const CanteraDouble r = moleFraction(product_species_index);
+    const CanteraDouble fmval = fm(r);
     return h0 + r * fmval * h_mixing;
 }
 
-double xlogx(double x)
+CanteraDouble xlogx(CanteraDouble x)
 {
     return x * std::log(x);
 }
 
-double MaskellSolidSolnPhase::entropy_mole() const
+CanteraDouble MaskellSolidSolnPhase::entropy_mole() const
 {
-    const double s0 = GasConstant * mean_X(m_s0_R);
-    const double r = moleFraction(product_species_index);
-    const double fmval = fm(r);
-    const double rfm = r * fmval;
+    const CanteraDouble s0 = GasConstant * mean_X(m_s0_R);
+    const CanteraDouble r = moleFraction(product_species_index);
+    const CanteraDouble fmval = fm(r);
+    const CanteraDouble rfm = r * fmval;
     return s0 + GasConstant * (xlogx(1-rfm) - xlogx(rfm) - xlogx(1-r-rfm) - xlogx((1-fmval)*r) - xlogx(1-r) - xlogx(r));
 }
 
@@ -58,49 +58,49 @@ double MaskellSolidSolnPhase::entropy_mole() const
 
 void MaskellSolidSolnPhase::calcDensity()
 {
-    const vector<double>& vbar = getStandardVolumes();
+    const vector<CanteraDouble>& vbar = getStandardVolumes();
 
-    vector<double> moleFracs(m_kk);
+    vector<CanteraDouble> moleFracs(m_kk);
     Phase::getMoleFractions(&moleFracs[0]);
-    double vtotal = 0.0;
+    CanteraDouble vtotal = 0.0;
     for (size_t i = 0; i < m_kk; i++) {
         vtotal += vbar[i] * moleFracs[i];
     }
     Phase::assignDensity(meanMolecularWeight() / vtotal);
 }
 
-void MaskellSolidSolnPhase::setPressure(double p)
+void MaskellSolidSolnPhase::setPressure(CanteraDouble p)
 {
     m_Pcurrent = p;
 }
 
 // Chemical Potentials and Activities
 
-void MaskellSolidSolnPhase::getActivityCoefficients(double* ac) const
+void MaskellSolidSolnPhase::getActivityCoefficients(CanteraDouble* ac) const
 {
     static const int cacheId = m_cache.getId();
     CachedArray cached = m_cache.getArray(cacheId);
     if (!cached.validate(temperature(), pressure(), stateMFNumber())) {
         cached.value.resize(2);
 
-        const double r = moleFraction(product_species_index);
-        const double pval = p(r);
-        const double rfm = r * fm(r);
-        const double A = (std::pow(1 - rfm, pval) * std::pow(rfm, pval) * std::pow(r - rfm, 1 - pval)) /
+        const CanteraDouble r = moleFraction(product_species_index);
+        const CanteraDouble pval = p(r);
+        const CanteraDouble rfm = r * fm(r);
+        const CanteraDouble A = (std::pow(1 - rfm, pval) * std::pow(rfm, pval) * std::pow(r - rfm, 1 - pval)) /
                              (std::pow(1 - r - rfm, 1 + pval) * (1 - r));
-        const double B = pval * h_mixing / RT();
+        const CanteraDouble B = pval * h_mixing / RT();
         cached.value[product_species_index] = A * std::exp(B);
         cached.value[reactant_species_index] = 1 / (A * r * (1-r) ) * std::exp(-B);
     }
     std::copy(cached.value.begin(), cached.value.end(), ac);
 }
 
-void MaskellSolidSolnPhase::getChemPotentials(double* mu) const
+void MaskellSolidSolnPhase::getChemPotentials(CanteraDouble* mu) const
 {
-    const double r = moleFraction(product_species_index);
-    const double pval = p(r);
-    const double rfm = r * fm(r);
-    const double DgbarDr = pval * h_mixing +
+    const CanteraDouble r = moleFraction(product_species_index);
+    const CanteraDouble pval = p(r);
+    const CanteraDouble rfm = r * fm(r);
+    const CanteraDouble DgbarDr = pval * h_mixing +
                                RT() *
                                std::log( (std::pow(1 - rfm, pval) * std::pow(rfm, pval) * std::pow(r - rfm, 1 - pval) * r) /
                                (std::pow(1 - r - rfm, 1 + pval) * (1 - r)) );
@@ -108,7 +108,7 @@ void MaskellSolidSolnPhase::getChemPotentials(double* mu) const
     mu[reactant_species_index] = RT() * m_g0_RT[reactant_species_index] - DgbarDr;
 }
 
-void MaskellSolidSolnPhase::getChemPotentials_RT(double* mu) const
+void MaskellSolidSolnPhase::getChemPotentials_RT(CanteraDouble* mu) const
 {
     warn_deprecated("MaskellSolidSolnPhase::getChemPotentials_RT",
                     "To be removed after Cantera 3.0. Use getChemPotentials instead.");
@@ -120,34 +120,34 @@ void MaskellSolidSolnPhase::getChemPotentials_RT(double* mu) const
 
 // Partial Molar Properties
 
-void MaskellSolidSolnPhase::getPartialMolarEnthalpies(double* hbar) const
+void MaskellSolidSolnPhase::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     throw NotImplementedError("MaskellSolidSolnPhase::getPartialMolarEnthalpies");
 }
 
-void MaskellSolidSolnPhase::getPartialMolarEntropies(double* sbar) const
+void MaskellSolidSolnPhase::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     throw NotImplementedError("MaskellSolidSolnPhase::getPartialMolarEntropies");
 }
 
-void MaskellSolidSolnPhase::getPartialMolarCp(double* cpbar) const
+void MaskellSolidSolnPhase::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     throw NotImplementedError("MaskellSolidSolnPhase::getPartialMolarCp");
 }
 
-void MaskellSolidSolnPhase::getPartialMolarVolumes(double* vbar) const
+void MaskellSolidSolnPhase::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     getStandardVolumes(vbar);
 }
 
-void MaskellSolidSolnPhase::getPureGibbs(double* gpure) const
+void MaskellSolidSolnPhase::getPureGibbs(CanteraDouble* gpure) const
 {
     for (size_t sp=0; sp < m_kk; ++sp) {
         gpure[sp] = RT() * m_g0_RT[sp];
     }
 }
 
-void MaskellSolidSolnPhase::getStandardChemPotentials(double* mu) const
+void MaskellSolidSolnPhase::getStandardChemPotentials(CanteraDouble* mu) const
 {
     // What is the difference between this and getPureGibbs? IdealSolidSolnPhase
     // gives the same for both
@@ -182,19 +182,19 @@ void MaskellSolidSolnPhase::setProductSpecies(const string& name)
     reactant_species_index = (product_species_index == 0) ? 1 : 0;
 }
 
-double MaskellSolidSolnPhase::s() const
+CanteraDouble MaskellSolidSolnPhase::s() const
 {
     return 1 + std::exp(h_mixing / RT());
 }
 
-double MaskellSolidSolnPhase::fm(const double r) const
+CanteraDouble MaskellSolidSolnPhase::fm(const CanteraDouble r) const
 {
     return (1 - std::sqrt(1 - 4*r*(1-r)/s())) / (2*r);
 }
 
-double MaskellSolidSolnPhase::p(const double r) const
+CanteraDouble MaskellSolidSolnPhase::p(const CanteraDouble r) const
 {
-    const double sval = s();
+    const CanteraDouble sval = s();
     return (1 - 2*r) / std::sqrt(sval*sval - 4 * sval * r + 4 * sval * r * r);
 }
 

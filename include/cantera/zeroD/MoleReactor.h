@@ -26,13 +26,13 @@ public:
         return "MoleReactor";
     }
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
-    void eval(double t, double* LHS, double* RHS) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
     size_t componentIndex(const string& nm) const override;
 
@@ -42,21 +42,21 @@ protected:
     //! For each surface in the reactor, update vector of triplets with all relevant
     //! surface jacobian derivatives of species with respect to species
     //! which are appropriately offset to align with the reactor's state vector.
-    virtual void addSurfaceJacobian(vector<Eigen::Triplet<double>> &triplets);
+    virtual void addSurfaceJacobian(vector<Eigen::Triplet<CanteraDouble>> &triplets);
 
     //! Get moles of the system from mass fractions stored by thermo object
     //! @param y vector for moles to be put into
-    void getMoles(double* y);
+    void getMoles(CanteraDouble* y);
 
     //! Set internal mass variable based on moles given
     //! @param y vector of moles of the system
-    void setMassFromMoles(double* y);
+    void setMassFromMoles(CanteraDouble* y);
 
-    void evalSurfaces(double* LHS, double* RHS, double* sdot) override;
+    void evalSurfaces(CanteraDouble* LHS, CanteraDouble* RHS, CanteraDouble* sdot) override;
 
-    void updateSurfaceState(double* y) override;
+    void updateSurfaceState(CanteraDouble* y) override;
 
-    void getSurfaceInitialConditions(double* y) override;
+    void getSurfaceInitialConditions(CanteraDouble* y) override;
 
     //! const value for the species start index
     const size_t m_sidx = 2;

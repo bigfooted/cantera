@@ -33,13 +33,13 @@ public:
      *      should be smaller than both `slope` and `curve`. Set `prune <= 0`
      *      to disable pruning.
      */
-    void setCriteria(double ratio = 10.0,
-                     double slope = 0.8,
-                     double curve = 0.8,
-                     double prune = -0.1);
+    void setCriteria(CanteraDouble ratio = 10.0,
+                     CanteraDouble slope = 0.8,
+                     CanteraDouble curve = 0.8,
+                     CanteraDouble prune = -0.1);
 
     //! Get the grid refinement criteria. @see Refiner::setCriteria
-    vector<double> getCriteria()
+    vector<CanteraDouble> getCriteria()
     {
         return {m_ratio, m_slope, m_curve, m_prune};
     }
@@ -59,18 +59,18 @@ public:
     }
 
     //! Set the minimum allowable spacing between adjacent grid points [m].
-    void setGridMin(double gridmin) {
+    void setGridMin(CanteraDouble gridmin) {
         m_gridmin = gridmin;
     }
 
     //! Returns the the minimum allowable spacing between adjacent
     //! grid points [m].
-    double gridMin() const {
+    CanteraDouble gridMin() const {
         return m_gridmin;
     }
 
-    int analyze(size_t n, const double* z, const double* x);
-    int getNewGrid(int n, const double* z, int nn, double* znew);
+    int analyze(size_t n, const CanteraDouble* z, const CanteraDouble* x);
+    int getNewGrid(int n, const CanteraDouble* z, int nn, CanteraDouble* znew);
     int nNewPoints() {
         return static_cast<int>(m_loc.size());
     }
@@ -81,18 +81,18 @@ public:
     bool keepPoint(size_t j) {
         return (m_keep[j] != -1);
     }
-    double value(const double* x, size_t i, size_t j);
+    CanteraDouble value(const CanteraDouble* x, size_t i, size_t j);
 
-    double maxRatio() {
+    CanteraDouble maxRatio() {
         return m_ratio;
     }
-    double maxDelta() {
+    CanteraDouble maxDelta() {
         return m_slope;
     }
-    double maxSlope() {
+    CanteraDouble maxSlope() {
         return m_curve;
     }
-    double prune() {
+    CanteraDouble prune() {
         return m_prune;
     }
 
@@ -103,16 +103,16 @@ protected:
     //! Names of components that require the addition of new grid points
     set<string> m_c;
     vector<bool> m_active;
-    double m_ratio = 10.0;
-    double m_slope = 0.8;
-    double m_curve = 0.8;
-    double m_prune = -0.001;
-    double m_min_range = 0.01;
+    CanteraDouble m_ratio = 10.0;
+    CanteraDouble m_slope = 0.8;
+    CanteraDouble m_curve = 0.8;
+    CanteraDouble m_prune = -0.001;
+    CanteraDouble m_min_range = 0.01;
     Domain1D* m_domain;
     size_t m_nv;
     size_t m_npmax = 1000;
-    double m_thresh = std::sqrt(std::numeric_limits<double>::epsilon());
-    double m_gridmin = 1e-10; //!< minimum grid spacing [m]
+    CanteraDouble m_thresh = std::sqrt(std::numeric_limits<CanteraDouble>::epsilon());
+    CanteraDouble m_gridmin = 1e-10; //!< minimum grid spacing [m]
 };
 
 }

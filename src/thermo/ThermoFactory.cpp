@@ -238,9 +238,9 @@ void addElements(ThermoPhase& thermo, const vector<string>& element_names,
     for (const auto& symbol : element_names) {
         if (local_elements.count(symbol)) {
             auto& element = *local_elements.at(symbol);
-            double weight = element["atomic-weight"].asDouble();
+            CanteraDouble weight = element["atomic-weight"].asDouble();
             long int number = element.getInt("atomic-number", 0);
-            double e298 = element.getDouble("entropy298", ENTROPY298_UNKNOWN);
+            CanteraDouble e298 = element.getDouble("entropy298", ENTROPY298_UNKNOWN);
             thermo.addElement(symbol, weight, number, e298);
         } else if (allow_default) {
             thermo.addElement(symbol);

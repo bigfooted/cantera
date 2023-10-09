@@ -53,15 +53,15 @@ public:
      * @param[out] d  Vector of diffusion coefficients for each species (m^2/s).
      * length m_nsp.
      */
-    void getMixDiffCoeffs(double* const d) override {
-        double Dm = thermalConductivity() / (m_thermo->density() * m_thermo->cp_mass());
+    void getMixDiffCoeffs(CanteraDouble* const d) override {
+        CanteraDouble Dm = thermalConductivity() / (m_thermo->density() * m_thermo->cp_mass());
         for (size_t k = 0; k < m_nsp; k++) {
             d[k] = Dm;
         }
     }
 
     //! Not implemented for unity Lewis number approximation
-    void getMixDiffCoeffsMole(double* const d) override {
+    void getMixDiffCoeffsMole(CanteraDouble* const d) override {
         throw NotImplementedError("UnityLewisTransport::getMixDiffCoeffsMole");
     }
 
@@ -78,8 +78,8 @@ public:
      * @param[out] d  Vector of diffusion coefficients for each species (m^2/s).
      * length m_nsp.
      */
-    void getMixDiffCoeffsMass(double* const d) override {
-        double Dm = thermalConductivity() / (m_thermo->density() * m_thermo->cp_mass());
+    void getMixDiffCoeffsMass(CanteraDouble* const d) override {
+        CanteraDouble Dm = thermalConductivity() / (m_thermo->density() * m_thermo->cp_mass());
         for (size_t k = 0; k < m_nsp; k++) {
             d[k] = Dm;
         }

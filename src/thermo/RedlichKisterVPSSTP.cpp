@@ -24,7 +24,7 @@ RedlichKisterVPSSTP::RedlichKisterVPSSTP(const string& inputFile, const string& 
 
 // - Activities, Standard States, Activity Concentrations -----------
 
-void RedlichKisterVPSSTP::getLnActivityCoefficients(double* lnac) const
+void RedlichKisterVPSSTP::getLnActivityCoefficients(CanteraDouble* lnac) const
 {
     // Update the activity coefficients
     s_update_lnActCoeff();
@@ -36,7 +36,7 @@ void RedlichKisterVPSSTP::getLnActivityCoefficients(double* lnac) const
 
 // ------------ Partial Molar Properties of the Solution ------------
 
-void RedlichKisterVPSSTP::getChemPotentials(double* mu) const
+void RedlichKisterVPSSTP::getChemPotentials(CanteraDouble* mu) const
 {
     // First get the standard chemical potentials in molar form. This requires
     // updates of standard state as a function of T and P
@@ -45,15 +45,15 @@ void RedlichKisterVPSSTP::getChemPotentials(double* mu) const
     s_update_lnActCoeff();
 
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(moleFractions_[k], SmallNumber);
+        CanteraDouble xx = std::max(moleFractions_[k], SmallNumber);
         mu[k] += RT() * (log(xx) + lnActCoeff_Scaled_[k]);
     }
 }
 
-double RedlichKisterVPSSTP::enthalpy_mole() const
+CanteraDouble RedlichKisterVPSSTP::enthalpy_mole() const
 {
-    double h = 0;
-    vector<double> hbar(m_kk);
+    CanteraDouble h = 0;
+    vector<CanteraDouble> hbar(m_kk);
     getPartialMolarEnthalpies(&hbar[0]);
     for (size_t i = 0; i < m_kk; i++) {
         h += moleFractions_[i]*hbar[i];
@@ -61,10 +61,10 @@ double RedlichKisterVPSSTP::enthalpy_mole() const
     return h;
 }
 
-double RedlichKisterVPSSTP::entropy_mole() const
+CanteraDouble RedlichKisterVPSSTP::entropy_mole() const
 {
-    double s = 0;
-    vector<double> sbar(m_kk);
+    CanteraDouble s = 0;
+    vector<CanteraDouble> sbar(m_kk);
     getPartialMolarEntropies(&sbar[0]);
     for (size_t i = 0; i < m_kk; i++) {
         s += moleFractions_[i]*sbar[i];
@@ -72,10 +72,10 @@ double RedlichKisterVPSSTP::entropy_mole() const
     return s;
 }
 
-double RedlichKisterVPSSTP::cp_mole() const
+CanteraDouble RedlichKisterVPSSTP::cp_mole() const
 {
-    double cp = 0;
-    vector<double> cpbar(m_kk);
+    CanteraDouble cp = 0;
+    vector<CanteraDouble> cpbar(m_kk);
     getPartialMolarCp(&cpbar[0]);
     for (size_t i = 0; i < m_kk; i++) {
         cp += moleFractions_[i]*cpbar[i];
@@ -83,17 +83,17 @@ double RedlichKisterVPSSTP::cp_mole() const
     return cp;
 }
 
-double RedlichKisterVPSSTP::cv_mole() const
+CanteraDouble RedlichKisterVPSSTP::cv_mole() const
 {
     return cp_mole();
 }
 
-void RedlichKisterVPSSTP::getPartialMolarEnthalpies(double* hbar) const
+void RedlichKisterVPSSTP::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     // Get the nondimensional standard state enthalpies
     getEnthalpy_RT(hbar);
     // dimensionalize it.
-    double T = temperature();
+    CanteraDouble T = temperature();
     for (size_t k = 0; k < m_kk; k++) {
         hbar[k] *= GasConstant * T;
     }
@@ -107,7 +107,7 @@ void RedlichKisterVPSSTP::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void RedlichKisterVPSSTP::getPartialMolarCp(double* cpbar) const
+void RedlichKisterVPSSTP::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     getCp_R(cpbar);
     // dimensionalize it.
@@ -116,11 +116,11 @@ void RedlichKisterVPSSTP::getPartialMolarCp(double* cpbar) const
     }
 }
 
-void RedlichKisterVPSSTP::getPartialMolarEntropies(double* sbar) const
+void RedlichKisterVPSSTP::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     // Get the nondimensional standard state entropies
     getEntropy_R(sbar);
-    double T = temperature();
+    CanteraDouble T = temperature();
 
     // Update the activity coefficients, This also update the internally stored
     // molalities.
@@ -128,7 +128,7 @@ void RedlichKisterVPSSTP::getPartialMolarEntropies(double* sbar) const
     s_update_dlnActCoeff_dT();
 
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(moleFractions_[k], SmallNumber);
+        CanteraDouble xx = std::max(moleFractions_[k], SmallNumber);
         sbar[k] += - lnActCoeff_Scaled_[k] -log(xx) - T * dlnActCoeffdT_Scaled_[k];
     }
     // dimensionalize it.
@@ -137,7 +137,7 @@ void RedlichKisterVPSSTP::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void RedlichKisterVPSSTP::getPartialMolarVolumes(double* vbar) const
+void RedlichKisterVPSSTP::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     // Get the standard state values in m^3 kmol-1
     getStandardVolumes(vbar);
@@ -151,8 +151,8 @@ void RedlichKisterVPSSTP::initThermo()
     if (m_input.hasKey("interactions")) {
         for (const auto& item : m_input["interactions"].asVector<AnyMap>()) {
             auto& species = item["species"].asVector<string>(2);
-            vector<double> h_excess = item.convertVector("excess-enthalpy", "J/kmol");
-            vector<double> s_excess = item.convertVector("excess-entropy", "J/kmol/K");
+            vector<CanteraDouble> h_excess = item.convertVector("excess-enthalpy", "J/kmol");
+            vector<CanteraDouble> s_excess = item.convertVector("excess-entropy", "J/kmol/K");
             addBinaryInteraction(species[0], species[1],
                                  h_excess.data(), h_excess.size(),
                                  s_excess.data(), s_excess.size());
@@ -170,8 +170,8 @@ void RedlichKisterVPSSTP::getParameters(AnyMap& phaseNode) const
         AnyMap interaction;
         interaction["species"] = vector<string>{
             speciesName(m_pSpecies_A_ij[n]), speciesName(m_pSpecies_B_ij[n])};
-        vector<double> h = m_HE_m_ij[n];
-        vector<double> s = m_SE_m_ij[n];
+        vector<CanteraDouble> h = m_HE_m_ij[n];
+        vector<CanteraDouble> s = m_SE_m_ij[n];
         while (h.size() > 1 && h.back() == 0) {
             h.pop_back();
         }
@@ -192,7 +192,7 @@ void RedlichKisterVPSSTP::initLengths()
 
 void RedlichKisterVPSSTP::s_update_lnActCoeff() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     lnActCoeff_Scaled_.assign(m_kk, 0.0);
 
     // Scaling: I moved the division of RT higher so that we are always dealing
@@ -202,18 +202,18 @@ void RedlichKisterVPSSTP::s_update_lnActCoeff() const
     for (size_t i = 0; i < m_HE_m_ij.size(); i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double deltaX = XA - XB;
-        const vector<double>& he_vec = m_HE_m_ij[i];
-        const vector<double>& se_vec = m_SE_m_ij[i];
-        double poly = 1.0;
-        double polyMm1 = 1.0;
-        double sum = 0.0;
-        double sumMm1 = 0.0;
-        double sum2 = 0.0;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble deltaX = XA - XB;
+        const vector<CanteraDouble>& he_vec = m_HE_m_ij[i];
+        const vector<CanteraDouble>& se_vec = m_SE_m_ij[i];
+        CanteraDouble poly = 1.0;
+        CanteraDouble polyMm1 = 1.0;
+        CanteraDouble sum = 0.0;
+        CanteraDouble sumMm1 = 0.0;
+        CanteraDouble sum2 = 0.0;
         for (size_t m = 0; m < he_vec.size(); m++) {
-            double A_ge = (he_vec[m] - T * se_vec[m]) / (GasConstant * T);
+            CanteraDouble A_ge = (he_vec[m] - T * se_vec[m]) / (GasConstant * T);
             sum += A_ge * poly;
             sum2 += A_ge * (m + 1) * poly;
             poly *= deltaX;
@@ -222,8 +222,8 @@ void RedlichKisterVPSSTP::s_update_lnActCoeff() const
                 polyMm1 *= deltaX;
             }
         }
-        double oneMXA = 1.0 - XA;
-        double oneMXB = 1.0 - XB;
+        CanteraDouble oneMXA = 1.0 - XA;
+        CanteraDouble oneMXB = 1.0 - XB;
         for (size_t k = 0; k < m_kk; k++) {
             if (iA == k) {
                 lnActCoeff_Scaled_[k] += (oneMXA * XB * sum) + (XA * XB * sumMm1 * (oneMXA + XB));
@@ -239,23 +239,23 @@ void RedlichKisterVPSSTP::s_update_lnActCoeff() const
 
 void RedlichKisterVPSSTP::s_update_dlnActCoeff_dT() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeffdT_Scaled_.assign(m_kk, 0.0);
 
     for (size_t i = 0; i < m_HE_m_ij.size(); i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double deltaX = XA - XB;
-        double poly = 1.0;
-        double sum = 0.0;
-        const vector<double>& he_vec = m_HE_m_ij[i];
-        double sumMm1 = 0.0;
-        double polyMm1 = 1.0;
-        double sum2 = 0.0;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble deltaX = XA - XB;
+        CanteraDouble poly = 1.0;
+        CanteraDouble sum = 0.0;
+        const vector<CanteraDouble>& he_vec = m_HE_m_ij[i];
+        CanteraDouble sumMm1 = 0.0;
+        CanteraDouble polyMm1 = 1.0;
+        CanteraDouble sum2 = 0.0;
         for (size_t m = 0; m < he_vec.size(); m++) {
-            double h_e = - he_vec[m] / (GasConstant * T * T);
+            CanteraDouble h_e = - he_vec[m] / (GasConstant * T * T);
             sum += h_e * poly;
             sum2 += h_e * (m + 1) * poly;
             poly *= deltaX;
@@ -264,8 +264,8 @@ void RedlichKisterVPSSTP::s_update_dlnActCoeff_dT() const
                 polyMm1 *= deltaX;
             }
         }
-        double oneMXA = 1.0 - XA;
-        double oneMXB = 1.0 - XB;
+        CanteraDouble oneMXA = 1.0 - XA;
+        CanteraDouble oneMXB = 1.0 - XB;
         for (size_t k = 0; k < m_kk; k++) {
             if (iA == k) {
                 dlnActCoeffdT_Scaled_[k] += (oneMXA * XB * sum) + (XA * XB * sumMm1 * (oneMXA + XB));
@@ -282,7 +282,7 @@ void RedlichKisterVPSSTP::s_update_dlnActCoeff_dT() const
     }
 }
 
-void RedlichKisterVPSSTP::getdlnActCoeffdT(double* dlnActCoeffdT) const
+void RedlichKisterVPSSTP::getdlnActCoeffdT(CanteraDouble* dlnActCoeffdT) const
 {
     s_update_dlnActCoeff_dT();
     for (size_t k = 0; k < m_kk; k++) {
@@ -290,7 +290,7 @@ void RedlichKisterVPSSTP::getdlnActCoeffdT(double* dlnActCoeffdT) const
     }
 }
 
-void RedlichKisterVPSSTP::getd2lnActCoeffdT2(double* d2lnActCoeffdT2) const
+void RedlichKisterVPSSTP::getd2lnActCoeffdT2(CanteraDouble* d2lnActCoeffdT2) const
 {
     s_update_dlnActCoeff_dT();
     for (size_t k = 0; k < m_kk; k++) {
@@ -300,25 +300,25 @@ void RedlichKisterVPSSTP::getd2lnActCoeffdT2(double* d2lnActCoeffdT2) const
 
 void RedlichKisterVPSSTP::s_update_dlnActCoeff_dlnX_diag() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeffdlnX_diag_.assign(m_kk, 0.0);
 
     for (size_t i = 0; i < m_HE_m_ij.size(); i++) {
       size_t iA =  m_pSpecies_A_ij[i];
       size_t iB =  m_pSpecies_B_ij[i];
-      double XA = moleFractions_[iA];
-      double XB = moleFractions_[iB];
-      double deltaX = XA - XB;
-      double poly = 1.0;
-      double sum = 0.0;
-      const vector<double>& he_vec = m_HE_m_ij[i];
-      const vector<double>& se_vec = m_SE_m_ij[i];
-      double sumMm1 = 0.0;
-      double polyMm1 = 1.0;
-      double polyMm2 = 1.0;
-      double sumMm2 = 0.0;
+      CanteraDouble XA = moleFractions_[iA];
+      CanteraDouble XB = moleFractions_[iB];
+      CanteraDouble deltaX = XA - XB;
+      CanteraDouble poly = 1.0;
+      CanteraDouble sum = 0.0;
+      const vector<CanteraDouble>& he_vec = m_HE_m_ij[i];
+      const vector<CanteraDouble>& se_vec = m_SE_m_ij[i];
+      CanteraDouble sumMm1 = 0.0;
+      CanteraDouble polyMm1 = 1.0;
+      CanteraDouble polyMm2 = 1.0;
+      CanteraDouble sumMm2 = 0.0;
       for (size_t m = 0; m < he_vec.size(); m++) {
-          double A_ge = (he_vec[m] -  T * se_vec[m]) / (GasConstant * T);;
+          CanteraDouble A_ge = (he_vec[m] -  T * se_vec[m]) / (GasConstant * T);;
           sum += A_ge * poly;
           poly *= deltaX;
           if (m >= 1) {
@@ -349,27 +349,27 @@ void RedlichKisterVPSSTP::s_update_dlnActCoeff_dlnX_diag() const
 
 void RedlichKisterVPSSTP::s_update_dlnActCoeff_dX_() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeff_dX_.zero();
 
     for (size_t i = 0; i < m_HE_m_ij.size(); i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double deltaX = XA - XB;
-        double poly = 1.0;
-        double sum = 0.0;
-        const vector<double>& he_vec = m_HE_m_ij[i];
-        const vector<double>& se_vec = m_SE_m_ij[i];
-        double sumMm1 = 0.0;
-        double polyMm1 = 1.0;
-        double polyMm2 = 1.0;
-        double sum2 = 0.0;
-        double sum2Mm1 = 0.0;
-        double sumMm2 = 0.0;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble deltaX = XA - XB;
+        CanteraDouble poly = 1.0;
+        CanteraDouble sum = 0.0;
+        const vector<CanteraDouble>& he_vec = m_HE_m_ij[i];
+        const vector<CanteraDouble>& se_vec = m_SE_m_ij[i];
+        CanteraDouble sumMm1 = 0.0;
+        CanteraDouble polyMm1 = 1.0;
+        CanteraDouble polyMm2 = 1.0;
+        CanteraDouble sum2 = 0.0;
+        CanteraDouble sum2Mm1 = 0.0;
+        CanteraDouble sumMm2 = 0.0;
         for (size_t m = 0; m < he_vec.size(); m++) {
-            double A_ge = he_vec[m] - T * se_vec[m];
+            CanteraDouble A_ge = he_vec[m] - T * se_vec[m];
             sum += A_ge * poly;
             sum2 += A_ge * (m + 1) * poly;
             poly *= deltaX;
@@ -409,8 +409,8 @@ void RedlichKisterVPSSTP::s_update_dlnActCoeff_dX_() const
     }
 }
 
-void RedlichKisterVPSSTP::getdlnActCoeffds(const double dTds, const double* const dXds,
-        double* dlnActCoeffds) const
+void RedlichKisterVPSSTP::getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+        CanteraDouble* dlnActCoeffds) const
 {
     s_update_dlnActCoeff_dT();
     s_update_dlnActCoeff_dX_();
@@ -422,7 +422,7 @@ void RedlichKisterVPSSTP::getdlnActCoeffds(const double dTds, const double* cons
     }
 }
 
-void RedlichKisterVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const
+void RedlichKisterVPSSTP::getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const
 {
     s_update_dlnActCoeff_dX_();
     for (size_t j = 0; j < m_kk; j++) {
@@ -433,7 +433,7 @@ void RedlichKisterVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) 
     }
 }
 
-void RedlichKisterVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const
+void RedlichKisterVPSSTP::getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const
 {
     s_update_dlnActCoeff_dlnX_diag();
     for (size_t k = 0; k < m_kk; k++) {
@@ -441,10 +441,10 @@ void RedlichKisterVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) 
     }
 }
 
-void RedlichKisterVPSSTP::getdlnActCoeffdlnN(const size_t ld, double* dlnActCoeffdlnN)
+void RedlichKisterVPSSTP::getdlnActCoeffdlnN(const size_t ld, CanteraDouble* dlnActCoeffdlnN)
 {
     s_update_dlnActCoeff_dX_();
-    double* data =  & dlnActCoeffdlnN_(0,0);
+    CanteraDouble* data =  & dlnActCoeffdlnN_(0,0);
     for (size_t k = 0; k < m_kk; k++) {
         for (size_t m = 0; m < m_kk; m++) {
             dlnActCoeffdlnN[ld * k + m] = data[m_kk * k + m];
@@ -454,8 +454,8 @@ void RedlichKisterVPSSTP::getdlnActCoeffdlnN(const size_t ld, double* dlnActCoef
 
 void RedlichKisterVPSSTP::addBinaryInteraction(
     const string& speciesA, const string& speciesB,
-    const double* excess_enthalpy, size_t n_enthalpy,
-    const double* excess_entropy, size_t n_entropy)
+    const CanteraDouble* excess_enthalpy, size_t n_enthalpy,
+    const CanteraDouble* excess_entropy, size_t n_entropy)
 {
     size_t kA = speciesIndex(speciesA);
     size_t kB = speciesIndex(speciesB);

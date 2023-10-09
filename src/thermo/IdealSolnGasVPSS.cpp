@@ -41,30 +41,30 @@ void IdealSolnGasVPSS::setStandardConcentrationModel(const string& model)
 
 // ------------Molar Thermodynamic Properties -------------------------
 
-double IdealSolnGasVPSS::enthalpy_mole() const
+CanteraDouble IdealSolnGasVPSS::enthalpy_mole() const
 {
     updateStandardStateThermo();
     return RT() * mean_X(m_hss_RT);
 }
 
-double IdealSolnGasVPSS::entropy_mole() const
+CanteraDouble IdealSolnGasVPSS::entropy_mole() const
 {
     updateStandardStateThermo();
     return GasConstant * (mean_X(m_sss_R) - sum_xlogx());
 }
 
-double IdealSolnGasVPSS::cp_mole() const
+CanteraDouble IdealSolnGasVPSS::cp_mole() const
 {
     updateStandardStateThermo();
     return GasConstant * mean_X(m_cpss_R);
 }
 
-double IdealSolnGasVPSS::cv_mole() const
+CanteraDouble IdealSolnGasVPSS::cv_mole() const
 {
     return cp_mole() - GasConstant;
 }
 
-void IdealSolnGasVPSS::setPressure(double p)
+void IdealSolnGasVPSS::setPressure(CanteraDouble p)
 {
     m_Pcurrent = p;
     updateStandardStateThermo();
@@ -73,7 +73,7 @@ void IdealSolnGasVPSS::setPressure(double p)
 
 void IdealSolnGasVPSS::calcDensity()
 {
-    double v_mol = mean_X(getStandardVolumes());
+    CanteraDouble v_mol = mean_X(getStandardVolumes());
     // Set the density in the parent object directly
     Phase::assignDensity(meanMolecularWeight() / v_mol);
 }
@@ -87,9 +87,9 @@ Units IdealSolnGasVPSS::standardConcentrationUnits() const
     }
 }
 
-void IdealSolnGasVPSS::getActivityConcentrations(double* c) const
+void IdealSolnGasVPSS::getActivityConcentrations(CanteraDouble* c) const
 {
-    const vector<double>& vss = getStandardVolumes();
+    const vector<CanteraDouble>& vss = getStandardVolumes();
     switch (m_formGC) {
     case 0:
         for (size_t k = 0; k < m_kk; k++) {
@@ -109,9 +109,9 @@ void IdealSolnGasVPSS::getActivityConcentrations(double* c) const
     }
 }
 
-double IdealSolnGasVPSS::standardConcentration(size_t k) const
+CanteraDouble IdealSolnGasVPSS::standardConcentration(size_t k) const
 {
-    const vector<double>& vss = getStandardVolumes();
+    const vector<CanteraDouble>& vss = getStandardVolumes();
     switch (m_formGC) {
     case 0:
         return 1.0;
@@ -123,7 +123,7 @@ double IdealSolnGasVPSS::standardConcentration(size_t k) const
     return 0.0;
 }
 
-void IdealSolnGasVPSS::getActivityCoefficients(double* ac) const
+void IdealSolnGasVPSS::getActivityCoefficients(CanteraDouble* ac) const
 {
     for (size_t k = 0; k < m_kk; k++) {
         ac[k] = 1.0;
@@ -132,49 +132,49 @@ void IdealSolnGasVPSS::getActivityCoefficients(double* ac) const
 
 // ---- Partial Molar Properties of the Solution -----------------
 
-void IdealSolnGasVPSS::getChemPotentials(double* mu) const
+void IdealSolnGasVPSS::getChemPotentials(CanteraDouble* mu) const
 {
     getStandardChemPotentials(mu);
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(SmallNumber, moleFraction(k));
+        CanteraDouble xx = std::max(SmallNumber, moleFraction(k));
         mu[k] += RT() * log(xx);
     }
 }
 
-void IdealSolnGasVPSS::getPartialMolarEnthalpies(double* hbar) const
+void IdealSolnGasVPSS::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     getEnthalpy_RT(hbar);
     scale(hbar, hbar+m_kk, hbar, RT());
 }
 
-void IdealSolnGasVPSS::getPartialMolarEntropies(double* sbar) const
+void IdealSolnGasVPSS::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     getEntropy_R(sbar);
     scale(sbar, sbar+m_kk, sbar, GasConstant);
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(SmallNumber, moleFraction(k));
+        CanteraDouble xx = std::max(SmallNumber, moleFraction(k));
         sbar[k] += GasConstant * (- log(xx));
     }
 }
 
-void IdealSolnGasVPSS::getPartialMolarIntEnergies(double* ubar) const
+void IdealSolnGasVPSS::getPartialMolarIntEnergies(CanteraDouble* ubar) const
 {
     getIntEnergy_RT(ubar);
     scale(ubar, ubar+m_kk, ubar, RT());
 }
 
-void IdealSolnGasVPSS::getPartialMolarCp(double* cpbar) const
+void IdealSolnGasVPSS::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     getCp_R(cpbar);
     scale(cpbar, cpbar+m_kk, cpbar, GasConstant);
 }
 
-void IdealSolnGasVPSS::getPartialMolarVolumes(double* vbar) const
+void IdealSolnGasVPSS::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     getStandardVolumes(vbar);
 }
 
-void IdealSolnGasVPSS::setToEquilState(const double* mu_RT)
+void IdealSolnGasVPSS::setToEquilState(const CanteraDouble* mu_RT)
 {
     updateStandardStateThermo();
 
@@ -183,14 +183,14 @@ void IdealSolnGasVPSS::setToEquilState(const double* mu_RT)
     //
     // If it is too low, we set the partial pressure to zero. This capability is
     // needed by the elemental potential method.
-    double pres = 0.0;
-    double m_p0 = refPressure();
+    CanteraDouble pres = 0.0;
+    CanteraDouble m_p0 = refPressure();
     for (size_t k = 0; k < m_kk; k++) {
-        double tmp = -m_g0_RT[k] + mu_RT[k];
+        CanteraDouble tmp = -m_g0_RT[k] + mu_RT[k];
         if (tmp < -600.) {
             m_pp[k] = 0.0;
         } else if (tmp > 500.0) {
-            double tmp2 = tmp / 500.;
+            CanteraDouble tmp2 = tmp / 500.;
             tmp2 *= tmp2;
             m_pp[k] = m_p0 * exp(500.) * tmp2;
         } else {

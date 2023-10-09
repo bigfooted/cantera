@@ -119,23 +119,23 @@ public:
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
 
-    double intEnergy_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
 
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    void setPressure(double pres) override;
-    void setTemperature(double temp) override;
-    void setState_TP(double temp, double pres) override;
+    void setPressure(CanteraDouble pres) override;
+    void setTemperature(CanteraDouble temp) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
 
     //! @}
     //! @name Miscellaneous properties of the standard state
     //! @{
 
-    double satPressure(double t) override;
+    CanteraDouble satPressure(CanteraDouble t) override;
 
     //! @}
     //! @name Initialization of the Object
@@ -146,12 +146,12 @@ public:
     //! Set polynomial coefficients for the standard state molar volume as a
     //! function of temperature. Cubic polynomial (4 coefficients). Leading
     //! coefficient is the constant (temperature-independent) term [m^3/kmol].
-    void setVolumePolynomial(double* coeffs);
+    void setVolumePolynomial(CanteraDouble* coeffs);
 
     //! Set polynomial coefficients for the standard state density as a function
     //! of temperature. Cubic polynomial (4 coefficients). Leading coefficient
     //! is the constant (temperature-independent) term [kg/m^3].
-    void setDensityPolynomial(double* coeffs);
+    void setDensityPolynomial(CanteraDouble* coeffs);
 
     void getParameters(AnyMap& eosNode) const override;
 
@@ -183,13 +183,13 @@ private:
     SSVolume_Model volumeModel_ = SSVolume_Model::tpoly;
 
     //! coefficients for the temperature representation
-    vector<double> TCoeff_;
+    vector<CanteraDouble> TCoeff_;
 
     //! Derivative of the volume wrt temperature
-    mutable double dVdT_;
+    mutable CanteraDouble dVdT_;
 
     //! 2nd derivative of the volume wrt temperature
-    mutable double d2VdT2_;
+    mutable CanteraDouble d2VdT2_;
 };
 
 }

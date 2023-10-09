@@ -14,8 +14,8 @@ namespace Cantera
 
 // STATIC ROUTINES DEFINED IN THIS FILE
 
-static double calc_damping(double* x, double* dx, size_t dim, int*);
-static double calcWeightedNorm(const double [], const double dx[], size_t);
+static CanteraDouble calc_damping(CanteraDouble* x, CanteraDouble* dx, size_t dim, int*);
+static CanteraDouble calcWeightedNorm(const CanteraDouble [], const CanteraDouble dx[], size_t);
 
 // solveSP Class Definitions
 
@@ -89,23 +89,23 @@ solveSP::solveSP(ImplicitSurfChem* surfChemPtr, int bulkFunc) :
     m_Jac.resize(dim1, dim1, 0.0);
 }
 
-int solveSP::solveSurfProb(int ifunc, double time_scale, double TKelvin,
-                           double PGas, double reltol, double abstol)
+int solveSP::solveSurfProb(int ifunc, CanteraDouble time_scale, CanteraDouble TKelvin,
+                           CanteraDouble PGas, CanteraDouble reltol, CanteraDouble abstol)
 {
-    double EXTRA_ACCURACY = 0.001;
+    CanteraDouble EXTRA_ACCURACY = 0.001;
     if (ifunc == SFLUX_JACOBIAN) {
         EXTRA_ACCURACY *= 0.001;
     }
     int label_t=-1; // Species IDs for time control
     int label_d = -1; // Species IDs for damping control
     int label_t_old=-1;
-    double label_factor = 1.0;
+    CanteraDouble label_factor = 1.0;
     int iter=0; // iteration number on nonlinear solver
     int iter_max=1000; // maximum number of nonlinear iterations
-    double deltaT = 1.0E-10; // Delta time step
-    double damp=1.0;
-    double inv_t = 0.0;
-    double t_real = 0.0, update_norm = 1.0E6;
+    CanteraDouble deltaT = 1.0E-10; // Delta time step
+    CanteraDouble damp=1.0;
+    CanteraDouble inv_t = 0.0;
+    CanteraDouble t_real = 0.0, update_norm = 1.0E6;
     bool do_time = false, not_converged = true;
     m_ioflag = std::min(m_ioflag, 1);
 
@@ -159,7 +159,7 @@ int solveSP::solveSurfProb(int ifunc, double time_scale, double TKelvin,
             if (damp < 1.0) {
                 label_factor = 1.0;
             }
-            double tmp = calc_t(m_netProductionRatesSave.data(),
+            CanteraDouble tmp = calc_t(m_netProductionRatesSave.data(),
                          m_XMolKinSpecies.data(),
                          &label_t, &label_t_old, &label_factor, m_ioflag);
             if (iter < 10) {
@@ -197,7 +197,7 @@ int solveSP::solveSurfProb(int ifunc, double time_scale, double TKelvin,
         }
 
         // Find the weighted norm of the residual
-        double resid_norm = calcWeightedNorm(m_wtResid.data(), m_resid.data(), m_neq);
+        CanteraDouble resid_norm = calcWeightedNorm(m_wtResid.data(), m_resid.data(), m_neq);
 
         // Solve Linear system.  The solution is in m_resid
         solve(m_Jac, m_resid.data());
@@ -260,7 +260,7 @@ int solveSP::solveSurfProb(int ifunc, double time_scale, double TKelvin,
     if (m_ioflag) {
         fun_eval(m_resid.data(), m_CSolnSP.data(), m_CSolnSPOld.data(),
                  false, deltaT);
-        double resid_norm = calcWeightedNorm(m_wtResid.data(), m_resid.data(), m_neq);
+        CanteraDouble resid_norm = calcWeightedNorm(m_wtResid.data(), m_resid.data(), m_neq);
         printIteration(m_ioflag, damp, label_d, label_t, inv_t, t_real, iter,
                        update_norm, resid_norm, do_time, true);
     }
@@ -272,9 +272,9 @@ int solveSP::solveSurfProb(int ifunc, double time_scale, double TKelvin,
     return 1;
 }
 
-void solveSP::updateState(const double* CSolnSP)
+void solveSP::updateState(const CanteraDouble* CSolnSP)
 {
-    vector<double> X;
+    vector<CanteraDouble> X;
     size_t loc = 0;
     for (size_t n = 0; n < m_numSurfPhases; n++) {
         X.resize(m_nSpeciesSurfPhase[n]);
@@ -286,7 +286,7 @@ void solveSP::updateState(const double* CSolnSP)
     }
 }
 
-void solveSP::updateMFSolnSP(double* XMolSolnSP)
+void solveSP::updateMFSolnSP(CanteraDouble* XMolSolnSP)
 {
     for (size_t isp = 0; isp < m_numSurfPhases; isp++) {
         size_t keqnStart = m_eqnIndexStartSolnPhase[isp];
@@ -294,7 +294,7 @@ void solveSP::updateMFSolnSP(double* XMolSolnSP)
     }
 }
 
-void solveSP::updateMFKinSpecies(double* XMolKinSpecies, int isp)
+void solveSP::updateMFKinSpecies(CanteraDouble* XMolKinSpecies, int isp)
 {
     InterfaceKinetics* kin = m_objects[isp];
     for (size_t iph = 0; iph < kin->nPhases(); iph++) {
@@ -303,11 +303,11 @@ void solveSP::updateMFKinSpecies(double* XMolKinSpecies, int isp)
     }
 }
 
-void solveSP::evalSurfLarge(const double* CSolnSP)
+void solveSP::evalSurfLarge(const CanteraDouble* CSolnSP)
 {
     size_t kindexSP = 0;
     for (size_t isp = 0; isp < m_numSurfPhases; isp++) {
-        double Clarge = CSolnSP[kindexSP];
+        CanteraDouble Clarge = CSolnSP[kindexSP];
         m_spSurfLarge[isp] = 0;
         kindexSP++;
         for (size_t k = 1; k <  m_nSpeciesSurfPhase[isp]; k++, kindexSP++) {
@@ -319,11 +319,11 @@ void solveSP::evalSurfLarge(const double* CSolnSP)
     }
 }
 
-void solveSP::fun_eval(double* resid, const double* CSoln, const double* CSolnOld,
-                       const bool do_time, const double deltaT)
+void solveSP::fun_eval(CanteraDouble* resid, const CanteraDouble* CSoln, const CanteraDouble* CSolnOld,
+                       const bool do_time, const CanteraDouble deltaT)
 {
     size_t k;
-    double lenScale = 1.0E-9;
+    CanteraDouble lenScale = 1.0E-9;
     if (m_numSurfPhases > 0) {
         // update the surface concentrations with the input surface
         // concentration vector
@@ -350,7 +350,7 @@ void solveSP::fun_eval(double* resid, const double* CSoln, const double* CSolnOl
                 }
 
                 size_t kspecial = kins + m_spSurfLarge[isp];
-                double sd = m_ptrsSurfPhase[isp]->siteDensity();
+                CanteraDouble sd = m_ptrsSurfPhase[isp]->siteDensity();
                 resid[kspecial] = sd;
                 for (k = 0; k < nsp; k++) {
                     resid[kspecial] -= CSoln[kins + k];
@@ -369,7 +369,7 @@ void solveSP::fun_eval(double* resid, const double* CSoln, const double* CSolnOl
                     resid[kindexSP] = - m_netProductionRatesSave[kstart + k];
                 }
                 size_t kspecial = kins + m_spSurfLarge[isp];
-                double sd = m_ptrsSurfPhase[isp]->siteDensity();
+                CanteraDouble sd = m_ptrsSurfPhase[isp]->siteDensity();
                 resid[kspecial] = sd;
                 for (k = 0; k < nsp; k++) {
                     resid[kspecial] -= CSoln[kins + k];
@@ -380,11 +380,11 @@ void solveSP::fun_eval(double* resid, const double* CSoln, const double* CSolnOl
         if (m_bulkFunc == BULK_DEPOSITION) {
             size_t kindexSP = m_numTotSurfSpecies;
             for (size_t isp = 0; isp < m_numBulkPhasesSS; isp++) {
-                double* XBlk = m_numEqn1.data();
+                CanteraDouble* XBlk = m_numEqn1.data();
                 size_t nsp = m_nSpeciesSurfPhase[isp];
                 size_t surfPhaseIndex = m_indexKinObjSurfPhase[isp];
                 InterfaceKinetics* kin = m_objects[isp];
-                double grRate = 0.0;
+                CanteraDouble grRate = 0.0;
                 size_t kstart = kin->kineticsSpeciesIndex(0, surfPhaseIndex);
                 for (k = 0; k < nsp; k++) {
                     if (m_netProductionRatesSave[kstart + k] > 0.0) {
@@ -425,9 +425,9 @@ void solveSP::fun_eval(double* resid, const double* CSoln, const double* CSolnOl
     }
 }
 
-void solveSP::resjac_eval(DenseMatrix& jac, double resid[], double CSoln[],
-                          const double CSolnOld[], const bool do_time,
-                          const double deltaT)
+void solveSP::resjac_eval(DenseMatrix& jac, CanteraDouble resid[], CanteraDouble CSoln[],
+                          const CanteraDouble CSolnOld[], const bool do_time,
+                          const CanteraDouble deltaT)
 {
     size_t kColIndex = 0;
     // Calculate the residual
@@ -435,10 +435,10 @@ void solveSP::resjac_eval(DenseMatrix& jac, double resid[], double CSoln[],
     // Now we will look over the columns perturbing each unknown.
     for (size_t jsp = 0; jsp < m_numSurfPhases; jsp++) {
         size_t nsp = m_nSpeciesSurfPhase[jsp];
-        double sd = m_ptrsSurfPhase[jsp]->siteDensity();
+        CanteraDouble sd = m_ptrsSurfPhase[jsp]->siteDensity();
         for (size_t kCol = 0; kCol < nsp; kCol++) {
-            double cSave = CSoln[kColIndex];
-            double dc = std::max(1.0E-10 * sd, fabs(cSave) * 1.0E-7);
+            CanteraDouble cSave = CSoln[kColIndex];
+            CanteraDouble dc = std::max(1.0E-10 * sd, fabs(cSave) * 1.0E-7);
             CSoln[kColIndex] += dc;
             fun_eval(m_numEqn2.data(), CSoln, CSolnOld, do_time, deltaT);
             for (size_t i = 0; i < m_neq; i++) {
@@ -452,10 +452,10 @@ void solveSP::resjac_eval(DenseMatrix& jac, double resid[], double CSoln[],
     if (m_bulkFunc == BULK_DEPOSITION) {
         for (size_t jsp = 0; jsp < m_numBulkPhasesSS; jsp++) {
             size_t nsp = m_numBulkSpecies[jsp];
-            double sd = m_bulkPhasePtrs[jsp]->molarDensity();
+            CanteraDouble sd = m_bulkPhasePtrs[jsp]->molarDensity();
             for (size_t kCol = 0; kCol < nsp; kCol++) {
-                double cSave = CSoln[kColIndex];
-                double dc = std::max(1.0E-10 * sd, fabs(cSave) * 1.0E-7);
+                CanteraDouble cSave = CSoln[kColIndex];
+                CanteraDouble dc = std::max(1.0E-10 * sd, fabs(cSave) * 1.0E-7);
                 CSoln[kColIndex] += dc;
                 fun_eval(m_numEqn2.data(), CSoln, CSolnOld, do_time, deltaT);
                 for (size_t i = 0; i < m_neq; i++) {
@@ -479,22 +479,22 @@ void solveSP::resjac_eval(DenseMatrix& jac, double resid[], double CSoln[],
  * that the step can take.  If the full step would not force any fraction
  * outside of 0-1, then Newton's method is allowed to operate normally.
  */
-static double calc_damping(double x[], double dxneg[], size_t dim, int* label)
+static CanteraDouble calc_damping(CanteraDouble x[], CanteraDouble dxneg[], size_t dim, int* label)
 {
-    const double APPROACH = 0.80;
-    double damp = 1.0;
-    static double damp_old = 1.0; //! @todo this variable breaks thread safety
+    const CanteraDouble APPROACH = 0.80;
+    CanteraDouble damp = 1.0;
+    static CanteraDouble damp_old = 1.0; //! @todo this variable breaks thread safety
     *label = -1;
 
     for (size_t i = 0; i < dim; i++) {
         // Calculate the new suggested new value of x[i]
-        double xnew = x[i] - damp * dxneg[i];
+        CanteraDouble xnew = x[i] - damp * dxneg[i];
 
         // Calculate the allowed maximum and minimum values of x[i]
         //  - Only going to allow x[i] to converge to zero by a
         //    single order of magnitude at a time
-        double xtop = 1.0 - 0.1*fabs(1.0-x[i]);
-        double xbot = fabs(x[i]*0.1) - 1.0e-16;
+        CanteraDouble xtop = 1.0 - 0.1*fabs(1.0-x[i]);
+        CanteraDouble xbot = fabs(x[i]*0.1) - 1.0e-16;
         if (xnew > xtop)  {
             damp = - APPROACH * (1.0 - x[i]) / dxneg[i];
             *label = int(i);
@@ -525,9 +525,9 @@ static double calc_damping(double x[], double dxneg[], size_t dim, int* label)
  *    This function calculates the norm of an update, dx[], based on the
  *    weighted values of x.
  */
-static double calcWeightedNorm(const double wtX[], const double dx[], size_t dim)
+static CanteraDouble calcWeightedNorm(const CanteraDouble wtX[], const CanteraDouble dx[], size_t dim)
 {
-    double norm = 0.0;
+    CanteraDouble norm = 0.0;
     if (dim == 0) {
         return 0.0;
     }
@@ -537,22 +537,22 @@ static double calcWeightedNorm(const double wtX[], const double dx[], size_t dim
     return sqrt(norm/dim);
 }
 
-void solveSP::calcWeights(double wtSpecies[], double wtResid[],
-                          const Array2D& Jac, const double CSoln[],
-                          const double abstol, const double reltol)
+void solveSP::calcWeights(CanteraDouble wtSpecies[], CanteraDouble wtResid[],
+                          const Array2D& Jac, const CanteraDouble CSoln[],
+                          const CanteraDouble abstol, const CanteraDouble reltol)
 {
     // First calculate the weighting factor for the concentrations of the
     // surface species and bulk species.
     size_t kindex = 0;
     for (size_t isp = 0; isp < m_numSurfPhases; isp++) {
-        double sd = m_ptrsSurfPhase[isp]->siteDensity();
+        CanteraDouble sd = m_ptrsSurfPhase[isp]->siteDensity();
         for (size_t k = 0; k < m_nSpeciesSurfPhase[isp]; k++, kindex++) {
             wtSpecies[kindex] = abstol * sd + reltol * fabs(CSoln[kindex]);
         }
     }
     if (m_bulkFunc == BULK_DEPOSITION) {
         for (size_t isp = 0; isp < m_numBulkPhasesSS; isp++) {
-            double sd = m_bulkPhasePtrs[isp]->molarDensity();
+            CanteraDouble sd = m_bulkPhasePtrs[isp]->molarDensity();
             for (size_t k = 0; k < m_numBulkSpecies[isp]; k++, kindex++) {
                 wtSpecies[kindex] = abstol * sd + reltol * fabs(CSoln[kindex]);
             }
@@ -570,10 +570,10 @@ void solveSP::calcWeights(double wtSpecies[], double wtResid[],
     }
 }
 
-double solveSP::calc_t(double netProdRateSolnSP[], double XMolSolnSP[], int* label,
-                       int* label_old, double* label_factor, int ioflag)
+CanteraDouble solveSP::calc_t(CanteraDouble netProdRateSolnSP[], CanteraDouble XMolSolnSP[], int* label,
+                       int* label_old, CanteraDouble* label_factor, int ioflag)
 {
-    double inv_timeScale = 1.0E-10;
+    CanteraDouble inv_timeScale = 1.0E-10;
     size_t kindexSP = 0;
     *label = 0;
     updateMFSolnSP(XMolSolnSP);
@@ -586,11 +586,11 @@ double solveSP::calc_t(double netProdRateSolnSP[], double XMolSolnSP[], int* lab
         size_t surfIndex = kin->reactionPhaseIndex();
         size_t kstart = kin->kineticsSpeciesIndex(0, surfIndex);
         kin->getNetProductionRates(m_numEqn1.data());
-        double sden = kin->thermo(surfIndex).molarDensity();
+        CanteraDouble sden = kin->thermo(surfIndex).molarDensity();
         for (size_t k = 0; k < m_nSpeciesSurfPhase[isp]; k++, kindexSP++) {
             size_t kspindex = kstart + k;
             netProdRateSolnSP[kindexSP] = m_numEqn1[kspindex];
-            double tmp = std::max(XMolSolnSP[kindexSP], 1.0e-10);
+            CanteraDouble tmp = std::max(XMolSolnSP[kindexSP], 1.0e-10);
             tmp *= sden;
             tmp = fabs(netProdRateSolnSP[kindexSP]/ tmp);
             if (netProdRateSolnSP[kindexSP]> 0.0) {
@@ -614,8 +614,8 @@ double solveSP::calc_t(double netProdRateSolnSP[], double XMolSolnSP[], int* lab
     return inv_timeScale / *label_factor;
 } // calc_t
 
-void solveSP::print_header(int ioflag, int ifunc, double time_scale,
-                           int damping, double reltol, double abstol)
+void solveSP::print_header(int ioflag, int ifunc, CanteraDouble time_scale,
+                           int damping, CanteraDouble reltol, CanteraDouble abstol)
 {
     if (ioflag) {
         writelog("\n================================ SOLVESP CALL SETUP "
@@ -663,10 +663,10 @@ void solveSP::print_header(int ioflag, int ifunc, double time_scale,
     }
 }
 
-void solveSP::printIteration(int ioflag, double damp, int label_d,
-                             int label_t, double inv_t, double t_real,
-                             size_t iter, double update_norm,
-                             double resid_norm, bool do_time, bool final)
+void solveSP::printIteration(int ioflag, CanteraDouble damp, int label_d,
+                             int label_t, CanteraDouble inv_t, CanteraDouble t_real,
+                             size_t iter, CanteraDouble update_norm,
+                             CanteraDouble resid_norm, bool do_time, bool final)
 {
     if (ioflag == 1) {
         if (final) {

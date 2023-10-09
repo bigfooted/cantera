@@ -17,21 +17,21 @@ namespace tpx
 {
 
 // Heptane constants
-static const double Tmn = 182.56; // [K] minimum temperature for which calculations are valid
-static const double Tmx = 1000.0; // [K] maximum temperature for which calculations are valid
-static const double Tc=537.68; // [K] critical temperature
-static const double Roc=197.60; // [kg/m^3] critical density
-static const double To=300; // [K] reference Temperature
-static const double R=82.99504; // [J/(kg*K)] gas constant (for this substance)
-static const double Gamma=9.611604E-6; // [??]
-static const double u0=3.4058439E5; // [] internal energy at To
-static const double s0=1.1080254E3; // [] entropy at To
-static const double Tp=400; // [K] ??
-static const double Pc=2.6199E6; // [Pa] critical pressure
-static const double M=100.20; // [kg/kmol] molar density
+static const CanteraDouble Tmn = 182.56; // [K] minimum temperature for which calculations are valid
+static const CanteraDouble Tmx = 1000.0; // [K] maximum temperature for which calculations are valid
+static const CanteraDouble Tc=537.68; // [K] critical temperature
+static const CanteraDouble Roc=197.60; // [kg/m^3] critical density
+static const CanteraDouble To=300; // [K] reference Temperature
+static const CanteraDouble R=82.99504; // [J/(kg*K)] gas constant (for this substance)
+static const CanteraDouble Gamma=9.611604E-6; // [??]
+static const CanteraDouble u0=3.4058439E5; // [] internal energy at To
+static const CanteraDouble s0=1.1080254E3; // [] entropy at To
+static const CanteraDouble Tp=400; // [K] ??
+static const CanteraDouble Pc=2.6199E6; // [Pa] critical pressure
+static const CanteraDouble M=100.20; // [kg/kmol] molar density
 
 // array Ahept is used by the function Pp
-static const double Ahept[]= {
+static const CanteraDouble Ahept[]= {
     2.246032E-3,
     2.082990E2,
     5.085746E7,
@@ -45,7 +45,7 @@ static const double Ahept[]= {
 };
 
 // array F is used by Psat
-static const double F[]= {
+static const CanteraDouble F[]= {
     -7.2298764,
     3.8607475E-1,
     -3.4216472,
@@ -57,7 +57,7 @@ static const double F[]= {
 };
 
 // array D is used by the function ldens
-static const double D[]= {
+static const CanteraDouble D[]= {
     1.9760405E2,
     8.9451237E2,
     -1.1462908E3,
@@ -67,7 +67,7 @@ static const double D[]= {
 };
 
 // array G is used by the function sp
-static const double G[]= {
+static const CanteraDouble G[]= {
     1.1925213E5,
     -7.7231363E2,
     7.4463527,
@@ -76,7 +76,7 @@ static const double G[]= {
     0.0
 };
 
-double Heptane::C(int j,double Tinverse, double T2inverse, double T3inverse, double T4inverse)
+CanteraDouble Heptane::C(int j,CanteraDouble Tinverse, CanteraDouble T2inverse, CanteraDouble T3inverse, CanteraDouble T4inverse)
 {
     switch (j) {
     case 0:
@@ -98,7 +98,7 @@ double Heptane::C(int j,double Tinverse, double T2inverse, double T3inverse, dou
     }
 }
 
-double Heptane::Cprime(int j, double T2inverse, double T3inverse, double T4inverse)
+CanteraDouble Heptane::Cprime(int j, CanteraDouble T2inverse, CanteraDouble T3inverse, CanteraDouble T4inverse)
 {
     switch (j) {
     case 0:
@@ -118,7 +118,7 @@ double Heptane::Cprime(int j, double T2inverse, double T3inverse, double T4inver
     }
 }
 
-double Heptane::I(int j, double ergho, double Gamma)
+CanteraDouble Heptane::I(int j, CanteraDouble ergho, CanteraDouble Gamma)
 {
     switch (j) {
     case 0:
@@ -134,7 +134,7 @@ double Heptane::I(int j, double ergho, double Gamma)
     }
 }
 
-double Heptane::H(int i, double egrho)
+CanteraDouble Heptane::H(int i, CanteraDouble egrho)
 {
     if (i < 2) {
         return pow(Rho,i+2);
@@ -147,18 +147,18 @@ double Heptane::H(int i, double egrho)
     }
 }
 
-double Heptane::up()
+CanteraDouble Heptane::up()
 {
-    double Tinverse = 1.0/T;
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble Tinverse = 1.0/T;
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     int i;
     for (i=1; i<=5; i++) {
-        sum += G[i]*(pow(T,i) - pow(To,i))/double(i);
+        sum += G[i]*(pow(T,i) - pow(To,i))/CanteraDouble(i);
     }
     sum += G[0]*log(T/To);
     for (i=0; i<=6; i++) {
@@ -168,16 +168,16 @@ double Heptane::up()
     return sum + m_energy_offset;
 }
 
-double Heptane::sp()
+CanteraDouble Heptane::sp()
 {
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (int i=2; i<=5; i++) {
-        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/double(i-1);
+        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/CanteraDouble(i-1);
     }
     sum += G[1]*log(T/To);
     sum -= G[0]*(1.0/T - 1.0/To);
@@ -188,45 +188,45 @@ double Heptane::sp()
     return sum + m_entropy_offset;
 }
 
-double Heptane::Pp()
+CanteraDouble Heptane::Pp()
 {
-    double Tinverse = pow(T,-1);
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble Tinverse = pow(T,-1);
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<=3; i++) {
         P += C(i,Tinverse, T2inverse, T3inverse, T4inverse)*H(i,egrho);
     }
     return P;
 }
 
-double Heptane::Psat()
+CanteraDouble Heptane::Psat()
 {
-    double log, sum=0;
+    CanteraDouble log, sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("Heptane::Psat",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=1; i<=8; i++) {
-        sum += F[i-1] * pow((T/Tp -1),double(i-1));
+        sum += F[i-1] * pow((T/Tp -1),CanteraDouble(i-1));
     }
 
     log = ((Tc/T)-1)*sum;
     return exp(log)*Pc;
 }
 
-double Heptane::ldens()
+CanteraDouble Heptane::ldens()
 {
-    double xx=1-(T/Tc), sum=0;
+    CanteraDouble xx=1-(T/Tc), sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("Heptane::ldens",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=1; i<=6; i++) {
-        sum+=D[i-1]*pow(xx,double(i-1)/3.0);
+        sum+=D[i-1]*pow(xx,CanteraDouble(i-1)/3.0);
     }
 
     return sum;
@@ -235,27 +235,27 @@ double Heptane::ldens()
 // The following functions allow users to get the properties of Heptane that
 // are not dependent on the state
 
-double Heptane::Tcrit()
+CanteraDouble Heptane::Tcrit()
 {
     return Tc;
 }
-double Heptane::Pcrit()
+CanteraDouble Heptane::Pcrit()
 {
     return Pc;
 }
-double Heptane::Vcrit()
+CanteraDouble Heptane::Vcrit()
 {
     return 1.0/Roc;
 }
-double Heptane::Tmin()
+CanteraDouble Heptane::Tmin()
 {
     return Tmn;
 }
-double Heptane::Tmax()
+CanteraDouble Heptane::Tmax()
 {
     return Tmx;
 }
-double Heptane::MolWt()
+CanteraDouble Heptane::MolWt()
 {
     return M;
 }

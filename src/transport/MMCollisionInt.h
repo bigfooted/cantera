@@ -34,46 +34,46 @@ public:
      *  @param loglevel    Set the loglevel for the object. The default
      *                     loglevel is zero, indicating no output.
      */
-    void init(double tsmin, double tsmax, int loglevel = 0);
+    void init(CanteraDouble tsmin, CanteraDouble tsmax, int loglevel = 0);
 
-    double omega22(double ts, double deltastar);
-    double astar(double ts, double deltastar);
-    double bstar(double ts, double deltastar);
-    double cstar(double ts, double deltastar);
-    void fit(int degree, double deltastar, double* astar, double* bstar, double* cstar);
-    void fit_omega22(int degree, double deltastar, double* om22);
-    double omega11(double ts, double deltastar) {
+    CanteraDouble omega22(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble astar(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble bstar(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble cstar(CanteraDouble ts, CanteraDouble deltastar);
+    void fit(int degree, CanteraDouble deltastar, CanteraDouble* astar, CanteraDouble* bstar, CanteraDouble* cstar);
+    void fit_omega22(int degree, CanteraDouble deltastar, CanteraDouble* om22);
+    CanteraDouble omega11(CanteraDouble ts, CanteraDouble deltastar) {
         return omega22(ts, deltastar)/astar(ts, deltastar);
     }
 
 private:
-    double fitDelta(int table, int ntstar, int degree, double* c);
+    CanteraDouble fitDelta(int table, int ntstar, int degree, CanteraDouble* c);
 
-    vector<vector<double>> m_o22poly;
-    vector<vector<double>> m_apoly;
-    vector<vector<double>> m_bpoly;
-    vector<vector<double>> m_cpoly;
+    vector<vector<CanteraDouble>> m_o22poly;
+    vector<vector<CanteraDouble>> m_apoly;
+    vector<vector<CanteraDouble>> m_bpoly;
+    vector<vector<CanteraDouble>> m_cpoly;
 
-    static double delta[8];
-    static double tstar22[37];
+    static CanteraDouble delta[8];
+    static CanteraDouble tstar22[37];
 
     //! Table of omega22 values from MM
-    static double omega22_table[37*8];
+    static CanteraDouble omega22_table[37*8];
 
     //! table of tstar values
-    static double tstar[39];
+    static CanteraDouble tstar[39];
 
     //! astar table from MM
-    static double astar_table[39*8];
+    static CanteraDouble astar_table[39*8];
 
     //! bstar table from MM
-    static double bstar_table[39*8];
+    static CanteraDouble bstar_table[39*8];
 
     //! cstar table from MM
-    static double cstar_table[39*8];
+    static CanteraDouble cstar_table[39*8];
 
     //! Log temp
-    vector<double> m_logTemp;
+    vector<CanteraDouble> m_logTemp;
 
     int m_nmin;
     int m_nmax;

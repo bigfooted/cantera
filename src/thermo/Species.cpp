@@ -18,7 +18,7 @@ using namespace std;
 namespace Cantera {
 
 Species::Species(const string& name_, const Composition& comp_,
-                 double charge_, double size_)
+                 CanteraDouble charge_, CanteraDouble size_)
     : name(name_)
     , composition(comp_)
     , charge(charge_)
@@ -26,9 +26,9 @@ Species::Species(const string& name_, const Composition& comp_,
 {
 }
 
-double Species::molecularWeight() {
+CanteraDouble Species::molecularWeight() {
     if (m_molecularWeight == Undef) {
-        double weight = 0.0;
+        CanteraDouble weight = 0.0;
         const auto& elements = elementWeights();
         for (const auto& [eName, stoich] : composition) {
             auto search = elements.find(eName);
@@ -45,10 +45,10 @@ double Species::molecularWeight() {
     return m_molecularWeight;
 }
 
-void Species::setMolecularWeight(double weight) {
+void Species::setMolecularWeight(CanteraDouble weight) {
     if (m_molecularWeight != Undef) {
-        double maxWeight = max(weight, m_molecularWeight);
-        double weight_cmp = fabs(weight - m_molecularWeight) / maxWeight;
+        CanteraDouble maxWeight = max(weight, m_molecularWeight);
+        CanteraDouble weight_cmp = fabs(weight - m_molecularWeight) / maxWeight;
         if (weight_cmp > 1.0e-9) {
             warn_user(
                 "Species::setMolecularWeight",
@@ -105,7 +105,7 @@ AnyMap Species::parameters(const ThermoPhase* phase, bool withInput) const
 unique_ptr<Species> newSpecies(const AnyMap& node)
 {
     auto s = make_unique<Species>(node["name"].asString(),
-                                  node["composition"].asMap<double>());
+                                  node["composition"].asMap<CanteraDouble>());
 
     if (node.hasKey("thermo")) {
         s->thermo = newSpeciesThermo(node["thermo"].as<AnyMap>());

@@ -10,7 +10,7 @@ using namespace Cantera;
 
 namespace tpx
 {
-static const double
+static const CanteraDouble
 M = 16.04996,
 Tmn = 90.68,
 Tmx = 1700.0,
@@ -28,7 +28,7 @@ beta=2009.152,
 u0 = 357696.0858,
 s0 = -1918.035071;
 
-static const double Ameth[] = {
+static const CanteraDouble Ameth[] = {
     -7.25929210183, 4.13766054566e2, -6.32167316855e3,
     3.34015577724e5, -1.68253379982e7, 1.87884851902e-2, -1.18673201223e1,
     2.09062618015e3, -4.07532656958e5, -5.73917603241e-5,4.37711441593e-2,
@@ -40,16 +40,16 @@ static const double Ameth[] = {
     -4.70845544152e-17, 5.21465091383e-16
 };
 
-static const double Dmeth[]=
+static const CanteraDouble Dmeth[]=
 {  -1.78860165e-1, 4.83847500e-2, -1.84898700e-2  };
 
-static const double Fmeth[]=
+static const CanteraDouble Fmeth[]=
 {  4.77748580, 1.76065363, -5.67888940e-1, 1.32786231  };
 
-static const double Gmeth[]=
+static const CanteraDouble Gmeth[]=
 {  1.34740610e3, 1.35512060e2, -2.93910458e1, 2.12774600, 2.44656600e3  };
 
-double methane::C(int i, double rt, double rt2)
+CanteraDouble methane::C(int i, CanteraDouble rt, CanteraDouble rt2)
 {
     switch (i) {
     case 0:
@@ -85,7 +85,7 @@ double methane::C(int i, double rt, double rt2)
     }
 }
 
-double methane::Cprime(int i, double rt, double rt2, double rt3)
+CanteraDouble methane::Cprime(int i, CanteraDouble rt, CanteraDouble rt2, CanteraDouble rt3)
 {
     switch (i) {
     case 0:
@@ -121,31 +121,31 @@ double methane::Cprime(int i, double rt, double rt2, double rt3)
     }
 }
 
-double methane::W(int n, double egrho)
+CanteraDouble methane::W(int n, CanteraDouble egrho)
 {
     return (n == 0 ? (1.0 - egrho)/(2.0*Gamma) :
             (n*W(n-1, egrho) - 0.5*pow(Rho,2*n)*egrho)/Gamma);
 }
 
-double methane::H(int i, double egrho)
+CanteraDouble methane::H(int i, CanteraDouble egrho)
 {
     return (i < 8 ? pow(Rho,i+2) : pow(Rho,2*i-13)*egrho);
 }
 
-double methane::I(int i, double egrho)
+CanteraDouble methane::I(int i, CanteraDouble egrho)
 {
-    return (i < 8 ? pow(Rho,i+1)/double(i+1) : W(i-8, egrho));
+    return (i < 8 ? pow(Rho,i+1)/CanteraDouble(i+1) : W(i-8, egrho));
 }
 
-double methane::up()
+CanteraDouble methane::up()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
-    double t3 = pow(T,1.0/3.0);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble t3 = pow(T,1.0/3.0);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (int i=0; i<14; i++) {
         sum += (C(i, rt, rt2) - T*Cprime(i, rt, rt2, rt3))*I(i, egrho);
     }
@@ -154,14 +154,14 @@ double methane::up()
     return sum + m_energy_offset;
 }
 
-double methane::sp()
+CanteraDouble methane::sp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
-    double t3 = pow(T,1.0/3.0);
-    double sum = 0.0;
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble t3 = pow(T,1.0/3.0);
+    CanteraDouble sum = 0.0;
     sum = s0 - R*log(Rho);
     for (int i=0; i<14; i++) {
         sum -= Cprime(i, rt, rt2, rt3)*I(i, egrho);
@@ -172,23 +172,23 @@ double methane::sp()
     return sum + m_entropy_offset;
 }
 
-double methane::Pp()
+CanteraDouble methane::Pp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<14; i++) {
         P += C(i, rt, rt2)*H(i, egrho);
     }
     return P;
 }
 
-double methane::Psat()
+CanteraDouble methane::Psat()
 {
-    double x = (1.0 - Tt/T)/(1.0 - Tt/Tc);
-    double result;
+    CanteraDouble x = (1.0 - Tt/T)/(1.0 - Tt/Tc);
+    CanteraDouble result;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("methane::Psat",
                            "Temperature out of range. T = {}", T);
@@ -198,11 +198,11 @@ double methane::Psat()
     return exp(result)*Pt;
 }
 
-double methane::ldens()
+CanteraDouble methane::ldens()
 {
-    double result;
-    double sum;
-    double w;
+    CanteraDouble result;
+    CanteraDouble sum;
+    CanteraDouble w;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("methane::ldens",
                            "Temperature out of range. T = {}", T);
@@ -216,27 +216,27 @@ double methane::ldens()
     return result;
 }
 
-double methane::Tcrit()
+CanteraDouble methane::Tcrit()
 {
     return Tc;
 }
-double methane::Pcrit()
+CanteraDouble methane::Pcrit()
 {
     return Pc;
 }
-double methane::Vcrit()
+CanteraDouble methane::Vcrit()
 {
     return 1.0/Roc;
 }
-double methane::Tmin()
+CanteraDouble methane::Tmin()
 {
     return Tmn;
 }
-double methane::Tmax()
+CanteraDouble methane::Tmax()
 {
     return Tmx;
 }
-double methane::MolWt()
+CanteraDouble methane::MolWt()
 {
     return M;
 }

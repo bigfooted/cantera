@@ -15,28 +15,28 @@ string demangle(const std::type_info& type);
 template<class T>
 const T &AnyValue::as() const {
     try {
-        if (typeid(T) == typeid(double) && m_value.type() == typeid(long int)) {
-            // Implicit conversion of long int to double
-            const_cast<AnyValue*>(this)->m_value = static_cast<double>(as<long int>());
-            m_equals = eq_comparer<double>;
-        } else if (typeid(T) == typeid(string) && m_value.type() == typeid(double)) {
-            // Implicit conversion of double to string
-            const_cast<AnyValue*>(this)->m_value = fmt::format("{}", as<double>());
+        if (typeid(T) == typeid(CanteraDouble) && m_value.type() == typeid(long int)) {
+            // Implicit conversion of long int to CanteraDouble
+            const_cast<AnyValue*>(this)->m_value = static_cast<CanteraDouble>(as<long int>());
+            m_equals = eq_comparer<CanteraDouble>;
+        } else if (typeid(T) == typeid(string) && m_value.type() == typeid(CanteraDouble)) {
+            // Implicit conversion of CanteraDouble to string
+            const_cast<AnyValue*>(this)->m_value = fmt::format("{}", as<CanteraDouble>());
             m_equals = eq_comparer<string>;
         } else if (typeid(T) == typeid(string) && m_value.type() == typeid(long int)) {
             // Implicit conversion of long int to string
             const_cast<AnyValue*>(this)->m_value = fmt::format("{}", as<long int>());
             m_equals = eq_comparer<string>;
-        } else if (typeid(T) == typeid(vector<double>)
+        } else if (typeid(T) == typeid(vector<CanteraDouble>)
                    && m_value.type() == typeid(vector<AnyValue>)) {
-            // Implicit conversion of vector<AnyValue> to vector<double>
+            // Implicit conversion of vector<AnyValue> to vector<CanteraDouble>
             auto& asAny = as<vector<AnyValue>>();
-            vector<double> asDouble(asAny.size());
+            vector<CanteraDouble> asDouble(asAny.size());
             for (size_t i = 0; i < asAny.size(); i++) {
-                asDouble[i] = asAny[i].as<double>();
+                asDouble[i] = asAny[i].as<CanteraDouble>();
             }
             const_cast<AnyValue*>(this)->m_value = std::move(asDouble);
-            m_equals = eq_comparer<vector<double>>;
+            m_equals = eq_comparer<vector<CanteraDouble>>;
         }
         return std::any_cast<const T&>(m_value);
     } catch (std::bad_any_cast&) {
@@ -69,7 +69,7 @@ bool AnyValue::is() const {
     return m_value.type() == typeid(T);
 }
 
-template<> bool AnyValue::is<vector<double>>() const;
+template<> bool AnyValue::is<vector<CanteraDouble>>() const;
 
 template<class T>
 bool AnyValue::isVector() const {
@@ -216,7 +216,7 @@ template<class T>
 bool AnyValue::eq_comparer(const std::any& lhs, const std::any& rhs)
 {
     using std::any_cast;
-    typedef vector<double> vd;
+    typedef vector<CanteraDouble> vd;
     typedef vector<long int> vi;
     typedef vector<AnyValue> va;
     typedef vector<string> vs;
@@ -228,10 +228,10 @@ bool AnyValue::eq_comparer(const std::any& lhs, const std::any& rhs)
 
     if (ltype == rtype) {
         return any_cast<T>(lhs) == any_cast<T>(rhs);
-    } else if (ltype == typeid(double) && rtype == typeid(long int)) {
-        return any_cast<double>(lhs) == any_cast<long int>(rhs);
-    } else if (ltype == typeid(long int) && rtype == typeid(double)) {
-        return any_cast<long int>(lhs) == any_cast<double>(rhs);
+    } else if (ltype == typeid(CanteraDouble) && rtype == typeid(long int)) {
+        return any_cast<CanteraDouble>(lhs) == any_cast<long int>(rhs);
+    } else if (ltype == typeid(long int) && rtype == typeid(CanteraDouble)) {
+        return any_cast<long int>(lhs) == any_cast<CanteraDouble>(rhs);
 
     } else if (ltype == typeid(vd) && rtype == typeid(vi)) {
         return vector_eq<vd, vi>(lhs, rhs);

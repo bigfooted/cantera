@@ -94,7 +94,7 @@ public:
      *            - coeffs[7] = @f$ \mu^o(T_3) @f$ (J/kmol)
      *            - ........
      */
-    Mu0Poly(double tlow, double thigh, double pref, const double* coeffs);
+    Mu0Poly(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs);
 
     //! Set parameters for @f$ \mu^o(T) @f$
     /*!
@@ -106,7 +106,7 @@ public:
      *               energy [J/kmol] as the values. Must contain one point at
      *               298.15 K.
      */
-    void setParameters(double h0, const map<double, double>& T_mu);
+    void setParameters(CanteraDouble h0, const map<CanteraDouble, CanteraDouble>& T_mu);
 
     int reportType() const override {
         return MU0_INTERP;
@@ -118,16 +118,16 @@ public:
      * Temperature Polynomial:
      *     tt[0] = temp (Kelvin)
      */
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override;
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override;
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override;
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override;
 
     size_t nCoeffs() const override;
 
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override;
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override;
 
     void getParameters(AnyMap& thermo) const override;
 
@@ -138,23 +138,23 @@ protected:
 
     //! Value of the enthalpy at T = 298.15. This value is tied to the Heat of
     //! formation of the species at 298.15.
-    double m_H298 = 0.0;
+    CanteraDouble m_H298 = 0.0;
 
     //! Points at which the standard state chemical potential are given.
-    vector<double> m_t0_int;
+    vector<CanteraDouble> m_t0_int;
 
     //! Mu0's are primary input data. They aren't strictly needed, but are kept
     //! here for convenience.
-    vector<double> m_mu0_R_int;
+    vector<CanteraDouble> m_mu0_R_int;
 
     //! Dimensionless Enthalpies at the temperature points
-    vector<double> m_h0_R_int;
+    vector<CanteraDouble> m_h0_R_int;
 
     //! Entropy at the points
-    vector<double> m_s0_R_int;
+    vector<CanteraDouble> m_s0_R_int;
 
     //! Heat capacity at the points
-    vector<double> m_cp0_R_int;
+    vector<CanteraDouble> m_cp0_R_int;
 };
 
 }

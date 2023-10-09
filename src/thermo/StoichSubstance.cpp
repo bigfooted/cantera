@@ -24,22 +24,22 @@ StoichSubstance::StoichSubstance(const string& infile, const string& id_)
 
 // ----- Mechanical Equation of State ------
 
-double StoichSubstance::pressure() const
+CanteraDouble StoichSubstance::pressure() const
 {
     return m_press;
 }
 
-void StoichSubstance::setPressure(double p)
+void StoichSubstance::setPressure(CanteraDouble p)
 {
     m_press = p;
 }
 
-double StoichSubstance::isothermalCompressibility() const
+CanteraDouble StoichSubstance::isothermalCompressibility() const
 {
     return 0.0;
 }
 
-double StoichSubstance::thermalExpansionCoeff() const
+CanteraDouble StoichSubstance::thermalExpansionCoeff() const
 {
     return 0.0;
 }
@@ -51,54 +51,54 @@ Units StoichSubstance::standardConcentrationUnits() const
     return Units(1.0);
 }
 
-void StoichSubstance::getActivityConcentrations(double* c) const
+void StoichSubstance::getActivityConcentrations(CanteraDouble* c) const
 {
     c[0] = 1.0;
 }
 
-double StoichSubstance::standardConcentration(size_t k) const
+CanteraDouble StoichSubstance::standardConcentration(size_t k) const
 {
     return 1.0;
 }
 
-double StoichSubstance::logStandardConc(size_t k) const
+CanteraDouble StoichSubstance::logStandardConc(size_t k) const
 {
     return 0.0;
 }
 
 // Properties of the Standard State of the Species in the Solution
 
-void StoichSubstance::getStandardChemPotentials(double* mu0) const
+void StoichSubstance::getStandardChemPotentials(CanteraDouble* mu0) const
 {
     getGibbs_RT(mu0);
     mu0[0] *= RT();
 }
 
-void StoichSubstance::getEnthalpy_RT(double* hrt) const
+void StoichSubstance::getEnthalpy_RT(CanteraDouble* hrt) const
 {
     getEnthalpy_RT_ref(hrt);
-    double presCorrect = (m_press - m_p0) / molarDensity();
+    CanteraDouble presCorrect = (m_press - m_p0) / molarDensity();
     hrt[0] += presCorrect / RT();
 }
 
-void StoichSubstance::getEntropy_R(double* sr) const
+void StoichSubstance::getEntropy_R(CanteraDouble* sr) const
 {
     getEntropy_R_ref(sr);
 }
 
-void StoichSubstance::getGibbs_RT(double* grt) const
+void StoichSubstance::getGibbs_RT(CanteraDouble* grt) const
 {
     getEnthalpy_RT(grt);
     grt[0] -= m_s0_R;
 }
 
-void StoichSubstance::getCp_R(double* cpr) const
+void StoichSubstance::getCp_R(CanteraDouble* cpr) const
 {
     _updateThermo();
     cpr[0] = m_cp0_R;
 }
 
-void StoichSubstance::getIntEnergy_RT(double* urt) const
+void StoichSubstance::getIntEnergy_RT(CanteraDouble* urt) const
 {
     _updateThermo();
     urt[0] = m_h0_RT - m_p0 / molarDensity() / RT();
@@ -106,7 +106,7 @@ void StoichSubstance::getIntEnergy_RT(double* urt) const
 
 // ---- Thermodynamic Values for the Species Reference States ----
 
-void StoichSubstance::getIntEnergy_RT_ref(double* urt) const
+void StoichSubstance::getIntEnergy_RT_ref(CanteraDouble* urt) const
 {
     _updateThermo();
     urt[0] = m_h0_RT - m_p0 / molarDensity() / RT();

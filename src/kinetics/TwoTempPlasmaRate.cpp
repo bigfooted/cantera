@@ -12,8 +12,8 @@ namespace Cantera
 
 bool TwoTempPlasmaData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double T = phase.temperature();
-    double Te = phase.electronTemperature();
+    CanteraDouble T = phase.temperature();
+    CanteraDouble Te = phase.electronTemperature();
     bool changed = false;
     if (T != temperature) {
         ReactionData::update(T);
@@ -26,19 +26,19 @@ bool TwoTempPlasmaData::update(const ThermoPhase& phase, const Kinetics& kin)
     return changed;
 }
 
-void TwoTempPlasmaData::update(double T)
+void TwoTempPlasmaData::update(CanteraDouble T)
 {
     throw CanteraError("TwoTempPlasmaData::update",
         "Missing state information: 'TwoTempPlasmaData' requires electron temperature.");
 }
 
-void TwoTempPlasmaData::update(double T, double Te)
+void TwoTempPlasmaData::update(CanteraDouble T, CanteraDouble Te)
 {
     ReactionData::update(T);
     updateTe(Te);
 }
 
-void TwoTempPlasmaData::updateTe(double Te)
+void TwoTempPlasmaData::updateTe(CanteraDouble Te)
 {
     electronTemp = Te;
     logTe = std::log(Te);
@@ -51,7 +51,7 @@ TwoTempPlasmaRate::TwoTempPlasmaRate()
     m_E4_str = "Ea-electron";
 }
 
-TwoTempPlasmaRate::TwoTempPlasmaRate(double A, double b, double Ea, double EE)
+TwoTempPlasmaRate::TwoTempPlasmaRate(CanteraDouble A, CanteraDouble b, CanteraDouble Ea, CanteraDouble EE)
     : ArrheniusBase(A, b, Ea)
 {
     m_Ea_str = "Ea-gas";
@@ -65,7 +65,7 @@ TwoTempPlasmaRate::TwoTempPlasmaRate(const AnyMap& node, const UnitStack& rate_u
     setParameters(node, rate_units);
 }
 
-double TwoTempPlasmaRate::ddTScaledFromStruct(const TwoTempPlasmaData& shared_data) const
+CanteraDouble TwoTempPlasmaRate::ddTScaledFromStruct(const TwoTempPlasmaData& shared_data) const
 {
     warn_user("TwoTempPlasmaRate::ddTScaledFromStruct",
         "Temperature derivative does not consider changes of electron temperature.");

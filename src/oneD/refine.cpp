@@ -18,7 +18,7 @@ Refiner::Refiner(Domain1D& domain) :
     m_active.resize(m_nv, true);
 }
 
-void Refiner::setCriteria(double ratio, double slope, double curve, double prune)
+void Refiner::setCriteria(CanteraDouble ratio, CanteraDouble slope, CanteraDouble curve, CanteraDouble prune)
 {
     if (ratio < 2.0) {
         throw CanteraError("Refiner::setCriteria",
@@ -40,7 +40,7 @@ void Refiner::setCriteria(double ratio, double slope, double curve, double prune
     m_prune = prune;
 }
 
-int Refiner::analyze(size_t n, const double* z, const double* x)
+int Refiner::analyze(size_t n, const CanteraDouble* z, const CanteraDouble* x)
 {
     if (n >= m_npmax) {
         throw CanteraError("Refiner::analyze", "max number of grid points reached ({}).", m_npmax);
@@ -65,9 +65,9 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
     }
 
     // find locations where cell size ratio is too large.
-    vector<double> v(n), s(n-1);
+    vector<CanteraDouble> v(n), s(n-1);
 
-    vector<double> dz(n-1);
+    vector<CanteraDouble> dz(n-1);
     for (size_t j = 0; j < n-1; j++) {
         dz[j] = z[j+1] - z[j];
     }
@@ -86,14 +86,14 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             }
 
             // find the range of values and slopes
-            double vmin = *min_element(v.begin(), v.end());
-            double vmax = *max_element(v.begin(), v.end());
-            double smin = *min_element(s.begin(), s.end());
-            double smax = *max_element(s.begin(), s.end());
+            CanteraDouble vmin = *min_element(v.begin(), v.end());
+            CanteraDouble vmax = *max_element(v.begin(), v.end());
+            CanteraDouble smin = *min_element(s.begin(), s.end());
+            CanteraDouble smax = *max_element(s.begin(), s.end());
 
             // max absolute values of v and s
-            double aa = std::max(fabs(vmax), fabs(vmin));
-            double ss = std::max(fabs(smax), fabs(smin));
+            CanteraDouble aa = std::max(fabs(vmax), fabs(vmin));
+            CanteraDouble ss = std::max(fabs(smax), fabs(smin));
 
             // refine based on component i only if the range of v is
             // greater than a fraction 'min_range' of max |v|. This
@@ -102,9 +102,9 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             if ((vmax - vmin) > m_min_range*aa) {
                 // maximum allowable difference in value between adjacent
                 // points.
-                double dmax = m_slope*(vmax - vmin) + m_thresh;
+                CanteraDouble dmax = m_slope*(vmax - vmin) + m_thresh;
                 for (size_t j = 0; j < n-1; j++) {
-                    double r = fabs(v[j+1] - v[j])/dmax;
+                    CanteraDouble r = fabs(v[j+1] - v[j])/dmax;
                     if (r > 1.0 && dz[j] >= 2 * m_gridmin) {
                         m_loc.insert(j);
                         m_c.insert(name);
@@ -125,9 +125,9 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             if ((smax - smin) > m_min_range*ss) {
                 // maximum allowable difference in slope between
                 // adjacent points.
-                double dmax = m_curve*(smax - smin);
+                CanteraDouble dmax = m_curve*(smax - smin);
                 for (size_t j = 0; j < n-2; j++) {
-                    double r = fabs(s[j+1] - s[j]) / (dmax + m_thresh/dz[j]);
+                    CanteraDouble r = fabs(s[j+1] - s[j]) / (dmax + m_thresh/dz[j]);
                     if (r > 1.0 && dz[j] >= 2 * m_gridmin &&
                             dz[j+1] >= 2 * m_gridmin) {
                         m_c.insert(name);
@@ -197,7 +197,7 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
     return int(m_loc.size());
 }
 
-double Refiner::value(const double* x, size_t i, size_t j)
+CanteraDouble Refiner::value(const CanteraDouble* x, size_t i, size_t j)
 {
     return x[m_domain->index(i,j)];
 }
@@ -224,7 +224,7 @@ void Refiner::show()
     }
 }
 
-int Refiner::getNewGrid(int n, const double* z, int nn, double* zn)
+int Refiner::getNewGrid(int n, const CanteraDouble* z, int nn, CanteraDouble* zn)
 {
     int nnew = static_cast<int>(m_loc.size());
     if (nnew + n > nn) {

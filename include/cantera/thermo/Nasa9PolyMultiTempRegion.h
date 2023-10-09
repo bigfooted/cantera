@@ -65,8 +65,8 @@ public:
      *                - `coeffs[3:11 + 11*zone]`: 9 coefficient parameterization
      *                where `zone` runs from zero to `nzones`-1.
      */
-    Nasa9PolyMultiTempRegion(double tlow, double thigh, double pref,
-                             const double* coeffs);
+    Nasa9PolyMultiTempRegion(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref,
+                             const CanteraDouble* coeffs);
 
     //! Set the array of polynomial coefficients for each temperature region
     /*!
@@ -74,19 +74,19 @@ public:
      *                  region and each value is the array of 9 polynomial
      *                  coefficients for that region.
      */
-    void setParameters(const map<double, vector<double>>& regions);
+    void setParameters(const map<CanteraDouble, vector<CanteraDouble>>& regions);
 
     int reportType() const override;
 
     size_t temperaturePolySize() const override { return 7; }
-    void updateTemperaturePoly(double T, double* T_poly) const override;
+    void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const override;
 
     //! @copydoc Nasa9Poly1::updateProperties
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override;
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override;
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override;
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override;
 
     size_t nCoeffs() const override;
 
@@ -109,14 +109,14 @@ public:
      *        coeffs[index+1] = maxTempZone
      *        coeffs[index+2+i] from i =0,9 are the coefficients themselves
      */
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override;
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override;
 
     void getParameters(AnyMap& thermo) const override;
 
 protected:
     //! Lower boundaries of each temperature regions
-    vector<double> m_lowerTempBounds;
+    vector<CanteraDouble> m_lowerTempBounds;
 
     //! Individual temperature region objects
     vector<unique_ptr<Nasa9Poly1>> m_regionPts;

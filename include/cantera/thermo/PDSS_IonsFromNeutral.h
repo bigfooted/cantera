@@ -45,9 +45,9 @@ public:
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
 
-    double enthalpy_RT() const override;
-    double intEnergy_mole() const override;
-    double entropy_R() const override;
+    CanteraDouble enthalpy_RT() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble entropy_R() const override;
 
     /**
      * @copydoc PDSS::gibbs_RT()
@@ -62,26 +62,26 @@ public:
      * is added to all ions except for the species ionic species, which in this
      * case is the single anion species, with species index *sp*.
      */
-    double gibbs_RT() const override;
-    double cp_R() const override;
-    double molarVolume() const override;
-    double density() const override;
+    CanteraDouble gibbs_RT() const override;
+    CanteraDouble cp_R() const override;
+    CanteraDouble molarVolume() const override;
+    CanteraDouble density() const override;
 
     //! @}
     //! @name Properties of the Reference State of the Species in the Solution
     //! @{
 
-    double gibbs_RT_ref() const override;
-    double enthalpy_RT_ref() const override;
-    double entropy_R_ref() const override;
-    double cp_R_ref() const override;
-    double molarVolume_ref() const override;
+    CanteraDouble gibbs_RT_ref() const override;
+    CanteraDouble enthalpy_RT_ref() const override;
+    CanteraDouble entropy_R_ref() const override;
+    CanteraDouble cp_R_ref() const override;
+    CanteraDouble molarVolume_ref() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    void setState_TP(double temp, double pres) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
 
     //! @}
     //! @name Initialization of the Object
@@ -89,7 +89,7 @@ public:
 
     void setParent(VPStandardStateTP* phase, size_t k) override;
 
-    void setNeutralSpeciesMultiplier(const string& species, double mult);
+    void setNeutralSpeciesMultiplier(const string& species, CanteraDouble mult);
     void setSpecialSpecies(bool special=true);
     void getParameters(AnyMap& eosNode) const override;
     void initThermo() override;
@@ -99,7 +99,7 @@ protected:
     //! Pointer to the Neutral Molecule ThermoPhase object
     shared_ptr<ThermoPhase> neutralMoleculePhase_;
 
-    map<string, double> neutralSpeciesMultipliers_;
+    map<string, CanteraDouble> neutralSpeciesMultipliers_;
 
     //! Number of neutral molecule species that make up the stoichiometric
     //! vector for this species, in terms of calculating thermodynamic functions
@@ -110,7 +110,7 @@ protected:
 
     //! Stoichiometric coefficient for this species using the Neutral Molecule
     //! Species in the vector idNeutralMoleculeVec
-    vector<double> factorVec;
+    vector<CanteraDouble> factorVec;
 
     //! Add 2RTln2 to the entropy and Gibbs free energies for this species
     /*!
@@ -119,7 +119,7 @@ protected:
     bool add2RTln2_ = true;
 
     //! Vector of length equal to the number of species in the neutral molecule phase
-    mutable vector<double> tmpNM;
+    mutable vector<CanteraDouble> tmpNM;
 };
 }
 

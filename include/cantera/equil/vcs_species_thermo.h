@@ -52,26 +52,26 @@ public:
 
     //! Internal storage of the last calculation of the reference naught Gibbs
     //! free energy at SS0_TSave. (always in units of Kelvin)
-    double SS0_feSave = 0.0;
+    CanteraDouble SS0_feSave = 0.0;
 
     //! Internal storage of the last temperature used in the calculation of the
     //! reference naught Gibbs free energy. units = kelvin
-    double SS0_TSave = -90.0;
+    CanteraDouble SS0_TSave = -90.0;
 
     //! Base temperature used in the VCS_SS0_CONSTANT_CP model
-    double SS0_T0 = 273.15;
+    CanteraDouble SS0_T0 = 273.15;
 
     //! Base enthalpy used in the VCS_SS0_CONSTANT_CP model
-    double SS0_H0 = 0.0;
+    CanteraDouble SS0_H0 = 0.0;
 
     //! Base entropy used in the VCS_SS0_CONSTANT_CP model
-    double SS0_S0 = 0.0;
+    CanteraDouble SS0_S0 = 0.0;
 
     //! Base heat capacity used in the VCS_SS0_CONSTANT_CP model
-    double SS0_Cp0 = 0.0;
+    CanteraDouble SS0_Cp0 = 0.0;
 
     //! Value of the pressure for the reference state.
-    double SS0_Pref = OneAtm;
+    CanteraDouble SS0_Pref = OneAtm;
 
     //! Integer value representing the star state model.
     int SSStar_Model = VCS_SSSTAR_CONSTANT;
@@ -80,7 +80,7 @@ public:
     int SSStar_Vol_Model = VCS_SSVOL_IDEALGAS;
 
     //! parameter that is used in the VCS_SSVOL_CONSTANT model.
-    double SSStar_Vol0 = -1;
+    CanteraDouble SSStar_Vol0 = -1;
 };
 
 }

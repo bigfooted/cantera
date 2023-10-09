@@ -82,8 +82,8 @@ void MultiSpeciesThermo::modifySpecies(size_t index,
     m_sp[type][m_speciesLoc[index].second] = {index, spthermo};
 }
 
-void MultiSpeciesThermo::update_single(size_t k, double t, double* cp_R,
-                                       double* h_RT, double* s_R) const
+void MultiSpeciesThermo::update_single(size_t k, CanteraDouble t, CanteraDouble* cp_R,
+                                       CanteraDouble* h_RT, CanteraDouble* s_R) const
 {
     const SpeciesThermoInterpType* sp_ptr = provideSTIT(k);
     if (sp_ptr) {
@@ -91,13 +91,13 @@ void MultiSpeciesThermo::update_single(size_t k, double t, double* cp_R,
     }
 }
 
-void MultiSpeciesThermo::update(double t, double* cp_R, double* h_RT, double* s_R) const
+void MultiSpeciesThermo::update(CanteraDouble t, CanteraDouble* cp_R, CanteraDouble* h_RT, CanteraDouble* s_R) const
 {
     auto iter = m_sp.begin();
     auto jter = m_tpoly.begin();
     for (; iter != m_sp.end(); iter++, jter++) {
         const vector<index_STIT>& species = iter->second;
-        double* tpoly = &jter->second[0];
+        CanteraDouble* tpoly = &jter->second[0];
         species[0].second->updateTemperaturePoly(t, tpoly);
         for (auto& [i, spthermo] : species) {
             spthermo->updateProperties(tpoly, cp_R+i, h_RT+i, s_R+i);
@@ -114,8 +114,8 @@ int MultiSpeciesThermo::reportType(size_t index) const
     return -1;
 }
 
-void MultiSpeciesThermo::reportParams(size_t index, int& type, double* const c,
-        double& minTemp_, double& maxTemp_, double& refPressure_) const
+void MultiSpeciesThermo::reportParams(size_t index, int& type, CanteraDouble* const c,
+        CanteraDouble& minTemp_, CanteraDouble& maxTemp_, CanteraDouble& refPressure_) const
 {
     const SpeciesThermoInterpType* sp = provideSTIT(index);
     size_t n;
@@ -127,7 +127,7 @@ void MultiSpeciesThermo::reportParams(size_t index, int& type, double* const c,
     }
 }
 
-double MultiSpeciesThermo::minTemp(size_t k) const
+CanteraDouble MultiSpeciesThermo::minTemp(size_t k) const
 {
     if (k != npos) {
         const SpeciesThermoInterpType* sp = provideSTIT(k);
@@ -138,7 +138,7 @@ double MultiSpeciesThermo::minTemp(size_t k) const
     return m_tlow_max;
 }
 
-double MultiSpeciesThermo::maxTemp(size_t k) const
+CanteraDouble MultiSpeciesThermo::maxTemp(size_t k) const
 {
     if (k != npos) {
         const SpeciesThermoInterpType* sp = provideSTIT(k);
@@ -149,7 +149,7 @@ double MultiSpeciesThermo::maxTemp(size_t k) const
     return m_thigh_min;
 }
 
-double MultiSpeciesThermo::refPressure(size_t k) const
+CanteraDouble MultiSpeciesThermo::refPressure(size_t k) const
 {
     if (k != npos) {
         warn_deprecated("MultiSpeciesThermo::refPressure(size_t k)",
@@ -183,17 +183,17 @@ const SpeciesThermoInterpType* MultiSpeciesThermo::provideSTIT(size_t k) const
     }
 }
 
-double MultiSpeciesThermo::reportOneHf298(const size_t k) const
+CanteraDouble MultiSpeciesThermo::reportOneHf298(const size_t k) const
 {
     const SpeciesThermoInterpType* sp_ptr = provideSTIT(k);
-    double h = -1.0;
+    CanteraDouble h = -1.0;
     if (sp_ptr) {
         h = sp_ptr->reportHf298(0);
     }
     return h;
 }
 
-void MultiSpeciesThermo::modifyOneHf298(const size_t k, const double Hf298New)
+void MultiSpeciesThermo::modifyOneHf298(const size_t k, const CanteraDouble Hf298New)
 {
     SpeciesThermoInterpType* sp_ptr = provideSTIT(k);
     if (sp_ptr) {

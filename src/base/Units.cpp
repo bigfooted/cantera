@@ -80,7 +80,7 @@ const map<string, Units> knownUnits{
     {"J/kmol", Units(1.0, 1, 2, -2, 0, 0, -1)},
 };
 
-const map<string, double> prefixes{
+const map<string, CanteraDouble> prefixes{
     {"Y", 1e24},
     {"Z", 1e21},
     {"E", 1e18},
@@ -106,8 +106,8 @@ const map<string, double> prefixes{
 namespace Cantera
 {
 
-Units::Units(double factor, double mass, double length, double time,
-             double temperature, double current, double quantity)
+Units::Units(CanteraDouble factor, CanteraDouble mass, CanteraDouble length, CanteraDouble time,
+             CanteraDouble temperature, CanteraDouble current, CanteraDouble quantity)
     : m_factor(factor)
     , m_mass_dim(mass)
     , m_length_dim(length)
@@ -155,7 +155,7 @@ Units::Units(const string& name, bool force_unity)
         string unit = trimCopy(
             name.substr(start, std::min(caret, stop) - start));
 
-        double exponent = 1.0;
+        CanteraDouble exponent = 1.0;
         if (caret != npos) {
             exponent = fpValueCheck(name.substr(caret+1, stop-caret-1));
         }
@@ -220,7 +220,7 @@ Units& Units::operator*=(const Units& other)
     return *this;
 }
 
-Units Units::pow(double exponent) const
+Units Units::pow(CanteraDouble exponent) const
 {
     return Units(std::pow(m_factor, exponent),
                  m_mass_dim * exponent,
@@ -233,7 +233,7 @@ Units Units::pow(double exponent) const
 
 string Units::str(bool skip_unity) const
 {
-    map<string, double> dims{
+    map<string, CanteraDouble> dims{
         {"kg", m_mass_dim},
         {"m", m_length_dim},
         {"s", m_time_dim},
@@ -300,7 +300,7 @@ bool Units::operator==(const Units& other) const
            && m_energy_dim == other.m_energy_dim;
 }
 
-double Units::dimension(const string& primary) const
+CanteraDouble Units::dimension(const string& primary) const
 {
     if (primary == "mass") {
         return m_mass_dim;
@@ -341,7 +341,7 @@ void UnitStack::setStandardUnits(Units& standardUnits)
     stack[0].first = standardUnits;
 }
 
-double UnitStack::standardExponent() const
+CanteraDouble UnitStack::standardExponent() const
 {
     if (!stack.size()) {
         return NAN;
@@ -349,7 +349,7 @@ double UnitStack::standardExponent() const
     return stack[0].second;
 }
 
-void UnitStack::join(double exponent)
+void UnitStack::join(CanteraDouble exponent)
 {
     if (!stack.size()) {
         throw CanteraError("UnitStack::join",
@@ -359,7 +359,7 @@ void UnitStack::join(double exponent)
 
 }
 
-void UnitStack::update(const Units& units, double exponent)
+void UnitStack::update(const Units& units, CanteraDouble exponent)
 {
     bool found = false;
     for (auto& [current_unit, current_exp] : stack) {
@@ -535,12 +535,12 @@ void UnitSystem::setDefaultActivationEnergy(const string& e_units)
     m_explicit_activation_energy = true;
 }
 
-double UnitSystem::convert(double value, const string& src, const string& dest) const
+CanteraDouble UnitSystem::convert(CanteraDouble value, const string& src, const string& dest) const
 {
     return convert(value, Units(src), Units(dest));
 }
 
-double UnitSystem::convert(double value, const Units& src,
+CanteraDouble UnitSystem::convert(CanteraDouble value, const Units& src,
                            const Units& dest) const
 {
     if (!src.convertible(dest)) {
@@ -551,12 +551,12 @@ double UnitSystem::convert(double value, const Units& src,
     return value * src.factor() / dest.factor();
 }
 
-double UnitSystem::convertTo(double value, const string& dest) const
+CanteraDouble UnitSystem::convertTo(CanteraDouble value, const string& dest) const
 {
     return convertTo(value, Units(dest));
 }
 
-double UnitSystem::convertTo(double value, const Units& dest) const
+CanteraDouble UnitSystem::convertTo(CanteraDouble value, const Units& dest) const
 {
     return value / dest.factor()
         * pow(m_mass_factor, dest.m_mass_dim - dest.m_pressure_dim - dest.m_energy_dim)
@@ -567,12 +567,12 @@ double UnitSystem::convertTo(double value, const Units& dest) const
         * pow(m_energy_factor, dest.m_energy_dim);
 }
 
-double UnitSystem::convertFrom(double value, const string& dest) const
+CanteraDouble UnitSystem::convertFrom(CanteraDouble value, const string& dest) const
 {
     return convertFrom(value, Units(dest));
 }
 
-double UnitSystem::convertFrom(double value, const Units& src) const
+CanteraDouble UnitSystem::convertFrom(CanteraDouble value, const Units& src) const
 {
     return value * src.factor()
         * pow(m_mass_factor, -src.m_mass_dim + src.m_pressure_dim + src.m_energy_dim)
@@ -583,7 +583,7 @@ double UnitSystem::convertFrom(double value, const Units& src) const
         * pow(m_energy_factor, -src.m_energy_dim);
 }
 
-static pair<double, string> split_unit(const AnyValue& v) {
+static pair<CanteraDouble, string> split_unit(const AnyValue& v) {
     if (v.is<string>()) {
         // Should be a value and units, separated by a space, for example '2e4 J/kmol'
         string val_units = v.asString();
@@ -601,7 +601,7 @@ static pair<double, string> split_unit(const AnyValue& v) {
     }
 }
 
-double UnitSystem::convert(const AnyValue& v, const string& dest) const
+CanteraDouble UnitSystem::convert(const AnyValue& v, const string& dest) const
 {
     try {
         return convert(v, Units(dest));
@@ -612,7 +612,7 @@ double UnitSystem::convert(const AnyValue& v, const string& dest) const
     }
 }
 
-double UnitSystem::convert(const AnyValue& v, const Units& dest) const
+CanteraDouble UnitSystem::convert(const AnyValue& v, const Units& dest) const
 {
     try {
         auto [value, units] = split_unit(v);
@@ -628,7 +628,7 @@ double UnitSystem::convert(const AnyValue& v, const Units& dest) const
     }
 }
 
-double UnitSystem::convertRateCoeff(const AnyValue& v, const Units& dest) const
+CanteraDouble UnitSystem::convertRateCoeff(const AnyValue& v, const Units& dest) const
 {
     if (dest.factor() != 0) {
         // If the destination units are defined, no special handling is required
@@ -654,23 +654,23 @@ double UnitSystem::convertRateCoeff(const AnyValue& v, const Units& dest) const
         "likely while creating a standalone ReactionRate object.");
 }
 
-vector<double> UnitSystem::convert(const vector<AnyValue>& vals,
+vector<CanteraDouble> UnitSystem::convert(const vector<AnyValue>& vals,
                                    const string& dest) const
 {
     return convert(vals, Units(dest));
 }
 
-vector<double> UnitSystem::convert(const vector<AnyValue>& vals,
+vector<CanteraDouble> UnitSystem::convert(const vector<AnyValue>& vals,
                                    const Units& dest) const
 {
-    vector<double> out;
+    vector<CanteraDouble> out;
     for (const auto& val : vals) {
         out.emplace_back(convert(val, dest));
     }
     return out;
 }
 
-double UnitSystem::convertActivationEnergy(double value, const string& src,
+CanteraDouble UnitSystem::convertActivationEnergy(CanteraDouble value, const string& src,
                                            const string& dest) const
 {
     // Convert to J/kmol
@@ -702,12 +702,12 @@ double UnitSystem::convertActivationEnergy(double value, const string& src,
     return value;
 }
 
-double UnitSystem::convertActivationEnergyTo(double value, const string& dest) const
+CanteraDouble UnitSystem::convertActivationEnergyTo(CanteraDouble value, const string& dest) const
 {
     return convertActivationEnergyTo(value, Units(dest));
 }
 
-double UnitSystem::convertActivationEnergyTo(double value,
+CanteraDouble UnitSystem::convertActivationEnergyTo(CanteraDouble value,
                                              const Units& dest) const
 {
     if (dest.convertible(Units("J/kmol"))) {
@@ -722,7 +722,7 @@ double UnitSystem::convertActivationEnergyTo(double value,
     }
 }
 
-double UnitSystem::convertActivationEnergyFrom(double value, const string& src) const
+CanteraDouble UnitSystem::convertActivationEnergyFrom(CanteraDouble value, const string& src) const
 {
     Units usrc(src);
     if (usrc.convertible(Units("J/kmol"))) {
@@ -737,7 +737,7 @@ double UnitSystem::convertActivationEnergyFrom(double value, const string& src) 
     }
 }
 
-double UnitSystem::convertActivationEnergy(const AnyValue& v, const string& dest) const
+CanteraDouble UnitSystem::convertActivationEnergy(const AnyValue& v, const string& dest) const
 {
     try {
         auto [value, units] = split_unit(v);

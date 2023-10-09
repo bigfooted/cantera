@@ -24,9 +24,9 @@ struct ChebyshevData : public ReactionData
 {
     ChebyshevData() = default;
 
-    void update(double T) override;
+    void update(CanteraDouble T) override;
 
-    void update(double T, double P) override {
+    void update(CanteraDouble T, CanteraDouble P) override {
         ReactionData::update(T);
         pressure = P;
         log10P = std::log10(P);
@@ -41,7 +41,7 @@ struct ChebyshevData : public ReactionData
      * The method is used for the evaluation of numerical derivatives.
      * @param  deltaP  relative pressure perturbation
      */
-    void perturbPressure(double deltaP);
+    void perturbPressure(CanteraDouble deltaP);
 
     void restore() override;
 
@@ -50,11 +50,11 @@ struct ChebyshevData : public ReactionData
         pressure = NAN;
     }
 
-    double pressure = NAN; //!< pressure
-    double log10P = 0.0; //!< base 10 logarithm of pressure
+    CanteraDouble pressure = NAN; //!< pressure
+    CanteraDouble log10P = 0.0; //!< base 10 logarithm of pressure
 
 protected:
-    double m_pressure_buf = -1.0; //!< buffered pressure
+    CanteraDouble m_pressure_buf = -1.0; //!< buffered pressure
 };
 
 //! Pressure-dependent rate expression where the rate coefficient is expressed
@@ -104,7 +104,7 @@ public:
      *      `nP` are the number of temperatures and pressures used in the fit,
      *      respectively.
      */
-    ChebyshevRate(double Tmin, double Tmax, double Pmin, double Pmax,
+    ChebyshevRate(CanteraDouble Tmin, CanteraDouble Tmax, CanteraDouble Pmin, CanteraDouble Pmax,
                   const Array2D& coeffs);
 
     ChebyshevRate(const AnyMap& node, const UnitStack& rate_units={});
@@ -140,10 +140,10 @@ public:
     void updateFromStruct(const ChebyshevData& shared_data) {
         if (shared_data.log10P != m_log10P) {
             m_log10P = shared_data.log10P;
-            double Pr = (2 * shared_data.log10P + PrNum_) * PrDen_;
-            double Cnm1 = Pr;
-            double Cn = 1;
-            double Cnp1;
+            CanteraDouble Pr = (2 * shared_data.log10P + PrNum_) * PrDen_;
+            CanteraDouble Cnm1 = Pr;
+            CanteraDouble Cn = 1;
+            CanteraDouble Cnp1;
             for (size_t i = 0; i < m_coeffs.nRows(); i++) {
                 dotProd_[i] = m_coeffs(i, 0);
             }
@@ -162,12 +162,12 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const ChebyshevData& shared_data) {
-        double Tr = (2 * shared_data.recipT + TrNum_) * TrDen_;
-        double Cnm1 = Tr;
-        double Cn = 1;
-        double Cnp1;
-        double logk = dotProd_[0];
+    CanteraDouble evalFromStruct(const ChebyshevData& shared_data) {
+        CanteraDouble Tr = (2 * shared_data.recipT + TrNum_) * TrDen_;
+        CanteraDouble Cnm1 = Tr;
+        CanteraDouble Cn = 1;
+        CanteraDouble Cnp1;
+        CanteraDouble logk = dotProd_[0];
         for (size_t i = 1; i < m_coeffs.nRows(); i++) {
             Cnp1 = 2 * Tr * Cn - Cnm1;
             logk += Cnp1 * dotProd_[i];
@@ -184,25 +184,25 @@ public:
      *  @param Pmin    Minimum pressure [Pa]
      *  @param Pmax    Maximum pressure [Pa]
      */
-    void setLimits(double Tmin, double Tmax, double Pmin, double Pmax);
+    void setLimits(CanteraDouble Tmin, CanteraDouble Tmax, CanteraDouble Pmin, CanteraDouble Pmax);
 
     //! Minimum valid temperature [K]
-    double Tmin() const {
+    CanteraDouble Tmin() const {
         return Tmin_;
     }
 
     //! Maximum valid temperature [K]
-    double Tmax() const {
+    CanteraDouble Tmax() const {
         return Tmax_;
     }
 
     //! Minimum valid pressure [Pa]
-    double Pmin() const {
+    CanteraDouble Pmin() const {
         return Pmin_;
     }
 
     //! Maximum valid pressure [Pa]
-    double Pmax() const {
+    CanteraDouble Pmax() const {
         return Pmax_;
     }
 
@@ -226,14 +226,14 @@ public:
     void setData(const Array2D& coeffs);
 
 protected:
-    double m_log10P = NAN; //!< value detecting updates
-    double Tmin_, Tmax_; //!< valid temperature range
-    double Pmin_, Pmax_; //!< valid pressure range
-    double TrNum_, TrDen_; //!< terms appearing in the reduced temperature
-    double PrNum_, PrDen_; //!< terms appearing in the reduced pressure
+    CanteraDouble m_log10P = NAN; //!< value detecting updates
+    CanteraDouble Tmin_, Tmax_; //!< valid temperature range
+    CanteraDouble Pmin_, Pmax_; //!< valid pressure range
+    CanteraDouble TrNum_, TrDen_; //!< terms appearing in the reduced temperature
+    CanteraDouble PrNum_, PrDen_; //!< terms appearing in the reduced pressure
 
     Array2D m_coeffs; //!<< coefficient array
-    vector<double> dotProd_; //!< dot product of coeffs with the reduced pressure polynomial
+    vector<CanteraDouble> dotProd_; //!< dot product of coeffs with the reduced pressure polynomial
 };
 
 }

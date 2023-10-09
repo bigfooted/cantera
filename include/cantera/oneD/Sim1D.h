@@ -54,8 +54,8 @@ public:
      * @param vals A vector of values corresponding to the relative position
      *     locations.
      */
-    void setInitialGuess(const string& component, vector<double>& locs,
-                         vector<double>& vals);
+    void setInitialGuess(const string& component, vector<CanteraDouble>& locs,
+                         vector<CanteraDouble>& vals);
 
     /**
      * Set a single value in the solution vector.
@@ -65,7 +65,7 @@ public:
      *     the leftmost grid point in the domain.
      * @param value the value.
      */
-    void setValue(size_t dom, size_t comp, size_t localPoint, double value);
+    void setValue(size_t dom, size_t comp, size_t localPoint, CanteraDouble value);
 
     /**
      * Get one entry in the solution vector.
@@ -74,9 +74,9 @@ public:
      * @param localPoint grid point within the domain, beginning with 0 for
      *     the leftmost grid point in the domain.
      */
-    double value(size_t dom, size_t comp, size_t localPoint) const;
+    CanteraDouble value(size_t dom, size_t comp, size_t localPoint) const;
 
-    double workValue(size_t dom, size_t comp, size_t localPoint) const;
+    CanteraDouble workValue(size_t dom, size_t comp, size_t localPoint) const;
 
     /**
      * Specify a profile for one component of one domain.
@@ -92,11 +92,11 @@ public:
      * the grid points will be linearly interpolated based on the (pos,
      * values) specification.
      */
-    void setProfile(size_t dom, size_t comp, const vector<double>& pos,
-                    const vector<double>& values);
+    void setProfile(size_t dom, size_t comp, const vector<CanteraDouble>& pos,
+                    const vector<CanteraDouble>& values);
 
     //! Set component 'comp' of domain 'dom' to value 'v' at all points.
-    void setFlatProfile(size_t dom, size_t comp, double v);
+    void setFlatProfile(size_t dom, size_t comp, CanteraDouble v);
 
     //! @}
 
@@ -219,22 +219,22 @@ public:
     //! @}
 
     //! @deprecated To be removed after %Cantera 3.0 (unused)
-    const double* solution() {
+    const CanteraDouble* solution() {
         warn_deprecated("Sim1D::solution",
             "This method is unused and will be removed after Cantera 3.0.");
         return m_state->data();
     }
 
-    void setTimeStep(double stepsize, size_t n, const int* tsteps);
+    void setTimeStep(CanteraDouble stepsize, size_t n, const int* tsteps);
 
     void solve(int loglevel = 0, bool refine_grid = true);
 
-    void eval(double rdt=-1.0, int count = 1) {
+    void eval(CanteraDouble rdt=-1.0, int count = 1) {
         OneDim::eval(npos, m_state->data(), m_xnew.data(), rdt, count);
     }
 
     // Evaluate the governing equations and return the vector of residuals
-    void getResidual(double rdt, double* resid) {
+    void getResidual(CanteraDouble rdt, CanteraDouble* resid) {
         OneDim::eval(npos, m_state->data(), resid, rdt, 0);
     }
 
@@ -242,29 +242,29 @@ public:
     int refine(int loglevel=0);
 
     //! Add node for fixed temperature point of freely propagating flame
-    int setFixedTemperature(double t);
+    int setFixedTemperature(CanteraDouble t);
 
     //! Return temperature at the point used to fix the flame location
-    double fixedTemperature();
+    CanteraDouble fixedTemperature();
 
     //! Return location of the point where temperature is fixed
-    double fixedTemperatureLocation();
+    CanteraDouble fixedTemperatureLocation();
 
     /**
      * Set grid refinement criteria. If dom >= 0, then the settings
      * apply only to the specified domain.  If dom < 0, the settings
      * are applied to each domain.  @see Refiner::setCriteria.
      */
-    void setRefineCriteria(int dom = -1, double ratio = 10.0,
-                           double slope = 0.8, double curve = 0.8,
-                           double prune = -0.1);
+    void setRefineCriteria(int dom = -1, CanteraDouble ratio = 10.0,
+                           CanteraDouble slope = 0.8, CanteraDouble curve = 0.8,
+                           CanteraDouble prune = -0.1);
 
     /**
      * Get the grid refinement criteria. dom must be greater than
      * or equal to zero (that is, the domain must be specified).
      * @see Refiner::getCriteria
      */
-    vector<double> getRefineCriteria(int dom);
+    vector<CanteraDouble> getRefineCriteria(int dom);
 
     /**
      * Set the maximum number of grid points in the domain. If dom >= 0,
@@ -286,7 +286,7 @@ public:
      *            to all domains.
      * @param gridmin The minimum allowable grid spacing [m]
      */
-    void setGridMin(int dom, double gridmin);
+    void setGridMin(int dom, CanteraDouble gridmin);
 
     //! Set the current solution vector to the last successful time-stepping
     //! solution. This can be used to examine the solver progress after a failed
@@ -301,20 +301,20 @@ public:
     void getInitialSoln();
 
     //! @deprecated To be removed after %Cantera 3.0 (unused)
-    void setSolution(const double* soln) {
+    void setSolution(const CanteraDouble* soln) {
         warn_deprecated("Sim1D::setSolution",
             "This method is unused and will be removed after Cantera 3.0.");
         std::copy(soln, soln + m_state->size(), m_state->data());
     }
 
     //! @deprecated To be removed after %Cantera 3.0 (unused)
-    const double* solution() const {
+    const CanteraDouble* solution() const {
         warn_deprecated("Sim1D::solution",
             "This method is unused and will be removed after Cantera 3.0.");
         return m_state->data();
     }
 
-    double jacobian(int i, int j);
+    CanteraDouble jacobian(int i, int j);
 
     void evalSSJacobian();
 
@@ -331,7 +331,7 @@ public:
      *         - \lambda^T \frac{\partial f}{\partial p}
      * @f]
      */
-    void solveAdjoint(const double* b, double* lambda);
+    void solveAdjoint(const CanteraDouble* b, CanteraDouble* lambda);
 
     void resize() override;
 
@@ -344,21 +344,21 @@ public:
 
 protected:
     //! the solution vector after the last successful timestepping
-    vector<double> m_xlast_ts;
+    vector<CanteraDouble> m_xlast_ts;
 
     //! the solution vector after the last successful steady-state solve (stored
     //! before grid refinement)
-    vector<double> m_xlast_ss;
+    vector<CanteraDouble> m_xlast_ss;
 
     //! the grids for each domain after the last successful steady-state solve
     //! (stored before grid refinement)
-    vector<vector<double>> m_grid_last_ss;
+    vector<vector<CanteraDouble>> m_grid_last_ss;
 
     //! a work array used to hold the residual or the new solution
-    vector<double> m_xnew;
+    vector<CanteraDouble> m_xnew;
 
     //! timestep
-    double m_tstep;
+    CanteraDouble m_tstep;
 
     //! array of number of steps to take before re-attempting the steady-state
     //! solution

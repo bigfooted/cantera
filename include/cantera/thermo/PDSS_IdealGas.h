@@ -33,18 +33,18 @@ public:
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
 
-    double intEnergy_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    double pressure() const override;
-    void setPressure(double pres) override;
-    void setTemperature(double temp) override;
-    void setState_TP(double temp, double pres) override;
-    void setState_TR(double temp, double rho) override;
+    CanteraDouble pressure() const override;
+    void setPressure(CanteraDouble pres) override;
+    void setTemperature(CanteraDouble temp) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
+    void setState_TR(CanteraDouble temp, CanteraDouble rho) override;
 
     //! @}
     //! @name Initialization of the Object

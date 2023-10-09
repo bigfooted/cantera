@@ -183,19 +183,19 @@ public:
      *          Note the actual converged solution is returned as part of the
      *          internal state of the InterfaceKinetics objects.
      */
-    int solveSurfProb(int ifunc, double time_scale, double TKelvin,
-                      double PGas, double reltol, double abstol);
+    int solveSurfProb(int ifunc, CanteraDouble time_scale, CanteraDouble TKelvin,
+                      CanteraDouble PGas, CanteraDouble reltol, CanteraDouble abstol);
 
 private:
     //! Printing routine that optionally gets called at the start of every
     //! invocation
-    void print_header(int ioflag, int ifunc, double time_scale,
-                      int damping, double reltol, double abstol);
+    void print_header(int ioflag, int ifunc, CanteraDouble time_scale,
+                      int damping, CanteraDouble reltol, CanteraDouble abstol);
 
     //! Printing routine that gets called after every iteration
-    void printIteration(int ioflag, double damp, int label_d, int label_t,
-                        double inv_t, double t_real, size_t iter,
-                        double update_norm, double resid_norm,
+    void printIteration(int ioflag, CanteraDouble damp, int label_d, int label_t,
+                        CanteraDouble inv_t, CanteraDouble t_real, size_t iter,
+                        CanteraDouble update_norm, CanteraDouble resid_norm,
                         bool do_time, bool final=false);
 
     //! Calculate a conservative delta T to use in a pseudo-steady state
@@ -225,9 +225,9 @@ private:
      * @param ioflag Level of the output requested.
      * @returns the 1. /  delta T to be used on the next step
      */
-    double calc_t(double netProdRateSolnSP[], double XMolSolnSP[],
+    CanteraDouble calc_t(CanteraDouble netProdRateSolnSP[], CanteraDouble XMolSolnSP[],
                   int* label, int* label_old,
-                  double* label_factor, int ioflag);
+                  CanteraDouble* label_factor, int ioflag);
 
     //! Calculate the solution and residual weights
     /*!
@@ -239,21 +239,21 @@ private:
      *  @param abstol     Absolute error tolerance
      *  @param reltol     Relative error tolerance
      */
-    void calcWeights(double wtSpecies[], double wtResid[],
-                     const Array2D& Jac, const double CSolnSP[],
-                     const double abstol, const double reltol);
+    void calcWeights(CanteraDouble wtSpecies[], CanteraDouble wtResid[],
+                     const Array2D& Jac, const CanteraDouble CSolnSP[],
+                     const CanteraDouble abstol, const CanteraDouble reltol);
 
     /**
      * Update the surface states of the surface phases.
      */
-    void updateState(const double* cSurfSpec);
+    void updateState(const CanteraDouble* cSurfSpec);
 
     //! Update mole fraction vector consisting of unknowns in surface problem
     /*!
      * @param XMolSolnSP  Vector of mole fractions for the unknowns in the
      *                    surface problem.
      */
-    void updateMFSolnSP(double* XMolSolnSP);
+    void updateMFSolnSP(CanteraDouble* XMolSolnSP);
 
     //! Update the mole fraction vector for a specific kinetic species vector
     //! corresponding to one InterfaceKinetics object
@@ -264,7 +264,7 @@ private:
      *                  phases in the InterfaceKinetics object
      * @param isp       ID of the InterfaceKinetics Object.
      */
-    void updateMFKinSpecies(double* XMolKinSp, int isp);
+    void updateMFKinSpecies(CanteraDouble* XMolKinSp, int isp);
 
     //! Update the vector that keeps track of the largest species in each
     //! surface phase.
@@ -272,7 +272,7 @@ private:
      * @param CSolnSP Vector of the current values of the surface concentrations
      *                in all of the surface species.
      */
-    void evalSurfLarge(const double* CSolnSP);
+    void evalSurfLarge(const CanteraDouble* CSolnSP);
 
     //! Main Function evaluation
     /*!
@@ -284,8 +284,8 @@ private:
      *  @param do_time Calculate a time dependent residual
      *  @param deltaT  Delta time for time dependent problem.
      */
-    void fun_eval(double* resid, const double* CSolnSP,
-                  const double* CSolnOldSP, const bool do_time, const double deltaT);
+    void fun_eval(CanteraDouble* resid, const CanteraDouble* CSolnSP,
+                  const CanteraDouble* CSolnOldSP, const bool do_time, const CanteraDouble deltaT);
 
     //! Main routine that calculates the current residual and Jacobian
     /*!
@@ -299,10 +299,10 @@ private:
      *  @param do_time Calculate a time dependent residual
      *  @param deltaT  Delta time for time dependent problem.
      */
-    void resjac_eval(DenseMatrix& jac, double* resid,
-                     double* CSolnSP,
-                     const double* CSolnSPOld, const bool do_time,
-                     const double deltaT);
+    void resjac_eval(DenseMatrix& jac, CanteraDouble* resid,
+                     CanteraDouble* CSolnSP,
+                     const CanteraDouble* CSolnSPOld, const bool do_time,
+                     const CanteraDouble deltaT);
 
     //! Vector of interface kinetics objects
     /*!
@@ -440,34 +440,34 @@ private:
     size_t m_maxTotSpecies = 0;
 
     //! Temporary vector with length equal to max m_maxTotSpecies
-    vector<double> m_netProductionRatesSave;
+    vector<CanteraDouble> m_netProductionRatesSave;
 
     //! Temporary vector with length equal to max m_maxTotSpecies
-    vector<double> m_numEqn1;
+    vector<CanteraDouble> m_numEqn1;
 
     //! Temporary vector with length equal to max m_maxTotSpecies
-    vector<double> m_numEqn2;
+    vector<CanteraDouble> m_numEqn2;
 
     //! Temporary vector with length equal to max m_maxTotSpecies
-    vector<double> m_CSolnSave;
+    vector<CanteraDouble> m_CSolnSave;
 
     //! Solution vector. length MAX(1, m_neq)
-    vector<double> m_CSolnSP;
+    vector<CanteraDouble> m_CSolnSP;
 
     //! Saved initial solution vector. length MAX(1, m_neq)
-    vector<double> m_CSolnSPInit;
+    vector<CanteraDouble> m_CSolnSPInit;
 
     //! Saved  solution vector at the old time step. length MAX(1, m_neq)
-    vector<double> m_CSolnSPOld;
+    vector<CanteraDouble> m_CSolnSPOld;
 
     //! Weights for the residual norm calculation. length MAX(1, m_neq)
-    vector<double> m_wtResid;
+    vector<CanteraDouble> m_wtResid;
 
     //! Weights for the species concentrations norm calculation
     /*!
      * length MAX(1, m_neq)
      */
-    vector<double> m_wtSpecies;
+    vector<CanteraDouble> m_wtSpecies;
 
     //!  Residual for the surface problem
     /*!
@@ -479,10 +479,10 @@ private:
      *
      * length MAX(1, m_neq)
      */
-    vector<double> m_resid;
+    vector<CanteraDouble> m_resid;
 
     //! Vector of mole fractions. length m_maxTotSpecies
-    vector<double> m_XMolKinSpecies;
+    vector<CanteraDouble> m_XMolKinSpecies;
 
     //! Jacobian. m_neq by m_neq computed Jacobian matrix for the local
     //! Newton's method.

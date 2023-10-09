@@ -31,10 +31,10 @@ public:
      * reciprocal of the time step. If zero, the steady-state Jacobian is
      * evaluated.
      */
-    void eval(double* x0, double* resid0, double rdt);
+    void eval(CanteraDouble* x0, CanteraDouble* resid0, CanteraDouble rdt);
 
     //! Elapsed CPU time spent computing the Jacobian.
-    double elapsedTime() const {
+    CanteraDouble elapsedTime() const {
         return m_elapsed;
     }
 
@@ -53,7 +53,7 @@ public:
         m_age++;
     }
 
-    void updateTransient(double rdt, integer* mask);
+    void updateTransient(CanteraDouble rdt, integer* mask);
 
     //! Set the Jacobian age.
     void setAge(int age) {
@@ -64,7 +64,7 @@ public:
         return m_mask;
     }
 
-    void incrementDiagonal(int j, double d);
+    void incrementDiagonal(int j, CanteraDouble d);
 
 protected:
     //! Residual evaluator for this Jacobian
@@ -74,11 +74,11 @@ protected:
      */
     OneDim* m_resid;
 
-    vector<double> m_r1;
-    double m_rtol = 1e-5;
-    double m_atol = sqrt(std::numeric_limits<double>::epsilon());
-    double m_elapsed = 0.0;
-    vector<double> m_ssdiag;
+    vector<CanteraDouble> m_r1;
+    CanteraDouble m_rtol = 1e-5;
+    CanteraDouble m_atol = sqrt(std::numeric_limits<CanteraDouble>::epsilon());
+    CanteraDouble m_elapsed = 0.0;
+    vector<CanteraDouble> m_ssdiag;
     vector<int> m_mask;
     int m_nevals = 0;
     int m_age = 100000;

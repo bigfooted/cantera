@@ -18,21 +18,21 @@ extern "C" {
     CANTERA_CAPI int rdiag_del(int i);
     CANTERA_CAPI int rdiag_detailed(int i);
     CANTERA_CAPI int rdiag_brief(int i);
-    CANTERA_CAPI int rdiag_setThreshold(int i, double v);
+    CANTERA_CAPI int rdiag_setThreshold(int i, CanteraDouble v);
     CANTERA_CAPI int rdiag_setBoldColor(int i, const char* color);
     CANTERA_CAPI int rdiag_setNormalColor(int i, const char* color);
     CANTERA_CAPI int rdiag_setDashedColor(int i, const char* color);
     CANTERA_CAPI int rdiag_setDotOptions(int i, const char* opt);
-    CANTERA_CAPI int rdiag_setBoldThreshold(int i, double v);
-    CANTERA_CAPI int rdiag_setNormalThreshold(int i, double v);
-    CANTERA_CAPI int rdiag_setLabelThreshold(int i, double v);
-    CANTERA_CAPI int rdiag_setScale(int i, double v);
+    CANTERA_CAPI int rdiag_setBoldThreshold(int i, CanteraDouble v);
+    CANTERA_CAPI int rdiag_setNormalThreshold(int i, CanteraDouble v);
+    CANTERA_CAPI int rdiag_setLabelThreshold(int i, CanteraDouble v);
+    CANTERA_CAPI int rdiag_setScale(int i, CanteraDouble v);
     CANTERA_CAPI int rdiag_setFlowType(int i, int iflow);
-    CANTERA_CAPI int rdiag_setArrowWidth(int i, double v);
+    CANTERA_CAPI int rdiag_setArrowWidth(int i, CanteraDouble v);
     CANTERA_CAPI int rdiag_setTitle(int i, const char* title);
     CANTERA_CAPI int rdiag_write(int i, int fmt, const char* fname);
     CANTERA_CAPI int rdiag_add(int i, int n);
-    CANTERA_CAPI int rdiag_findMajor(int i, double threshold, size_t lda, double* a);
+    CANTERA_CAPI int rdiag_findMajor(int i, CanteraDouble threshold, size_t lda, CanteraDouble* a);
     CANTERA_CAPI int rdiag_setFont(int i, const char* font);
     CANTERA_CAPI int rdiag_displayOnly(int i, int k);
 

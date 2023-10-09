@@ -108,7 +108,7 @@ pair<size_t, size_t> Kinetics::checkDuplicates(bool throw_err) const
 {
     //! Map of (key indicating participating species) to reaction numbers
     map<size_t, vector<size_t>> participants;
-    vector<map<int, double>> net_stoich;
+    vector<map<int, CanteraDouble>> net_stoich;
     std::unordered_set<size_t> unmatched_duplicates;
     for (size_t i = 0; i < m_reactions.size(); i++) {
         if (m_reactions[i]->duplicate) {
@@ -121,7 +121,7 @@ pair<size_t, size_t> Kinetics::checkDuplicates(bool throw_err) const
         unsigned long int key = 0;
         Reaction& R = *m_reactions[i];
         net_stoich.emplace_back();
-        map<int, double>& net = net_stoich.back();
+        map<int, CanteraDouble>& net = net_stoich.back();
         for (const auto& [name, stoich] : R.reactants) {
             int k = static_cast<int>(kineticsSpeciesIndex(name));
             key += k*(k+1);
@@ -149,7 +149,7 @@ pair<size_t, size_t> Kinetics::checkDuplicates(bool throw_err) const
             {
                 continue; // different rate parameterizations
             }
-            double c = checkDuplicateStoich(net_stoich[i], net_stoich[m]);
+            CanteraDouble c = checkDuplicateStoich(net_stoich[i], net_stoich[m]);
             if (c == 0) {
                 continue; // stoichiometries differ (not by a multiple)
             } else if (c < 0.0 && !R.reversible && !other.reversible) {
@@ -197,7 +197,7 @@ pair<size_t, size_t> Kinetics::checkDuplicates(bool throw_err) const
     return {npos, npos};
 }
 
-double Kinetics::checkDuplicateStoich(map<int, double>& r1, map<int, double>& r2) const
+CanteraDouble Kinetics::checkDuplicateStoich(map<int, CanteraDouble>& r1, map<int, CanteraDouble>& r2) const
 {
     std::unordered_set<int> keys; // species keys (k+1 or -k-1)
     for (auto& [speciesKey, stoich] : r1) {
@@ -208,7 +208,7 @@ double Kinetics::checkDuplicateStoich(map<int, double>& r1, map<int, double>& r2
     }
     int k1 = r1.begin()->first;
     // check for duplicate written in the same direction
-    double ratio = 0.0;
+    CanteraDouble ratio = 0.0;
     if (r1[k1] && r2[k1]) {
         ratio = r2[k1]/r1[k1];
         bool different = false;
@@ -240,8 +240,8 @@ double Kinetics::checkDuplicateStoich(map<int, double>& r1, map<int, double>& r2
     return ratio;
 }
 
-void Kinetics::selectPhase(const double* data, const ThermoPhase* phase,
-                           double* phase_data)
+void Kinetics::selectPhase(const CanteraDouble* data, const ThermoPhase* phase,
+                           CanteraDouble* phase_data)
 {
     warn_deprecated("Kinetics::selectPhase", "To be removed after Cantera 3.0");
     for (size_t n = 0; n < nPhases(); n++) {
@@ -331,12 +331,12 @@ size_t Kinetics::speciesPhaseIndex(size_t k) const
                        "illegal species index: {}", k);
 }
 
-double Kinetics::reactantStoichCoeff(size_t kSpec, size_t irxn) const
+CanteraDouble Kinetics::reactantStoichCoeff(size_t kSpec, size_t irxn) const
 {
     return m_reactantStoich.stoichCoeffs().coeff(kSpec, irxn);
 }
 
-double Kinetics::productStoichCoeff(size_t kSpec, size_t irxn) const
+CanteraDouble Kinetics::productStoichCoeff(size_t kSpec, size_t irxn) const
 {
     return m_productStoich.stoichCoeffs().coeff(kSpec, irxn);
 }
@@ -371,25 +371,25 @@ string Kinetics::productString(size_t i) const
     return m_reactions[i]->productString();
 }
 
-void Kinetics::getFwdRatesOfProgress(double* fwdROP)
+void Kinetics::getFwdRatesOfProgress(CanteraDouble* fwdROP)
 {
     updateROP();
     std::copy(m_ropf.begin(), m_ropf.end(), fwdROP);
 }
 
-void Kinetics::getRevRatesOfProgress(double* revROP)
+void Kinetics::getRevRatesOfProgress(CanteraDouble* revROP)
 {
     updateROP();
     std::copy(m_ropr.begin(), m_ropr.end(), revROP);
 }
 
-void Kinetics::getNetRatesOfProgress(double* netROP)
+void Kinetics::getNetRatesOfProgress(CanteraDouble* netROP)
 {
     updateROP();
     std::copy(m_ropnet.begin(), m_ropnet.end(), netROP);
 }
 
-void Kinetics::getReactionDelta(const double* prop, double* deltaProp) const
+void Kinetics::getReactionDelta(const CanteraDouble* prop, CanteraDouble* deltaProp) const
 {
     fill(deltaProp, deltaProp + nReactions(), 0.0);
     // products add
@@ -398,7 +398,7 @@ void Kinetics::getReactionDelta(const double* prop, double* deltaProp) const
     m_reactantStoich.decrementReactions(prop, deltaProp);
 }
 
-void Kinetics::getRevReactionDelta(const double* prop, double* deltaProp) const
+void Kinetics::getRevReactionDelta(const CanteraDouble* prop, CanteraDouble* deltaProp) const
 {
     fill(deltaProp, deltaProp + nReactions(), 0.0);
     // products add
@@ -407,7 +407,7 @@ void Kinetics::getRevReactionDelta(const double* prop, double* deltaProp) const
     m_reactantStoich.decrementReactions(prop, deltaProp);
 }
 
-void Kinetics::getCreationRates(double* cdot)
+void Kinetics::getCreationRates(CanteraDouble* cdot)
 {
     updateROP();
 
@@ -421,7 +421,7 @@ void Kinetics::getCreationRates(double* cdot)
     m_reactantStoich.incrementSpecies(m_ropr.data(), cdot);
 }
 
-void Kinetics::getDestructionRates(double* ddot)
+void Kinetics::getDestructionRates(CanteraDouble* ddot)
 {
     updateROP();
 
@@ -432,7 +432,7 @@ void Kinetics::getDestructionRates(double* ddot)
     m_reactantStoich.incrementSpecies(m_ropf.data(), ddot);
 }
 
-void Kinetics::getNetProductionRates(double* net)
+void Kinetics::getNetProductionRates(CanteraDouble* net)
 {
     updateROP();
 
@@ -443,7 +443,7 @@ void Kinetics::getNetProductionRates(double* net)
     m_reactantStoich.decrementSpecies(m_ropnet.data(), net);
 }
 
-void Kinetics::getCreationRates_ddT(double* dwdot)
+void Kinetics::getCreationRates_ddT(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -455,7 +455,7 @@ void Kinetics::getCreationRates_ddT(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-void Kinetics::getCreationRates_ddP(double* dwdot)
+void Kinetics::getCreationRates_ddP(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -467,7 +467,7 @@ void Kinetics::getCreationRates_ddP(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-void Kinetics::getCreationRates_ddC(double* dwdot)
+void Kinetics::getCreationRates_ddC(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -479,9 +479,9 @@ void Kinetics::getCreationRates_ddC(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-Eigen::SparseMatrix<double> Kinetics::creationRates_ddX()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::creationRates_ddX()
 {
-    Eigen::SparseMatrix<double> jac;
+    Eigen::SparseMatrix<CanteraDouble> jac;
     // the forward direction creates product species
     jac = m_productStoich.stoichCoeffs() * fwdRatesOfProgress_ddX();
     // the reverse direction creates reactant species
@@ -489,9 +489,9 @@ Eigen::SparseMatrix<double> Kinetics::creationRates_ddX()
     return jac;
 }
 
-Eigen::SparseMatrix<double> Kinetics::creationRates_ddCi()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::creationRates_ddCi()
 {
-    Eigen::SparseMatrix<double> jac;
+    Eigen::SparseMatrix<CanteraDouble> jac;
     // the forward direction creates product species
     jac = m_productStoich.stoichCoeffs() * fwdRatesOfProgress_ddCi();
     // the reverse direction creates reactant species
@@ -499,7 +499,7 @@ Eigen::SparseMatrix<double> Kinetics::creationRates_ddCi()
     return jac;
 }
 
-void Kinetics::getDestructionRates_ddT(double* dwdot)
+void Kinetics::getDestructionRates_ddT(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -511,7 +511,7 @@ void Kinetics::getDestructionRates_ddT(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-void Kinetics::getDestructionRates_ddP(double* dwdot)
+void Kinetics::getDestructionRates_ddP(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -523,7 +523,7 @@ void Kinetics::getDestructionRates_ddP(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-void Kinetics::getDestructionRates_ddC(double* dwdot)
+void Kinetics::getDestructionRates_ddC(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -535,9 +535,9 @@ void Kinetics::getDestructionRates_ddC(double* dwdot)
     out += m_reactantStoich.stoichCoeffs() * buf;
 }
 
-Eigen::SparseMatrix<double> Kinetics::destructionRates_ddX()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::destructionRates_ddX()
 {
-    Eigen::SparseMatrix<double> jac;
+    Eigen::SparseMatrix<CanteraDouble> jac;
     // the reverse direction destroys products in reversible reactions
     jac = m_revProductStoich.stoichCoeffs() * revRatesOfProgress_ddX();
     // the forward direction destroys reactants
@@ -545,9 +545,9 @@ Eigen::SparseMatrix<double> Kinetics::destructionRates_ddX()
     return jac;
 }
 
-Eigen::SparseMatrix<double> Kinetics::destructionRates_ddCi()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::destructionRates_ddCi()
 {
-    Eigen::SparseMatrix<double> jac;
+    Eigen::SparseMatrix<CanteraDouble> jac;
     // the reverse direction destroys products in reversible reactions
     jac = m_revProductStoich.stoichCoeffs() * revRatesOfProgress_ddCi();
     // the forward direction destroys reactants
@@ -555,7 +555,7 @@ Eigen::SparseMatrix<double> Kinetics::destructionRates_ddCi()
     return jac;
 }
 
-void Kinetics::getNetProductionRates_ddT(double* dwdot)
+void Kinetics::getNetProductionRates_ddT(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -563,7 +563,7 @@ void Kinetics::getNetProductionRates_ddT(double* dwdot)
     out = m_stoichMatrix * buf;
 }
 
-void Kinetics::getNetProductionRates_ddP(double* dwdot)
+void Kinetics::getNetProductionRates_ddP(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -571,7 +571,7 @@ void Kinetics::getNetProductionRates_ddP(double* dwdot)
     out = m_stoichMatrix * buf;
 }
 
-void Kinetics::getNetProductionRates_ddC(double* dwdot)
+void Kinetics::getNetProductionRates_ddC(CanteraDouble* dwdot)
 {
     Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
     Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
@@ -579,12 +579,12 @@ void Kinetics::getNetProductionRates_ddC(double* dwdot)
     out = m_stoichMatrix * buf;
 }
 
-Eigen::SparseMatrix<double> Kinetics::netProductionRates_ddX()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::netProductionRates_ddX()
 {
     return m_stoichMatrix * netRatesOfProgress_ddX();
 }
 
-Eigen::SparseMatrix<double> Kinetics::netProductionRates_ddCi()
+Eigen::SparseMatrix<CanteraDouble> Kinetics::netProductionRates_ddCi()
 {
     return m_stoichMatrix * netRatesOfProgress_ddCi();
 }
@@ -691,7 +691,7 @@ bool Kinetics::addReaction(shared_ptr<Reaction> r, bool resize)
 
     // Reactant and product stoichiometric coefficients, such that rstoich[i] is
     // the coefficient for species rk[i]
-    vector<double> rstoich, pstoich;
+    vector<CanteraDouble> rstoich, pstoich;
 
     for (const auto& [name, stoich] : r->reactants) {
         rk.push_back(kineticsSpeciesIndex(name));
@@ -706,7 +706,7 @@ bool Kinetics::addReaction(shared_ptr<Reaction> r, bool resize)
     // The default order for each reactant is its stoichiometric coefficient,
     // which can be overridden by entries in the Reaction.orders map. rorder[i]
     // is the order for species rk[i].
-    vector<double> rorder = rstoich;
+    vector<CanteraDouble> rorder = rstoich;
     for (const auto& [name, order] : r->orders) {
         size_t k = kineticsSpeciesIndex(name);
         // Find the index of species k within rk
@@ -793,14 +793,14 @@ shared_ptr<const Reaction> Kinetics::reaction(size_t i) const
     return m_reactions[i];
 }
 
-double Kinetics::reactionEnthalpy(const Composition& reactants, const Composition& products)
+CanteraDouble Kinetics::reactionEnthalpy(const Composition& reactants, const Composition& products)
 {
     warn_deprecated("Kinetics::reactionEnthalpy", "To be removed after Cantera 3.0");
-    vector<double> hk(nTotalSpecies());
+    vector<CanteraDouble> hk(nTotalSpecies());
     for (size_t n = 0; n < nPhases(); n++) {
         thermo(n).getPartialMolarEnthalpies(&hk[m_start[n]]);
     }
-    double rxn_deltaH = 0;
+    CanteraDouble rxn_deltaH = 0;
     for (const auto& [name, stoich] : products) {
         size_t k = kineticsSpeciesIndex(name);
         rxn_deltaH += hk[k] * stoich;

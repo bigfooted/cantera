@@ -56,11 +56,11 @@ void IonGasTransport::init(ThermoPhase* thermo, int mode, int log_level)
     }
     // set up O2/O2- collision integral [A^2]
     // Data taken from Prager (2005)
-    const vector<double> temp{300.0, 400.0, 500.0, 600.0, 800.0, 1000.0,
+    const vector<CanteraDouble> temp{300.0, 400.0, 500.0, 600.0, 800.0, 1000.0,
                          1200.0, 1500.0, 2000.0, 2500.0, 3000.0, 4000.0};
-    const vector<double> om11_O2{120.0, 107.0, 98.1, 92.1, 83.0, 77.0,
+    const vector<CanteraDouble> om11_O2{120.0, 107.0, 98.1, 92.1, 83.0, 77.0,
                             72.6, 67.9, 62.7, 59.3, 56.7, 53.8};
-    vector<double> w(temp.size(),-1);
+    vector<CanteraDouble> w(temp.size(),-1);
     int degree = 5;
     m_om11_O2.resize(degree + 1);
     polyfit(temp.size(), degree, temp.data(), om11_O2.data(),
@@ -93,7 +93,7 @@ void IonGasTransport::init(ThermoPhase* thermo, int mode, int log_level)
     }
 }
 
-double IonGasTransport::viscosity()
+CanteraDouble IonGasTransport::viscosity()
 {
     update_T();
     update_C();
@@ -102,7 +102,7 @@ double IonGasTransport::viscosity()
         return m_viscmix;
     }
 
-    double vismix = 0.0;
+    CanteraDouble vismix = 0.0;
     // update m_visc and m_phi if necessary
     if (!m_viscwt_ok) {
         updateViscosity_T();
@@ -117,7 +117,7 @@ double IonGasTransport::viscosity()
     return vismix;
 }
 
-double IonGasTransport::thermalConductivity()
+CanteraDouble IonGasTransport::thermalConductivity()
 {
     update_T();
     update_C();
@@ -125,7 +125,7 @@ double IonGasTransport::thermalConductivity()
         updateCond_T();
     }
     if (!m_condmix_ok) {
-        double sum1 = 0.0, sum2 = 0.0;
+        CanteraDouble sum1 = 0.0, sum2 = 0.0;
         for (size_t k : m_kNeutral) {
             sum1 += m_molefracs[k] * m_cond[k];
             sum2 += m_molefracs[k] / m_cond[k];
@@ -136,14 +136,14 @@ double IonGasTransport::thermalConductivity()
     return m_lambda;
 }
 
-double IonGasTransport::electricalConductivity()
+CanteraDouble IonGasTransport::electricalConductivity()
 {
-    vector<double> mobi(m_nsp);
+    vector<CanteraDouble> mobi(m_nsp);
     getMobilities(&mobi[0]);
-    double p = m_thermo->pressure();
-    double sum = 0.0;
+    CanteraDouble p = m_thermo->pressure();
+    CanteraDouble sum = 0.0;
     for (size_t k : m_kIon) {
-        double ND_k = m_molefracs[k] * p / m_kbt;
+        CanteraDouble ND_k = m_molefracs[k] * p / m_kbt;
         sum += ND_k * std::abs(m_speciesCharge[k]) * ElectronCharge * mobi[k];
     }
     if (m_kElectron != npos) {
@@ -160,22 +160,22 @@ void IonGasTransport::fitDiffCoeffs(MMCollisionInt& integrals)
     // number of points to use in generating fit data
     const size_t np = 50;
     int degree = 4;
-    double dt = (m_thermo->maxTemp() - m_thermo->minTemp())/(np-1);
-    vector<double> tlog(np);
-    vector<double> w(np);
+    CanteraDouble dt = (m_thermo->maxTemp() - m_thermo->minTemp())/(np-1);
+    vector<CanteraDouble> tlog(np);
+    vector<CanteraDouble> w(np);
 
     // generate array of log(t) values
     for (size_t n = 0; n < np; n++) {
-        double t = m_thermo->minTemp() + dt*n;
+        CanteraDouble t = m_thermo->minTemp() + dt*n;
         tlog[n] = log(t);
     }
 
     // vector of polynomial coefficients
-    vector<double> c(degree + 1);
-    double err = 0.0, relerr = 0.0,
+    vector<CanteraDouble> c(degree + 1);
+    CanteraDouble err = 0.0, relerr = 0.0,
            mxerr = 0.0, mxrelerr = 0.0;
 
-    vector<double> diff(np + 1);
+    vector<CanteraDouble> diff(np + 1);
     // The array order still not ideal
     for (size_t k = 0; k < m_nsp; k++) {
         for (size_t j = k; j < m_nsp; j++) {
@@ -193,11 +193,11 @@ void IonGasTransport::fitDiffCoeffs(MMCollisionInt& integrals)
                 }
             }
             for (size_t n = 0; n < np; n++) {
-                double t = m_thermo->minTemp() + dt*n;
-                double eps = m_epsilon(j,k);
-                double tstar = Boltzmann * t/eps;
-                double sigma = m_diam(j,k);
-                double om11 = omega11_n64(tstar, m_gamma(j,k))
+                CanteraDouble t = m_thermo->minTemp() + dt*n;
+                CanteraDouble eps = m_epsilon(j,k);
+                CanteraDouble tstar = Boltzmann * t/eps;
+                CanteraDouble sigma = m_diam(j,k);
+                CanteraDouble om11 = omega11_n64(tstar, m_gamma(j,k))
                               * Pi * sigma * sigma;
                 // Stockmayer-(n,6,4) model is not suitable for collision
                 // between O2/O2- due to resonant charge transfer.
@@ -208,7 +208,7 @@ void IonGasTransport::fitDiffCoeffs(MMCollisionInt& integrals)
                      j == m_thermo->speciesIndex("O2"))) {
                        om11 = poly5(t, m_om11_O2.data()) / 1e20;
                 }
-                double diffcoeff = 3.0/16.0 * sqrt(2.0 * Pi/m_reducedMass(k,j))
+                CanteraDouble diffcoeff = 3.0/16.0 * sqrt(2.0 * Pi/m_reducedMass(k,j))
                     * pow(Boltzmann * t, 1.5) / om11;
 
                 diff[n] = diffcoeff/pow(t, 1.5);
@@ -217,9 +217,9 @@ void IonGasTransport::fitDiffCoeffs(MMCollisionInt& integrals)
             polyfit(np, degree, tlog.data(), diff.data(), w.data(), c.data());
 
             for (size_t n = 0; n < np; n++) {
-                double val, fit;
-                double t = exp(tlog[n]);
-                double pre = pow(t, 1.5);
+                CanteraDouble val, fit;
+                CanteraDouble t = exp(tlog[n]);
+                CanteraDouble pre = pow(t, 1.5);
                 val = pre * diff[n];
                 fit = pre * poly4(tlog[n], c.data());
                 err = fit - val;
@@ -250,24 +250,24 @@ void IonGasTransport::setupN64()
     for (size_t i : m_kIon) {
         for (size_t j : m_kNeutral) {
             if (m_alpha[j] != 0.0 && m_alpha[i] != 0.0) {
-                double r_alpha = m_alpha[i] / m_alpha[j];
+                CanteraDouble r_alpha = m_alpha[i] / m_alpha[j];
                 // save a copy of polarizability in Angstrom
-                double alphaA_i = m_alpha[i] * 1e30;
-                double alphaA_j = m_alpha[j] * 1e30;
+                CanteraDouble alphaA_i = m_alpha[i] * 1e30;
+                CanteraDouble alphaA_j = m_alpha[j] * 1e30;
                 // The ratio of dispersion to induction forces
-                double xi = alphaA_i / (m_speciesCharge[i] * m_speciesCharge[i] *
+                CanteraDouble xi = alphaA_i / (m_speciesCharge[i] * m_speciesCharge[i] *
                             (1.0 + pow(2 * r_alpha, 2./3.)) * sqrt(alphaA_j));
 
                 // the collision diameter
-                double K1 = 1.767;
-                double kappa = 0.095;
+                CanteraDouble K1 = 1.767;
+                CanteraDouble kappa = 0.095;
                 m_diam(i,j) = K1 * (pow(m_alpha[i], 1./3.) + pow(m_alpha[j], 1./3.)) /
                               pow(alphaA_i * alphaA_j * (1.0 + 1.0 / xi), kappa);
 
                 // The original K2 is 0.72, but Han et al. suggested that K2 = 1.44
                 // for better fit.
-                double K2 = 1.44;
-                double epsilon = K2 * ElectronCharge * ElectronCharge *
+                CanteraDouble K2 = 1.44;
+                CanteraDouble epsilon = K2 * ElectronCharge * ElectronCharge *
                                  m_speciesCharge[i] * m_speciesCharge[i] *
                                  m_alpha[j] * (1.0 + xi) /
                                  (8 * Pi * epsilon_0 * pow(m_diam(i,j),4));
@@ -297,7 +297,7 @@ void IonGasTransport::setupN64()
                 // Reference:
                 // Tang, K. T. "Dynamic polarizabilities and van der Waals coefficients."
                 // Physical Review 177.1 (1969): 108.
-                double C6 = 2.0 * m_disp[i] * m_disp[j] /
+                CanteraDouble C6 = 2.0 * m_disp[i] * m_disp[j] /
                             (1.0/r_alpha * m_disp[i] + r_alpha * m_disp[j]);
 
                 m_gamma(i,j) = (2.0 / pow(m_speciesCharge[i],2) * C6 + m_quad_polar[j]) /
@@ -312,10 +312,10 @@ void IonGasTransport::setupN64()
     }
 }
 
-double IonGasTransport::omega11_n64(const double tstar, const double gamma)
+CanteraDouble IonGasTransport::omega11_n64(const CanteraDouble tstar, const CanteraDouble gamma)
 {
-    double logtstar = log(tstar);
-    double om11 = 0.0;
+    CanteraDouble logtstar = log(tstar);
+    CanteraDouble om11 = 0.0;
     if (tstar < 0.01) {
         throw CanteraError("IonGasTransport::omega11_n64",
                            "tstar = {} is smaller than 0.01", tstar);
@@ -344,7 +344,7 @@ double IonGasTransport::omega11_n64(const double tstar, const double gamma)
     return om11;
 }
 
-void IonGasTransport::getMixDiffCoeffs(double* const d)
+void IonGasTransport::getMixDiffCoeffs(CanteraDouble* const d)
 {
     update_T();
     update_C();
@@ -354,8 +354,8 @@ void IonGasTransport::getMixDiffCoeffs(double* const d)
         updateDiff_T();
     }
 
-    double mmw = m_thermo->meanMolecularWeight();
-    double p = m_thermo->pressure();
+    CanteraDouble mmw = m_thermo->meanMolecularWeight();
+    CanteraDouble p = m_thermo->pressure();
     if (m_nsp == 1) {
         d[0] = m_bdiff(0,0) / p;
     } else {
@@ -363,7 +363,7 @@ void IonGasTransport::getMixDiffCoeffs(double* const d)
             if (k == m_kElectron) {
                 d[k] = 0.4 * m_kbt / ElectronCharge;
             } else {
-                double sum2 = 0.0;
+                CanteraDouble sum2 = 0.0;
                 for (size_t j : m_kNeutral) {
                     if (j != k) {
                         sum2 += m_molefracs[j] / m_bdiff(j,k);
@@ -379,7 +379,7 @@ void IonGasTransport::getMixDiffCoeffs(double* const d)
     }
 }
 
-void IonGasTransport::getMobilities(double* const mobi)
+void IonGasTransport::getMobilities(CanteraDouble* const mobi)
 {
     update_T();
     update_C();
@@ -388,7 +388,7 @@ void IonGasTransport::getMobilities(double* const mobi)
     if (!m_bindiff_ok) {
         updateDiff_T();
     }
-    double p = m_thermo->pressure();
+    CanteraDouble p = m_thermo->pressure();
     for (size_t k = 0; k < m_nsp; k++) {
         if (k == m_kElectron) {
             mobi[k] = 0.4;
@@ -397,9 +397,9 @@ void IonGasTransport::getMobilities(double* const mobi)
         }
     }
     for (size_t k : m_kIon) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t j : m_kNeutral) {
-            double bmobi = m_bdiff(k,j) * ElectronCharge / m_kbt;
+            CanteraDouble bmobi = m_bdiff(k,j) * ElectronCharge / m_kbt;
             sum += m_molefracs[j] / bmobi;
         }
         mobi[k] = 1.0 / sum / p;

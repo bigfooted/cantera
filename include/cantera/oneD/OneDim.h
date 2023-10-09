@@ -58,7 +58,7 @@ public:
      * @param x1         Final solution satisfying F(x1) = 0.
      * @param loglevel   Controls amount of diagnostic output.
      */
-    int solve(double* x0, double* x1, int loglevel);
+    int solve(CanteraDouble* x0, CanteraDouble* x1, int loglevel);
 
     //! Number of domains.
     size_t nDomains() const {
@@ -154,15 +154,15 @@ public:
      * solution x. On return, array r contains the steady-state residual
      * values. Used only for diagnostic output.
      */
-    double ssnorm(double* x, double* r);
+    CanteraDouble ssnorm(CanteraDouble* x, CanteraDouble* r);
 
     //! Reciprocal of the time step.
-    double rdt() const {
+    CanteraDouble rdt() const {
         return m_rdt;
     }
 
     //! Prepare for time stepping beginning with solution *x* and timestep *dt*.
-    void initTimeInteg(double dt, double* x);
+    void initTimeInteg(CanteraDouble dt, CanteraDouble* x);
 
     //! True if transient mode.
     bool transient() const {
@@ -193,7 +193,7 @@ public:
      *                  the default value is used.
      * @param count   Set to zero to omit this call from the statistics
      */
-    void eval(size_t j, double* x, double* r, double rdt=-1.0, int count = 1);
+    void eval(size_t j, CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt=-1.0, int count = 1);
 
     //! Return a pointer to the domain global point *i* belongs to.
     /*!
@@ -219,9 +219,9 @@ public:
      * @param loglevel controls amount of printed diagnostics
      * @returns size of last timestep taken
      */
-    double timeStep(int nsteps, double dt, double* x, double* r, int loglevel);
+    CanteraDouble timeStep(int nsteps, CanteraDouble dt, CanteraDouble* x, CanteraDouble* r, int loglevel);
 
-    void resetBadValues(double* x);
+    void resetBadValues(CanteraDouble* x);
 
     //! Write statistics about the number of iterations and Jacobians at each
     //! grid level
@@ -233,16 +233,16 @@ public:
     void writeStats(int printTime = 1);
 
     //! @deprecated To be removed after %Cantera 3.0; unused.
-    AnyMap serialize(const double* soln) const;
+    AnyMap serialize(const CanteraDouble* soln) const;
 
     // options
-    void setMinTimeStep(double tmin) {
+    void setMinTimeStep(CanteraDouble tmin) {
         m_tmin = tmin;
     }
-    void setMaxTimeStep(double tmax) {
+    void setMaxTimeStep(CanteraDouble tmax) {
         m_tmax = tmax;
     }
-    void setTimeStepFactor(double tfactor) {
+    void setTimeStepFactor(CanteraDouble tfactor) {
         m_tfactor = tfactor;
     }
 
@@ -284,14 +284,14 @@ public:
     }
 
     //! Return CPU time spent evaluating Jacobians in each call to solve()
-    const vector<double>& jacobianTimeStats() {
+    const vector<CanteraDouble>& jacobianTimeStats() {
         saveStats();
         return m_jacElapsed;
     }
 
     //! Return CPU time spent on non-Jacobian function evaluations in each call
     //! to solve()
-    const vector<double>& evalTimeStats() {
+    const vector<CanteraDouble>& evalTimeStats() {
         saveStats();
         return m_funcElapsed;
     }
@@ -331,19 +331,19 @@ public:
     }
 
 protected:
-    void evalSSJacobian(double* x, double* xnew);
+    void evalSSJacobian(CanteraDouble* x, CanteraDouble* xnew);
 
-    double m_tmin = 1e-16; //!< minimum timestep size
-    double m_tmax = 1e+08; //!< maximum timestep size
+    CanteraDouble m_tmin = 1e-16; //!< minimum timestep size
+    CanteraDouble m_tmax = 1e+08; //!< maximum timestep size
 
     //! factor time step is multiplied by  if time stepping fails ( < 1 )
-    double m_tfactor = 0.5;
+    CanteraDouble m_tfactor = 0.5;
 
-    shared_ptr<vector<double>> m_state; //!< Solution vector
+    shared_ptr<vector<CanteraDouble>> m_state; //!< Solution vector
 
     unique_ptr<MultiJac> m_jac; //!< Jacobian evaluator
     unique_ptr<MultiNewton> m_newt; //!< Newton iterator
-    double m_rdt = 0.0; //!< reciprocal of time step
+    CanteraDouble m_rdt = 0.0; //!< reciprocal of time step
     bool m_jac_ok = false; //!< if true, Jacobian is current
 
     size_t m_bw = 0; //!< Jacobian bandwidth
@@ -382,12 +382,12 @@ protected:
 private:
     // statistics
     int m_nevals = 0;
-    double m_evaltime = 0;
+    CanteraDouble m_evaltime = 0;
     vector<size_t> m_gridpts;
     vector<int> m_jacEvals;
-    vector<double> m_jacElapsed;
+    vector<CanteraDouble> m_jacElapsed;
     vector<int> m_funcEvals;
-    vector<double> m_funcElapsed;
+    vector<CanteraDouble> m_funcElapsed;
 
     //! Number of time steps taken in each call to solve() (for example, for each
     //! successive grid refinement)

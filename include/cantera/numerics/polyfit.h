@@ -30,8 +30,8 @@ namespace Cantera
  * @returns the root mean squared error of the fit at the input points.
  * @ingroup mathUtils
  */
-double polyfit(size_t n, size_t deg, const double* x, const double* y,
-               const double* w, double* p);
+CanteraDouble polyfit(size_t n, size_t deg, const CanteraDouble* x, const CanteraDouble* y,
+               const CanteraDouble* w, CanteraDouble* p);
 
 }
 #endif

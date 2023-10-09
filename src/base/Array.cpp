@@ -12,14 +12,14 @@
 namespace Cantera
 {
 
-Array2D::Array2D(const size_t m, const size_t n, const double v)
+Array2D::Array2D(const size_t m, const size_t n, const CanteraDouble v)
     : m_nrows(m)
     , m_ncols(n)
 {
     m_data.assign(n*m, v);
 }
 
-Array2D::Array2D(const size_t m, const size_t n, const double* values)
+Array2D::Array2D(const size_t m, const size_t n, const CanteraDouble* values)
     : m_nrows(m)
     , m_ncols(n)
 {
@@ -44,14 +44,14 @@ Array2D& Array2D::operator=(const Array2D& y)
     return *this;
 }
 
-void Array2D::resize(size_t n, size_t m, double v)
+void Array2D::resize(size_t n, size_t m, CanteraDouble v)
 {
     m_nrows = n;
     m_ncols = m;
     m_data.resize(n*m, v);
 }
 
-void Array2D::appendColumn(const vector<double>& c)
+void Array2D::appendColumn(const vector<CanteraDouble>& c)
 {
     m_ncols++;
     m_data.resize(m_nrows * m_ncols);
@@ -60,7 +60,7 @@ void Array2D::appendColumn(const vector<double>& c)
     }
 }
 
-void Array2D::appendColumn(const double* const c)
+void Array2D::appendColumn(const CanteraDouble* const c)
 {
     m_ncols++;
     m_data.resize(m_nrows * m_ncols);
@@ -69,28 +69,28 @@ void Array2D::appendColumn(const double* const c)
     }
 }
 
-void Array2D::setRow(size_t n, const double* const rw)
+void Array2D::setRow(size_t n, const CanteraDouble* const rw)
 {
     for (size_t j = 0; j < m_ncols; j++) {
         m_data[m_nrows*j + n] = rw[j];
     }
 }
 
-void Array2D::getRow(size_t n, double* const rw)
+void Array2D::getRow(size_t n, CanteraDouble* const rw)
 {
     for (size_t j = 0; j < m_ncols; j++) {
         rw[j] = m_data[m_nrows*j + n];
     }
 }
 
-void Array2D::setColumn(size_t m, double* const col)
+void Array2D::setColumn(size_t m, CanteraDouble* const col)
 {
     for (size_t i = 0; i < m_nrows; i++) {
         m_data[m_nrows*m + i] = col[i];
     }
 }
 
-void Array2D::getColumn(size_t m, double* const col)
+void Array2D::getColumn(size_t m, CanteraDouble* const col)
 {
     for (size_t i = 0; i < m_nrows; i++) {
         col[i] = m_data[m_nrows*m + i];
@@ -131,7 +131,7 @@ std::ostream& operator<<(std::ostream& s, const Array2D& m)
     return s;
 }
 
-void operator*=(Array2D& m, double a)
+void operator*=(Array2D& m, CanteraDouble a)
 {
     scale(m.begin(), m.end(), m.begin(), a);
 }

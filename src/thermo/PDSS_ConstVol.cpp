@@ -45,32 +45,32 @@ void PDSS_ConstVol::getParameters(AnyMap &eosNode) const
     }
 }
 
-double PDSS_ConstVol::intEnergy_mole() const
+CanteraDouble PDSS_ConstVol::intEnergy_mole() const
 {
-    double pV = (m_pres * m_Vss);
+    CanteraDouble pV = (m_pres * m_Vss);
     return m_h0_RT * GasConstant * m_temp - pV;
 }
 
-double PDSS_ConstVol::cv_mole() const
+CanteraDouble PDSS_ConstVol::cv_mole() const
 {
     return (cp_mole() - m_V0);
 }
 
-void PDSS_ConstVol::setPressure(double p)
+void PDSS_ConstVol::setPressure(CanteraDouble p)
 {
     m_pres = p;
-    double del_pRT = (m_pres - m_p0) / (GasConstant * m_temp);
+    CanteraDouble del_pRT = (m_pres - m_p0) / (GasConstant * m_temp);
     m_hss_RT = m_h0_RT + del_pRT * m_Vss;
     m_gss_RT = m_hss_RT - m_sss_R;
 }
 
-void PDSS_ConstVol::setTemperature(double temp)
+void PDSS_ConstVol::setTemperature(CanteraDouble temp)
 {
     m_temp = temp;
     m_spthermo->updatePropertiesTemp(temp, &m_cp0_R, &m_h0_RT, &m_s0_R);
     m_g0_RT = m_h0_RT - m_s0_R;
 
-    double del_pRT = (m_pres - m_p0) / (GasConstant * m_temp);
+    CanteraDouble del_pRT = (m_pres - m_p0) / (GasConstant * m_temp);
 
     m_hss_RT = m_h0_RT + del_pRT * m_Vss;
     m_cpss_R = m_cp0_R;
@@ -78,16 +78,16 @@ void PDSS_ConstVol::setTemperature(double temp)
     m_gss_RT = m_hss_RT - m_sss_R;
 }
 
-void PDSS_ConstVol::setState_TP(double temp, double pres)
+void PDSS_ConstVol::setState_TP(CanteraDouble temp, CanteraDouble pres)
 {
     setTemperature(temp);
     setPressure(pres);
 }
 
-void PDSS_ConstVol::setState_TR(double temp, double rho)
+void PDSS_ConstVol::setState_TR(CanteraDouble temp, CanteraDouble rho)
 {
     warn_deprecated("PDSS_ConstVol::setState_TR", "To be removed after Cantera 3.0");
-    double rhoStored = m_mw / m_constMolarVolume;
+    CanteraDouble rhoStored = m_mw / m_constMolarVolume;
     if (fabs(rhoStored - rho) / (rhoStored + rho) > 1.0E-4) {
         throw CanteraError("PDSS_ConstVol::setState_TR",
                            "Inconsistent supplied density.");
@@ -95,7 +95,7 @@ void PDSS_ConstVol::setState_TR(double temp, double rho)
     setTemperature(temp);
 }
 
-double PDSS_ConstVol::satPressure(double t)
+CanteraDouble PDSS_ConstVol::satPressure(CanteraDouble t)
 {
     return 1.0E-200;
 }

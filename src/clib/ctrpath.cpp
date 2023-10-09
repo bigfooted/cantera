@@ -65,7 +65,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setThreshold(int i, double v)
+    int rdiag_setThreshold(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).threshold = v;
@@ -125,7 +125,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setBoldThreshold(int i, double v)
+    int rdiag_setBoldThreshold(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).bold_min = v;
@@ -135,7 +135,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setNormalThreshold(int i, double v)
+    int rdiag_setNormalThreshold(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).dashed_max = v;
@@ -145,7 +145,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setLabelThreshold(int i, double v)
+    int rdiag_setLabelThreshold(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).label_min = v;
@@ -155,7 +155,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setScale(int i, double v)
+    int rdiag_setScale(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).scale = v;
@@ -179,7 +179,7 @@ extern "C" {
         }
     }
 
-    int rdiag_setArrowWidth(int i, double v)
+    int rdiag_setArrowWidth(int i, CanteraDouble v)
     {
         try {
             DiagramCabinet::item(i).arrow_width = v;
@@ -209,8 +209,8 @@ extern "C" {
         }
     }
 
-    int rdiag_findMajor(int i, double threshold,
-                        size_t lda, double* a)
+    int rdiag_findMajor(int i, CanteraDouble threshold,
+                        size_t lda, CanteraDouble* a)
     {
         try {
             DiagramCabinet::item(i).findMajorPaths(threshold, lda, a);

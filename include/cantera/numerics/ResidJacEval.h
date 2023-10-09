@@ -66,7 +66,7 @@ public:
     /*!
      * @param atol   Initial value of the global tolerance (defaults to 1.0E-13)
      */
-    ResidJacEval(double atol = 1.0e-13);
+    ResidJacEval(CanteraDouble atol = 1.0e-13);
 
     //! Return the number of equations in the equation system
     int nEquations() const override;
@@ -88,18 +88,18 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int evalResidNJ(const double t, const double delta_t,
-                            const double* const y,
-                            const double* const ydot,
-                            double* const resid,
+    virtual int evalResidNJ(const CanteraDouble t, const CanteraDouble delta_t,
+                            const CanteraDouble* const y,
+                            const CanteraDouble* const ydot,
+                            CanteraDouble* const resid,
                             const ResidEval_Type_Enum evalType = Base_ResidEval,
                             const int id_x = -1,
-                            const double delta_x = 0.0);
+                            const CanteraDouble delta_x = 0.0);
 
-    int eval(const double t, const double* const y, const double* const ydot,
-             double* const r) override;
+    int eval(const CanteraDouble t, const CanteraDouble* const y, const CanteraDouble* const ydot,
+             CanteraDouble* const r) override;
 
-    int getInitialConditions(const double t0, double* const y, double* const ydot) override;
+    int getInitialConditions(const CanteraDouble t0, CanteraDouble* const y, CanteraDouble* const ydot) override;
 
     //! Filter the solution predictions
     /*!
@@ -111,8 +111,8 @@ public:
      * @param step          Proposed step in the solution that will be cropped
      * @returns             the norm of the amount of filtering
      */
-    virtual double filterNewStep(const double t, const double* const ybase,
-                                     double* const step);
+    virtual CanteraDouble filterNewStep(const CanteraDouble t, const CanteraDouble* const ybase,
+                                     CanteraDouble* const step);
 
     //! Filter the solution predictions
     /*!
@@ -123,13 +123,13 @@ public:
      * @param y             Solution vector (input, output)
      * @returns the norm of the amount of filtering
      */
-    virtual double filterSolnPrediction(const double t, double* const y);
+    virtual CanteraDouble filterSolnPrediction(const CanteraDouble t, CanteraDouble* const y);
 
     //! Set a global value of the absolute tolerance
     /*!
      *  @param atol   Value of atol
      */
-    void setAtol(double atol);
+    void setAtol(CanteraDouble atol);
 
     //! Evaluate the time tracking equations, if any
     /*!
@@ -146,8 +146,8 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int evalTimeTrackingEqns(const double t, const double delta_t, const double* const y,
-                                     const double* const ydot);
+    virtual int evalTimeTrackingEqns(const CanteraDouble t, const CanteraDouble delta_t, const CanteraDouble* const y,
+                                     const CanteraDouble* const ydot);
 
     //! Evaluate any stopping criteria other than a final time limit
     /*!
@@ -162,10 +162,10 @@ public:
      * @param y             Solution vector (input, do not modify)
      * @param ydot          Rate of change of solution vector. (input, do not modify)
      */
-    virtual bool evalStoppingCritera(const double t,
-                                     const double delta_t,
-                                     const double* const y,
-                                     const double* const ydot);
+    virtual bool evalStoppingCritera(const CanteraDouble t,
+                                     const CanteraDouble delta_t,
+                                     const CanteraDouble* const y,
+                                     const CanteraDouble* const ydot);
 
     //! Return a vector of delta y's for calculation of the numerical Jacobian
     /*!
@@ -184,11 +184,11 @@ public:
      *           -0 or neg value Means an unsuccessful operation
      */
     virtual int
-    calcDeltaSolnVariables(const double t,
-                           const double* const y,
-                           const double* const ydot,
-                           double* const delta_y,
-                           const double* const solnWeights = 0);
+    calcDeltaSolnVariables(const CanteraDouble t,
+                           const CanteraDouble* const y,
+                           const CanteraDouble* const ydot,
+                           CanteraDouble* const delta_y,
+                           const CanteraDouble* const solnWeights = 0);
 
     //! Returns a vector of column scale factors that can be used to column
     //! scale Jacobians.
@@ -200,8 +200,8 @@ public:
      * @param y_old         Old Solution vector (input, do not modify)
      * @param yScales       Value of the column scales
      */
-    virtual void calcSolnScales(const double t, const double* const y,
-                                const double* const y_old, double* const yScales);
+    virtual void calcSolnScales(const CanteraDouble t, const CanteraDouble* const y,
+                                const CanteraDouble* const y_old, CanteraDouble* const yScales);
 
     //! This function may be used to create output at various points in the
     //! execution of an application.
@@ -216,10 +216,10 @@ public:
      * @param y             Solution vector (input, do not modify)
      * @param ydot          Rate of change of solution vector. (input)
      */
-    virtual void user_out2(const int ifunc, const double t,
-                           const double delta_t,
-                           const double* const y,
-                           const double* const ydot);
+    virtual void user_out2(const int ifunc, const CanteraDouble t,
+                           const CanteraDouble delta_t,
+                           const CanteraDouble* const y,
+                           const CanteraDouble* const ydot);
 
     //! This function may be used to create output at various points in the
     //! execution of an application.
@@ -231,9 +231,9 @@ public:
      * @param y             Solution vector (input, do not modify)
      * @param ydot          Rate of change of solution vector. (input)
      */
-    virtual void user_out(const int ifunc, const double t,
-                          const double* y,
-                          const double* ydot);
+    virtual void user_out(const int ifunc, const CanteraDouble t,
+                          const CanteraDouble* y,
+                          const CanteraDouble* ydot);
 
     //! Multiply the matrix by another matrix that leads to better conditioning
     /*!
@@ -254,8 +254,8 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int matrixConditioning(double* const matrix, const int nrows,
-                                   double* const rhs);
+    virtual int matrixConditioning(CanteraDouble* const matrix, const int nrows,
+                                   CanteraDouble* const rhs);
 
     //! Calculate an analytical Jacobian and the residual at the current time
     //! and values.
@@ -273,9 +273,9 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int evalJacobian(const double t, const double delta_t, double cj,
-                             const double* const y, const double* const ydot,
-                             DenseMatrix& J, double* const resid);
+    virtual int evalJacobian(const CanteraDouble t, const CanteraDouble delta_t, CanteraDouble cj,
+                             const CanteraDouble* const y, const CanteraDouble* const ydot,
+                             DenseMatrix& J, CanteraDouble* const resid);
 
     //! Calculate an analytical Jacobian and the residual at the current time and values.
     /*!
@@ -293,15 +293,15 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int evalJacobianDP(const double t, const double delta_t, double cj,
-                               const double* const y,
-                               const double* const ydot,
-                               double* const* jacobianColPts,
-                               double* const resid);
+    virtual int evalJacobianDP(const CanteraDouble t, const CanteraDouble delta_t, CanteraDouble cj,
+                               const CanteraDouble* const y,
+                               const CanteraDouble* const ydot,
+                               CanteraDouble* const* jacobianColPts,
+                               CanteraDouble* const resid);
 
 protected:
     //! constant value of atol
-    double m_atol;
+    CanteraDouble m_atol;
 
     //! Number of equations
     int neq_;

@@ -33,29 +33,29 @@ void PDSS_IdealGas::getParameters(AnyMap &eosNode) const
     eosNode["model"] = "ideal-gas";
 }
 
-double PDSS_IdealGas::intEnergy_mole() const
+CanteraDouble PDSS_IdealGas::intEnergy_mole() const
 {
     return (m_h0_RT - 1.0) * GasConstant * m_temp;
 }
 
-double PDSS_IdealGas::cv_mole() const
+CanteraDouble PDSS_IdealGas::cv_mole() const
 {
     return cp_mole() - GasConstant;
 }
 
-double PDSS_IdealGas::pressure() const
+CanteraDouble PDSS_IdealGas::pressure() const
 {
     throw NotImplementedError("PDSS_IdealGas::pressure");
 }
 
-void PDSS_IdealGas::setPressure(double p)
+void PDSS_IdealGas::setPressure(CanteraDouble p)
 {
     m_sss_R = m_s0_R - log(m_pres/m_p0);
     m_gss_RT = m_hss_RT - m_sss_R;
     m_Vss = GasConstant * m_temp / m_pres;
 }
 
-void PDSS_IdealGas::setTemperature(double temp)
+void PDSS_IdealGas::setTemperature(CanteraDouble temp)
 {
     m_temp = temp;
     m_spthermo->updatePropertiesTemp(temp, &m_cp0_R, &m_h0_RT, &m_s0_R);
@@ -68,13 +68,13 @@ void PDSS_IdealGas::setTemperature(double temp)
     m_Vss = GasConstant * m_temp / m_pres;
 }
 
-void PDSS_IdealGas::setState_TP(double temp, double pres)
+void PDSS_IdealGas::setState_TP(CanteraDouble temp, CanteraDouble pres)
 {
     m_pres = pres;
     setTemperature(temp);
 }
 
-void PDSS_IdealGas::setState_TR(double temp, double rho)
+void PDSS_IdealGas::setState_TR(CanteraDouble temp, CanteraDouble rho)
 {
     warn_deprecated("PDSS_IdealGas::setState_TR", "To be removed after Cantera 3.0");
     m_pres = GasConstant * temp * rho / m_mw;

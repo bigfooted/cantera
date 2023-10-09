@@ -9,12 +9,12 @@
 #include "wrappers.h"
 
 // Service function to pass index/value triplets describing sparse matrix
-inline size_t sparseTriplets(const Eigen::SparseMatrix<double>& mat,
-    int* rows, int* cols, double* data, size_t length)
+inline size_t sparseTriplets(const Eigen::SparseMatrix<CanteraDouble>& mat,
+    int* rows, int* cols, CanteraDouble* data, size_t length)
 {
     size_t count = 0;
     for (int i = 0; i < mat.outerSize(); i++) {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(mat, i); it; ++it) {
+        for (Eigen::SparseMatrix<CanteraDouble>::InnerIterator it(mat, i); it; ++it) {
             if (count < length) {
                 rows[count] = it.row();
                 cols[count] = it.col();
@@ -32,15 +32,15 @@ inline size_t sparseTriplets(const Eigen::SparseMatrix<double>& mat,
 }
 
 // Service function to pass CSC data describing sparse matrix
-inline void sparseCscData(const Eigen::SparseMatrix<double>& mat,
-    double* value, int* inner, int* outer)
+inline void sparseCscData(const Eigen::SparseMatrix<CanteraDouble>& mat,
+    CanteraDouble* value, int* inner, int* outer)
 {
     if (!mat.isCompressed()) {
         throw Cantera::CanteraError("sparseCscData",
             "Invalid input: Eigen matrix is not compressed.");
     }
 
-    const double* valuePtr = mat.valuePtr();
+    const CanteraDouble* valuePtr = mat.valuePtr();
     const int* innerPtr = mat.innerIndexPtr();
     for (size_t i = 0; i < mat.nonZeros(); ++i) {
         value[i] = valuePtr[i];

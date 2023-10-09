@@ -30,12 +30,12 @@ public:
 
     void setThermoMgr(ThermoPhase& thermo) override;
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
-    void eval(double t, double* LHS, double* RHS) override;
+    void initialize(CanteraDouble t0=0.0) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     //! Return the index in the solution vector for this reactor of the
     //! component named *nm*. Possible values for *nm* are "mass",
@@ -45,7 +45,7 @@ public:
     string componentName(size_t k) override;
 
 protected:
-    vector<double> m_hk; //!< Species molar enthalpies
+    vector<CanteraDouble> m_hk; //!< Species molar enthalpies
 };
 }
 

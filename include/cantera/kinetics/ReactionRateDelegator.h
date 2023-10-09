@@ -23,7 +23,7 @@ public:
 
     bool update(const ThermoPhase& phase, const Kinetics& kin) override;
 
-    void update(double T) override {
+    void update(CanteraDouble T) override {
         throw NotImplementedError("ReactionDataDelegator",
             "Not implemented for delegated reaction rates");
     }
@@ -58,7 +58,7 @@ protected:
     shared_ptr<ExternalHandle> m_wrappedData;
 
     //! Delegated `update` method taking the Solution wrapper as its argument
-    function<double(void*)> m_update;
+    function<CanteraDouble(void*)> m_update;
 };
 
 //! Delegate methods of the ReactionRate class to external functions
@@ -86,7 +86,7 @@ public:
     //! Evaluate reaction rate
     //!
     //! @param shared_data  data shared by all reactions of a given type
-    double evalFromStruct(const ReactionDataDelegator& shared_data) {
+    CanteraDouble evalFromStruct(const ReactionDataDelegator& shared_data) {
         return m_evalFromStruct(shared_data.getWrapper()->get());
     }
 
@@ -106,7 +106,7 @@ private:
 
     //! Delegated `evalFromStruct` method taking a pointer to the corresponding
     //! ReactionData wrapper object
-    function<double(void*)> m_evalFromStruct;
+    function<CanteraDouble(void*)> m_evalFromStruct;
 
     function<void(const string&, void*)> m_validate;
     function<void(const AnyMap&, const UnitStack&)> m_setParameters;

@@ -33,62 +33,62 @@ public:
         return false;
     }
 
-    double enthalpy_mole() const override {
+    CanteraDouble enthalpy_mole() const override {
         return 0.0;
     }
-    double intEnergy_mole() const override {
+    CanteraDouble intEnergy_mole() const override {
         return - pressure() * molarVolume();
     }
-    double entropy_mole() const override {
+    CanteraDouble entropy_mole() const override {
         return 0.0;
     }
-    double gibbs_mole() const override {
+    CanteraDouble gibbs_mole() const override {
         return 0.0;
     }
-    double cp_mole() const override {
+    CanteraDouble cp_mole() const override {
         return 0.0;
     }
-    double cv_mole() const override {
+    CanteraDouble cv_mole() const override {
         return 0.0;
     }
 
-    void setPressure(double pres) override {
+    void setPressure(CanteraDouble pres) override {
         m_press = pres;
     }
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_press;
     }
 
-    void getChemPotentials(double* mu) const override {
+    void getChemPotentials(CanteraDouble* mu) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             mu[n] = 0.0;
         }
     }
 
-    void getEnthalpy_RT(double* hrt) const override {
+    void getEnthalpy_RT(CanteraDouble* hrt) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             hrt[n] = 0.0;
         }
     }
 
-    void getEntropy_R(double* sr) const override {
+    void getEntropy_R(CanteraDouble* sr) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             sr[n] = 0.0;
         }
     }
 
-    void getStandardChemPotentials(double* mu0) const override {
+    void getStandardChemPotentials(CanteraDouble* mu0) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             mu0[n] = 0.0;
         }
     }
 
-    void getActivityConcentrations(double* c) const override {
+    void getActivityConcentrations(CanteraDouble* c) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             c[n] = 1.0;
         }
     }
-    void getPartialMolarEnthalpies(double *h) const override {
+    void getPartialMolarEnthalpies(CanteraDouble *h) const override {
         for (size_t n = 0; n < nSpecies(); n++) {
             h[n] = 0.0;
         }
@@ -98,11 +98,11 @@ public:
         return Units(1.0);
     }
 
-    double standardConcentration(size_t k=0) const override {
+    CanteraDouble standardConcentration(size_t k=0) const override {
         return 1.0;
     }
 
-    double logStandardConc(size_t k=0) const override {
+    CanteraDouble logStandardConc(size_t k=0) const override {
         return 0.0;
     }
 
@@ -118,7 +118,7 @@ public:
     }
 
 private:
-    double m_press;
+    CanteraDouble m_press;
 };
 }
 

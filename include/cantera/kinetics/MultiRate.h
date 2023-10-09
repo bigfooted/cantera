@@ -65,13 +65,13 @@ public:
         m_shared.invalidateCache();
     }
 
-    void getRateConstants(double* kf) override {
+    void getRateConstants(CanteraDouble* kf) override {
         for (auto& [iRxn, rate] : m_rxn_rates) {
             kf[iRxn] = rate.evalFromStruct(m_shared);
         }
     }
 
-    void processRateConstants_ddT(double* rop, const double* kf, double deltaT) override
+    void processRateConstants_ddT(CanteraDouble* rop, const CanteraDouble* kf, CanteraDouble deltaT) override
     {
         if constexpr (has_ddT<RateType>::value) {
             for (const auto& [iRxn, rate] : m_rxn_rates) {
@@ -79,14 +79,14 @@ public:
             }
         } else {
             // perturb conditions
-            double dTinv = 1. / (m_shared.temperature * deltaT);
+            CanteraDouble dTinv = 1. / (m_shared.temperature * deltaT);
             m_shared.perturbTemperature(deltaT);
             _update();
 
             // apply numerical derivative
             for (auto& [iRxn, rate] : m_rxn_rates) {
                 if (kf[iRxn] != 0.) {
-                    double k1 = rate.evalFromStruct(m_shared);
+                    CanteraDouble k1 = rate.evalFromStruct(m_shared);
                     rop[iRxn] *= dTinv * (k1 / kf[iRxn] - 1.);
                 } // else not needed: derivative is already zero
             }
@@ -97,16 +97,16 @@ public:
         }
     }
 
-    void processRateConstants_ddP(double* rop, const double* kf, double deltaP) override
+    void processRateConstants_ddP(CanteraDouble* rop, const CanteraDouble* kf, CanteraDouble deltaP) override
     {
         if constexpr (has_ddP<DataType>::value) {
-            double dPinv = 1. / (m_shared.pressure * deltaP);
+            CanteraDouble dPinv = 1. / (m_shared.pressure * deltaP);
             m_shared.perturbPressure(deltaP);
             _update();
 
             for (auto& [iRxn, rate] : m_rxn_rates) {
                 if (kf[iRxn] != 0.) {
-                    double k1 = rate.evalFromStruct(m_shared);
+                    CanteraDouble k1 = rate.evalFromStruct(m_shared);
                     rop[iRxn] *= dPinv * (k1 / kf[iRxn] - 1.);
                 } // else not needed: derivative is already zero
             }
@@ -121,17 +121,17 @@ public:
         }
     }
 
-    void processRateConstants_ddM(double* rop, const double* kf, double deltaM,
+    void processRateConstants_ddM(CanteraDouble* rop, const CanteraDouble* kf, CanteraDouble deltaM,
                                   bool overwrite=true) override
     {
         if constexpr (has_ddM<DataType>::value) {
-            double dMinv = 1. / deltaM;
+            CanteraDouble dMinv = 1. / deltaM;
             m_shared.perturbThirdBodies(deltaM);
             _update();
 
             for (auto& [iRxn, rate] : m_rxn_rates) {
                 if (kf[iRxn] != 0. && m_shared.conc_3b[iRxn] > 0.) {
-                    double k1 = rate.evalFromStruct(m_shared);
+                    CanteraDouble k1 = rate.evalFromStruct(m_shared);
                     rop[iRxn] *= dMinv * (k1 / kf[iRxn] - 1.);
                     rop[iRxn] /= m_shared.conc_3b[iRxn];
                 } else {
@@ -153,17 +153,17 @@ public:
         }
     }
 
-    void update(double T) override {
+    void update(CanteraDouble T) override {
         m_shared.update(T);
         _update();
     }
 
-    void update(double T, double extra) override {
+    void update(CanteraDouble T, CanteraDouble extra) override {
         m_shared.update(T, extra);
         _update();
     }
 
-    void update(double T, const vector<double>& extra) override {
+    void update(CanteraDouble T, const vector<CanteraDouble>& extra) override {
         m_shared.update(T, extra);
         _update();
     }
@@ -178,7 +178,7 @@ public:
         return changed;
     }
 
-    double evalSingle(ReactionRate& rate) override {
+    CanteraDouble evalSingle(ReactionRate& rate) override {
         RateType& R = static_cast<RateType&>(rate);
         if constexpr (has_update<RateType>::value) {
             R.updateFromStruct(m_shared);

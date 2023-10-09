@@ -34,31 +34,31 @@ IonsFromNeutralVPSSTP::IonsFromNeutralVPSSTP(const string& inputFile, const stri
 
 // ------------ Molar Thermodynamic Properties ----------------------
 
-double IonsFromNeutralVPSSTP::enthalpy_mole() const
+CanteraDouble IonsFromNeutralVPSSTP::enthalpy_mole() const
 {
     getPartialMolarEnthalpies(m_work.data());
     return mean_X(m_work);
 }
 
-double IonsFromNeutralVPSSTP::entropy_mole() const
+CanteraDouble IonsFromNeutralVPSSTP::entropy_mole() const
 {
     getPartialMolarEntropies(m_work.data());
     return mean_X(m_work);
 }
 
-double IonsFromNeutralVPSSTP::gibbs_mole() const
+CanteraDouble IonsFromNeutralVPSSTP::gibbs_mole() const
 {
     getChemPotentials(m_work.data());
     return mean_X(m_work);
 }
 
-double IonsFromNeutralVPSSTP::cp_mole() const
+CanteraDouble IonsFromNeutralVPSSTP::cp_mole() const
 {
     getPartialMolarCp(m_work.data());
     return mean_X(m_work);
 }
 
-double IonsFromNeutralVPSSTP::cv_mole() const
+CanteraDouble IonsFromNeutralVPSSTP::cv_mole() const
 {
     // Need to revisit this, as it is wrong
     getPartialMolarCp(m_work.data());
@@ -67,15 +67,15 @@ double IonsFromNeutralVPSSTP::cv_mole() const
 
 // -- Activities, Standard States, Activity Concentrations -----------
 
-void IonsFromNeutralVPSSTP::getDissociationCoeffs(vector<double>& coeffs,
-        vector<double>& charges, vector<size_t>& neutMolIndex) const
+void IonsFromNeutralVPSSTP::getDissociationCoeffs(vector<CanteraDouble>& coeffs,
+        vector<CanteraDouble>& charges, vector<size_t>& neutMolIndex) const
 {
     coeffs = fm_neutralMolec_ions_;
     charges = m_speciesCharge;
     neutMolIndex = fm_invert_ionForNeutral;
 }
 
-void IonsFromNeutralVPSSTP::getActivityCoefficients(double* ac) const
+void IonsFromNeutralVPSSTP::getActivityCoefficients(CanteraDouble* ac) const
 {
     // Update the activity coefficients
     s_update_lnActCoeff();
@@ -88,10 +88,10 @@ void IonsFromNeutralVPSSTP::getActivityCoefficients(double* ac) const
 
 // ---------  Partial Molar Properties of the Solution -------------
 
-void IonsFromNeutralVPSSTP::getChemPotentials(double* mu) const
+void IonsFromNeutralVPSSTP::getChemPotentials(CanteraDouble* mu) const
 {
     size_t icat, jNeut;
-    double xx, fact2;
+    CanteraDouble xx, fact2;
 
     // Get the standard chemical potentials of neutral molecules
     neutralMoleculePhase_->getStandardChemPotentials(muNeutralMolecule_.data());
@@ -137,7 +137,7 @@ void IonsFromNeutralVPSSTP::getChemPotentials(double* mu) const
     }
 }
 
-void IonsFromNeutralVPSSTP::getPartialMolarEnthalpies(double* hbar) const
+void IonsFromNeutralVPSSTP::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     // Get the nondimensional standard state enthalpies
     getEnthalpy_RT(hbar);
@@ -156,7 +156,7 @@ void IonsFromNeutralVPSSTP::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void IonsFromNeutralVPSSTP::getPartialMolarEntropies(double* sbar) const
+void IonsFromNeutralVPSSTP::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     // Get the nondimensional standard state entropies
     getEntropy_R(sbar);
@@ -167,7 +167,7 @@ void IonsFromNeutralVPSSTP::getPartialMolarEntropies(double* sbar) const
     s_update_dlnActCoeffdT();
 
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(moleFractions_[k], SmallNumber);
+        CanteraDouble xx = std::max(moleFractions_[k], SmallNumber);
         sbar[k] += - lnActCoeff_Scaled_[k] -log(xx) - temperature() * dlnActCoeffdT_Scaled_[k];
     }
 
@@ -177,7 +177,7 @@ void IonsFromNeutralVPSSTP::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void IonsFromNeutralVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const
+void IonsFromNeutralVPSSTP::getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const
 {
     s_update_lnActCoeff();
     s_update_dlnActCoeff_dlnX_diag();
@@ -187,7 +187,7 @@ void IonsFromNeutralVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag
     }
 }
 
-void IonsFromNeutralVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const
+void IonsFromNeutralVPSSTP::getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const
 {
     s_update_lnActCoeff();
     s_update_dlnActCoeff_dlnN_diag();
@@ -197,11 +197,11 @@ void IonsFromNeutralVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag
     }
 }
 
-void IonsFromNeutralVPSSTP::getdlnActCoeffdlnN(const size_t ld, double* dlnActCoeffdlnN)
+void IonsFromNeutralVPSSTP::getdlnActCoeffdlnN(const size_t ld, CanteraDouble* dlnActCoeffdlnN)
 {
     s_update_lnActCoeff();
     s_update_dlnActCoeff_dlnN();
-    double* data =  & dlnActCoeffdlnN_(0,0);
+    CanteraDouble* data =  & dlnActCoeffdlnN_(0,0);
     for (size_t k = 0; k < m_kk; k++) {
         for (size_t m = 0; m < m_kk; m++) {
             dlnActCoeffdlnN[ld * k + m] = data[m_kk * k + m];
@@ -219,7 +219,7 @@ void IonsFromNeutralVPSSTP::calcDensity()
     Phase::assignDensity(neutralMoleculePhase_->density());
 }
 
-void IonsFromNeutralVPSSTP::calcIonMoleFractions(double* const mf) const
+void IonsFromNeutralVPSSTP::calcIonMoleFractions(CanteraDouble* const mf) const
 {
     // Download the neutral mole fraction vector into the vector,
     // NeutralMolecMoleFractions_[]
@@ -233,13 +233,13 @@ void IonsFromNeutralVPSSTP::calcIonMoleFractions(double* const mf) const
     // Use the formula matrix to calculate the relative mole numbers.
     for (size_t jNeut = 0; jNeut < numNeutralMoleculeSpecies_; jNeut++) {
         for (size_t k = 0; k < m_kk; k++) {
-            double fmij = fm_neutralMolec_ions_[k + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[k + jNeut * m_kk];
             mf[k] += fmij * NeutralMolecMoleFractions_[jNeut];
         }
     }
 
     // Normalize the new mole fractions
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t k = 0; k < m_kk; k++) {
         sum += mf[k];
     }
@@ -251,8 +251,8 @@ void IonsFromNeutralVPSSTP::calcIonMoleFractions(double* const mf) const
 void IonsFromNeutralVPSSTP::calcNeutralMoleculeMoleFractions() const
 {
     size_t icat, jNeut;
-    double fmij;
-    double sum = 0.0;
+    CanteraDouble fmij;
+    CanteraDouble sum = 0.0;
 
     // Zero the vector we are trying to find.
     for (size_t k = 0; k < numNeutralMoleculeSpecies_; k++) {
@@ -344,9 +344,9 @@ void IonsFromNeutralVPSSTP::calcNeutralMoleculeMoleFractions() const
     }
 }
 
-void IonsFromNeutralVPSSTP::getNeutralMoleculeMoleGrads(const double* const dx, double* const dy) const
+void IonsFromNeutralVPSSTP::getNeutralMoleculeMoleGrads(const CanteraDouble* const dx, CanteraDouble* const dy) const
 {
-    double sumy, sumdy;
+    CanteraDouble sumy, sumdy;
 
     // check sum dx = 0
     // Zero the vector we are trying to find.
@@ -369,9 +369,9 @@ void IonsFromNeutralVPSSTP::getNeutralMoleculeMoleGrads(const double* const dx, 
             size_t icat = cationList_[k];
             size_t jNeut = fm_invert_ionForNeutral[icat];
             if (jNeut != npos) {
-                double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+                CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
                 AssertTrace(fmij != 0.0);
-                const double temp = 1.0/fmij;
+                const CanteraDouble temp = 1.0/fmij;
                 dy[jNeut] += dx[icat] * temp;
                 y_[jNeut] += moleFractions_[icat] * temp;
             }
@@ -380,8 +380,8 @@ void IonsFromNeutralVPSSTP::getNeutralMoleculeMoleGrads(const double* const dx, 
         for (size_t k = 0; k < passThroughList_.size(); k++) {
             size_t icat = passThroughList_[k];
             size_t jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[ icat + jNeut * m_kk];
-            const double temp = 1.0/fmij;
+            CanteraDouble fmij = fm_neutralMolec_ions_[ icat + jNeut * m_kk];
+            const CanteraDouble temp = 1.0/fmij;
             dy[jNeut] += dx[icat] * temp;
             y_[jNeut] += moleFractions_[icat] * temp;
         }
@@ -432,17 +432,17 @@ void IonsFromNeutralVPSSTP::compositionChanged()
  *     @param elemVectorI
  *     @param nElementsI
  */
-static double factorOverlap(const vector<string>& elnamesVN ,
-                            const vector<double>& elemVectorN,
+static CanteraDouble factorOverlap(const vector<string>& elnamesVN ,
+                            const vector<CanteraDouble>& elemVectorN,
                             const size_t nElementsN,
                             const vector<string>& elnamesVI ,
-                            const vector<double>& elemVectorI,
+                            const vector<CanteraDouble>& elemVectorI,
                             const size_t nElementsI)
 {
-    double fMax = 1.0E100;
+    CanteraDouble fMax = 1.0E100;
     for (size_t mi = 0; mi < nElementsI; mi++) {
         if (elnamesVI[mi] != "E" && elemVectorI[mi] > 1.0E-13) {
-            double eiNum = elemVectorI[mi];
+            CanteraDouble eiNum = elemVectorI[mi];
             for (size_t mn = 0; mn < nElementsN; mn++) {
                 if (elnamesVI[mi] == elnamesVN[mn]) {
                     if (elemVectorN[mn] <= 1.0E-13) {
@@ -491,11 +491,11 @@ void IonsFromNeutralVPSSTP::initThermo()
 
     size_t nElementsN = neutralMoleculePhase_->nElements();
     const vector<string>& elnamesVN = neutralMoleculePhase_->elementNames();
-    vector<double> elemVectorN(nElementsN);
+    vector<CanteraDouble> elemVectorN(nElementsN);
 
     size_t nElementsI = nElements();
     const vector<string>& elnamesVI = elementNames();
-    vector<double> elemVectorI(nElementsI);
+    vector<CanteraDouble> elemVectorI(nElementsI);
 
     if (indexSpecialSpecies_ == npos) {
         throw CanteraError(
@@ -512,7 +512,7 @@ void IonsFromNeutralVPSSTP::initThermo()
             elemVectorN[m] = neutralMoleculePhase_->nAtoms(jNeut, m);
         }
 
-        double fac = factorOverlap(elnamesVN, elemVectorN, nElementsN,
+        CanteraDouble fac = factorOverlap(elnamesVN, elemVectorN, nElementsN,
                                    elnamesVI ,elemVectorI, nElementsI);
         if (fac > 0.0) {
             for (size_t m = 0; m < nElementsN; m++) {
@@ -646,7 +646,7 @@ void IonsFromNeutralVPSSTP::s_update_lnActCoeff() const
             // Get the id for the next cation
             icat = cationList_[k];
             jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
             lnActCoeff_Scaled_[icat] = lnActCoeff_NeutralMolecule_[jNeut] / fmij;
         }
 
@@ -675,8 +675,8 @@ void IonsFromNeutralVPSSTP::s_update_lnActCoeff() const
     }
 }
 
-void IonsFromNeutralVPSSTP::getdlnActCoeffds(const double dTds, const double* const dXds,
-        double* dlnActCoeffds) const
+void IonsFromNeutralVPSSTP::getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+        CanteraDouble* dlnActCoeffds) const
 {
     size_t icat, jNeut;
     // Get the activity coefficients of the neutral molecules
@@ -701,7 +701,7 @@ void IonsFromNeutralVPSSTP::getdlnActCoeffds(const double dTds, const double* co
             // Get the id for the next cation
             icat = cationList_[k];
             jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
             dlnActCoeffds[icat] = dlnActCoeff_NeutralMolecule_[jNeut]/fmij;
         }
 
@@ -751,7 +751,7 @@ void IonsFromNeutralVPSSTP::s_update_dlnActCoeffdT() const
             //! Get the id for the next cation
             icat = cationList_[k];
             jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
             dlnActCoeffdT_Scaled_[icat] = dlnActCoeffdT_NeutralMolecule_[jNeut]/fmij;
         }
 
@@ -801,7 +801,7 @@ void IonsFromNeutralVPSSTP::s_update_dlnActCoeff_dlnX_diag() const
             // Get the id for the next cation
             icat = cationList_[k];
             jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
             dlnActCoeffdlnX_diag_[icat] = dlnActCoeffdlnX_diag_NeutralMolecule_[jNeut]/fmij;
         }
 
@@ -851,7 +851,7 @@ void IonsFromNeutralVPSSTP::s_update_dlnActCoeff_dlnN_diag() const
             // Get the id for the next cation
             icat = cationList_[k];
             jNeut = fm_invert_ionForNeutral[icat];
-            double fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
+            CanteraDouble fmij = fm_neutralMolec_ions_[icat + jNeut * m_kk];
             dlnActCoeffdlnN_diag_[icat] = dlnActCoeffdlnN_diag_NeutralMolecule_[jNeut]/fmij;
         }
 
@@ -883,7 +883,7 @@ void IonsFromNeutralVPSSTP::s_update_dlnActCoeff_dlnN_diag() const
 void IonsFromNeutralVPSSTP::s_update_dlnActCoeff_dlnN() const
 {
     size_t kcat = 0, kNeut = 0, mcat = 0, mNeut = 0;
-    double fmij = 0.0;
+    CanteraDouble fmij = 0.0;
     dlnActCoeffdlnN_.zero();
     // Get the activity coefficients of the neutral molecules
     if (!geThermo) {
@@ -907,7 +907,7 @@ void IonsFromNeutralVPSSTP::s_update_dlnActCoeff_dlnN() const
 
                 mcat = cationList_[m];
                 mNeut = fm_invert_ionForNeutral[mcat];
-                double mfmij = fm_neutralMolec_ions_[mcat + mNeut * m_kk];
+                CanteraDouble mfmij = fm_neutralMolec_ions_[mcat + mNeut * m_kk];
 
                 dlnActCoeffdlnN_(kcat,mcat) = dlnActCoeffdlnN_NeutralMolecule_(kNeut,mNeut) * mfmij / fmij;
 

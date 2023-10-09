@@ -217,7 +217,7 @@ public:
     ThirdBody(const AnyMap& node);
 
     //! @deprecated To be removed after %Cantera 3.0; instantiate using string instead
-    ThirdBody(double default_efficiency);
+    ThirdBody(CanteraDouble default_efficiency);
 
     //! Name of the third body collider
     //! @since New in %Cantera 3.0
@@ -243,7 +243,7 @@ public:
     void getParameters(AnyMap& node) const;
 
     //! Get the third-body efficiency for species *k*
-    double efficiency(const string& k) const;
+    CanteraDouble efficiency(const string& k) const;
 
     //! Suffix representing the third body collider in reaction equation, for example
     //! `+ M` or `(+M)`
@@ -263,7 +263,7 @@ public:
     Composition efficiencies;
 
     //! The default third body efficiency for species not listed in #efficiencies.
-    double default_efficiency = 1.;
+    CanteraDouble default_efficiency = 1.;
 
     //! Third body is used by law of mass action
     //! (`true` for three-body reactions, `false` for falloff reactions)

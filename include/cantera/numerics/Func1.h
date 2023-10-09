@@ -104,7 +104,7 @@ public:
         m_f2 = f2.get();
     }
 
-    Func1(shared_ptr<Func1> f1, double A) : m_c(A), m_f1_shared(f1) {
+    Func1(shared_ptr<Func1> f1, CanteraDouble A) : m_c(A), m_f1_shared(f1) {
         m_f1 = f1.get();
     }
 
@@ -138,10 +138,10 @@ public:
     string typeName() const;
 
     //! Calls method eval to evaluate the function
-    double operator()(double t) const;
+    CanteraDouble operator()(CanteraDouble t) const;
 
     //! Evaluate the function.
-    virtual double eval(double t) const;
+    virtual CanteraDouble eval(CanteraDouble t) const;
 
     //! Creates a derivative to the current function
     /*!
@@ -167,18 +167,18 @@ public:
      */
     bool isIdentical(Func1& other) const;
 
-    virtual double isProportional(TimesConstant1& other);
-    virtual double isProportional(Func1& other);
+    virtual CanteraDouble isProportional(TimesConstant1& other);
+    virtual CanteraDouble isProportional(Func1& other);
 
     //! Write LaTeX string describing function.
     virtual string write(const string& arg) const;
 
     //! Accessor function for the stored constant
-    double c() const;
+    CanteraDouble c() const;
 
     //! Function to set the stored constant
     //! @deprecated To be removed after %Cantera 3.0. Only used by deprecated methods.
-    void setC(double c);
+    void setC(CanteraDouble c);
 
     //! accessor function for m_f1
     //! @deprecated To be removed after %Cantera 3.0; replaced by func1_shared().
@@ -216,7 +216,7 @@ public:
     void setParent(Func1* p);
 
 protected:
-    double m_c = 0.0;
+    CanteraDouble m_c = 0.0;
     Func1* m_f1 = nullptr;
     Func1* m_f2 = nullptr;
     Func1* m_parent = nullptr;
@@ -232,8 +232,8 @@ Func1& newDiffFunction(Func1& f1, Func1& f2);
 Func1& newProdFunction(Func1& f1, Func1& f2);
 Func1& newRatioFunction(Func1& f1, Func1& f2);
 Func1& newCompositeFunction(Func1& f1, Func1& f2);
-Func1& newTimesConstFunction(Func1& f1, double c);
-Func1& newPlusConstFunction(Func1& f1, double c);
+Func1& newTimesConstFunction(Func1& f1, CanteraDouble c);
+Func1& newPlusConstFunction(Func1& f1, CanteraDouble c);
 
 
 //! Sum of two functions.
@@ -258,11 +258,11 @@ shared_ptr<Func1> newCompositeFunction(shared_ptr<Func1> f1, shared_ptr<Func1> f
 
 //! Product of function and constant.
 //! @ingroup func1helper
-shared_ptr<Func1> newTimesConstFunction(shared_ptr<Func1> f1, double c);
+shared_ptr<Func1> newTimesConstFunction(shared_ptr<Func1> f1, CanteraDouble c);
 
 //! Sum of function and constant.
 //! @ingroup func1helper
-shared_ptr<Func1> newPlusConstFunction(shared_ptr<Func1> f1, double c);
+shared_ptr<Func1> newPlusConstFunction(shared_ptr<Func1> f1, CanteraDouble c);
 
 //! Implements the @c sin() function.
 /*!
@@ -274,12 +274,12 @@ shared_ptr<Func1> newPlusConstFunction(shared_ptr<Func1> f1, double c);
 class Sin1 : public Func1
 {
 public:
-    Sin1(double omega=1.0) {
+    Sin1(CanteraDouble omega=1.0) {
         m_c = omega;
     }
 
     //! Constructor uses single parameter (frequency)
-    Sin1(const vector<double>& params);
+    Sin1(const vector<CanteraDouble>& params);
 
     Sin1(const Sin1& b) :
         Func1(b) {
@@ -303,7 +303,7 @@ public:
         return "sin";
     }
 
-    double eval(double t) const override{
+    CanteraDouble eval(CanteraDouble t) const override{
         return sin(m_c*t);
     }
 
@@ -323,12 +323,12 @@ public:
 class Cos1 : public Func1
 {
 public:
-    Cos1(double omega=1.0) {
+    Cos1(CanteraDouble omega=1.0) {
         m_c = omega;
     }
 
     //! Constructor uses single parameter (frequency)
-    Cos1(const vector<double>& params);
+    Cos1(const vector<CanteraDouble>& params);
 
     Cos1(const Cos1& b) :
         Func1(b) {
@@ -351,7 +351,7 @@ public:
         return "cos";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return cos(m_c * t);
     }
     Func1& derivative() const override;
@@ -368,12 +368,12 @@ public:
 class Exp1 : public Func1
 {
 public:
-    Exp1(double a=1.0) {
+    Exp1(CanteraDouble a=1.0) {
         m_c = a;
     }
 
     //! Constructor uses single parameter (exponent factor)
-    Exp1(const vector<double>& params);
+    Exp1(const vector<CanteraDouble>& params);
 
     Exp1(const Exp1& b) :
         Func1(b) {
@@ -393,7 +393,7 @@ public:
         return "exp";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return exp(m_c*t);
     }
 
@@ -413,18 +413,18 @@ public:
 class Log1 : public Func1
 {
 public:
-    Log1(double a=1.0) {
+    Log1(CanteraDouble a=1.0) {
         m_c = a;
     }
 
     //! Constructor uses single parameter (factor)
-    Log1(const vector<double>& params);
+    Log1(const vector<CanteraDouble>& params);
 
     string type() const override {
         return "log";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return log(m_c * t);
     }
 
@@ -442,12 +442,12 @@ public:
 class Pow1 : public Func1
 {
 public:
-    Pow1(double n) {
+    Pow1(CanteraDouble n) {
         m_c = n;
     }
 
     //! Constructor uses single parameter (exponent)
-    Pow1(const vector<double>& params);
+    Pow1(const vector<CanteraDouble>& params);
 
     Pow1(const Pow1& b) :
         Func1(b) {
@@ -467,7 +467,7 @@ public:
         return "pow";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return pow(t, m_c);
     }
     Func1& duplicate() const override;
@@ -495,12 +495,12 @@ public:
      * @param fvals   Pointer to function value array
      * @param method Interpolation method ('linear' or 'previous')
      */
-    Tabulated1(size_t n, const double* tvals, const double* fvals,
+    Tabulated1(size_t n, const CanteraDouble* tvals, const CanteraDouble* fvals,
                const string& method="linear");
 
     //! Constructor uses @f$ 2 n @f$ parameters in the following order:
     //! @f$ [t_0, t_1, \dots, t_{n-1}, f_0, f_1, \dots, f_{n-1}] @f$
-    Tabulated1(const vector<double>& params);
+    Tabulated1(const vector<CanteraDouble>& params);
 
     //! Set the interpolation method
     //! @param method  Evaluation method. If @c "linear" (default), a linear
@@ -520,13 +520,13 @@ public:
         return "tabulated-previous";
     }
 
-    double eval(double t) const override;
+    CanteraDouble eval(CanteraDouble t) const override;
     Func1& duplicate() const override;
     Func1& derivative() const override;
     shared_ptr<Func1> derivative3() const override;
 private:
-    vector<double> m_tvec; //!< Vector of time values
-    vector<double> m_fvec; //!< Vector of function values
+    vector<CanteraDouble> m_tvec; //!< Vector of time values
+    vector<CanteraDouble> m_fvec; //!< Vector of function values
     bool m_isLinear; //!< Boolean indicating interpolation method
 };
 
@@ -540,12 +540,12 @@ private:
 class Const1 : public Func1
 {
 public:
-    Const1(double a) {
+    Const1(CanteraDouble a) {
         m_c = a;
     }
 
     //! Constructor uses single parameter (constant)
-    Const1(const vector<double>& params);
+    Const1(const vector<CanteraDouble>& params);
 
     Const1(const Const1& b) :
         Func1(b) {
@@ -567,7 +567,7 @@ public:
         return "constant";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_c;
     }
     Func1& duplicate() const override;
@@ -631,7 +631,7 @@ public:
         return "sum";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) + m_f2->eval(t);
     }
 
@@ -703,7 +703,7 @@ public:
         return "diff";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) - m_f2->eval(t);
     }
 
@@ -778,7 +778,7 @@ public:
 
     string write(const string& arg) const override;
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) * m_f2->eval(t);
     }
 
@@ -802,13 +802,13 @@ public:
 class TimesConstant1 : public Func1
 {
 public:
-    TimesConstant1(Func1& f1, double a) {
+    TimesConstant1(Func1& f1, CanteraDouble a) {
         m_f1 = &f1;
         m_c = a;
         m_f1->setParent(this);
     }
 
-    TimesConstant1(shared_ptr<Func1> f1, double a) : Func1(f1, a) {}
+    TimesConstant1(shared_ptr<Func1> f1, CanteraDouble a) : Func1(f1, a) {}
 
     ~TimesConstant1() override {
         if (!m_f1_shared) {
@@ -838,7 +838,7 @@ public:
         return "times-constant";
     }
 
-    double isProportional(TimesConstant1& other) override {
+    CanteraDouble isProportional(TimesConstant1& other) override {
         if (func1().isIdentical(other.func1())) {
             return (other.c()/c());
         } else {
@@ -846,7 +846,7 @@ public:
         }
     }
 
-    double isProportional(Func1& other) override {
+    CanteraDouble isProportional(Func1& other) override {
         if (func1().isIdentical(other)) {
             return 1.0/c();
         } else {
@@ -854,7 +854,7 @@ public:
         }
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) * m_c;
     }
 
@@ -882,13 +882,13 @@ public:
 class PlusConstant1 : public Func1
 {
 public:
-    PlusConstant1(Func1& f1, double a) {
+    PlusConstant1(Func1& f1, CanteraDouble a) {
         m_f1 = &f1;
         m_c = a;
         m_f1->setParent(this);
     }
 
-    PlusConstant1(shared_ptr<Func1> f1, double a) : Func1(f1, a) {}
+    PlusConstant1(shared_ptr<Func1> f1, CanteraDouble a) : Func1(f1, a) {}
 
     ~PlusConstant1() override {
         if (!m_f1_shared) {
@@ -919,7 +919,7 @@ public:
         return "plus-constant";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) + m_c;
     }
 
@@ -991,7 +991,7 @@ public:
         return "ratio";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(t) / m_f2->eval(t);
     }
 
@@ -1060,7 +1060,7 @@ public:
         return "composite";
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         return m_f1->eval(m_f2->eval(t));
     }
 
@@ -1095,7 +1095,7 @@ public:
 class Gaussian1 : public Func1
 {
 public:
-    Gaussian1(double A, double t0, double fwhm) {
+    Gaussian1(CanteraDouble A, CanteraDouble t0, CanteraDouble fwhm) {
         m_A = A;
         m_t0 = t0;
         m_tau = fwhm/(2.0*std::sqrt(std::log(2.0)));
@@ -1103,7 +1103,7 @@ public:
 
     //! Constructor uses 3 parameters in the following order:
     //! @f$ [A, t_0, \mathrm{fwhm}] @f$
-    Gaussian1(const vector<double>& params);
+    Gaussian1(const vector<CanteraDouble>& params);
 
     Gaussian1(const Gaussian1& b) :
         Func1(b) {
@@ -1126,13 +1126,13 @@ public:
         return "Gaussian";
     }
 
-    double eval(double t) const override {
-        double x = (t - m_t0)/m_tau;
+    CanteraDouble eval(CanteraDouble t) const override {
+        CanteraDouble x = (t - m_t0)/m_tau;
         return m_A * std::exp(-x*x);
     }
 
 protected:
-    double m_A, m_t0, m_tau;
+    CanteraDouble m_A, m_t0, m_tau;
 };
 
 
@@ -1150,7 +1150,7 @@ protected:
  */
 class Gaussian : public Gaussian1
 {
-    Gaussian(double A, double t0, double fwhm);
+    Gaussian(CanteraDouble A, CanteraDouble t0, CanteraDouble fwhm);
 
     Gaussian(const Gaussian& b);
 
@@ -1169,14 +1169,14 @@ class Gaussian : public Gaussian1
 class Poly1 : public Func1
 {
 public:
-    Poly1(size_t n, const double* c) {
+    Poly1(size_t n, const CanteraDouble* c) {
         m_cpoly.resize(n+1);
         std::copy(c, c+m_cpoly.size(), m_cpoly.begin());
     }
 
     //! Constructor uses @f$ n + 1 @f$ parameters in the following order:
     //! @f$ [a_n, \dots, a_1, a_0] @f$
-    Poly1(const vector<double>& params);
+    Poly1(const vector<CanteraDouble>& params);
 
     Poly1(const Poly1& b) :
         Func1(b) {
@@ -1199,8 +1199,8 @@ public:
 
     Func1& duplicate() const override;
 
-    double eval(double t) const override {
-        double r = m_cpoly[m_cpoly.size()-1];
+    CanteraDouble eval(CanteraDouble t) const override {
+        CanteraDouble r = m_cpoly[m_cpoly.size()-1];
         for (size_t n = 1; n < m_cpoly.size(); n++) {
             r *= t;
             r += m_cpoly[m_cpoly.size() - n - 1];
@@ -1209,7 +1209,7 @@ public:
     }
 
 protected:
-    vector<double> m_cpoly;
+    vector<CanteraDouble> m_cpoly;
 };
 
 
@@ -1225,7 +1225,7 @@ protected:
 class Fourier1 : public Func1
 {
 public:
-    Fourier1(size_t n, double omega, double a0, const double* a, const double* b) {
+    Fourier1(size_t n, CanteraDouble omega, CanteraDouble a0, const CanteraDouble* a, const CanteraDouble* b) {
         m_omega = omega;
         m_a0_2 = 0.5*a0;
         m_ccos.resize(n);
@@ -1236,7 +1236,7 @@ public:
 
     //! Constructor uses @f$ 2 n + 2 @f$ parameters in the following order:
     //! @f$ [a_0, a_1, \dots, a_n, \omega, b_1, \dots, b_n] @f$
-    Fourier1(const vector<double>& params);
+    Fourier1(const vector<CanteraDouble>& params);
 
     Fourier1(const Fourier1& b) :
         Func1(b) {
@@ -1262,9 +1262,9 @@ public:
 
     Func1& duplicate() const override;
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         size_t n, nn;
-        double sum = m_a0_2;
+        CanteraDouble sum = m_a0_2;
         for (n = 0; n < m_ccos.size(); n++) {
             nn = n + 1;
             sum += m_ccos[n]*std::cos(m_omega*nn*t)
@@ -1274,8 +1274,8 @@ public:
     }
 
 protected:
-    double m_omega, m_a0_2;
-    vector<double> m_ccos, m_csin;
+    CanteraDouble m_omega, m_a0_2;
+    vector<CanteraDouble> m_ccos, m_csin;
 };
 
 
@@ -1290,7 +1290,7 @@ protected:
 class Arrhenius1 : public Func1
 {
 public:
-    Arrhenius1(size_t n, const double* c) {
+    Arrhenius1(size_t n, const CanteraDouble* c) {
         m_A.resize(n);
         m_b.resize(n);
         m_E.resize(n);
@@ -1304,7 +1304,7 @@ public:
 
     //! Constructor uses @f$ 3 n @f$ parameters in the following order:
     //! @f$ [A_1, b_1, E_1, A_2, b_2, E_2, \dots, A_n, b_n, E_n] @f$
-    Arrhenius1(const vector<double>& params);
+    Arrhenius1(const vector<CanteraDouble>& params);
 
     Arrhenius1(const Arrhenius1& b) :
         Func1() {
@@ -1329,8 +1329,8 @@ public:
 
     Func1& duplicate() const override;
 
-    double eval(double t) const override {
-        double sum = 0.0;
+    CanteraDouble eval(CanteraDouble t) const override {
+        CanteraDouble sum = 0.0;
         for (size_t n = 0; n < m_A.size(); n++) {
             sum += m_A[n]*std::pow(t,m_b[n])*std::exp(-m_E[n]/t);
         }
@@ -1338,7 +1338,7 @@ public:
     }
 
 protected:
-    vector<double> m_A, m_b, m_E;
+    vector<CanteraDouble> m_A, m_b, m_E;
 };
 
 /**
@@ -1351,7 +1351,7 @@ protected:
 class Periodic1 : public Func1
 {
 public:
-    Periodic1(Func1& f, double T) {
+    Periodic1(Func1& f, CanteraDouble T) {
         m_f1 = &f;
         m_c = T;
     }
@@ -1360,7 +1360,7 @@ public:
         *this = Periodic1::operator=(b);
     }
 
-    Periodic1(shared_ptr<Func1> f, double A) : Func1(f, A) {}
+    Periodic1(shared_ptr<Func1> f, CanteraDouble A) : Func1(f, A) {}
 
     Periodic1& operator=(const Periodic1& right) {
         if (&right == this) {
@@ -1383,9 +1383,9 @@ public:
         }
     }
 
-    double eval(double t) const override {
+    CanteraDouble eval(CanteraDouble t) const override {
         int np = int(t/m_c);
-        double time = t - np*m_c;
+        CanteraDouble time = t - np*m_c;
         return m_f1->eval(time);
     }
 };

@@ -23,7 +23,7 @@ extern "C" {
 
     // functions
 
-    int func_new(int type, size_t n, size_t lenp, const double* params)
+    int func_new(int type, size_t n, size_t lenp, const CanteraDouble* params)
     {
         try {
             shared_ptr<Func1> r;
@@ -40,16 +40,16 @@ extern "C" {
             } else if (type == ConstFuncType) {
                 r = newFunc1("constant", params[0]);
             } else if (type == FourierFuncType) {
-                vector<double> par(params, params + lenp);
+                vector<CanteraDouble> par(params, params + lenp);
                 r = newFunc1("Fourier", par);
             } else if (type == GaussianFuncType) {
-                vector<double> par(params, params + lenp);
+                vector<CanteraDouble> par(params, params + lenp);
                 r = newFunc1("Gaussian", par);
             } else if (type == PolyFuncType) {
-                vector<double> par(params, params + lenp);
+                vector<CanteraDouble> par(params, params + lenp);
                 r = newFunc1("polynomial", par);
             } else if (type == ArrheniusFuncType) {
-                vector<double> par(params, params + lenp);
+                vector<CanteraDouble> par(params, params + lenp);
                 r = newFunc1("Arrhenius", par);
             } else if (type == PeriodicFuncType) {
                 r = newFunc1("periodic", FuncCabinet::at(nn), params[0]);
@@ -76,7 +76,7 @@ extern "C" {
         }
     }
 
-    int func_new_basic(const char* type, double c)
+    int func_new_basic(const char* type, CanteraDouble c)
     {
         try {
             return FuncCabinet::add(newFunc1(type, c));
@@ -85,10 +85,10 @@ extern "C" {
         }
     }
 
-    int func_new_advanced(const char* type, size_t lenp, const double* params)
+    int func_new_advanced(const char* type, size_t lenp, const CanteraDouble* params)
     {
         try {
-            vector<double> par(params, params + lenp);
+            vector<CanteraDouble> par(params, params + lenp);
             return FuncCabinet::add(newFunc1(type, par));
         } catch (...) {
             return handleAllExceptions(-1, ERR);
@@ -105,7 +105,7 @@ extern "C" {
         }
     }
 
-    int func_new_modified(const char* type, int a, double c)
+    int func_new_modified(const char* type, int a, CanteraDouble c)
     {
         try {
             return FuncCabinet::add(newFunc1(type, FuncCabinet::at(a), c));
@@ -143,7 +143,7 @@ extern "C" {
         }
     }
 
-    double func_value(int i, double t)
+    CanteraDouble func_value(int i, CanteraDouble t)
     {
         try {
             return FuncCabinet::item(i).eval(t);

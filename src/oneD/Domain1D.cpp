@@ -14,7 +14,7 @@
 namespace Cantera
 {
 
-Domain1D::Domain1D(size_t nv, size_t points, double time)
+Domain1D::Domain1D(size_t nv, size_t points, CanteraDouble time)
 {
     resize(nv, points);
 }
@@ -73,7 +73,7 @@ size_t Domain1D::componentIndex(const string& name) const
                        "no component named "+name);
 }
 
-void Domain1D::setTransientTolerances(double rtol, double atol, size_t n)
+void Domain1D::setTransientTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n)
 {
     if (n == npos) {
         for (n = 0; n < m_nv; n++) {
@@ -86,7 +86,7 @@ void Domain1D::setTransientTolerances(double rtol, double atol, size_t n)
     }
 }
 
-void Domain1D::setSteadyTolerances(double rtol, double atol, size_t n)
+void Domain1D::setSteadyTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n)
 {
     if (n == npos) {
         for (n = 0; n < m_nv; n++) {
@@ -109,10 +109,10 @@ void Domain1D::needJacUpdate()
 
 AnyMap Domain1D::getMeta() const
 {
-    auto wrap_tols = [this](const vector<double>& tols) {
+    auto wrap_tols = [this](const vector<CanteraDouble>& tols) {
         // If all tolerances are the same, just store the scalar value.
         // Otherwise, store them by component name
-        set<double> unique_tols(tols.begin(), tols.end());
+        set<CanteraDouble> unique_tols(tols.begin(), tols.end());
         if (unique_tols.size() == 1) {
             return AnyValue(tols[0]);
         } else {
@@ -135,7 +135,7 @@ AnyMap Domain1D::getMeta() const
     return state;
 }
 
-AnyMap Domain1D::serialize(const double* soln) const
+AnyMap Domain1D::serialize(const CanteraDouble* soln) const
 {
     warn_deprecated("Domain1D::serialize",
         "To be removed after Cantera 3.0; superseded by asArray.");
@@ -171,7 +171,7 @@ void Domain1D::fromArray(const shared_ptr<SolutionArray>& arr)
 
 void Domain1D::setMeta(const AnyMap& meta)
 {
-    auto set_tols = [&](const AnyValue& tols, const string& which, vector<double>& out)
+    auto set_tols = [&](const AnyValue& tols, const string& which, vector<CanteraDouble>& out)
     {
         if (!tols.hasKey(which)) {
             return;
@@ -201,7 +201,7 @@ void Domain1D::setMeta(const AnyMap& meta)
     }
 }
 
-void Domain1D::restore(const AnyMap& state, double* soln, int loglevel)
+void Domain1D::restore(const AnyMap& state, CanteraDouble* soln, int loglevel)
 {
     warn_deprecated("Domain1D::restore",
         "To be removed after Cantera 3.0; restore from SolutionArray instead.");
@@ -230,7 +230,7 @@ void Domain1D::locate()
     }
 }
 
-void Domain1D::setupGrid(size_t n, const double* z)
+void Domain1D::setupGrid(size_t n, const CanteraDouble* z)
 {
     if (n > 1) {
         resize(m_nv, n);
@@ -240,21 +240,21 @@ void Domain1D::setupGrid(size_t n, const double* z)
     }
 }
 
-void Domain1D::showSolution_s(std::ostream& s, const double* x)
+void Domain1D::showSolution_s(std::ostream& s, const CanteraDouble* x)
 {
     warn_deprecated("Domain1D::showSolution_s",
         "To be removed after Cantera 3.0; replaced by 'show'.");
     show(s, x);
 }
 
-void Domain1D::showSolution(const double* x)
+void Domain1D::showSolution(const CanteraDouble* x)
 {
     warn_deprecated("Domain1D::showSolution",
         "To be removed after Cantera 3.0; replaced by 'show'.");
     show(x);
 }
 
-void Domain1D::show(const double* x)
+void Domain1D::show(const CanteraDouble* x)
 {
     size_t nn = m_nv/5;
     for (size_t i = 0; i < nn; i++) {
@@ -267,7 +267,7 @@ void Domain1D::show(const double* x)
         for (size_t j = 0; j < m_points; j++) {
             writelog("\n {:10.4g} ", m_z[j]);
             for (size_t n = 0; n < 5; n++) {
-                double v = value(x, i*5+n, j);
+                CanteraDouble v = value(x, i*5+n, j);
                 writelog(" {:10.4g} ", v);
             }
         }
@@ -283,14 +283,14 @@ void Domain1D::show(const double* x)
     for (size_t j = 0; j < m_points; j++) {
         writelog("\n {:10.4g} ", m_z[j]);
         for (size_t n = 0; n < nrem; n++) {
-            double v = value(x, nn*5+n, j);
+            CanteraDouble v = value(x, nn*5+n, j);
             writelog(" {:10.4g} ", v);
         }
     }
     writelog("\n");
 }
 
-void Domain1D::setProfile(const string& name, double* values, double* soln)
+void Domain1D::setProfile(const string& name, CanteraDouble* values, CanteraDouble* soln)
 {
     for (size_t n = 0; n < m_nv; n++) {
         if (name == componentName(n)) {
@@ -303,7 +303,7 @@ void Domain1D::setProfile(const string& name, double* values, double* soln)
     throw CanteraError("Domain1D::setProfile", "unknown component: "+name);
 }
 
-void Domain1D::_getInitialSoln(double* x)
+void Domain1D::_getInitialSoln(CanteraDouble* x)
 {
     for (size_t j = 0; j < m_points; j++) {
         for (size_t n = 0; n < m_nv; n++) {
@@ -312,7 +312,7 @@ void Domain1D::_getInitialSoln(double* x)
     }
 }
 
-double Domain1D::initialValue(size_t n, size_t j)
+CanteraDouble Domain1D::initialValue(size_t n, size_t j)
 {
     throw NotImplementedError("Domain1D::initialValue");
 }

@@ -35,9 +35,9 @@ class Units
 {
 public:
     //! Create a Units object with the specified dimensions.
-    explicit Units(double factor=1.0, double mass=0, double length=0,
-                   double time=0, double temperature=0, double current=0,
-                   double quantity=0);
+    explicit Units(CanteraDouble factor=1.0, CanteraDouble mass=0, CanteraDouble length=0,
+                   CanteraDouble time=0, CanteraDouble temperature=0, CanteraDouble current=0,
+                   CanteraDouble quantity=0);
 
     //! Create an object with the specified dimensions
     //! @param units        A string representation of the units. See UnitSystem
@@ -50,7 +50,7 @@ public:
 
     //! Return the factor for converting from this unit to Cantera's base
     //! units.
-    double factor() const { return m_factor; }
+    CanteraDouble factor() const { return m_factor; }
 
     //! Multiply two Units objects, combining their conversion factors and
     //! dimensions
@@ -62,27 +62,27 @@ public:
 
     //! Raise these Units to a power, changing both the conversion factor and
     //! the dimensions of these Units.
-    Units pow(double exponent) const;
+    Units pow(CanteraDouble exponent) const;
 
     bool operator==(const Units& other) const;
 
     //! Return dimension of primary unit component
     //! ("mass", "length", "time", "temperature", "current", or "quantity")
-    double dimension(const string& primary) const;
+    CanteraDouble dimension(const string& primary) const;
 
 private:
     //! Scale the unit by the factor `k`
-    void scale(double k) { m_factor *= k; }
+    void scale(CanteraDouble k) { m_factor *= k; }
 
-    double m_factor = 1.0; //!< conversion factor to %Cantera base units
-    double m_mass_dim = 0.0;
-    double m_length_dim = 0.0;
-    double m_time_dim = 0.0;
-    double m_temperature_dim = 0.0;
-    double m_current_dim = 0.0;
-    double m_quantity_dim = 0.0;
-    double m_pressure_dim = 0.0; //!< pseudo-dimension to track explicit pressure units
-    double m_energy_dim = 0.0; //!< pseudo-dimension to track explicit energy units
+    CanteraDouble m_factor = 1.0; //!< conversion factor to %Cantera base units
+    CanteraDouble m_mass_dim = 0.0;
+    CanteraDouble m_length_dim = 0.0;
+    CanteraDouble m_time_dim = 0.0;
+    CanteraDouble m_temperature_dim = 0.0;
+    CanteraDouble m_current_dim = 0.0;
+    CanteraDouble m_quantity_dim = 0.0;
+    CanteraDouble m_pressure_dim = 0.0; //!< pseudo-dimension to track explicit pressure units
+    CanteraDouble m_energy_dim = 0.0; //!< pseudo-dimension to track explicit energy units
 
     friend class UnitSystem;
 };
@@ -109,7 +109,7 @@ struct UnitStack
     }
 
     //! Alternative constructor allows for direct assignment of vector
-    UnitStack(std::initializer_list<pair<Units, double>> units)
+    UnitStack(std::initializer_list<pair<Units, CanteraDouble>> units)
         : stack(units) {}
 
     UnitStack() = default;
@@ -124,20 +124,20 @@ struct UnitStack
     void setStandardUnits(Units& standardUnits);
 
     //! Effective exponent of standard unit
-    double standardExponent() const;
+    CanteraDouble standardExponent() const;
 
     //! Join (update) exponent of standard units, where the updated exponent is
     //! the sum of the pre-existing exponent and the exponent passed as the argument.
-    void join(double exponent);
+    void join(CanteraDouble exponent);
 
     //! Update exponent of item with matching units; if it does not exist,
     //! add unit-exponent pair at end of stack
-    void update(const Units& units, double exponent);
+    void update(const Units& units, CanteraDouble exponent);
 
     //! Calculate product of units-exponent stack
     Units product() const;
 
-    vector<pair<Units, double>> stack; //!< Stack uses vector of pairs
+    vector<pair<Units, CanteraDouble>> stack; //!< Stack uses vector of pairs
 };
 
 
@@ -207,83 +207,83 @@ public:
     void setDefaultActivationEnergy(const string& e_units);
 
     //! Convert `value` from the units of `src` to the units of `dest`.
-    double convert(double value, const string& src, const string& dest) const;
-    double convert(double value, const Units& src, const Units& dest) const;
+    CanteraDouble convert(CanteraDouble value, const string& src, const string& dest) const;
+    CanteraDouble convert(CanteraDouble value, const Units& src, const Units& dest) const;
 
     //! Convert `value` to the specified `dest` units from the appropriate units
     //! for this unit system (defined by `setDefaults`)
-    double convertTo(double value, const string& dest) const;
-    double convertTo(double value, const Units& dest) const;
+    CanteraDouble convertTo(CanteraDouble value, const string& dest) const;
+    CanteraDouble convertTo(CanteraDouble value, const Units& dest) const;
 
     //! Convert `value` from the specified `src` units to units appropriate for
     //! this unit system (defined by `setDefaults`)
-    double convertFrom(double value, const string& src) const;
-    double convertFrom(double value, const Units& src) const;
+    CanteraDouble convertFrom(CanteraDouble value, const string& src) const;
+    CanteraDouble convertFrom(CanteraDouble value, const Units& src) const;
 
     //! Convert a generic AnyValue node to the units specified in `dest`. If the
-    //! input is a double, convert it using the default units. If the input is a
+    //! input is a CanteraDouble, convert it using the default units. If the input is a
     //! string, treat this as a dimensioned value, such as '988 kg/m^3' and convert
     //! from the specified units.
-    double convert(const AnyValue& val, const string& dest) const;
-    double convert(const AnyValue& val, const Units& dest) const;
+    CanteraDouble convert(const AnyValue& val, const string& dest) const;
+    CanteraDouble convert(const AnyValue& val, const Units& dest) const;
 
     //! Convert a generic AnyValue node representing a reaction rate coefficient to the
     //! units specified in `dest`. Works like `convert(AnyValue&, Units&)` but with
     //! special handling for the case where the destination units are undefined.
     //!
     //! @since New in %Cantera 3.0
-    double convertRateCoeff(const AnyValue& val, const Units& dest) const;
+    CanteraDouble convertRateCoeff(const AnyValue& val, const Units& dest) const;
 
     //! Convert an array of AnyValue nodes to the units specified in `dest`. For
-    //! each node, if the value is a double, convert it using the default units,
+    //! each node, if the value is a CanteraDouble, convert it using the default units,
     //! and if it is a string, treat it as a value with the given dimensions.
-    vector<double> convert(const vector<AnyValue>& vals, const string& dest) const;
-    vector<double> convert(const vector<AnyValue>& vals, const Units& dest) const;
+    vector<CanteraDouble> convert(const vector<AnyValue>& vals, const string& dest) const;
+    vector<CanteraDouble> convert(const vector<AnyValue>& vals, const Units& dest) const;
 
     //! Convert `value` from the units of `src` to the units of `dest`, allowing
     //! for the different dimensions that can be used for activation energies
-    double convertActivationEnergy(double value, const string& src,
+    CanteraDouble convertActivationEnergy(CanteraDouble value, const string& src,
                                    const string& dest) const;
 
     //! Convert `value` to the units specified by `dest` from the default
     //! activation energy units
-    double convertActivationEnergyTo(double value, const string& dest) const;
-    double convertActivationEnergyTo(double value, const Units& dest) const;
+    CanteraDouble convertActivationEnergyTo(CanteraDouble value, const string& dest) const;
+    CanteraDouble convertActivationEnergyTo(CanteraDouble value, const Units& dest) const;
 
     //! Convert `value` from the units specified by `src` to the default
     //! activation energy units
-    double convertActivationEnergyFrom(double value, const string& src) const;
+    CanteraDouble convertActivationEnergyFrom(CanteraDouble value, const string& src) const;
 
     //! Convert a generic AnyValue node to the units specified in `dest`. If the
-    //! input is a double, convert it using the default units. If the input is a
+    //! input is a CanteraDouble, convert it using the default units. If the input is a
     //! string, treat this as a dimensioned value, such as '2.7e4 J/kmol', and
     //! convert from the specified units.
-    double convertActivationEnergy(const AnyValue& val, const string& dest) const;
+    CanteraDouble convertActivationEnergy(const AnyValue& val, const string& dest) const;
 
     //! Get the changes to the defaults from `other` to this UnitSystem
     AnyMap getDelta(const UnitSystem& other) const;
 
 private:
     //! Factor to convert mass from this unit system to kg
-    double m_mass_factor = 1.0;
+    CanteraDouble m_mass_factor = 1.0;
 
     //! Factor to convert length from this unit system to meters
-    double m_length_factor = 1.0;
+    CanteraDouble m_length_factor = 1.0;
 
     //! Factor to convert time from this unit system to seconds
-    double m_time_factor = 1.0;
+    CanteraDouble m_time_factor = 1.0;
 
     //! Factor to convert pressure from this unit system to Pa
-    double m_pressure_factor = 1.0;
+    CanteraDouble m_pressure_factor = 1.0;
 
     //! Factor to convert energy from this unit system to J
-    double m_energy_factor = 1.0;
+    CanteraDouble m_energy_factor = 1.0;
 
     //! Factor to convert activation energy from this unit system to J/kmol
-    double m_activation_energy_factor = 1.0;
+    CanteraDouble m_activation_energy_factor = 1.0;
 
     //! Factor to convert quantity from this unit system to kmol
-    double m_quantity_factor = 1.0;
+    CanteraDouble m_quantity_factor = 1.0;
 
     //! True if activation energy units are set explicitly, rather than as a
     //! combination of energy and quantity units

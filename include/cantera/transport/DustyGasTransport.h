@@ -67,7 +67,7 @@ public:
         return "DustyGas";
     }
 
-    void getMultiDiffCoeffs(const size_t ld, double* const d) override;
+    void getMultiDiffCoeffs(const size_t ld, CanteraDouble* const d) override;
 
     //! Get the molar fluxes [kmol/m^2/s], given the thermodynamic state at two nearby points.
     /*!
@@ -81,8 +81,8 @@ public:
      *
      * @param fluxes   Vector of species molar fluxes due to diffusional driving force
      */
-    void getMolarFluxes(const double* const state1, const double* const state2,
-                        const double delta, double* const fluxes) override;
+    void getMolarFluxes(const CanteraDouble* const state1, const CanteraDouble* const state2,
+                        const CanteraDouble delta, CanteraDouble* const fluxes) override;
 
     // new methods added in this class
 
@@ -90,7 +90,7 @@ public:
     /*!
      * @param porosity  Set the value of the porosity
      */
-    void setPorosity(double porosity);
+    void setPorosity(CanteraDouble porosity);
 
     //! Set the tortuosity (dimensionless)
     /*!
@@ -98,19 +98,19 @@ public:
      *
      * @param tort  Value of the tortuosity
      */
-    void setTortuosity(double tort);
+    void setTortuosity(CanteraDouble tort);
 
     //! Set the mean pore radius (m)
     /*!
      * @param rbar  Value of the pore radius ( m)
      */
-    void setMeanPoreRadius(double rbar);
+    void setMeanPoreRadius(CanteraDouble rbar);
 
     //! Set the mean particle diameter
     /*!
      * @param dbar  Set the mean particle diameter (m)
      */
-    void setMeanParticleDiameter(double dbar);
+    void setMeanParticleDiameter(CanteraDouble dbar);
 
     //! Set the permeability of the media
     /*!
@@ -125,7 +125,7 @@ public:
      *
      * @param B  set the permeability of the media (units = m^2)
      */
-    void setPermeability(double B);
+    void setPermeability(CanteraDouble B);
 
     //! Return a reference to the transport manager used to compute the gas
     //! binary diffusion coefficients and the viscosity.
@@ -220,31 +220,31 @@ private:
      *  units kg /kmol
      *  length = m_nsp;
      */
-    vector<double> m_mw;
+    vector<CanteraDouble> m_mw;
 
     //! binary diffusion coefficients
     DenseMatrix m_d;
 
     //! mole fractions
-    vector<double> m_x;
+    vector<CanteraDouble> m_x;
 
     //! Knudsen diffusion coefficients. @see updateKnudsenDiffCoeffs()
-    vector<double> m_dk;
+    vector<CanteraDouble> m_dk;
 
     //! temperature
-    double m_temp = -1.0;
+    CanteraDouble m_temp = -1.0;
 
     //! Multicomponent diffusion coefficients. @see eval_H_matrix()
     DenseMatrix m_multidiff;
 
     //! work space of size m_nsp;
-    vector<double> m_spwork;
+    vector<CanteraDouble> m_spwork;
 
     //! work space of size m_nsp;
-    vector<double> m_spwork2;
+    vector<CanteraDouble> m_spwork2;
 
     //! Pressure Gradient
-    double m_gradP = 0.0;
+    CanteraDouble m_gradP = 0.0;
 
     //! Update-to-date variable for Knudsen diffusion coefficients
     bool m_knudsen_ok = false;
@@ -253,19 +253,19 @@ private:
     bool m_bulk_ok = false;
 
     //! Porosity
-    double m_porosity = 0.0;
+    CanteraDouble m_porosity = 0.0;
 
     //! Tortuosity
-    double m_tortuosity = 1.0;
+    CanteraDouble m_tortuosity = 1.0;
 
     //! Pore radius (meter)
-    double m_pore_radius = 0.0;
+    CanteraDouble m_pore_radius = 0.0;
 
     //! Particle diameter
     /*!
      * The medium is assumed to consist of particles of size m_diam. units =  m
      */
-    double m_diam = 0.0;
+    CanteraDouble m_diam = 0.0;
 
     //! Permeability of the media
     /*!
@@ -280,7 +280,7 @@ private:
      *
      * units are m2
      */
-    double m_perm = -1.0;
+    CanteraDouble m_perm = -1.0;
 
     //! Pointer to the transport object for the gas phase
     unique_ptr<Transport> m_gastran;

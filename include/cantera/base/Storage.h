@@ -94,8 +94,8 @@ public:
     //!     expected, if npos, the size is detected automatically; otherwise, an exact
     //!     number of columns needs to be matched.
     //! @returns  matrix or vector containing data; implemented for types
-    //!     `vector<double>`, `vector<long int>`, `vector<string>`,
-    //!     `vector<vector<double>>`, `vector<vector<long int>>` and
+    //!     `vector<CanteraDouble>`, `vector<long int>`, `vector<string>`,
+    //!     `vector<vector<CanteraDouble>>`, `vector<vector<long int>>` and
     //!     `vector<vector<string>>`
     AnyValue readData(const string& id,
                       const string& name, size_t rows, size_t cols=npos) const;
@@ -104,8 +104,8 @@ public:
     //! @param id  storage location within file
     //! @param name  name of matrix entry
     //! @param data  vector or matrix containing data; implemented for types
-    //!     `vector<double>`, `vector<long int>`, `vector<string>`
-    //!     `vector<vector<double>>`, `vector<vector<long int>>` and
+    //!     `vector<CanteraDouble>`, `vector<long int>`, `vector<string>`
+    //!     `vector<vector<CanteraDouble>>`, `vector<vector<long int>>` and
     //!     `vector<vector<string>>`
     void writeData(const string& id, const string& name, const AnyValue& data);
 

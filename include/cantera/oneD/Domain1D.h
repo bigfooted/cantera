@@ -46,7 +46,7 @@ public:
      * @param points  Number of grid points.
      * @param time    (unused)
      */
-    Domain1D(size_t nv=1, size_t points=1, double time=0.0);
+    Domain1D(size_t nv=1, size_t points=1, CanteraDouble time=0.0);
 
     virtual ~Domain1D();
     Domain1D(const Domain1D&) = delete;
@@ -134,15 +134,15 @@ public:
      */
     virtual void init() {  }
 
-    virtual void setInitialState(double* xlocal = 0) {}
-    virtual void setState(size_t point, const double* state, double* x) {}
+    virtual void setInitialState(CanteraDouble* xlocal = 0) {}
+    virtual void setState(size_t point, const CanteraDouble* state, CanteraDouble* x) {}
 
     /**
      * When called, this function should reset "bad" values in the state vector
      * such as negative species concentrations. This function may be called
      * after a failed solution attempt.
      */
-    virtual void resetBadValues(double* xg) {}
+    virtual void resetBadValues(CanteraDouble* xg) {}
 
     /**
      * Resize the domain to have nv components and np grid points. This method
@@ -210,7 +210,7 @@ public:
     //! index of component with name @e name.
     virtual size_t componentIndex(const string& name) const;
 
-    void setBounds(size_t n, double lower, double upper) {
+    void setBounds(size_t n, CanteraDouble lower, CanteraDouble upper) {
         m_min[n] = lower;
         m_max[n] = upper;
     }
@@ -223,7 +223,7 @@ public:
      *      default), these tolerances will be applied to all solution
      *      components.
      */
-    void setTransientTolerances(double rtol, double atol, size_t n=npos);
+    void setTransientTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n=npos);
 
     //! Set tolerances for steady-state mode
     /*!
@@ -233,45 +233,45 @@ public:
      *     default), these tolerances will be applied to all solution
      *     components.
      */
-    void setSteadyTolerances(double rtol, double atol, size_t n=npos);
+    void setSteadyTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n=npos);
 
     //! Relative tolerance of the nth component.
-    double rtol(size_t n) {
+    CanteraDouble rtol(size_t n) {
         return (m_rdt == 0.0 ? m_rtol_ss[n] : m_rtol_ts[n]);
     }
 
     //! Absolute tolerance of the nth component.
-    double atol(size_t n) {
+    CanteraDouble atol(size_t n) {
         return (m_rdt == 0.0 ? m_atol_ss[n] : m_atol_ts[n]);
     }
 
     //! Steady relative tolerance of the nth component
-    double steady_rtol(size_t n) {
+    CanteraDouble steady_rtol(size_t n) {
         return m_rtol_ss[n];
     }
 
     //! Steady absolute tolerance of the nth component
-    double steady_atol(size_t n) {
+    CanteraDouble steady_atol(size_t n) {
         return m_atol_ss[n];
     }
 
     //! Transient relative tolerance of the nth component
-    double transient_rtol(size_t n) {
+    CanteraDouble transient_rtol(size_t n) {
         return m_rtol_ts[n];
     }
 
     //! Transient absolute tolerance of the nth component
-    double transient_atol(size_t n) {
+    CanteraDouble transient_atol(size_t n) {
         return m_atol_ts[n];
     }
 
     //! Upper bound on the nth component.
-    double upperBound(size_t n) const {
+    CanteraDouble upperBound(size_t n) const {
         return m_max[n];
     }
 
     //! Lower bound on the nth component
-    double lowerBound(size_t n) const {
+    CanteraDouble lowerBound(size_t n) const {
         return m_min[n];
     }
 
@@ -279,7 +279,7 @@ public:
     /*!
      * Copy the internally-stored solution at the last time step to array x0.
      */
-    void initTimeInteg(double dt, const double* x0) {
+    void initTimeInteg(CanteraDouble dt, const CanteraDouble* x0) {
         std::copy(x0 + loc(), x0 + loc() + size(), m_slast.begin());
         m_rdt = 1.0/dt;
     }
@@ -322,14 +322,14 @@ public:
      *  @param[in] rdt Reciprocal of the timestep (`rdt=0` implies steady-
      *  state.)
      */
-    virtual void eval(size_t j, double* x, double* r, integer* mask, double rdt=0.0) {
+    virtual void eval(size_t j, CanteraDouble* x, CanteraDouble* r, integer* mask, CanteraDouble rdt=0.0) {
         throw NotImplementedError("Domain1D::eval");
     }
 
     size_t index(size_t n, size_t j) const {
         return m_nv*j + n;
     }
-    double value(const double* x, size_t n, size_t j) const {
+    CanteraDouble value(const CanteraDouble* x, size_t n, size_t j) const {
         return x[index(n,j)];
     }
 
@@ -341,7 +341,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0; superseded by asArray().
      */
-    AnyMap serialize(const double* soln) const;
+    AnyMap serialize(const CanteraDouble* soln) const;
 
     //! Save the state of this domain as a SolutionArray.
     /*!
@@ -351,7 +351,7 @@ public:
      *
      * @since New in %Cantera 3.0.
      */
-    virtual shared_ptr<SolutionArray> asArray(const double* soln) const {
+    virtual shared_ptr<SolutionArray> asArray(const CanteraDouble* soln) const {
         throw NotImplementedError("Domain1D::asArray", "Needs to be overloaded.");
     }
 
@@ -374,7 +374,7 @@ public:
      *
      * @deprecated To be removed after %Cantera 3.0; restore from SolutionArray instead.
      */
-    void restore(const AnyMap& state, double* soln, int loglevel);
+    void restore(const AnyMap& state, CanteraDouble* soln, int loglevel);
 
     //! Restore the solution for this domain from a SolutionArray
     /*!
@@ -383,7 +383,7 @@ public:
      *
      * @since New in %Cantera 3.0.
      */
-    virtual void fromArray(SolutionArray& arr, double* soln) {
+    virtual void fromArray(SolutionArray& arr, CanteraDouble* soln) {
         throw NotImplementedError("Domain1D::fromArray", "Needs to be overloaded.");
     }
 
@@ -472,7 +472,7 @@ public:
     }
 
     //! Value of component n at point j in the previous solution.
-    double prevSoln(size_t n, size_t j) const {
+    CanteraDouble prevSoln(size_t n, size_t j) const {
         return m_slast[m_nv*j + n];
     }
 
@@ -490,42 +490,42 @@ public:
     }
 
     //! @deprecated To be removed after %Cantera 3.0; replaced by show()
-    virtual void showSolution_s(std::ostream& s, const double* x);
+    virtual void showSolution_s(std::ostream& s, const CanteraDouble* x);
 
     //! Print the solution.
     //! @deprecated To be removed after %Cantera 3.0; replaced by show()
-    virtual void showSolution(const double* x);
+    virtual void showSolution(const CanteraDouble* x);
 
     //! Print the solution.
-    virtual void show(std::ostream& s, const double* x) {}
+    virtual void show(std::ostream& s, const CanteraDouble* x) {}
 
     //! Print the solution.
-    virtual void show(const double* x);
+    virtual void show(const CanteraDouble* x);
 
-    double z(size_t jlocal) const {
+    CanteraDouble z(size_t jlocal) const {
         return m_z[jlocal];
     }
-    double zmin() const {
+    CanteraDouble zmin() const {
         return m_z[0];
     }
-    double zmax() const {
+    CanteraDouble zmax() const {
         return m_z[m_points - 1];
     }
 
-    void setProfile(const string& name, double* values, double* soln);
+    void setProfile(const string& name, CanteraDouble* values, CanteraDouble* soln);
 
-    vector<double>& grid() {
+    vector<CanteraDouble>& grid() {
         return m_z;
     }
-    const vector<double>& grid() const {
+    const vector<CanteraDouble>& grid() const {
         return m_z;
     }
-    double grid(size_t point) const {
+    CanteraDouble grid(size_t point) const {
         return m_z[point];
     }
 
     //! called to set up initial grid, and after grid refinement
-    virtual void setupGrid(size_t n, const double* z);
+    virtual void setupGrid(size_t n, const CanteraDouble* z);
 
     /**
      * Writes some or all initial solution values into the global solution
@@ -534,10 +534,10 @@ public:
      * been set locally prior to installing this domain into the container to be
      * written to the global solution vector.
      */
-    virtual void _getInitialSoln(double* x);
+    virtual void _getInitialSoln(CanteraDouble* x);
 
     //! Initial value of solution component @e n at grid point @e j.
-    virtual double initialValue(size_t n, size_t j);
+    virtual CanteraDouble initialValue(size_t n, size_t j);
 
     /**
      * In some cases, a domain may need to set parameters that depend on the
@@ -547,7 +547,7 @@ public:
      * this domain that will be used as the initial guess. If no such parameters
      * need to be set, then method _finalize does not need to be overloaded.
      */
-    virtual void _finalize(const double* x) {}
+    virtual void _finalize(const CanteraDouble* x) {}
 
     /**
      * In some cases, for computational efficiency some properties (such as
@@ -560,7 +560,7 @@ public:
     }
 
     //! Set shared data pointer
-    void setData(shared_ptr<vector<double>>& data) {
+    void setData(shared_ptr<vector<CanteraDouble>>& data) {
         m_state = data;
     }
 
@@ -571,17 +571,17 @@ protected:
     //! Retrieve meta data
     virtual void setMeta(const AnyMap& meta);
 
-    shared_ptr<vector<double>> m_state; //!< data pointer shared from OneDim
+    shared_ptr<vector<CanteraDouble>> m_state; //!< data pointer shared from OneDim
 
-    double m_rdt = 0.0;
+    CanteraDouble m_rdt = 0.0;
     size_t m_nv = 0;
     size_t m_points; //!< Number of grid points
-    vector<double> m_slast;
-    vector<double> m_max;
-    vector<double> m_min;
-    vector<double> m_rtol_ss, m_rtol_ts;
-    vector<double> m_atol_ss, m_atol_ts;
-    vector<double> m_z;
+    vector<CanteraDouble> m_slast;
+    vector<CanteraDouble> m_max;
+    vector<CanteraDouble> m_min;
+    vector<CanteraDouble> m_rtol_ss, m_rtol_ts;
+    vector<CanteraDouble> m_atol_ss, m_atol_ts;
+    vector<CanteraDouble> m_z;
     OneDim* m_container = nullptr;
     size_t m_index;
     int m_type = 0; //!< @deprecated To be removed after %Cantera 3.0

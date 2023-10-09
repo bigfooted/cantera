@@ -55,9 +55,9 @@ public:
     /*!
      *  Currently not implemented for this model
      */
-    void getThermalDiffCoeffs(double* const dt) override;
+    void getThermalDiffCoeffs(CanteraDouble* const dt) override;
 
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
     /**
      * Returns the matrix of binary diffusion coefficients
@@ -67,28 +67,28 @@ public:
      * @param ld    offset of rows in the storage
      * @param d     output vector of diffusion coefficients.  Units of m**2 / s
      */
-    void getBinaryDiffCoeffs(const size_t ld, double* const d) override;
+    void getBinaryDiffCoeffs(const size_t ld, CanteraDouble* const d) override;
 
-    void getMultiDiffCoeffs(const size_t ld, double* const d) override;
+    void getMultiDiffCoeffs(const size_t ld, CanteraDouble* const d) override;
 
-    double viscosity() override;
+    CanteraDouble viscosity() override;
 
     friend class TransportFactory;
 
 protected:
-    double Tcrit_i(size_t i);
+    CanteraDouble Tcrit_i(size_t i);
 
-    double Pcrit_i(size_t i);
+    CanteraDouble Pcrit_i(size_t i);
 
-    double Vcrit_i(size_t i);
+    CanteraDouble Vcrit_i(size_t i);
 
-    double Zcrit_i(size_t i);
+    CanteraDouble Zcrit_i(size_t i);
 
-    vector<double> store(size_t i, size_t nsp);
+    vector<CanteraDouble> store(size_t i, size_t nsp);
 
-    double FQ_i(double Q, double Tr, double MW);
+    CanteraDouble FQ_i(CanteraDouble Q, CanteraDouble Tr, CanteraDouble MW);
 
-    double setPcorr(double Pr, double Tr);
+    CanteraDouble setPcorr(CanteraDouble Pr, CanteraDouble Tr);
 };
 }
 #endif

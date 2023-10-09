@@ -20,27 +20,27 @@ public:
         m_formula = "H2O";
     }
 
-    double MolWt() override;
-    double Tcrit() override;
-    double Pcrit() override;
-    double Vcrit() override;
-    double Tmin() override;
-    double Tmax() override;
+    CanteraDouble MolWt() override;
+    CanteraDouble Tcrit() override;
+    CanteraDouble Pcrit() override;
+    CanteraDouble Vcrit() override;
+    CanteraDouble Tmin() override;
+    CanteraDouble Tmax() override;
 
-    double Pp() override;
-    double up() override;
-    double sp() override;
-    double Psat() override;
-    double dPsatdT();
+    CanteraDouble Pp() override;
+    CanteraDouble up() override;
+    CanteraDouble sp() override;
+    CanteraDouble Psat() override;
+    CanteraDouble dPsatdT();
 
 protected:
-    double ldens() override;
+    CanteraDouble ldens() override;
 
 private:
-    double C(int i);
-    double Cprime(int i);
-    double I(int i);
-    double H(int i);
+    CanteraDouble C(int i);
+    CanteraDouble Cprime(int i);
+    CanteraDouble I(int i);
+    CanteraDouble H(int i);
 };
 
 }

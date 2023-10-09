@@ -16,26 +16,26 @@ clockWC::clockWC() :
     last_num_ticks(clock()),
     clock_rollovers(0u),
     start_ticks(0),
-    inv_clocks_per_sec(1./(double)CLOCKS_PER_SEC),
-    clock_width((double)(1L<<((int)sizeof(clock_t)*8-2))*4./(double)CLOCKS_PER_SEC)
+    inv_clocks_per_sec(1./(CanteraDouble)CLOCKS_PER_SEC),
+    clock_width((CanteraDouble)(1L<<((int)sizeof(clock_t)*8-2))*4./(CanteraDouble)CLOCKS_PER_SEC)
 {
     start_ticks = last_num_ticks;
 }
 
-double clockWC::start()
+CanteraDouble clockWC::start()
 {
     start_ticks = last_num_ticks = clock();
     clock_rollovers = 0u;
     return 0.0;
 }
 
-double clockWC::secondsWC()
+CanteraDouble clockWC::secondsWC()
 {
     clock_t num_ticks = clock();
     if (num_ticks < last_num_ticks) {
         clock_rollovers++;
     }
-    double value = (num_ticks - start_ticks) * inv_clocks_per_sec;
+    CanteraDouble value = (num_ticks - start_ticks) * inv_clocks_per_sec;
     if (clock_rollovers) {
         value += clock_rollovers * clock_width;
     }

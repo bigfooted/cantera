@@ -17,30 +17,30 @@ namespace Cantera
 
 // ------------ Molar Thermodynamic Properties --------------------
 
-double SingleSpeciesTP::enthalpy_mole() const
+CanteraDouble SingleSpeciesTP::enthalpy_mole() const
 {
-    double hbar;
+    CanteraDouble hbar;
     getPartialMolarEnthalpies(&hbar);
     return hbar;
 }
 
-double SingleSpeciesTP::intEnergy_mole() const
+CanteraDouble SingleSpeciesTP::intEnergy_mole() const
 {
-    double ubar;
+    CanteraDouble ubar;
     getPartialMolarIntEnergies(&ubar);
     return ubar;
 }
 
-double SingleSpeciesTP::entropy_mole() const
+CanteraDouble SingleSpeciesTP::entropy_mole() const
 {
-    double sbar;
+    CanteraDouble sbar;
     getPartialMolarEntropies(&sbar);
     return sbar;
 }
 
-double SingleSpeciesTP::gibbs_mole() const
+CanteraDouble SingleSpeciesTP::gibbs_mole() const
 {
-    double gbar;
+    CanteraDouble gbar;
 
     // Get the chemical potential of the first species. This is the same as the
     // partial molar Gibbs free energy.
@@ -48,9 +48,9 @@ double SingleSpeciesTP::gibbs_mole() const
     return gbar;
 }
 
-double SingleSpeciesTP::cp_mole() const
+CanteraDouble SingleSpeciesTP::cp_mole() const
 {
-    double cpbar;
+    CanteraDouble cpbar;
 
     // Really should have a partial molar heat capacity function in ThermoPhase.
     // However, the standard state heat capacity will do fine here for now.
@@ -59,7 +59,7 @@ double SingleSpeciesTP::cp_mole() const
     return cpbar;
 }
 
-double SingleSpeciesTP::cv_mole() const
+CanteraDouble SingleSpeciesTP::cv_mole() const
 {
     // For single species, we go directory to the general Cp - Cv relation
     //
@@ -68,11 +68,11 @@ double SingleSpeciesTP::cv_mole() const
     // where
     //     alpha = volume thermal expansion coefficient
     //     beta  = isothermal compressibility
-    double cvbar = cp_mole();
-    double alpha = thermalExpansionCoeff();
-    double beta = isothermalCompressibility();
-    double V = molecularWeight(0)/density();
-    double T = temperature();
+    CanteraDouble cvbar = cp_mole();
+    CanteraDouble alpha = thermalExpansionCoeff();
+    CanteraDouble beta = isothermalCompressibility();
+    CanteraDouble V = molecularWeight(0)/density();
+    CanteraDouble T = temperature();
     if (beta != 0.0) {
         cvbar -= alpha * alpha * V * T / beta;
     }
@@ -81,12 +81,12 @@ double SingleSpeciesTP::cv_mole() const
 
 // ----------- Partial Molar Properties of the Solution -----------------
 
-void SingleSpeciesTP::getChemPotentials(double* mu) const
+void SingleSpeciesTP::getChemPotentials(CanteraDouble* mu) const
 {
     getStandardChemPotentials(mu);
 }
 
-void SingleSpeciesTP::getChemPotentials_RT(double* murt) const
+void SingleSpeciesTP::getChemPotentials_RT(CanteraDouble* murt) const
 {
     warn_deprecated("SingleSpeciesTP::getChemPotentials_RT",
                     "To be removed after Cantera 3.0. Use getChemPotentials instead.");
@@ -94,75 +94,75 @@ void SingleSpeciesTP::getChemPotentials_RT(double* murt) const
     murt[0] /= RT();
 }
 
-void SingleSpeciesTP::getPartialMolarEnthalpies(double* hbar) const
+void SingleSpeciesTP::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     getEnthalpy_RT(hbar);
     hbar[0] *= RT();
 }
 
-void SingleSpeciesTP::getPartialMolarIntEnergies(double* ubar) const
+void SingleSpeciesTP::getPartialMolarIntEnergies(CanteraDouble* ubar) const
 {
     getIntEnergy_RT(ubar);
     ubar[0] *= RT();
 }
 
-void SingleSpeciesTP::getPartialMolarEntropies(double* sbar) const
+void SingleSpeciesTP::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     getEntropy_R(sbar);
     sbar[0] *= GasConstant;
 }
 
-void SingleSpeciesTP::getPartialMolarCp(double* cpbar) const
+void SingleSpeciesTP::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     getCp_R(cpbar);
     cpbar[0] *= GasConstant;
 }
 
-void SingleSpeciesTP::getPartialMolarVolumes(double* vbar) const
+void SingleSpeciesTP::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     vbar[0] = molecularWeight(0) / density();
 }
 
 // Properties of the Standard State of the Species in the Solution
 
-void SingleSpeciesTP::getPureGibbs(double* gpure) const
+void SingleSpeciesTP::getPureGibbs(CanteraDouble* gpure) const
 {
     getGibbs_RT(gpure);
     gpure[0] *= RT();
 }
 
-void SingleSpeciesTP::getStandardVolumes(double* vbar) const
+void SingleSpeciesTP::getStandardVolumes(CanteraDouble* vbar) const
 {
     vbar[0] = molecularWeight(0) / density();
 }
 
 // ---- Thermodynamic Values for the Species Reference States -------
 
-void SingleSpeciesTP::getEnthalpy_RT_ref(double* hrt) const
+void SingleSpeciesTP::getEnthalpy_RT_ref(CanteraDouble* hrt) const
 {
     _updateThermo();
     hrt[0] = m_h0_RT;
 }
 
-void SingleSpeciesTP::getGibbs_RT_ref(double* grt) const
+void SingleSpeciesTP::getGibbs_RT_ref(CanteraDouble* grt) const
 {
     _updateThermo();
     grt[0] = m_h0_RT - m_s0_R;
 }
 
-void SingleSpeciesTP::getGibbs_ref(double* g) const
+void SingleSpeciesTP::getGibbs_ref(CanteraDouble* g) const
 {
     getGibbs_RT_ref(g);
     g[0] *= RT();
 }
 
-void SingleSpeciesTP::getEntropy_R_ref(double* er) const
+void SingleSpeciesTP::getEntropy_R_ref(CanteraDouble* er) const
 {
     _updateThermo();
     er[0] = m_s0_R;
 }
 
-void SingleSpeciesTP::getCp_R_ref(double* cpr) const
+void SingleSpeciesTP::getCp_R_ref(CanteraDouble* cpr) const
 {
     _updateThermo();
     cpr[0] = m_cp0_R;
@@ -170,9 +170,9 @@ void SingleSpeciesTP::getCp_R_ref(double* cpr) const
 
 // ------------------ Setting the State ------------------------
 
-void SingleSpeciesTP::setState_HP(double h, double p, double tol)
+void SingleSpeciesTP::setState_HP(CanteraDouble h, CanteraDouble p, CanteraDouble tol)
 {
-    double dt;
+    CanteraDouble dt;
     setPressure(p);
     for (int n = 0; n < 50; n++) {
         dt = clip((h - enthalpy_mass())/cp_mass(), -100.0, 100.0);
@@ -185,9 +185,9 @@ void SingleSpeciesTP::setState_HP(double h, double p, double tol)
                        "no convergence. dt = {}", dt);
 }
 
-void SingleSpeciesTP::setState_UV(double u, double v, double tol)
+void SingleSpeciesTP::setState_UV(CanteraDouble u, CanteraDouble v, CanteraDouble tol)
 {
-    double dt;
+    CanteraDouble dt;
     if (v == 0.0) {
         setDensity(1.0E100);
     } else {
@@ -204,9 +204,9 @@ void SingleSpeciesTP::setState_UV(double u, double v, double tol)
                        "no convergence. dt = {}\nu = {} v = {}", dt, u, v);
 }
 
-void SingleSpeciesTP::setState_SP(double s, double p, double tol)
+void SingleSpeciesTP::setState_SP(CanteraDouble s, CanteraDouble p, CanteraDouble tol)
 {
-    double dt;
+    CanteraDouble dt;
     setPressure(p);
     for (int n = 0; n < 50; n++) {
         dt = clip((s - entropy_mass())*temperature()/cp_mass(), -100.0, 100.0);
@@ -219,9 +219,9 @@ void SingleSpeciesTP::setState_SP(double s, double p, double tol)
                        "no convergence. dt = {}", dt);
 }
 
-void SingleSpeciesTP::setState_SV(double s, double v, double tol)
+void SingleSpeciesTP::setState_SV(CanteraDouble s, CanteraDouble v, CanteraDouble tol)
 {
-    double dt;
+    CanteraDouble dt;
     if (v == 0.0) {
         setDensity(1.0E100);
     } else {
@@ -249,7 +249,7 @@ bool SingleSpeciesTP::addSpecies(shared_ptr<Species> spec)
 
 void SingleSpeciesTP::_updateThermo() const
 {
-    double tnow = temperature();
+    CanteraDouble tnow = temperature();
     if (m_tlast != tnow) {
         m_spthermo.update(tnow, &m_cp0_R, &m_h0_RT, &m_s0_R);
         m_tlast = tnow;

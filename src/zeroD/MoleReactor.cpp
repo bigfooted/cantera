@@ -18,14 +18,14 @@ namespace bmt = boost::math::tools;
 namespace Cantera
 {
 
-void MoleReactor::getSurfaceInitialConditions(double* y)
+void MoleReactor::getSurfaceInitialConditions(CanteraDouble* y)
 {
     size_t loc = 0;
     for (auto& S : m_surfaces) {
-        double area = S->area();
+        CanteraDouble area = S->area();
         auto currPhase = S->thermo();
         size_t tempLoc = currPhase->nSpecies();
-        double surfDensity = currPhase->siteDensity();
+        CanteraDouble surfDensity = currPhase->siteDensity();
         S->getCoverages(y + loc);
         // convert coverages to moles
         for (size_t i = 0; i < tempLoc; i++) {
@@ -35,20 +35,20 @@ void MoleReactor::getSurfaceInitialConditions(double* y)
     }
 }
 
-void MoleReactor::initialize(double t0)
+void MoleReactor::initialize(CanteraDouble t0)
 {
     Reactor::initialize(t0);
     m_nv -= 1; // moles gives the state one fewer variables
 }
 
-void MoleReactor::updateSurfaceState(double* y)
+void MoleReactor::updateSurfaceState(CanteraDouble* y)
 {
     size_t loc = 0;
-    vector<double> coverages(m_nv_surf, 0.0);
+    vector<CanteraDouble> coverages(m_nv_surf, 0.0);
     for (auto& S : m_surfaces) {
         auto surf = S->thermo();
-        double invArea = 1/S->area();
-        double invSurfDensity = 1/surf->siteDensity();
+        CanteraDouble invArea = 1/S->area();
+        CanteraDouble invSurfDensity = 1/surf->siteDensity();
         size_t tempLoc = surf->nSpecies();
         for (size_t i = 0; i < tempLoc; i++) {
             coverages[i + loc] = y[i + loc] * invArea * surf->size(i) * invSurfDensity;
@@ -58,14 +58,14 @@ void MoleReactor::updateSurfaceState(double* y)
     }
 }
 
-void MoleReactor::evalSurfaces(double* LHS, double* RHS, double* sdot)
+void MoleReactor::evalSurfaces(CanteraDouble* LHS, CanteraDouble* RHS, CanteraDouble* sdot)
 {
     fill(sdot, sdot + m_nsp, 0.0);
     size_t loc = 0; // offset into ydot
     for (auto S : m_surfaces) {
         Kinetics* kin = S->kinetics();
         SurfPhase* surf = S->thermo();
-        double wallarea = S->area();
+        CanteraDouble wallarea = S->area();
         size_t nk = surf->nSpecies();
         S->syncState();
         kin->getNetProductionRates(&m_work[0]);
@@ -84,12 +84,12 @@ void MoleReactor::evalSurfaces(double* LHS, double* RHS, double* sdot)
     }
 }
 
-void MoleReactor::addSurfaceJacobian(vector<Eigen::Triplet<double>> &triplets)
+void MoleReactor::addSurfaceJacobian(vector<Eigen::Triplet<CanteraDouble>> &triplets)
 {
     size_t offset = m_nsp;
     for (auto& S : m_surfaces) {
         S->syncState();
-        double A = S->area();
+        CanteraDouble A = S->area();
         auto kin = S->kinetics();
         size_t nk = S->thermo()->nSpecies();
         // index of gas and surface phases to check if the species is in gas or surface
@@ -97,11 +97,11 @@ void MoleReactor::addSurfaceJacobian(vector<Eigen::Triplet<double>> &triplets)
         size_t gpi = kin->speciesPhaseIndex(kin->kineticsSpeciesIndex(
             m_thermo->speciesName(0)));
         // get surface jacobian in concentration units
-        Eigen::SparseMatrix<double> surfJac = kin->netProductionRates_ddCi();
+        Eigen::SparseMatrix<CanteraDouble> surfJac = kin->netProductionRates_ddCi();
         // loop through surface specific jacobian and add elements to triplets vector
         // accordingly
         for (int k=0; k<surfJac.outerSize(); ++k) {
-            for (Eigen::SparseMatrix<double>::InnerIterator it(surfJac, k); it; ++it) {
+            for (Eigen::SparseMatrix<CanteraDouble>::InnerIterator it(surfJac, k); it; ++it) {
                 size_t row = it.row();
                 size_t col = it.col();
                 auto& rowPhase = kin->speciesPhase(row);
@@ -122,7 +122,7 @@ void MoleReactor::addSurfaceJacobian(vector<Eigen::Triplet<double>> &triplets)
                     // determine appropriate scalar to account for dimensionality
                     // gas phase species indices will be less than m_nsp
                     // so use volume if that is the case or area otherwise
-                    double scalar = A;
+                    CanteraDouble scalar = A;
                     if (cpi == spi) {
                         col += offset;
                         scalar /= A;
@@ -140,19 +140,19 @@ void MoleReactor::addSurfaceJacobian(vector<Eigen::Triplet<double>> &triplets)
     }
 }
 
-void MoleReactor::getMoles(double* y)
+void MoleReactor::getMoles(CanteraDouble* y)
 {
     // Use inverse molecular weights to convert to moles
-    const double* Y = m_thermo->massFractions();
-    const vector<double>& imw = m_thermo->inverseMolecularWeights();
+    const CanteraDouble* Y = m_thermo->massFractions();
+    const vector<CanteraDouble>& imw = m_thermo->inverseMolecularWeights();
     for (size_t i = 0; i < m_nsp; i++) {
         y[i] = m_mass * imw[i] * Y[i];
     }
 }
 
-void MoleReactor::setMassFromMoles(double* y)
+void MoleReactor::setMassFromMoles(CanteraDouble* y)
 {
-    const vector<double>& mw = m_thermo->molecularWeights();
+    const vector<CanteraDouble>& mw = m_thermo->molecularWeights();
     // calculate mass from moles
     m_mass = 0;
     for (size_t i = 0; i < m_nsp; i++) {
@@ -160,7 +160,7 @@ void MoleReactor::setMassFromMoles(double* y)
     }
 }
 
-void MoleReactor::getState(double* y)
+void MoleReactor::getState(CanteraDouble* y)
 {
     if (m_thermo == 0) {
         throw CanteraError("MoleReactor::getState",
@@ -179,7 +179,7 @@ void MoleReactor::getState(double* y)
     getSurfaceInitialConditions(y+m_nsp+m_sidx);
 }
 
-void MoleReactor::updateState(double* y)
+void MoleReactor::updateState(CanteraDouble* y)
 {
     // The components of y are [0] total internal energy, [1] the total volume, and
     // [2...K+3] are the moles of each species, and [K+3...] are the moles
@@ -188,24 +188,24 @@ void MoleReactor::updateState(double* y)
     m_vol = y[1];
     m_thermo->setMolesNoTruncate(y + m_sidx);
     if (m_energy) {
-        double U = y[0];
+        CanteraDouble U = y[0];
         // Residual function: error in internal energy as a function of T
-        auto u_err = [this, U](double T) {
+        auto u_err = [this, U](CanteraDouble T) {
             m_thermo->setState_TD(T, m_mass / m_vol);
             return m_thermo->intEnergy_mass() * m_mass - U;
         };
-        double T = m_thermo->temperature();
+        CanteraDouble T = m_thermo->temperature();
         boost::uintmax_t maxiter = 100;
-        pair<double, double> TT;
+        pair<CanteraDouble, CanteraDouble> TT;
         try {
             TT = bmt::bracket_and_solve_root(
-                u_err, T, 1.2, true, bmt::eps_tolerance<double>(48), maxiter);
+                u_err, T, 1.2, true, bmt::eps_tolerance<CanteraDouble>(48), maxiter);
         } catch (std::exception&) {
             // Try full-range bisection if bracketing fails (for example, near
             // temperature limits for the phase's equation of state)
             try {
                 TT = bmt::bisect(u_err, m_thermo->minTemp(), m_thermo->maxTemp(),
-                    bmt::eps_tolerance<double>(48), maxiter);
+                    bmt::eps_tolerance<CanteraDouble>(48), maxiter);
             } catch (std::exception& err2) {
                 // Set m_thermo back to a reasonable state if root finding fails
                 m_thermo->setState_TD(T, m_mass / m_vol);
@@ -224,16 +224,16 @@ void MoleReactor::updateState(double* y)
     updateSurfaceState(y + m_nsp + m_sidx);
 }
 
-void MoleReactor::eval(double time, double* LHS, double* RHS)
+void MoleReactor::eval(CanteraDouble time, CanteraDouble* LHS, CanteraDouble* RHS)
 {
-    double* dndt = RHS + m_sidx; // moles per time
+    CanteraDouble* dndt = RHS + m_sidx; // moles per time
 
     evalWalls(time);
     m_thermo->restoreState(m_state);
 
     evalSurfaces(LHS + m_nsp + m_sidx, RHS + m_nsp + m_sidx, m_sdot.data());
     // inverse molecular weights for conversion
-    const vector<double>& imw = m_thermo->inverseMolecularWeights();
+    const vector<CanteraDouble>& imw = m_thermo->inverseMolecularWeights();
     // volume equation
     RHS[1] = m_vdot;
 
@@ -263,7 +263,7 @@ void MoleReactor::eval(double time, double* LHS, double* RHS)
             dndt[n] -= outlet->outletSpeciesMassFlowRate(n) * imw[n];
         }
         // energy update based on mass flow
-        double mdot = outlet->massFlowRate();
+        CanteraDouble mdot = outlet->massFlowRate();
         if (m_energy) {
             RHS[0] -= mdot * m_enthalpy;
         }
@@ -271,7 +271,7 @@ void MoleReactor::eval(double time, double* LHS, double* RHS)
 
     // add terms for inlets
     for (auto inlet : m_inlet) {
-        double mdot = inlet->massFlowRate();
+        CanteraDouble mdot = inlet->massFlowRate();
         for (size_t n = 0; n < m_nsp; n++) {
             // flow of species into system and dilution by other species
             dndt[n] += inlet->outletSpeciesMassFlowRate(n) * imw[n];

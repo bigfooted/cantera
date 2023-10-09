@@ -10,7 +10,7 @@ using namespace Cantera;
 
 namespace tpx
 {
-static const double
+static const CanteraDouble
 M = 2.0159,
 Tmn = 13.8,
 Tmx = 5000.0,
@@ -29,7 +29,7 @@ T2 = 400,
 alpha = 1.5814454428, //to be used with psat
 alpha1 = .3479; //to be used with ldens
 
-static const double Ahydro[] = {
+static const CanteraDouble Ahydro[] = {
     1.150470519352900e1, 1.055427998826072e3, -1.270685949968568e4,
     7.287844527295619e4, -7.448780703363973e5, 2.328994151810363e-1,
     -1.635308393739296e1, 3.730678064960389e3, 6.299667723184813e5,
@@ -42,20 +42,20 @@ static const double Ahydro[] = {
     -5.597033440289980e-9, 8.842130160884514e-8, -2.655507264539047e-12,
     -4.544474518140164e-12, 9.818775257001922e-11
 };
-static const double Dhydro[]= {
+static const CanteraDouble Dhydro[]= {
     4.8645813003e1, -3.4779278180e1, 4.0776538192e2,
     -1.1719787304e3, 1.6213924400e3, -1.1531096683e3, 3.3825492039e2
 };
-static const double Fhydro[]=
+static const CanteraDouble Fhydro[]=
 { 3.05300134164, 2.80810925813, -6.55461216567e-1, 1.59514439374 };
-static const double Ghydro[]= {
+static const CanteraDouble Ghydro[]= {
     6.1934792e3, 2.9490437e2, -1.5401979e3, -4.9176101e3,
     6.8957165e4, -2.2282185e5, 3.7990059e5, -3.7094216e5, 2.1326792e5,
     -7.1519411e4, 1.2971743e4, -9.8533014e2, 1.0434776e4,
     -3.9144179e2, 5.8277696e2, 6.5409163e2, -1.8728847e2
 };
 
-double hydrogen::C(int i, double rt, double rt2)
+CanteraDouble hydrogen::C(int i, CanteraDouble rt, CanteraDouble rt2)
 {
     switch (i) {
     case 0:
@@ -91,7 +91,7 @@ double hydrogen::C(int i, double rt, double rt2)
     }
 }
 
-double hydrogen::Cprime(int i, double rt, double rt2, double rt3)
+CanteraDouble hydrogen::Cprime(int i, CanteraDouble rt, CanteraDouble rt2, CanteraDouble rt3)
 {
     switch (i) {
     case 0:
@@ -127,34 +127,34 @@ double hydrogen::Cprime(int i, double rt, double rt2, double rt3)
     }
 }
 
-double hydrogen::W(int n, double egrho)
+CanteraDouble hydrogen::W(int n, CanteraDouble egrho)
 {
     return (n == 0 ? (1.0 - egrho)/(2.0*Gamma) :
             (n*W(n-1, egrho) - 0.5*pow(Rho,2*n)*egrho)/Gamma);
 }
 
-double hydrogen::H(int i, double egrho)
+CanteraDouble hydrogen::H(int i, CanteraDouble egrho)
 {
     return (i < 8 ? pow(Rho,i+2) : pow(Rho,2*i-13)*egrho);
 }
 
-double hydrogen::I(int i, double egrho)
+CanteraDouble hydrogen::I(int i, CanteraDouble egrho)
 {
-    return (i < 8 ? pow(Rho,i+1)/double(i+1) : W(i-8, egrho));
+    return (i < 8 ? pow(Rho,i+1)/CanteraDouble(i+1) : W(i-8, egrho));
 }
 
-double hydrogen::icv(int i, double x, double xlg)
+CanteraDouble hydrogen::icv(int i, CanteraDouble x, CanteraDouble xlg)
 {
     return (i == 0 ? x - 1 : x*pow(xlg,i) - i*icv(i-1,x,xlg));
 }
 
-double hydrogen::up()
+CanteraDouble hydrogen::up()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
-    double sum = u0;
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble sum = u0;
     for (int i=0; i<14; i++) {
         sum += (C(i, rt, rt2) - T*Cprime(i, rt, rt2, rt3))*I(i, egrho);
     }
@@ -162,13 +162,13 @@ double hydrogen::up()
     //   add \int c_{v,0} term
     sum += Ghydro[0] * (std::min(T, T1) - To);
     if (T > T1) {
-        double x = std::min(T, T2) / T1;
+        CanteraDouble x = std::min(T, T2) / T1;
         for (int i = 0; i < 12; i++) {
             sum += Ghydro[i] * T1 * icv(i, x, log(x));
         }
     }
     if (T > T2) {
-        double x = T/T2;
+        CanteraDouble x = T/T2;
         for (int i = 0; i < 5; i++) {
             sum += Ghydro[i+12] * T2 * icv(i, x, log(x));
         }
@@ -176,13 +176,13 @@ double hydrogen::up()
     return sum + m_energy_offset;
 }
 
-double hydrogen::sp()
+CanteraDouble hydrogen::sp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
-    double sum = s0 - R*log(Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble sum = s0 - R*log(Rho);
     for (int i=0; i<14; i++) {
         sum -= Cprime(i, rt, rt2, rt3)*I(i, egrho);
     }
@@ -190,13 +190,13 @@ double hydrogen::sp()
     //   add \int c_{v,0}/T term
     sum += Ghydro[0] * log(std::min(T, T1)/ To);
     if (T > T1) {
-        double xlg = log(std::min(T, T2)/T1);
+        CanteraDouble xlg = log(std::min(T, T2)/T1);
         for (int i = 0; i < 12; i++) {
             sum += Ghydro[i] / (i + 1) * pow(xlg, i+1);
         }
     }
     if (T > T2) {
-        double xlg = log(T/T2);
+        CanteraDouble xlg = log(T/T2);
         for (int i = 0; i < 5; i++) {
             sum += Ghydro[i+12] / (i + 1) * pow(xlg, i+1);
         }
@@ -204,38 +204,38 @@ double hydrogen::sp()
     return sum + m_entropy_offset;
 }
 
-double hydrogen::Pp()
+CanteraDouble hydrogen::Pp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<14; i++) {
         P += C(i, rt, rt2)*H(i, egrho);
     }
     return P;
 }
 
-double hydrogen::ldens()
+CanteraDouble hydrogen::ldens()
 {
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("hydrogen::ldens",
                            "Temperature out of range. T = {}", T);
     }
-    double x=1-T/Tc;
-    double sum;
+    CanteraDouble x=1-T/Tc;
+    CanteraDouble sum;
     int i;
     for (i=1, sum=0; i<=6; i++) {
-        sum+=Dhydro[i]*pow(x, 1+double(i-1)/3.0);
+        sum+=Dhydro[i]*pow(x, 1+CanteraDouble(i-1)/3.0);
     }
     return sum+Roc+Dhydro[0]*pow(x,alpha1);
 }
 
-double hydrogen::Psat()
+CanteraDouble hydrogen::Psat()
 {
-    double x = (1.0 - Tt/T)/(1.0 - Tt/Tc);
-    double result;
+    CanteraDouble x = (1.0 - Tt/T)/(1.0 - Tt/Tc);
+    CanteraDouble result;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("hydrogen::Psat",
                            "Temperature out of range. T = {}", T);
@@ -245,27 +245,27 @@ double hydrogen::Psat()
     return exp(result)*Pt;
 }
 
-double hydrogen::Tcrit()
+CanteraDouble hydrogen::Tcrit()
 {
     return Tc;
 }
-double hydrogen::Pcrit()
+CanteraDouble hydrogen::Pcrit()
 {
     return Pc;
 }
-double hydrogen::Vcrit()
+CanteraDouble hydrogen::Vcrit()
 {
     return 1.0/Roc;
 }
-double hydrogen::Tmin()
+CanteraDouble hydrogen::Tmin()
 {
     return Tmn;
 }
-double hydrogen::Tmax()
+CanteraDouble hydrogen::Tmax()
 {
     return Tmx;
 }
-double hydrogen::MolWt()
+CanteraDouble hydrogen::MolWt()
 {
     return M;
 }

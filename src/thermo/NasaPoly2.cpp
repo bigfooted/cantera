@@ -8,8 +8,8 @@
 
 namespace Cantera {
 
-void NasaPoly2::setParameters(double Tmid, const vector<double>& low,
-                              const vector<double>& high) {
+void NasaPoly2::setParameters(CanteraDouble Tmid, const vector<CanteraDouble>& low,
+                              const vector<CanteraDouble>& high) {
     m_midT = Tmid;
     mnp_low.setMaxTemp(Tmid);
     mnp_high.setMinTemp(Tmid);
@@ -21,9 +21,9 @@ void NasaPoly2::getParameters(AnyMap& thermo) const
 {
     thermo["model"] = "NASA7";
     SpeciesThermoInterpType::getParameters(thermo);
-    vector<double> Tranges {m_lowT, m_midT, m_highT};
+    vector<CanteraDouble> Tranges {m_lowT, m_midT, m_highT};
     thermo["temperature-ranges"].setQuantity(Tranges, "K");
-    thermo["data"] = vector<vector<double>>();
+    thermo["data"] = vector<vector<CanteraDouble>>();
     mnp_low.getParameters(thermo);
     mnp_high.getParameters(thermo);
 }
@@ -34,12 +34,12 @@ void NasaPoly2::validate(const string& name)
         return;
     }
 
-    double cp_low, h_low, s_low;
-    double cp_high, h_high, s_high;
+    CanteraDouble cp_low, h_low, s_low;
+    CanteraDouble cp_high, h_high, s_high;
     mnp_low.updatePropertiesTemp(m_midT, &cp_low, &h_low, &s_low);
     mnp_high.updatePropertiesTemp(m_midT, &cp_high, &h_high, &s_high);
 
-    double delta = cp_low - cp_high;
+    CanteraDouble delta = cp_low - cp_high;
     if (fabs(delta/(fabs(cp_low)+1.0E-4)) > 0.01) {
         warn_user("NasaPoly2::validate",
             "\nFor species {}, discontinuity in cp/R detected at Tmid = {}\n"

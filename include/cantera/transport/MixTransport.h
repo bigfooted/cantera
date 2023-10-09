@@ -67,7 +67,7 @@ public:
      *
      * @param dt  Vector of thermal diffusion coefficients. Units = kg/m/s
      */
-    void getThermalDiffCoeffs(double* const dt) override;
+    void getThermalDiffCoeffs(CanteraDouble* const dt) override;
 
     //! Returns the mixture thermal conductivity (W/m /K)
     /*!
@@ -88,7 +88,7 @@ public:
      *
      * @returns the mixture thermal conductivity, with units of W/m/K
      */
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
     //! Get the Electrical mobilities (m^2/V/s).
     /*!
@@ -106,7 +106,7 @@ public:
      *               The array must be dimensioned at least as large as the
      *               number of species.
      */
-    void getMobilities(double* const mobil) override;
+    void getMobilities(CanteraDouble* const mobil) override;
 
     //! Update the internal parameters whenever the temperature has changed
     /*!
@@ -143,9 +143,9 @@ public:
      * @param fluxes    Output of the diffusive mass fluxes. Flat vector with
      *                  the m_nsp in the inner loop. length = ldx * ndim
      */
-    void getSpeciesFluxes(size_t ndim, const double* const grad_T,
-                          size_t ldx, const double* const grad_X,
-                          size_t ldf, double* const fluxes) override;
+    void getSpeciesFluxes(size_t ndim, const CanteraDouble* const grad_T,
+                          size_t ldx, const CanteraDouble* const grad_X,
+                          size_t ldf, CanteraDouble* const fluxes) override;
 
     void init(ThermoPhase* thermo, int mode=0, int log_level=0) override;
 
@@ -163,13 +163,13 @@ protected:
      * These are used in wilke's rule to calculate the viscosity of the
      * solution. units = W /m /K = kg m /s^3 /K. length = m_kk.
      */
-    vector<double> m_cond;
+    vector<CanteraDouble> m_cond;
 
     //! Internal storage for the calculated mixture thermal conductivity
     /*!
      *  Units = W /m /K
      */
-    double m_lambda = 0.0;
+    CanteraDouble m_lambda = 0.0;
 
     //! Update boolean for the species thermal conductivities
     bool m_spcond_ok = false;

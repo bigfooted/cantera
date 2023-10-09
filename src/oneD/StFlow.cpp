@@ -78,7 +78,7 @@ StFlow::StFlow(ThermoPhase* ph, size_t nsp, size_t points) :
     m_refiner->setActive(c_offset_T, false);
     m_refiner->setActive(c_offset_L, false);
 
-    vector<double> gr;
+    vector<CanteraDouble> gr;
     for (size_t ng = 0; ng < m_points; ng++) {
         gr.push_back(1.0*ng/m_points);
     }
@@ -209,7 +209,7 @@ void StFlow::resize(size_t ncomponents, size_t points)
     m_z.resize(m_points);
 }
 
-void StFlow::setupGrid(size_t n, const double* z)
+void StFlow::setupGrid(size_t n, const CanteraDouble* z)
 {
     resize(m_nv, n);
 
@@ -224,11 +224,11 @@ void StFlow::setupGrid(size_t n, const double* z)
     }
 }
 
-void StFlow::resetBadValues(double* xg)
+void StFlow::resetBadValues(CanteraDouble* xg)
 {
-    double* x = xg + loc();
+    CanteraDouble* x = xg + loc();
     for (size_t j = 0; j < m_points; j++) {
-        double* Y = x + m_nv*j + c_offset_Y;
+        CanteraDouble* Y = x + m_nv*j + c_offset_Y;
         m_thermo->setMassFractions(Y);
         m_thermo->getMassFractions(Y);
     }
@@ -268,7 +268,7 @@ void StFlow::setTransport(Transport& trans)
     }
 }
 
-void StFlow::_getInitialSoln(double* x)
+void StFlow::_getInitialSoln(CanteraDouble* x)
 {
     for (size_t j = 0; j < m_points; j++) {
         T(x,j) = m_thermo->temperature();
@@ -277,19 +277,19 @@ void StFlow::_getInitialSoln(double* x)
     }
 }
 
-void StFlow::setGas(const double* x, size_t j)
+void StFlow::setGas(const CanteraDouble* x, size_t j)
 {
     m_thermo->setTemperature(T(x,j));
-    const double* yy = x + m_nv*j + c_offset_Y;
+    const CanteraDouble* yy = x + m_nv*j + c_offset_Y;
     m_thermo->setMassFractions_NoNorm(yy);
     m_thermo->setPressure(m_press);
 }
 
-void StFlow::setGasAtMidpoint(const double* x, size_t j)
+void StFlow::setGasAtMidpoint(const CanteraDouble* x, size_t j)
 {
     m_thermo->setTemperature(0.5*(T(x,j)+T(x,j+1)));
-    const double* yyj = x + m_nv*j + c_offset_Y;
-    const double* yyjp = x + m_nv*(j+1) + c_offset_Y;
+    const CanteraDouble* yyj = x + m_nv*j + c_offset_Y;
+    const CanteraDouble* yyjp = x + m_nv*(j+1) + c_offset_Y;
     for (size_t k = 0; k < m_nsp; k++) {
         m_ybar[k] = 0.5*(yyj[k] + yyjp[k]);
     }
@@ -303,7 +303,7 @@ bool StFlow::fixed_mdot() {
     return !m_isFree;
 }
 
-void StFlow::_finalize(const double* x)
+void StFlow::_finalize(const CanteraDouble* x)
 {
     if (!m_do_multicomponent && m_do_soret) {
         throw CanteraError("StFlow::_finalize",
@@ -317,8 +317,8 @@ void StFlow::_finalize(const double* x)
         if (e || nz == 0) {
             m_fixedtemp[j] = T(x, j);
         } else {
-            double zz = (z(j) - z(0))/(z(m_points - 1) - z(0));
-            double tt = linearInterp(zz, m_zfix, m_tfix);
+            CanteraDouble zz = (z(j) - z(0))/(z(m_points - 1) - z(0));
+            CanteraDouble tt = linearInterp(zz, m_zfix, m_tfix);
             m_fixedtemp[j] = tt;
         }
     }
@@ -350,7 +350,7 @@ void StFlow::_finalize(const double* x)
     }
 }
 
-void StFlow::eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt)
+void StFlow::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg, CanteraDouble rdt)
 {
     // if evaluating a Jacobian, and the global point is outside the domain of
     // influence for this domain, then skip evaluating the residual
@@ -359,8 +359,8 @@ void StFlow::eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt)
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* rsd = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* rsd = rg + loc();
     integer* diag = diagg + loc();
 
     size_t jmin, jmax;
@@ -377,7 +377,7 @@ void StFlow::eval(size_t jg, double* xg, double* rg, integer* diagg, double rdt)
     evalResidual(x, rsd, diag, rdt, jmin, jmax);
 }
 
-void StFlow::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
+void StFlow::updateProperties(size_t jg, CanteraDouble* x, size_t jmin, size_t jmax)
 {
     // properties are computed for grid points from j0 to j1
     size_t j0 = std::max<size_t>(jmin, 1) - 1;
@@ -390,9 +390,9 @@ void StFlow::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
         updateTransport(x, j0, j1);
     }
     if (jg == npos) {
-        double* Yleft = x + index(c_offset_Y, jmin);
+        CanteraDouble* Yleft = x + index(c_offset_Y, jmin);
         m_kExcessLeft = distance(Yleft, max_element(Yleft, Yleft + m_nsp));
-        double* Yright = x + index(c_offset_Y, jmax);
+        CanteraDouble* Yright = x + index(c_offset_Y, jmax);
         m_kExcessRight = distance(Yright, max_element(Yright, Yright + m_nsp));
     }
 
@@ -401,8 +401,8 @@ void StFlow::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
     updateDiffFluxes(x, j0, j1);
 }
 
-void StFlow::evalResidual(double* x, double* rsd, int* diag,
-                          double rdt, size_t jmin, size_t jmax)
+void StFlow::evalResidual(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                          CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     //----------------------------------------------------
     // evaluate the residual equations at all required
@@ -413,39 +413,39 @@ void StFlow::evalResidual(double* x, double* rsd, int* diag,
     if (m_do_radiation) {
         // variable definitions for the Planck absorption coefficient and the
         // radiation calculation:
-        double k_P_ref = 1.0*OneAtm;
+        CanteraDouble k_P_ref = 1.0*OneAtm;
 
         // polynomial coefficients:
-        const double c_H2O[6] = {-0.23093, -1.12390, 9.41530, -2.99880,
+        const CanteraDouble c_H2O[6] = {-0.23093, -1.12390, 9.41530, -2.99880,
                                      0.51382, -1.86840e-5};
-        const double c_CO2[6] = {18.741, -121.310, 273.500, -194.050,
+        const CanteraDouble c_CO2[6] = {18.741, -121.310, 273.500, -194.050,
                                      56.310, -5.8169};
 
         // calculation of the two boundary values
-        double boundary_Rad_left = m_epsilon_left * StefanBoltz * pow(T(x, 0), 4);
-        double boundary_Rad_right = m_epsilon_right * StefanBoltz * pow(T(x, m_points - 1), 4);
+        CanteraDouble boundary_Rad_left = m_epsilon_left * StefanBoltz * pow(T(x, 0), 4);
+        CanteraDouble boundary_Rad_right = m_epsilon_right * StefanBoltz * pow(T(x, m_points - 1), 4);
 
         // loop over all grid points
         for (size_t j = jmin; j < jmax; j++) {
             // helping variable for the calculation
-            double radiative_heat_loss = 0;
+            CanteraDouble radiative_heat_loss = 0;
 
             // calculation of the mean Planck absorption coefficient
-            double k_P = 0;
+            CanteraDouble k_P = 0;
             // absorption coefficient for H2O
             if (m_kRadiating[1] != npos) {
-                double k_P_H2O = 0;
+                CanteraDouble k_P_H2O = 0;
                 for (size_t n = 0; n <= 5; n++) {
-                    k_P_H2O += c_H2O[n] * pow(1000 / T(x, j), (double) n);
+                    k_P_H2O += c_H2O[n] * pow(1000 / T(x, j), (CanteraDouble) n);
                 }
                 k_P_H2O /= k_P_ref;
                 k_P += m_press * X(x, m_kRadiating[1], j) * k_P_H2O;
             }
             // absorption coefficient for CO2
             if (m_kRadiating[0] != npos) {
-                double k_P_CO2 = 0;
+                CanteraDouble k_P_CO2 = 0;
                 for (size_t n = 0; n <= 5; n++) {
-                    k_P_CO2 += c_CO2[n] * pow(1000 / T(x, j), (double) n);
+                    k_P_CO2 += c_CO2[n] * pow(1000 / T(x, j), (CanteraDouble) n);
                 }
                 k_P_CO2 /= k_P_ref;
                 k_P += m_press * X(x, m_kRadiating[0], j) * k_P_CO2;
@@ -490,7 +490,7 @@ void StFlow::evalResidual(double* x, double* rsd, int* diag,
 
             // The default boundary condition for species is zero flux. However,
             // the boundary object may modify this.
-            double sum = 0.0;
+            CanteraDouble sum = 0.0;
             for (size_t k = 0; k < m_nsp; k++) {
                 sum += Y(x,k,0);
                 rsd[index(c_offset_Y + k, 0)] =
@@ -532,8 +532,8 @@ void StFlow::evalResidual(double* x, double* rsd, int* diag,
             //-------------------------------------------------
             getWdot(x,j);
             for (size_t k = 0; k < m_nsp; k++) {
-                double convec = rho_u(x,j)*dYdz(x,k,j);
-                double diffus = 2.0*(m_flux(k,j) - m_flux(k,j-1))
+                CanteraDouble convec = rho_u(x,j)*dYdz(x,k,j);
+                CanteraDouble diffus = 2.0*(m_flux(k,j) - m_flux(k,j-1))
                                 / (z(j+1) - z(j-1));
                 rsd[index(c_offset_Y + k, j)]
                 = (m_wt[k]*(wdot(k,j))
@@ -553,12 +553,12 @@ void StFlow::evalResidual(double* x, double* rsd, int* diag,
             if (m_do_energy[j]) {
 
                 setGas(x,j);
-                double dtdzj = dTdz(x,j);
-                double sum = 0.0;
+                CanteraDouble dtdzj = dTdz(x,j);
+                CanteraDouble sum = 0.0;
 
                 grad_hk(x, j);
                 for (size_t k = 0; k < m_nsp; k++) {
-                    double flxk = 0.5*(m_flux(k,j-1) + m_flux(k,j));
+                    CanteraDouble flxk = 0.5*(m_flux(k,j-1) + m_flux(k,j));
                     sum += wdot(k,j)*m_hk(k,j);
                     sum += flxk * m_dhk_dz(k,j) / m_wt[k];
                 }
@@ -585,13 +585,13 @@ void StFlow::evalResidual(double* x, double* rsd, int* diag,
     }
 }
 
-void StFlow::updateTransport(double* x, size_t j0, size_t j1)
+void StFlow::updateTransport(CanteraDouble* x, size_t j0, size_t j1)
 {
      if (m_do_multicomponent) {
         for (size_t j = j0; j < j1; j++) {
             setGasAtMidpoint(x,j);
-            double wtm = m_thermo->meanMolecularWeight();
-            double rho = m_thermo->density();
+            CanteraDouble wtm = m_thermo->meanMolecularWeight();
+            CanteraDouble rho = m_thermo->density();
             m_visc[j] = (m_dovisc ? m_trans->viscosity() : 0.0);
             m_trans->getMultiDiffCoeffs(m_nsp, &m_multidiff[mindex(0,0,j)]);
 
@@ -615,7 +615,7 @@ void StFlow::updateTransport(double* x, size_t j0, size_t j1)
     }
 }
 
-void StFlow::show(const double* x)
+void StFlow::show(const CanteraDouble* x)
 {
     writelog("    Pressure:  {:10.4g} Pa\n", m_press);
 
@@ -632,13 +632,13 @@ void StFlow::show(const double* x)
     }
 }
 
-void StFlow::updateDiffFluxes(const double* x, size_t j0, size_t j1)
+void StFlow::updateDiffFluxes(const CanteraDouble* x, size_t j0, size_t j1)
 {
     if (m_do_multicomponent) {
         for (size_t j = j0; j < j1; j++) {
-            double dz = z(j+1) - z(j);
+            CanteraDouble dz = z(j+1) - z(j);
             for (size_t k = 0; k < m_nsp; k++) {
-                double sum = 0.0;
+                CanteraDouble sum = 0.0;
                 for (size_t m = 0; m < m_nsp; m++) {
                     sum += m_wt[m] * m_multidiff[mindex(k,m,j)] * (X(x,m,j+1)-X(x,m,j));
                 }
@@ -647,10 +647,10 @@ void StFlow::updateDiffFluxes(const double* x, size_t j0, size_t j1)
         }
     } else {
         for (size_t j = j0; j < j1; j++) {
-            double sum = 0.0;
-            double wtm = m_wtm[j];
-            double rho = density(j);
-            double dz = z(j+1) - z(j);
+            CanteraDouble sum = 0.0;
+            CanteraDouble wtm = m_wtm[j];
+            CanteraDouble rho = density(j);
+            CanteraDouble dz = z(j+1) - z(j);
             for (size_t k = 0; k < m_nsp; k++) {
                 m_flux(k,j) = m_wt[k]*(rho*m_diff[k+m_nsp*j]/wtm);
                 m_flux(k,j) *= (X(x,k,j) - X(x,k,j+1))/dz;
@@ -665,7 +665,7 @@ void StFlow::updateDiffFluxes(const double* x, size_t j0, size_t j1)
 
     if (m_do_soret) {
         for (size_t m = j0; m < j1; m++) {
-            double gradlogT = 2.0 * (T(x,m+1) - T(x,m)) /
+            CanteraDouble gradlogT = 2.0 * (T(x,m+1) - T(x,m)) /
                               ((T(x,m+1) + T(x,m)) * (z(m+1) - z(m)));
             for (size_t k = 0; k < m_nsp; k++) {
                 m_flux(k,m) -= m_dthermal(k,m)*gradlogT;
@@ -782,7 +782,7 @@ AnyMap StFlow::getMeta() const
     return state;
 }
 
-shared_ptr<SolutionArray> StFlow::asArray(const double* soln) const
+shared_ptr<SolutionArray> StFlow::asArray(const CanteraDouble* soln) const
 {
     auto arr = SolutionArray::create(
         m_solution, static_cast<int>(nPoints()), getMeta());
@@ -790,7 +790,7 @@ shared_ptr<SolutionArray> StFlow::asArray(const double* soln) const
     AnyValue value;
     value = m_z;
     arr->setComponent("grid", value);
-    vector<double> data(nPoints());
+    vector<CanteraDouble> data(nPoints());
     for (size_t i = 0; i < nComponents(); i++) {
         if (componentActive(i)) {
             auto name = componentName(i);
@@ -816,14 +816,14 @@ shared_ptr<SolutionArray> StFlow::asArray(const double* soln) const
     return arr;
 }
 
-void StFlow::fromArray(SolutionArray& arr, double* soln)
+void StFlow::fromArray(SolutionArray& arr, CanteraDouble* soln)
 {
     Domain1D::setMeta(arr.meta());
     arr.setLoc(0);
     auto phase = arr.thermo();
     m_press = phase->pressure();
 
-    const auto grid = arr.getComponent("grid").as<vector<double>>();
+    const auto grid = arr.getComponent("grid").as<vector<CanteraDouble>>();
     setupGrid(nPoints(), &grid[0]);
 
     for (size_t i = 0; i < nComponents(); i++) {
@@ -832,7 +832,7 @@ void StFlow::fromArray(SolutionArray& arr, double* soln)
         }
         string name = componentName(i);
         if (arr.hasComponent(name)) {
-            const vector<double> data = arr.getComponent(name).as<vector<double>>();
+            const vector<CanteraDouble> data = arr.getComponent(name).as<vector<CanteraDouble>>();
             for (size_t j = 0; j < nPoints(); j++) {
                 soln[index(i,j)] = data[j];
             }
@@ -894,10 +894,10 @@ void StFlow::setMeta(const AnyMap& state)
 
     if (state.hasKey("refine-criteria")) {
         const AnyMap& criteria = state["refine-criteria"].as<AnyMap>();
-        double ratio = criteria.getDouble("ratio", m_refiner->maxRatio());
-        double slope = criteria.getDouble("slope", m_refiner->maxDelta());
-        double curve = criteria.getDouble("curve", m_refiner->maxSlope());
-        double prune = criteria.getDouble("prune", m_refiner->prune());
+        CanteraDouble ratio = criteria.getDouble("ratio", m_refiner->maxRatio());
+        CanteraDouble slope = criteria.getDouble("slope", m_refiner->maxDelta());
+        CanteraDouble curve = criteria.getDouble("curve", m_refiner->maxSlope());
+        CanteraDouble prune = criteria.getDouble("prune", m_refiner->prune());
         m_refiner->setCriteria(ratio, slope, curve, prune);
 
         if (criteria.hasKey("grid-min")) {
@@ -968,7 +968,7 @@ bool StFlow::doElectricField(size_t j) const
         "Not used by '{}' objects.", type());
 }
 
-void StFlow::setBoundaryEmissivities(double e_left, double e_right)
+void StFlow::setBoundaryEmissivities(CanteraDouble e_left, CanteraDouble e_right)
 {
     if (e_left < 0 || e_left > 1) {
         throw CanteraError("StFlow::setBoundaryEmissivities",
@@ -1006,7 +1006,7 @@ void StFlow::fixTemperature(size_t j)
     }
 }
 
-void StFlow::evalRightBoundary(double* x, double* rsd, int* diag, double rdt)
+void StFlow::evalRightBoundary(CanteraDouble* x, CanteraDouble* rsd, int* diag, CanteraDouble rdt)
 {
     size_t j = m_points - 1;
 
@@ -1016,7 +1016,7 @@ void StFlow::evalRightBoundary(double* x, double* rsd, int* diag, double rdt)
 
     rsd[index(c_offset_V,j)] = V(x,j);
     diag[index(c_offset_V,j)] = 0;
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     // set residual of poisson's equ to zero
     rsd[index(c_offset_E, j)] = x[index(c_offset_E, j)];
     for (size_t k = 0; k < m_nsp; k++) {
@@ -1036,7 +1036,7 @@ void StFlow::evalRightBoundary(double* x, double* rsd, int* diag, double rdt)
     rsd[index(c_offset_T, j)] = T(x, j);
 }
 
-void StFlow::evalContinuity(size_t j, double* x, double* rsd, int* diag, double rdt)
+void StFlow::evalContinuity(size_t j, CanteraDouble* x, CanteraDouble* rsd, int* diag, CanteraDouble rdt)
 {
     //algebraic constraint
     diag[index(c_offset_U, j)] = 0;
@@ -1074,7 +1074,7 @@ void StFlow::evalContinuity(size_t j, double* x, double* rsd, int* diag, double 
     }
 }
 
-void StFlow::grad_hk(const double* x, size_t j)
+void StFlow::grad_hk(const CanteraDouble* x, size_t j)
 {
     for(size_t k = 0; k < m_nsp; k++) {
         if (u(x, j) > 0.0) {

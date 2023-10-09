@@ -50,7 +50,7 @@ public:
 
     //! Evaluate all rate constants handled by the evaluator
     //! @param kf  array of rate constants
-    virtual void getRateConstants(double* kf) = 0;
+    virtual void getRateConstants(CanteraDouble* kf) = 0;
 
     //! Evaluate all rate constant temperature derivatives handled by the evaluator;
     //! which are multiplied with the array of rate-of-progress variables.
@@ -60,9 +60,9 @@ public:
     //!     contains rop on input, and d(rop)/dT on output
     //! @param kf  array of forward rate constants (numerical derivative only)
     //! @param deltaT  relative temperature perturbation (numerical derivative only)
-    virtual void processRateConstants_ddT(double* rop,
-                                          const double* kf,
-                                          double deltaT) = 0;
+    virtual void processRateConstants_ddT(CanteraDouble* rop,
+                                          const CanteraDouble* kf,
+                                          CanteraDouble deltaT) = 0;
 
     //! Evaluate all rate constant pressure derivatives handled by the evaluator;
     //! which are multiplied with the array of rate-of-progress variables.
@@ -70,9 +70,9 @@ public:
     //!     contains rop on input, and d(rop)/dP on output
     //! @param kf  array of forward rate constants
     //! @param deltaP  relative pressure perturbation
-    virtual void processRateConstants_ddP(double* rop,
-                                          const double* kf,
-                                          double deltaP) = 0;
+    virtual void processRateConstants_ddP(CanteraDouble* rop,
+                                          const CanteraDouble* kf,
+                                          CanteraDouble deltaP) = 0;
 
     //! Evaluate all rate constant third-body derivatives handled by the evaluator;
     //! which are multiplied with the array of rate-of-progress variables.
@@ -81,21 +81,21 @@ public:
     //! @param kf  array of forward rate constants
     //! @param deltaM  relative perturbation of third-body concentrations
     //! @param overwrite  if `true`, rop entries not affected by M are set to zero
-    virtual void processRateConstants_ddM(double* rop,
-                                          const double* kf,
-                                          double deltaM,
+    virtual void processRateConstants_ddM(CanteraDouble* rop,
+                                          const CanteraDouble* kf,
+                                          CanteraDouble deltaM,
                                           bool overwrite=true) = 0;
 
     //! Update common reaction rate data based on temperature.
     //! Only used in conjunction with evalSingle and ReactionRate::eval
     //! @param T  temperature [K]
-    virtual void update(double T) = 0;
+    virtual void update(CanteraDouble T) = 0;
 
     //! Update common reaction rate data based on temperature and extra parameter.
     //! Only used in conjunction with evalSingle and ReactionRate::eval
     //! @param T  temperature [K]
     //! @param extra  extra parameter (depends on parameterization)
-    virtual void update(double T, double extra) = 0;
+    virtual void update(CanteraDouble T, CanteraDouble extra) = 0;
 
     //! Update common reaction rate data based on temperature and extra parameter.
     //! Only used in conjunction with evalSingle and ReactionRate::eval
@@ -103,7 +103,7 @@ public:
     //! @param extra  extra vector parameter (depends on parameterization)
     //! @warning  This method is an experimental part of the %Cantera API and
     //!     may be changed or removed without notice.
-    virtual void update(double T, const vector<double>& extra) = 0;
+    virtual void update(CanteraDouble T, const vector<CanteraDouble>& extra) = 0;
 
     //! Update data common to reaction rates of a specific type.
     //! This update mechanism is used by Kinetics reaction rate evaluators.
@@ -115,7 +115,7 @@ public:
     //! Get the rate for a single reaction. Used to implement ReactionRate::eval,
     //! which allows for the evaluation of a reaction rate expression outside of
     //! Kinetics reaction rate evaluators. Mainly used for testing purposes.
-    virtual double evalSingle(ReactionRate& rate) = 0;
+    virtual CanteraDouble evalSingle(ReactionRate& rate) = 0;
 };
 
 } // end namespace Cantera

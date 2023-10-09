@@ -244,7 +244,7 @@ extern "C" {
         }
     }
 
-    double thermo_temperature(int n)
+    CanteraDouble thermo_temperature(int n)
     {
         try {
             return ThermoCabinet::item(n).temperature();
@@ -253,7 +253,7 @@ extern "C" {
         }
     }
 
-    int thermo_setTemperature(int n, double t)
+    int thermo_setTemperature(int n, CanteraDouble t)
     {
         try {
             ThermoCabinet::item(n).setTemperature(t);
@@ -263,7 +263,7 @@ extern "C" {
         return 0;
     }
 
-    double thermo_density(int n)
+    CanteraDouble thermo_density(int n)
     {
         try {
             return ThermoCabinet::item(n).density();
@@ -272,7 +272,7 @@ extern "C" {
         }
     }
 
-    int thermo_setDensity(int n, double rho)
+    int thermo_setDensity(int n, CanteraDouble rho)
     {
         try {
             ThermoCabinet::item(n).setDensity(rho);
@@ -282,7 +282,7 @@ extern "C" {
         return 0;
     }
 
-    double thermo_molarDensity(int n)
+    CanteraDouble thermo_molarDensity(int n)
     {
         try {
             return ThermoCabinet::item(n).molarDensity();
@@ -291,7 +291,7 @@ extern "C" {
         }
     }
 
-    int thermo_setMolarDensity(int n, double ndens)
+    int thermo_setMolarDensity(int n, CanteraDouble ndens)
     {
         try {
             ThermoCabinet::item(n).setMolarDensity(ndens);
@@ -301,7 +301,7 @@ extern "C" {
         return 0;
     }
 
-    double thermo_meanMolecularWeight(int n)
+    CanteraDouble thermo_meanMolecularWeight(int n)
     {
         try {
             return ThermoCabinet::item(n).meanMolecularWeight();
@@ -328,7 +328,7 @@ extern "C" {
         }
     }
 
-    int thermo_getMoleFractions(int n, size_t lenx, double* x)
+    int thermo_getMoleFractions(int n, size_t lenx, CanteraDouble* x)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
@@ -340,7 +340,7 @@ extern "C" {
         }
     }
 
-    double thermo_moleFraction(int n, size_t k)
+    CanteraDouble thermo_moleFraction(int n, size_t k)
     {
         try {
             return ThermoCabinet::item(n).moleFraction(k);
@@ -349,7 +349,7 @@ extern "C" {
         }
     }
 
-    int thermo_getMassFractions(int n, size_t leny, double* y)
+    int thermo_getMassFractions(int n, size_t leny, CanteraDouble* y)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
@@ -361,7 +361,7 @@ extern "C" {
         }
     }
 
-    double thermo_massFraction(int n, size_t k)
+    CanteraDouble thermo_massFraction(int n, size_t k)
     {
         try {
             return ThermoCabinet::item(n).massFraction(k);
@@ -370,7 +370,7 @@ extern "C" {
         }
     }
 
-    int thermo_setMoleFractions(int n, size_t lenx, double* x, int norm)
+    int thermo_setMoleFractions(int n, size_t lenx, CanteraDouble* x, int norm)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
@@ -398,7 +398,7 @@ extern "C" {
     }
 
     int thermo_setMassFractions(int n, size_t leny,
-                               double* y, int norm)
+                               CanteraDouble* y, int norm)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
@@ -425,12 +425,12 @@ extern "C" {
         }
     }
 
-    int thermo_getAtomicWeights(int n, size_t lenm, double* atw)
+    int thermo_getAtomicWeights(int n, size_t lenm, CanteraDouble* atw)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
             p.checkElementArraySize(lenm);
-            const vector<double>& wt = p.atomicWeights();
+            const vector<CanteraDouble>& wt = p.atomicWeights();
             copy(wt.begin(), wt.end(), atw);
             return 0;
         } catch (...) {
@@ -438,12 +438,12 @@ extern "C" {
         }
     }
 
-    int thermo_getMolecularWeights(int n, size_t lenm, double* mw)
+    int thermo_getMolecularWeights(int n, size_t lenm, CanteraDouble* mw)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
             p.checkSpeciesArraySize(lenm);
-            const vector<double>& wt = p.molecularWeights();
+            const vector<CanteraDouble>& wt = p.molecularWeights();
             copy(wt.begin(), wt.end(), mw);
             return 0;
         } catch (...) {
@@ -451,7 +451,7 @@ extern "C" {
         }
     }
 
-    int thermo_getCharges(int n, size_t lenm, double* sc)
+    int thermo_getCharges(int n, size_t lenm, CanteraDouble* sc)
     {
         try {
             ThermoPhase& p = ThermoCabinet::item(n);
@@ -501,7 +501,7 @@ extern "C" {
     }
 
 
-    double thermo_nAtoms(int n, size_t k, size_t m)
+    CanteraDouble thermo_nAtoms(int n, size_t k, size_t m)
     {
         try {
             return ThermoCabinet::item(n).nAtoms(k,m);
@@ -510,7 +510,7 @@ extern "C" {
         }
     }
 
-    int thermo_addElement(int n, const char* name, double weight)
+    int thermo_addElement(int n, const char* name, CanteraDouble weight)
     {
         try {
             ThermoCabinet::item(n).addElement(name, weight);
@@ -539,7 +539,7 @@ extern "C" {
         }
     }
 
-    double thermo_enthalpy_mole(int n)
+    CanteraDouble thermo_enthalpy_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).enthalpy_mole();
@@ -548,7 +548,7 @@ extern "C" {
         }
     }
 
-    double thermo_intEnergy_mole(int n)
+    CanteraDouble thermo_intEnergy_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).intEnergy_mole();
@@ -557,7 +557,7 @@ extern "C" {
         }
     }
 
-    double thermo_entropy_mole(int n)
+    CanteraDouble thermo_entropy_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).entropy_mole();
@@ -566,7 +566,7 @@ extern "C" {
         }
     }
 
-    double thermo_gibbs_mole(int n)
+    CanteraDouble thermo_gibbs_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).gibbs_mole();
@@ -575,7 +575,7 @@ extern "C" {
         }
     }
 
-    double thermo_cp_mole(int n)
+    CanteraDouble thermo_cp_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).cp_mole();
@@ -584,7 +584,7 @@ extern "C" {
         }
     }
 
-    double thermo_cv_mole(int n)
+    CanteraDouble thermo_cv_mole(int n)
     {
         try {
             return ThermoCabinet::item(n).cv_mole();
@@ -593,7 +593,7 @@ extern "C" {
         }
     }
 
-    double thermo_pressure(int n)
+    CanteraDouble thermo_pressure(int n)
     {
         try {
             return ThermoCabinet::item(n).pressure();
@@ -602,7 +602,7 @@ extern "C" {
         }
     }
 
-    double thermo_enthalpy_mass(int n)
+    CanteraDouble thermo_enthalpy_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).enthalpy_mass();
@@ -611,7 +611,7 @@ extern "C" {
         }
     }
 
-    double thermo_intEnergy_mass(int n)
+    CanteraDouble thermo_intEnergy_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).intEnergy_mass();
@@ -620,7 +620,7 @@ extern "C" {
         }
     }
 
-    double thermo_entropy_mass(int n)
+    CanteraDouble thermo_entropy_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).entropy_mass();
@@ -629,7 +629,7 @@ extern "C" {
         }
     }
 
-    double thermo_gibbs_mass(int n)
+    CanteraDouble thermo_gibbs_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).gibbs_mass();
@@ -638,7 +638,7 @@ extern "C" {
         }
     }
 
-    double thermo_cp_mass(int n)
+    CanteraDouble thermo_cp_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).cp_mass();
@@ -647,7 +647,7 @@ extern "C" {
         }
     }
 
-    double thermo_cv_mass(int n)
+    CanteraDouble thermo_cv_mass(int n)
     {
         try {
             return ThermoCabinet::item(n).cv_mass();
@@ -656,7 +656,7 @@ extern "C" {
         }
     }
 
-    double thermo_electricPotential(int n)
+    CanteraDouble thermo_electricPotential(int n)
     {
         try {
             return ThermoCabinet::item(n).electricPotential();
@@ -665,7 +665,7 @@ extern "C" {
         }
     }
 
-    int thermo_chemPotentials(int n, size_t lenm, double* murt)
+    int thermo_chemPotentials(int n, size_t lenm, CanteraDouble* murt)
     {
         try {
             ThermoPhase& thrm = ThermoCabinet::item(n);
@@ -677,7 +677,7 @@ extern "C" {
         }
     }
 
-    int thermo_setPressure(int n, double p)
+    int thermo_setPressure(int n, CanteraDouble p)
     {
         try {
             if (p < 0.0) throw CanteraError("thermo_setPressure",
@@ -689,7 +689,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_TP(int n, double* vals)
+    int thermo_set_TP(int n, CanteraDouble* vals)
     {
         try{
             ThermoCabinet::item(n).setState_TP(vals[0], vals[1]);
@@ -699,7 +699,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_TD(int n, double* vals)
+    int thermo_set_TD(int n, CanteraDouble* vals)
     {
         try{
             ThermoCabinet::item(n).setState_TD(vals[0], vals[1]);
@@ -709,7 +709,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_RP(int n, double* vals)
+    int thermo_set_RP(int n, CanteraDouble* vals)
     {
         try{
             ThermoCabinet::item(n).setState_RP(vals[0], vals[1]);
@@ -719,7 +719,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_DP(int n, double* vals)
+    int thermo_set_DP(int n, CanteraDouble* vals)
     {
         try{
             ThermoCabinet::item(n).setState_DP(vals[0], vals[1]);
@@ -729,7 +729,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_HP(int n, double* vals)
+    int thermo_set_HP(int n, CanteraDouble* vals)
     {
         try {
             if (vals[1] < 0.0) {
@@ -747,7 +747,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_UV(int n, double* vals)
+    int thermo_set_UV(int n, CanteraDouble* vals)
     {
         try {
             if (vals[1] < 0.0) {
@@ -765,7 +765,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_SV(int n, double* vals)
+    int thermo_set_SV(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_SV(vals[0],vals[1]);
@@ -775,7 +775,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_SP(int n, double* vals)
+    int thermo_set_SP(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_SP(vals[0],vals[1]);
@@ -785,7 +785,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_ST(int n, double* vals)
+    int thermo_set_ST(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_ST(vals[0],vals[1]);
@@ -795,7 +795,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_TV(int n, double* vals)
+    int thermo_set_TV(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_TV(vals[0],vals[1]);
@@ -805,7 +805,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_PV(int n, double* vals)
+    int thermo_set_PV(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_PV(vals[0],vals[1]);
@@ -815,7 +815,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_UP(int n, double* vals)
+    int thermo_set_UP(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_UP(vals[0],vals[1]);
@@ -825,7 +825,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_VH(int n, double* vals)
+    int thermo_set_VH(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_VH(vals[0],vals[1]);
@@ -835,7 +835,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_TH(int n, double* vals)
+    int thermo_set_TH(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_TH(vals[0],vals[1]);
@@ -845,7 +845,7 @@ extern "C" {
         }
     }
 
-    int thermo_set_SH(int n, double* vals)
+    int thermo_set_SH(int n, CanteraDouble* vals)
     {
         try {
             ThermoCabinet::item(n).setState_SH(vals[0],vals[1]);
@@ -856,7 +856,7 @@ extern "C" {
     }
 
     int thermo_equilibrate(int n, const char* XY, int solver,
-                           double rtol, int maxsteps, int maxiter, int loglevel)
+                           CanteraDouble rtol, int maxsteps, int maxiter, int loglevel)
     {
         try {
             string ssolver;
@@ -880,7 +880,7 @@ extern "C" {
         }
     }
 
-    double thermo_refPressure(int n)
+    CanteraDouble thermo_refPressure(int n)
     {
         try {
             return ThermoCabinet::item(n).refPressure();
@@ -889,7 +889,7 @@ extern "C" {
         }
     }
 
-    double thermo_minTemp(int n, int k)
+    CanteraDouble thermo_minTemp(int n, int k)
     {
         try {
             ThermoPhase& ph = ThermoCabinet::item(n);
@@ -904,7 +904,7 @@ extern "C" {
         }
     }
 
-    double thermo_maxTemp(int n, int k)
+    CanteraDouble thermo_maxTemp(int n, int k)
     {
         try {
             ThermoPhase& ph = ThermoCabinet::item(n);
@@ -920,7 +920,7 @@ extern "C" {
     }
 
 
-    int thermo_getEnthalpies_RT(int n, size_t lenm, double* h_rt)
+    int thermo_getEnthalpies_RT(int n, size_t lenm, CanteraDouble* h_rt)
     {
         try {
             ThermoPhase& thrm = ThermoCabinet::item(n);
@@ -932,7 +932,7 @@ extern "C" {
         }
     }
 
-    int thermo_getEntropies_R(int n, size_t lenm, double* s_r)
+    int thermo_getEntropies_R(int n, size_t lenm, CanteraDouble* s_r)
     {
         try {
             ThermoPhase& thrm = ThermoCabinet::item(n);
@@ -944,7 +944,7 @@ extern "C" {
         }
     }
 
-    int thermo_getCp_R(int n, size_t lenm, double* cp_r)
+    int thermo_getCp_R(int n, size_t lenm, CanteraDouble* cp_r)
     {
         try {
             ThermoPhase& thrm = ThermoCabinet::item(n);
@@ -956,7 +956,7 @@ extern "C" {
         }
     }
 
-    int thermo_setElectricPotential(int n, double v)
+    int thermo_setElectricPotential(int n, CanteraDouble v)
     {
         try {
             ThermoCabinet::item(n).setElectricPotential(v);
@@ -966,7 +966,7 @@ extern "C" {
         }
     }
 
-    double thermo_thermalExpansionCoeff(int n)
+    CanteraDouble thermo_thermalExpansionCoeff(int n)
     {
         try {
             return ThermoCabinet::item(n).thermalExpansionCoeff();
@@ -975,7 +975,7 @@ extern "C" {
         }
     }
 
-    double thermo_isothermalCompressibility(int n)
+    CanteraDouble thermo_isothermalCompressibility(int n)
     {
         try {
             return ThermoCabinet::item(n).isothermalCompressibility();
@@ -986,7 +986,7 @@ extern "C" {
 
     //-------------- pure fluids ---------------//
 
-    double thermo_critTemperature(int n)
+    CanteraDouble thermo_critTemperature(int n)
     {
         try {
             return ThermoCabinet::item(n).critTemperature();
@@ -995,7 +995,7 @@ extern "C" {
         }
     }
 
-    double thermo_critPressure(int n)
+    CanteraDouble thermo_critPressure(int n)
     {
         try {
             return ThermoCabinet::item(n).critPressure();
@@ -1004,7 +1004,7 @@ extern "C" {
         }
     }
 
-    double thermo_critDensity(int n)
+    CanteraDouble thermo_critDensity(int n)
     {
         try {
             return ThermoCabinet::item(n).critDensity();
@@ -1013,7 +1013,7 @@ extern "C" {
         }
     }
 
-    double thermo_vaporFraction(int n)
+    CanteraDouble thermo_vaporFraction(int n)
     {
         try {
             return ThermoCabinet::get<PureFluidPhase>(n).vaporFraction();
@@ -1022,7 +1022,7 @@ extern "C" {
         }
     }
 
-    double thermo_satTemperature(int n, double p)
+    CanteraDouble thermo_satTemperature(int n, CanteraDouble p)
     {
         try {
             return ThermoCabinet::item(n).satTemperature(p);
@@ -1031,7 +1031,7 @@ extern "C" {
         }
     }
 
-    double thermo_satPressure(int n, double t)
+    CanteraDouble thermo_satPressure(int n, CanteraDouble t)
     {
         try {
             return ThermoCabinet::item(n).satPressure(t);
@@ -1040,7 +1040,7 @@ extern "C" {
         }
     }
 
-    int thermo_setState_Psat(int n, double p, double x)
+    int thermo_setState_Psat(int n, CanteraDouble p, CanteraDouble x)
     {
         try {
             ThermoCabinet::get<PureFluidPhase>(n).setState_Psat(p, x);
@@ -1050,7 +1050,7 @@ extern "C" {
         }
     }
 
-    int thermo_setState_Tsat(int n, double t, double x)
+    int thermo_setState_Tsat(int n, CanteraDouble t, CanteraDouble x)
     {
         try {
             ThermoCabinet::get<PureFluidPhase>(n).setState_Tsat(t, x);
@@ -1163,7 +1163,7 @@ extern "C" {
         }
     }
 
-    double kin_reactantStoichCoeff(int n, int k, int i)
+    CanteraDouble kin_reactantStoichCoeff(int n, int k, int i)
     {
         try {
             Kinetics& kin = KineticsCabinet::item(n);
@@ -1175,7 +1175,7 @@ extern "C" {
         }
     }
 
-    double kin_productStoichCoeff(int n, int k, int i)
+    CanteraDouble kin_productStoichCoeff(int n, int k, int i)
     {
         try {
             Kinetics& kin = KineticsCabinet::item(n);
@@ -1198,7 +1198,7 @@ extern "C" {
         }
     }
 
-    int kin_getFwdRatesOfProgress(int n, size_t len, double* fwdROP)
+    int kin_getFwdRatesOfProgress(int n, size_t len, CanteraDouble* fwdROP)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1210,7 +1210,7 @@ extern "C" {
         }
     }
 
-    int kin_getRevRatesOfProgress(int n, size_t len, double* revROP)
+    int kin_getRevRatesOfProgress(int n, size_t len, CanteraDouble* revROP)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1233,7 +1233,7 @@ extern "C" {
         }
     }
 
-    int kin_getNetRatesOfProgress(int n, size_t len, double* netROP)
+    int kin_getNetRatesOfProgress(int n, size_t len, CanteraDouble* netROP)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1245,7 +1245,7 @@ extern "C" {
         }
     }
 
-    int kin_getFwdRateConstants(int n, size_t len, double* kfwd)
+    int kin_getFwdRateConstants(int n, size_t len, CanteraDouble* kfwd)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1257,7 +1257,7 @@ extern "C" {
         }
     }
 
-    int kin_getRevRateConstants(int n, int doIrreversible, size_t len, double* krev)
+    int kin_getRevRateConstants(int n, int doIrreversible, size_t len, CanteraDouble* krev)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1269,7 +1269,7 @@ extern "C" {
         }
     }
 
-    int kin_getDelta(int n, int job, size_t len, double* delta)
+    int kin_getDelta(int n, int job, size_t len, CanteraDouble* delta)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1302,7 +1302,7 @@ extern "C" {
         }
     }
 
-    int kin_getCreationRates(int n, size_t len, double* cdot)
+    int kin_getCreationRates(int n, size_t len, CanteraDouble* cdot)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1314,7 +1314,7 @@ extern "C" {
         }
     }
 
-    int kin_getDestructionRates(int n, size_t len, double* ddot)
+    int kin_getDestructionRates(int n, size_t len, CanteraDouble* ddot)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1326,7 +1326,7 @@ extern "C" {
         }
     }
 
-    int kin_getNetProductionRates(int n, size_t len, double* wdot)
+    int kin_getNetProductionRates(int n, size_t len, CanteraDouble* wdot)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1338,7 +1338,7 @@ extern "C" {
         }
     }
 
-    int kin_getSourceTerms(int n, size_t len, double* ydot)
+    int kin_getSourceTerms(int n, size_t len, CanteraDouble* ydot)
     {
         try {
             // @todo This function only works for single phase kinetics
@@ -1348,7 +1348,7 @@ extern "C" {
             k.checkSpeciesArraySize(len);
             k.checkSpeciesArraySize(nsp);
             k.getNetProductionRates(ydot);
-            double rho_inv = 1.0 / p.density();
+            CanteraDouble rho_inv = 1.0 / p.density();
             for (size_t k = 0; k < nsp; k++) {
                 ydot[k] *= p.molecularWeight(k) * rho_inv;
             }
@@ -1358,7 +1358,7 @@ extern "C" {
         }
     }
 
-    double kin_multiplier(int n, int i)
+    CanteraDouble kin_multiplier(int n, int i)
     {
         try {
             Kinetics& kin = KineticsCabinet::item(n);
@@ -1380,7 +1380,7 @@ extern "C" {
         }
     }
 
-    int kin_getEquilibriumConstants(int n, size_t len, double* kc)
+    int kin_getEquilibriumConstants(int n, size_t len, CanteraDouble* kc)
     {
         try {
             Kinetics& k = KineticsCabinet::item(n);
@@ -1403,7 +1403,7 @@ extern "C" {
         }
     }
 
-    int kin_setMultiplier(int n, int i, double v)
+    int kin_setMultiplier(int n, int i, CanteraDouble v)
     {
         try {
             if (v >= 0.0) {
@@ -1419,7 +1419,7 @@ extern "C" {
         }
     }
 
-    int kin_advanceCoverages(int n, double tstep)
+    int kin_advanceCoverages(int n, CanteraDouble tstep)
     {
         try {
             KineticsCabinet::get<InterfaceKinetics>(n).advanceCoverages(tstep);
@@ -1461,7 +1461,7 @@ extern "C" {
         }
     }
 
-    double trans_viscosity(int n)
+    CanteraDouble trans_viscosity(int n)
     {
         try {
             return TransportCabinet::item(n).viscosity();
@@ -1470,7 +1470,7 @@ extern "C" {
         }
     }
 
-    double trans_electricalConductivity(int n)
+    CanteraDouble trans_electricalConductivity(int n)
     {
         try {
             return TransportCabinet::item(n).electricalConductivity();
@@ -1479,7 +1479,7 @@ extern "C" {
         }
     }
 
-    double trans_thermalConductivity(int n)
+    CanteraDouble trans_thermalConductivity(int n)
     {
         try {
             return TransportCabinet::item(n).thermalConductivity();
@@ -1488,7 +1488,7 @@ extern "C" {
         }
     }
 
-    int trans_getThermalDiffCoeffs(int n, int ldt, double* dt)
+    int trans_getThermalDiffCoeffs(int n, int ldt, CanteraDouble* dt)
     {
         try {
             Transport& tr = TransportCabinet::item(n);
@@ -1500,7 +1500,7 @@ extern "C" {
         }
     }
 
-    int trans_getMixDiffCoeffs(int n, int ld, double* d)
+    int trans_getMixDiffCoeffs(int n, int ld, CanteraDouble* d)
     {
         try {
             Transport& tr = TransportCabinet::item(n);
@@ -1512,7 +1512,7 @@ extern "C" {
         }
     }
 
-    int trans_getBinDiffCoeffs(int n, int ld, double* d)
+    int trans_getBinDiffCoeffs(int n, int ld, CanteraDouble* d)
     {
         try {
             // @todo length of d should be passed for bounds checking
@@ -1525,7 +1525,7 @@ extern "C" {
         }
     }
 
-    int trans_getMultiDiffCoeffs(int n, int ld, double* d)
+    int trans_getMultiDiffCoeffs(int n, int ld, CanteraDouble* d)
     {
         try {
             // @todo length of d should be passed for bounds checking
@@ -1538,7 +1538,7 @@ extern "C" {
         }
     }
 
-    int trans_setParameters(int n, int type, int k, double* d)
+    int trans_setParameters(int n, int type, int k, CanteraDouble* d)
     {
         try {
             TransportCabinet::item(n).setParameters(type, k, d);
@@ -1548,8 +1548,8 @@ extern "C" {
         }
     }
 
-    int trans_getMolarFluxes(int n, const double* state1,
-                             const double* state2, double delta, double* fluxes)
+    int trans_getMolarFluxes(int n, const CanteraDouble* state1,
+                             const CanteraDouble* state2, CanteraDouble delta, CanteraDouble* fluxes)
     {
         try {
             TransportCabinet::item(n).getMolarFluxes(state1, state2, delta, fluxes);
@@ -1559,8 +1559,8 @@ extern "C" {
         }
     }
 
-    int trans_getMassFluxes(int n, const double* state1,
-                            const double* state2, double delta, double* fluxes)
+    int trans_getMassFluxes(int n, const CanteraDouble* state1,
+                            const CanteraDouble* state2, CanteraDouble delta, CanteraDouble* fluxes)
     {
         try {
             TransportCabinet::item(n).getMassFluxes(state1, state2, delta, fluxes);
@@ -1587,7 +1587,7 @@ extern "C" {
         }
     }
 
-    int thermo_print(int nth, int show_thermo, double threshold)
+    int thermo_print(int nth, int show_thermo, CanteraDouble threshold)
     {
         try {
             bool stherm = (show_thermo != 0);

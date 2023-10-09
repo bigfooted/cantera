@@ -24,7 +24,7 @@ public:
         return "Reservoir";
     }
 
-    void initialize(double t0=0.0) override {}
+    void initialize(CanteraDouble t0=0.0) override {}
 
     void insert(ThermoPhase& contents) {
         setThermoMgr(contents);

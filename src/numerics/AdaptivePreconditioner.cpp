@@ -14,12 +14,12 @@ AdaptivePreconditioner::AdaptivePreconditioner()
     setPreconditionerSide("right");
 }
 
-void AdaptivePreconditioner::setValue(size_t row, size_t col, double value)
+void AdaptivePreconditioner::setValue(size_t row, size_t col, CanteraDouble value)
 {
     m_jac_trips.emplace_back(static_cast<int>(row), static_cast<int>(col), value);
 }
 
-void AdaptivePreconditioner::stateAdjustment(vector<double>& state) {
+void AdaptivePreconditioner::stateAdjustment(vector<CanteraDouble>& state) {
     // Only keep positive composition based on given tol
     for (size_t i = 0; i < state.size(); i++) {
         state[i] = std::max(state[i], m_atol);
@@ -84,7 +84,7 @@ void AdaptivePreconditioner::updatePreconditioner()
 void AdaptivePreconditioner::prunePreconditioner()
 {
     for (int k=0; k<m_precon_matrix.outerSize(); ++k) {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(m_precon_matrix, k); it;
+        for (Eigen::SparseMatrix<CanteraDouble>::InnerIterator it(m_precon_matrix, k); it;
             ++it) {
             if (std::abs(it.value()) < m_threshold && it.row() != it.col()) {
                 it.valueRef() = 0;
@@ -93,7 +93,7 @@ void AdaptivePreconditioner::prunePreconditioner()
     }
 }
 
-void AdaptivePreconditioner::solve(const size_t stateSize, double* rhs_vector, double*
+void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_vector, CanteraDouble*
     output)
 {
     // creating vectors in the form of Ax=b
@@ -116,7 +116,7 @@ void AdaptivePreconditioner::printPreconditioner() {
 
 void AdaptivePreconditioner::printJacobian() {
     std::stringstream ss;
-    Eigen::SparseMatrix<double> jacobian(m_dim, m_dim);
+    Eigen::SparseMatrix<CanteraDouble> jacobian(m_dim, m_dim);
     jacobian.setFromTriplets(m_jac_trips.begin(), m_jac_trips.end());
     ss << Eigen::MatrixXd(jacobian);
     writelog(ss.str());

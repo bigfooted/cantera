@@ -78,7 +78,7 @@ public:
      *
      * units = returns density in kg m-3.
      */
-    static double density_T(double T, double P, int ifunc);
+    static CanteraDouble density_T(CanteraDouble T, CanteraDouble P, int ifunc);
 
     //! Bradley-Pitzer equation for the dielectric constant
     //! of water as a function of temperature and pressure.
@@ -103,7 +103,7 @@ public:
      *
      * value at 25C and 1 atm, relEps = 78.38
      */
-    double relEpsilon(double T, double P_pascal, int ifunc = 0);
+    CanteraDouble relEpsilon(CanteraDouble T, CanteraDouble P_pascal, int ifunc = 0);
 
     //! ADebye calculates the value of A_Debye as a function of temperature and
     //! pressure according to relations that take into account the temperature
@@ -129,7 +129,7 @@ public:
      * @param T  Temperature (kelvin)
      * @param P  pressure (pascal)
      * @param ifunc Changes what's returned from the routine
-     * @returns a double whose meaning depends on ifunc:
+     * @returns a CanteraDouble whose meaning depends on ifunc:
      *   - ifunc = 0 return value
      *   - ifunc = 1 return temperature derivative
      *   - ifunc = 2 return temperature second derivative
@@ -140,14 +140,14 @@ public:
      * A_Debye computed with this function agrees with the Pitzer table p. 99 to
      * 4 significant digits at 25C. and 20C. (Aphi = ADebye/3)
      */
-    double ADebye(double T, double P, int ifunc);
+    CanteraDouble ADebye(CanteraDouble T, CanteraDouble P, int ifunc);
 
     //! Returns the saturation pressure given the temperature
     /*!
      * @param T temperature (kelvin)
      * @returns the saturation pressure (pascal)
      */
-    double satPressure(double T);
+    CanteraDouble satPressure(CanteraDouble T);
 
     //! Returns the density of water
     /*!
@@ -157,27 +157,27 @@ public:
      * @param T Temperature (kelvin)
      * @param P pressure (pascal)
      */
-    double density_IAPWS(double T, double P);
+    CanteraDouble density_IAPWS(CanteraDouble T, CanteraDouble P);
 
     //! Returns the density of water
     /*!
      * This function uses the internal state of the underlying water object
      */
-    double density_IAPWS() const;
+    CanteraDouble density_IAPWS() const;
 
     //! returns the coefficient of thermal expansion
     /*!
      * @param T Temperature (kelvin)
      * @param P pressure (pascal)
      */
-    double coeffThermalExp_IAPWS(double T, double P);
+    CanteraDouble coeffThermalExp_IAPWS(CanteraDouble T, CanteraDouble P);
 
     //! Returns the isothermal compressibility of water
     /*!
      * @param T  temperature in kelvin
      * @param P  pressure in pascal
      */
-    double isothermalCompressibility_IAPWS(double T, double P);
+    CanteraDouble isothermalCompressibility_IAPWS(CanteraDouble T, CanteraDouble P);
 
 protected:
     //! Pointer to the WaterPropsIAPWS object

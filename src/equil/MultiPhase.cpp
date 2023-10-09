@@ -28,7 +28,7 @@ void MultiPhase::addPhases(MultiPhase& mix)
 }
 
 void MultiPhase::addPhases(vector<ThermoPhase*>& phases,
-                           const vector<double>& phaseMoles)
+                           const vector<CanteraDouble>& phaseMoles)
 {
     for (size_t n = 0; n < phases.size(); n++) {
         addPhase(phases[n], phaseMoles[n]);
@@ -36,7 +36,7 @@ void MultiPhase::addPhases(vector<ThermoPhase*>& phases,
     init();
 }
 
-void MultiPhase::addPhase(ThermoPhase* p, double moles)
+void MultiPhase::addPhase(ThermoPhase* p, CanteraDouble moles)
 {
     if (m_init) {
         throw CanteraError("MultiPhase::addPhase",
@@ -171,17 +171,17 @@ void MultiPhase::checkPhaseArraySize(size_t mm) const
     }
 }
 
-double MultiPhase::speciesMoles(size_t k) const
+CanteraDouble MultiPhase::speciesMoles(size_t k) const
 {
     size_t ip = m_spphase[k];
     return m_moles[ip]*m_moleFractions[k];
 }
 
-double MultiPhase::elementMoles(size_t m) const
+CanteraDouble MultiPhase::elementMoles(size_t m) const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t i = 0; i < nPhases(); i++) {
-        double phasesum = 0.0;
+        CanteraDouble phasesum = 0.0;
         size_t nsp = m_phase[i]->nSpecies();
         for (size_t ik = 0; ik < nsp; ik++) {
             size_t k = speciesIndex(ik, i);
@@ -192,9 +192,9 @@ double MultiPhase::elementMoles(size_t m) const
     return sum;
 }
 
-double MultiPhase::charge() const
+CanteraDouble MultiPhase::charge() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t i = 0; i < nPhases(); i++) {
         sum += phaseCharge(i);
     }
@@ -217,9 +217,9 @@ size_t MultiPhase::speciesIndex(const string& speciesName, const string& phaseNa
     return m_spstart[p] + k;
 }
 
-double MultiPhase::phaseCharge(size_t p) const
+CanteraDouble MultiPhase::phaseCharge(size_t p) const
 {
-    double phasesum = 0.0;
+    CanteraDouble phasesum = 0.0;
     size_t nsp = m_phase[p]->nSpecies();
     for (size_t ik = 0; ik < nsp; ik++) {
         size_t k = speciesIndex(ik, p);
@@ -228,7 +228,7 @@ double MultiPhase::phaseCharge(size_t p) const
     return Faraday*phasesum*m_moles[p];
 }
 
-void MultiPhase::getChemPotentials(double* mu) const
+void MultiPhase::getChemPotentials(CanteraDouble* mu) const
 {
     updatePhases();
     size_t loc = 0;
@@ -238,7 +238,7 @@ void MultiPhase::getChemPotentials(double* mu) const
     }
 }
 
-void MultiPhase::getValidChemPotentials(double not_mu, double* mu, bool standard) const
+void MultiPhase::getValidChemPotentials(CanteraDouble not_mu, CanteraDouble* mu, bool standard) const
 {
     updatePhases();
     // iterate over the phases
@@ -266,9 +266,9 @@ bool MultiPhase::solutionSpecies(size_t k) const
     }
 }
 
-double MultiPhase::gibbs() const
+CanteraDouble MultiPhase::gibbs() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     updatePhases();
     for (size_t i = 0; i < nPhases(); i++) {
         if (m_moles[i] > 0.0) {
@@ -278,9 +278,9 @@ double MultiPhase::gibbs() const
     return sum;
 }
 
-double MultiPhase::enthalpy() const
+CanteraDouble MultiPhase::enthalpy() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     updatePhases();
     for (size_t i = 0; i < nPhases(); i++) {
         if (m_moles[i] > 0.0) {
@@ -290,9 +290,9 @@ double MultiPhase::enthalpy() const
     return sum;
 }
 
-double MultiPhase::IntEnergy() const
+CanteraDouble MultiPhase::IntEnergy() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     updatePhases();
     for (size_t i = 0; i < nPhases(); i++) {
         if (m_moles[i] > 0.0) {
@@ -302,9 +302,9 @@ double MultiPhase::IntEnergy() const
     return sum;
 }
 
-double MultiPhase::entropy() const
+CanteraDouble MultiPhase::entropy() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     updatePhases();
     for (size_t i = 0; i < nPhases(); i++) {
         if (m_moles[i] > 0.0) {
@@ -314,9 +314,9 @@ double MultiPhase::entropy() const
     return sum;
 }
 
-double MultiPhase::cp() const
+CanteraDouble MultiPhase::cp() const
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     updatePhases();
     for (size_t i = 0; i < nPhases(); i++) {
         if (m_moles[i] > 0.0) {
@@ -326,7 +326,7 @@ double MultiPhase::cp() const
     return sum;
 }
 
-void MultiPhase::setPhaseMoleFractions(const size_t n, const double* const x)
+void MultiPhase::setPhaseMoleFractions(const size_t n, const CanteraDouble* const x)
 {
     if (!m_init) {
         init();
@@ -342,7 +342,7 @@ void MultiPhase::setPhaseMoleFractions(const size_t n, const double* const x)
 void MultiPhase::setMolesByName(const Composition& xMap)
 {
     size_t kk = nSpecies();
-    vector<double> moles(kk, 0.0);
+    vector<CanteraDouble> moles(kk, 0.0);
     for (size_t k = 0; k < kk; k++) {
         moles[k] = std::max(getValue(xMap, speciesName(k), 0.0), 0.0);
     }
@@ -356,13 +356,13 @@ void MultiPhase::setMolesByName(const string& x)
     setMolesByName(xx);
 }
 
-void MultiPhase::getMoles(double* molNum) const
+void MultiPhase::getMoles(CanteraDouble* molNum) const
 {
     // First copy in the mole fractions
     copy(m_moleFractions.begin(), m_moleFractions.end(), molNum);
-    double* dtmp = molNum;
+    CanteraDouble* dtmp = molNum;
     for (size_t ip = 0; ip < nPhases(); ip++) {
-        double phasemoles = m_moles[ip];
+        CanteraDouble phasemoles = m_moles[ip];
         ThermoPhase* p = m_phase[ip];
         size_t nsp = p->nSpecies();
         for (size_t ik = 0; ik < nsp; ik++) {
@@ -371,7 +371,7 @@ void MultiPhase::getMoles(double* molNum) const
     }
 }
 
-void MultiPhase::setMoles(const double* n)
+void MultiPhase::setMoles(const CanteraDouble* n)
 {
     if (!m_init) {
         init();
@@ -381,7 +381,7 @@ void MultiPhase::setMoles(const double* n)
     for (size_t ip = 0; ip < nPhases(); ip++) {
         ThermoPhase* p = m_phase[ip];
         size_t nsp = p->nSpecies();
-        double phasemoles = 0.0;
+        CanteraDouble phasemoles = 0.0;
         for (size_t ik = 0; ik < nsp; ik++) {
             phasemoles += n[k];
             k++;
@@ -401,16 +401,16 @@ void MultiPhase::setMoles(const double* n)
     }
 }
 
-void MultiPhase::addSpeciesMoles(const int indexS, const double addedMoles)
+void MultiPhase::addSpeciesMoles(const int indexS, const CanteraDouble addedMoles)
 {
-    vector<double> tmpMoles(m_nsp, 0.0);
+    vector<CanteraDouble> tmpMoles(m_nsp, 0.0);
     getMoles(tmpMoles.data());
     tmpMoles[indexS] += addedMoles;
     tmpMoles[indexS] = std::max(tmpMoles[indexS], 0.0);
     setMoles(tmpMoles.data());
 }
 
-void MultiPhase::setState_TP(const double T, const double Pres)
+void MultiPhase::setState_TP(const CanteraDouble T, const CanteraDouble Pres)
 {
     if (!m_init) {
         init();
@@ -420,14 +420,14 @@ void MultiPhase::setState_TP(const double T, const double Pres)
     updatePhases();
 }
 
-void MultiPhase::setState_TPMoles(const double T, const double Pres, const double* n)
+void MultiPhase::setState_TPMoles(const CanteraDouble T, const CanteraDouble Pres, const CanteraDouble* n)
 {
     m_temp = T;
     m_press = Pres;
     setMoles(n);
 }
 
-void MultiPhase::getElemAbundances(double* elemAbundances) const
+void MultiPhase::getElemAbundances(CanteraDouble* elemAbundances) const
 {
     calcElemAbundances();
     for (size_t eGlobal = 0; eGlobal < m_nel; eGlobal++) {
@@ -438,14 +438,14 @@ void MultiPhase::getElemAbundances(double* elemAbundances) const
 void MultiPhase::calcElemAbundances() const
 {
     size_t loc = 0;
-    double spMoles;
+    CanteraDouble spMoles;
     for (size_t eGlobal = 0; eGlobal < m_nel; eGlobal++) {
         m_elemAbundances[eGlobal] = 0.0;
     }
     for (size_t ip = 0; ip < nPhases(); ip++) {
         ThermoPhase* p = m_phase[ip];
         size_t nspPhase = p->nSpecies();
-        double phasemoles = m_moles[ip];
+        CanteraDouble phasemoles = m_moles[ip];
         for (size_t ik = 0; ik < nspPhase; ik++) {
             size_t kGlobal = loc + ik;
             spMoles = m_moleFractions[kGlobal] * phasemoles;
@@ -457,21 +457,21 @@ void MultiPhase::calcElemAbundances() const
     }
 }
 
-double MultiPhase::volume() const
+CanteraDouble MultiPhase::volume() const
 {
-    double sum = 0;
+    CanteraDouble sum = 0;
     for (size_t i = 0; i < nPhases(); i++) {
-        double vol = 1.0/m_phase[i]->molarDensity();
+        CanteraDouble vol = 1.0/m_phase[i]->molarDensity();
         sum += m_moles[i] * vol;
     }
     return sum;
 }
 
-double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
+CanteraDouble MultiPhase::equilibrate_MultiPhaseEquil(int XY, CanteraDouble err, int maxsteps,
                                                int maxiter, int loglevel)
 {
     bool strt = false;
-    double dta = 0.0;
+    CanteraDouble dta = 0.0;
     if (!m_init) {
         init();
     }
@@ -481,10 +481,10 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
         MultiPhaseEquil e(this);
         return e.equilibrate(XY, err, maxsteps, loglevel);
     } else if (XY == HP) {
-        double h0 = enthalpy();
-        double Tlow = 0.5*m_Tmin; // lower bound on T
-        double Thigh = 2.0*m_Tmax; // upper bound on T
-        double Hlow = Undef, Hhigh = Undef;
+        CanteraDouble h0 = enthalpy();
+        CanteraDouble Tlow = 0.5*m_Tmin; // lower bound on T
+        CanteraDouble Thigh = 2.0*m_Tmax; // upper bound on T
+        CanteraDouble Hlow = Undef, Hhigh = Undef;
         for (int n = 0; n < maxiter; n++) {
             // if 'strt' is false, the current composition will be used as
             // the starting estimate; otherwise it will be estimated
@@ -494,7 +494,7 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
 
             try {
                 e.equilibrate(TP, err, maxsteps, loglevel);
-                double hnow = enthalpy();
+                CanteraDouble hnow = enthalpy();
                 // the equilibrium enthalpy monotonically increases with T;
                 // if the current value is below the target, the we know the
                 // current temperature is too low. Set
@@ -511,26 +511,26 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
                         Hhigh = hnow;
                     }
                 }
-                double dt;
+                CanteraDouble dt;
                 if (Hlow != Undef && Hhigh != Undef) {
-                    double cpb = (Hhigh - Hlow)/(Thigh - Tlow);
+                    CanteraDouble cpb = (Hhigh - Hlow)/(Thigh - Tlow);
                     dt = (h0 - hnow)/cpb;
                     dta = fabs(dt);
-                    double dtmax = 0.5*fabs(Thigh - Tlow);
+                    CanteraDouble dtmax = 0.5*fabs(Thigh - Tlow);
                     if (dta > dtmax) {
                         dt *= dtmax/dta;
                     }
                 } else {
-                    double tnew = sqrt(Tlow*Thigh);
+                    CanteraDouble tnew = sqrt(Tlow*Thigh);
                     dt = tnew - m_temp;
                 }
 
-                double herr = fabs((h0 - hnow)/h0);
+                CanteraDouble herr = fabs((h0 - hnow)/h0);
 
                 if (herr < err) {
                     return err;
                 }
-                double tnew = m_temp + dt;
+                CanteraDouble tnew = m_temp + dt;
                 if (tnew < 0.0) {
                     tnew = 0.5*m_temp;
                 }
@@ -546,7 +546,7 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
                 if (!strt) {
                     strt = true;
                 } else {
-                    double tnew = 0.5*(m_temp + Thigh);
+                    CanteraDouble tnew = 0.5*(m_temp + Thigh);
                     if (fabs(tnew - m_temp) < 1.0) {
                         tnew = m_temp + 1.0;
                     }
@@ -557,22 +557,22 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
         throw CanteraError("MultiPhase::equilibrate_MultiPhaseEquil",
                            "No convergence for T");
     } else if (XY == SP) {
-        double s0 = entropy();
-        double Tlow = 1.0; // lower bound on T
-        double Thigh = 1.0e6; // upper bound on T
+        CanteraDouble s0 = entropy();
+        CanteraDouble Tlow = 1.0; // lower bound on T
+        CanteraDouble Thigh = 1.0e6; // upper bound on T
         for (int n = 0; n < maxiter; n++) {
             MultiPhaseEquil e(this, strt);
 
             try {
                 e.equilibrate(TP, err, maxsteps, loglevel);
-                double snow = entropy();
+                CanteraDouble snow = entropy();
                 if (snow < s0) {
                     Tlow = std::max(Tlow, m_temp);
                 } else {
                     Thigh = std::min(Thigh, m_temp);
                 }
-                double dt = (s0 - snow)*m_temp/cp();
-                double dtmax = 0.5*fabs(Thigh - Tlow);
+                CanteraDouble dt = (s0 - snow)*m_temp/cp();
+                CanteraDouble dtmax = 0.5*fabs(Thigh - Tlow);
                 dtmax = (dtmax > 500.0 ? 500.0 : dtmax);
                 dta = fabs(dt);
                 if (dta > dtmax) {
@@ -581,7 +581,7 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
                 if (dta < 1.0e-4) {
                     return err;
                 }
-                double tnew = m_temp + dt;
+                CanteraDouble tnew = m_temp + dt;
                 setTemperature(tnew);
 
                 // if the size of Delta T is not too large, use
@@ -593,7 +593,7 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
                 if (!strt) {
                     strt = true;
                 } else {
-                    double tnew = 0.5*(m_temp + Thigh);
+                    CanteraDouble tnew = 0.5*(m_temp + Thigh);
                     setTemperature(tnew);
                 }
             }
@@ -601,23 +601,23 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
         throw CanteraError("MultiPhase::equilibrate_MultiPhaseEquil",
                            "No convergence for T");
     } else if (XY == TV) {
-        double v0 = volume();
+        CanteraDouble v0 = volume();
         bool start = true;
         for (int n = 0; n < maxiter; n++) {
-            double pnow = pressure();
+            CanteraDouble pnow = pressure();
             MultiPhaseEquil e(this, start);
             start = false;
 
             e.equilibrate(TP, err, maxsteps, loglevel);
-            double vnow = volume();
-            double verr = fabs((v0 - vnow)/v0);
+            CanteraDouble vnow = volume();
+            CanteraDouble verr = fabs((v0 - vnow)/v0);
 
             if (verr < err) {
                 return err;
             }
             // find dV/dP
             setPressure(pnow*1.01);
-            double dVdP = (volume() - vnow)/(0.01*pnow);
+            CanteraDouble dVdP = (volume() - vnow)/(0.01*pnow);
             setPressure(pnow + 0.5*(v0 - vnow)/dVdP);
         }
     } else {
@@ -628,15 +628,15 @@ double MultiPhase::equilibrate_MultiPhaseEquil(int XY, double err, int maxsteps,
 }
 
 void MultiPhase::equilibrate(const string& XY, const string& solver,
-                             double rtol, int max_steps, int max_iter,
+                             CanteraDouble rtol, int max_steps, int max_iter,
                              int estimate_equil, int log_level)
 {
     // Save the initial state so that it can be restored in case one of the
     // solvers fails
-    vector<double> initial_moleFractions = m_moleFractions;
-    vector<double> initial_moles = m_moles;
-    double initial_T = m_temp;
-    double initial_P = m_press;
+    vector<CanteraDouble> initial_moleFractions = m_moleFractions;
+    vector<CanteraDouble> initial_moles = m_moles;
+    CanteraDouble initial_T = m_temp;
+    CanteraDouble initial_P = m_press;
     int ixy = _equilflag(XY.c_str());
     if (solver == "auto" || solver == "vcs") {
         try {
@@ -691,7 +691,7 @@ void MultiPhase::equilibrate(const string& XY, const string& solver,
     }
 }
 
-void MultiPhase::setTemperature(const double T)
+void MultiPhase::setTemperature(const CanteraDouble T)
 {
     if (!m_init) {
         init();
@@ -748,12 +748,12 @@ string MultiPhase::speciesName(const size_t k) const
     return m_snames[k];
 }
 
-double MultiPhase::nAtoms(const size_t kGlob, const size_t mGlob) const
+CanteraDouble MultiPhase::nAtoms(const size_t kGlob, const size_t mGlob) const
 {
     return m_atoms(mGlob, kGlob);
 }
 
-void MultiPhase::getMoleFractions(double* const x) const
+void MultiPhase::getMoleFractions(CanteraDouble* const x) const
 {
     std::copy(m_moleFractions.begin(), m_moleFractions.end(), x);
 }
@@ -773,12 +773,12 @@ int MultiPhase::phaseIndex(const string& pName) const
     return -1;
 }
 
-double MultiPhase::phaseMoles(const size_t n) const
+CanteraDouble MultiPhase::phaseMoles(const size_t n) const
 {
     return m_moles[n];
 }
 
-void MultiPhase::setPhaseMoles(const size_t n, const double moles)
+void MultiPhase::setPhaseMoles(const size_t n, const CanteraDouble moles)
 {
     m_moles[n] = moles;
 }
@@ -788,7 +788,7 @@ size_t MultiPhase::speciesPhaseIndex(const size_t kGlob) const
     return m_spphase[kGlob];
 }
 
-double MultiPhase::moleFraction(const size_t kGlob) const
+CanteraDouble MultiPhase::moleFraction(const size_t kGlob) const
 {
     return m_moleFractions[kGlob];
 }

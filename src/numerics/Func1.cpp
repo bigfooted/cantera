@@ -52,13 +52,13 @@ string Func1::typeName() const
 }
 
 // Calls method eval to evaluate the function
-double Func1::operator()(double t) const
+CanteraDouble Func1::operator()(CanteraDouble t) const
 {
     return eval(t);
 }
 
 // Evaluate the function.
-double Func1::eval(double t) const
+CanteraDouble Func1::eval(CanteraDouble t) const
 {
     return 0.0;
 }
@@ -103,13 +103,13 @@ bool Func1::isIdentical(Func1& other) const
 }
 
 //! accessor function for the returned constant
-double Func1::c() const
+CanteraDouble Func1::c() const
 {
     return m_c;
 }
 
 // Function to set the stored constant
-void Func1::setC(double c)
+void Func1::setC(CanteraDouble c)
 {
     m_c = c;
 }
@@ -152,7 +152,7 @@ void Func1::setParent(Func1* p)
 
 /*****************************************************************************/
 
-Sin1::Sin1(const vector<double>& params)
+Sin1::Sin1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Sin1::Sin1",
@@ -194,7 +194,7 @@ shared_ptr<Func1> Sin1::derivative3() const
 
 /*****************************************************************************/
 
-Cos1::Cos1(const vector<double>& params)
+Cos1::Cos1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Cos1::Cos1",
@@ -236,7 +236,7 @@ string Cos1::write(const string& arg) const
 
 /**************************************************************************/
 
-Exp1::Exp1(const vector<double>& params)
+Exp1::Exp1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Exp1::Exp1",
@@ -281,7 +281,7 @@ string Exp1::write(const string& arg) const
     }
 }
 
-Log1::Log1(const vector<double>& params)
+Log1::Log1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Log1::Log1",
@@ -309,7 +309,7 @@ string Log1::write(const string& arg) const
 
 /******************************************************************************/
 
-Pow1::Pow1(const vector<double>& params)
+Pow1::Pow1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Pow1::Pow1",
@@ -354,7 +354,7 @@ shared_ptr<Func1> Pow1::derivative3() const
 
 /******************************************************************************/
 
-Const1::Const1(const vector<double>& params)
+Const1::Const1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 1) {
         throw CanteraError("Const1::Const1",
@@ -363,7 +363,7 @@ Const1::Const1(const vector<double>& params)
     m_c = params[0];
 }
 
-Poly1::Poly1(const vector<double>& params)
+Poly1::Poly1(const vector<CanteraDouble>& params)
 {
     if (params.size() == 0) {
         throw CanteraError("Poly1::Poly1",
@@ -374,7 +374,7 @@ Poly1::Poly1(const vector<double>& params)
     copy(params.data(), params.data() + m_cpoly.size(), m_cpoly.begin());
 }
 
-Fourier1::Fourier1(const vector<double>& params)
+Fourier1::Fourier1(const vector<CanteraDouble>& params)
 {
     if (params.size() < 4) {
         throw CanteraError("Fourier1::Fourier1",
@@ -393,7 +393,7 @@ Fourier1::Fourier1(const vector<double>& params)
     copy(params.data() + n + 2, params.data() + 2 * n + 2, m_csin.begin());
 }
 
-Gaussian1::Gaussian1(const vector<double>& params)
+Gaussian1::Gaussian1(const vector<CanteraDouble>& params)
 {
     if (params.size() != 3) {
         throw CanteraError("Gaussian1::Gaussian1",
@@ -404,7 +404,7 @@ Gaussian1::Gaussian1(const vector<double>& params)
     m_tau = params[2] / (2. * sqrt(log(2.)));
 }
 
-Arrhenius1::Arrhenius1(const vector<double>& params)
+Arrhenius1::Arrhenius1(const vector<CanteraDouble>& params)
 {
     if (params.size() < 3) {
         throw CanteraError("Arrhenius1::Arrhenius1",
@@ -426,7 +426,7 @@ Arrhenius1::Arrhenius1(const vector<double>& params)
     }
 }
 
-Tabulated1::Tabulated1(size_t n, const double* tvals, const double* fvals,
+Tabulated1::Tabulated1(size_t n, const CanteraDouble* tvals, const CanteraDouble* fvals,
                        const string& method)
 {
     m_tvec.resize(n);
@@ -442,7 +442,7 @@ Tabulated1::Tabulated1(size_t n, const double* tvals, const double* fvals,
     setMethod(method);
 }
 
-Tabulated1::Tabulated1(const vector<double>& params) : m_isLinear(true)
+Tabulated1::Tabulated1(const vector<CanteraDouble>& params) : m_isLinear(true)
 {
     if (params.size() < 4) {
         throw CanteraError("Tabulated1::Tabulated1",
@@ -477,7 +477,7 @@ void Tabulated1::setMethod(const string& method)
     }
 }
 
-double Tabulated1::eval(double t) const {
+CanteraDouble Tabulated1::eval(CanteraDouble t) const {
     size_t siz = m_tvec.size();
     // constructor ensures that siz > 0
     if (t <= m_tvec[0]) {
@@ -490,7 +490,7 @@ double Tabulated1::eval(double t) const {
             ix++;
         }
         if (m_isLinear) {
-            double df = m_fvec[ix+1] - m_fvec[ix];
+            CanteraDouble df = m_fvec[ix+1] - m_fvec[ix];
             df /= m_tvec[ix+1] - m_tvec[ix];
             df *= t - m_tvec[ix];
             return m_fvec[ix] + df;
@@ -515,14 +515,14 @@ Func1& Tabulated1::duplicate() const {
 Func1& Tabulated1::derivative() const {
     warn_deprecated("Tabulated1::derivative",
         "To be changed after Cantera 3.0; for new behavior, see 'derivative3'.");
-    vector<double> tvec;
-    vector<double> dvec;
+    vector<CanteraDouble> tvec;
+    vector<CanteraDouble> dvec;
     size_t siz = m_tvec.size();
     if (m_isLinear) {
         // piece-wise continuous derivative
         if (siz>1) {
             for (size_t i=1; i<siz; i++) {
-                double d = (m_fvec[i] - m_fvec[i-1]) /
+                CanteraDouble d = (m_fvec[i] - m_fvec[i-1]) /
                   (m_tvec[i] - m_tvec[i-1]);
                 tvec.push_back(m_tvec[i-1]);
                 dvec.push_back(d);
@@ -541,14 +541,14 @@ Func1& Tabulated1::derivative() const {
 }
 
 shared_ptr<Func1> Tabulated1::derivative3() const {
-    vector<double> tvec;
-    vector<double> dvec;
+    vector<CanteraDouble> tvec;
+    vector<CanteraDouble> dvec;
     size_t siz = m_tvec.size();
     if (m_isLinear) {
         // piece-wise continuous derivative
         if (siz>1) {
             for (size_t i=1; i<siz; i++) {
-                double d = (m_fvec[i] - m_fvec[i-1]) /
+                CanteraDouble d = (m_fvec[i] - m_fvec[i-1]) /
                   (m_tvec[i] - m_tvec[i-1]);
                 tvec.push_back(m_tvec[i-1]);
                 dvec.push_back(d);
@@ -568,7 +568,7 @@ shared_ptr<Func1> Tabulated1::derivative3() const {
 
 /******************************************************************************/
 
-Gaussian::Gaussian(double A, double t0, double fwhm) : Gaussian1(A, t0, fwhm)
+Gaussian::Gaussian(CanteraDouble A, CanteraDouble t0, CanteraDouble fwhm) : Gaussian1(A, t0, fwhm)
 {
     warn_deprecated("Gaussian::Gaussian", "To be removed after Cantera 3.0. "
         "Replaced by 'Gaussian1'.");
@@ -866,14 +866,14 @@ Func1& PlusConstant1::derivative() const {
 }
 
 
-double Func1::isProportional(TimesConstant1& other)
+CanteraDouble Func1::isProportional(TimesConstant1& other)
 {
     if (isIdentical(other.func1())) {
         return other.c();
     }
     return 0.0;
 }
-double Func1::isProportional(Func1& other)
+CanteraDouble Func1::isProportional(Func1& other)
 {
     if (isIdentical(other)) {
         return 1.0;
@@ -986,7 +986,7 @@ Func1& newSumFunction(Func1& f1, Func1& f2)
         delete &f2;
         return f1;
     }
-    double c = f1.isProportional(f2);
+    CanteraDouble c = f1.isProportional(f2);
     if (c != 0) {
         if (c == -1.0) {
             return *(new Const1(0.0));
@@ -1008,7 +1008,7 @@ shared_ptr<Func1> newSumFunction(shared_ptr<Func1> f1, shared_ptr<Func1> f2)
     if (isZero(f2)) {
         return f1;
     }
-    double c = f1->isProportional(*f2);
+    CanteraDouble c = f1->isProportional(*f2);
     if (c != 0.) {
         if (c == -1.) {
             return make_shared<Const1>(0.);
@@ -1032,7 +1032,7 @@ Func1& newDiffFunction(Func1& f1, Func1& f2)
         delete &f2;
         return *(new Const1(0.0));
     }
-    double c = f1.isProportional(f2);
+    CanteraDouble c = f1.isProportional(f2);
     if (c != 0.0) {
         if (c == 1.0) {
             return *(new Const1(0.0));
@@ -1055,7 +1055,7 @@ shared_ptr<Func1> newDiffFunction(shared_ptr<Func1> f1, shared_ptr<Func1> f2)
     if (f1->isIdentical(*f2)) {
         return make_shared<Const1>(0.);
     }
-    double c = f1->isProportional(*f2);
+    CanteraDouble c = f1->isProportional(*f2);
     if (c != 0.) {
         if (c == 1.0) {
             return make_shared<Const1>(0.);
@@ -1085,18 +1085,18 @@ Func1& newProdFunction(Func1& f1, Func1& f2)
         return *(new Const1(0.0));
     }
     if (isConstant(f1) && isConstant(f2)) {
-        double c1c2 = f1.c() * f2.c();
+        CanteraDouble c1c2 = f1.c() * f2.c();
         delete &f1;
         delete &f2;
         return *(new Const1(c1c2));
     }
     if (isConstant(f1)) {
-        double c = f1.c();
+        CanteraDouble c = f1.c();
         delete &f1;
         return newTimesConstFunction(f2, c);
     }
     if (isConstant(f2)) {
-        double c = f2.c();
+        CanteraDouble c = f2.c();
         delete &f2;
         return newTimesConstFunction(f1, c);
     }
@@ -1119,7 +1119,7 @@ Func1& newProdFunction(Func1& f1, Func1& f2)
     bool tc2 = isTimesConst(f2);
 
     if (tc1 || tc2) {
-        double c1 = 1.0, c2 = 1.0;
+        CanteraDouble c1 = 1.0, c2 = 1.0;
         Func1* ff1 = 0, *ff2 = 0;
         if (tc1) {
             c1 = f1.c();
@@ -1178,13 +1178,13 @@ shared_ptr<Func1> newProdFunction(shared_ptr<Func1> f1, shared_ptr<Func1> f2)
     bool tc2 = isTimesConst(f2);
 
     if (tc1 || tc2) {
-        double c1 = 1.0;
+        CanteraDouble c1 = 1.0;
         auto ff1 = f1;
         if (tc1) {
             c1 = f1->c();
             ff1 = f1->func1_shared();
         }
-        double c2 = 1.0;
+        CanteraDouble c2 = 1.0;
         auto ff2 = f2;
         if (tc2) {
             c2 = f2->c();
@@ -1269,7 +1269,7 @@ Func1& newCompositeFunction(Func1& f1, Func1& f2)
         return *(new Const1(1.0));
     }
     if (isPow(f1) && isPow(f2)) {
-        double c1c2 = f1.c() * f2.c();
+        CanteraDouble c1c2 = f1.c() * f2.c();
         delete &f1;
         delete &f2;
         return *(new Pow1(c1c2));
@@ -1297,9 +1297,9 @@ shared_ptr<Func1> newCompositeFunction(shared_ptr<Func1> f1, shared_ptr<Func1> f
     return make_shared<Composite1>(f1, f2);
 }
 
-Func1& newTimesConstFunction(Func1& f, double c)
+Func1& newTimesConstFunction(Func1& f, CanteraDouble c)
 {
-    warn_deprecated("newTimesConstFunction(Func1&, double)",
+    warn_deprecated("newTimesConstFunction(Func1&, CanteraDouble)",
         "To be removed after Cantera 3.0; replaced by shared pointer version.");
 
     if (c == 0.0) {
@@ -1316,7 +1316,7 @@ Func1& newTimesConstFunction(Func1& f, double c)
     return *(new TimesConstant1(f, c));
 }
 
-shared_ptr<Func1> newTimesConstFunction(shared_ptr<Func1> f, double c)
+shared_ptr<Func1> newTimesConstFunction(shared_ptr<Func1> f, CanteraDouble c)
 {
     if (c == 0.0) {
         return make_shared<Const1>(0.0);
@@ -1330,16 +1330,16 @@ shared_ptr<Func1> newTimesConstFunction(shared_ptr<Func1> f, double c)
     return make_shared<TimesConstant1>(f, c);
 }
 
-Func1& newPlusConstFunction(Func1& f, double c)
+Func1& newPlusConstFunction(Func1& f, CanteraDouble c)
 {
-    warn_deprecated("newPlusConstFunction(Func1&, double)",
+    warn_deprecated("newPlusConstFunction(Func1&, CanteraDouble)",
         "To be removed after Cantera 3.0; replaced by shared pointer version.");
 
     if (c == 0.0) {
         return f;
     }
     if (isConstant(f)) {
-        double cc = f.c() + c;
+        CanteraDouble cc = f.c() + c;
         delete &f;
         return *(new Const1(cc));
     }
@@ -1350,7 +1350,7 @@ Func1& newPlusConstFunction(Func1& f, double c)
     return *(new PlusConstant1(f, c));
 }
 
-shared_ptr<Func1> newPlusConstFunction(shared_ptr<Func1> f, double c)
+shared_ptr<Func1> newPlusConstFunction(shared_ptr<Func1> f, CanteraDouble c)
 {
     if (c == 0.0) {
         return f;

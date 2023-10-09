@@ -97,12 +97,12 @@ public:
     /*!
      * This is calculated from the partial molar enthalpies of the species.
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Activities, Standard States, and Activity Concentrations
@@ -114,13 +114,13 @@ public:
     //! on temperature and pressure.
     //! @{
 
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
     //! @}
     //! @name  Partial Molar Properties of the Solution
     //! @{
 
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     //! Returns an array of partial molar enthalpies for the species in the
     //! mixture.
@@ -138,7 +138,7 @@ public:
      *  @param hbar  Output vector of species partial molar enthalpies.
      *               Length: m_kk. Units: J/kmol
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     //! Returns an array of partial molar entropies for the species in the
     //! mixture.
@@ -158,13 +158,13 @@ public:
      *  @param sbar  Output vector of species partial molar entropies.
      *               Length: m_kk. Units: J/kmol/K
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
-    void getdlnActCoeffds(const double dTds, const double* const dXds,
-                          double* dlnActCoeffds) const override;
-    void getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const override;
-    void getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const override;
-    void getdlnActCoeffdlnN(const size_t ld, double* const dlnActCoeffdlnN) override;
+    void getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+                          CanteraDouble* dlnActCoeffds) const override;
+    void getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const override;
+    void getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const override;
+    void getdlnActCoeffdlnN(const size_t ld, CanteraDouble* const dlnActCoeffdlnN) override;
     //! @}
 
     //! Get the Salt Dissociation Coefficients.
@@ -178,15 +178,15 @@ public:
      *     This is the mapping between ion species and neutral molecule for
      *     quick invert.
      */
-    void getDissociationCoeffs(vector<double>& fm_neutralMolec_ions,
-        vector<double>& charges, vector<size_t>& neutMolIndex) const;
+    void getDissociationCoeffs(vector<CanteraDouble>& fm_neutralMolec_ions,
+        vector<CanteraDouble>& charges, vector<size_t>& neutMolIndex) const;
 
     //! Return the current value of the neutral mole fraction vector
     /*!
      *  @param neutralMoleculeMoleFractions  Vector of neutral molecule mole
      *      fractions.
      */
-    void getNeutralMolecMoleFractions(vector<double>& neutralMoleculeMoleFractions) const {
+    void getNeutralMolecMoleFractions(vector<CanteraDouble>& neutralMoleculeMoleFractions) const {
         neutralMoleculeMoleFractions = NeutralMolecMoleFractions_;
     }
 
@@ -205,7 +205,7 @@ public:
      * @param  dx  input vector of ion mole fraction gradients
      * @param  dy  output Vector of neutral molecule mole fraction gradients
      */
-    void getNeutralMoleculeMoleGrads(const double* const dx, double* const dy) const;
+    void getNeutralMoleculeMoleGrads(const CanteraDouble* const dx, CanteraDouble* const dy) const;
 
     //! Get the list of cations in this object
     /*!
@@ -234,7 +234,7 @@ public:
     /*!
      *  @param mf Dump the mole fractions into this vector.
      */
-    virtual void calcIonMoleFractions(double* const mf) const;
+    virtual void calcIonMoleFractions(CanteraDouble* const mf) const;
 
     //! Calculate neutral molecule mole fractions
     /*!
@@ -340,7 +340,7 @@ protected:
      *
      *  This is the number of ions of type i in the neutral molecule jNeut.
      */
-    vector<double> fm_neutralMolec_ions_;
+    vector<CanteraDouble> fm_neutralMolec_ions_;
 
     //! Mapping between ion species and neutral molecule for quick invert.
     /*!
@@ -369,7 +369,7 @@ protected:
     vector<size_t> fm_invert_ionForNeutral;
 
     //! Mole fractions using the Neutral Molecule Mole fraction basis
-    mutable vector<double> NeutralMolecMoleFractions_;
+    mutable vector<CanteraDouble> NeutralMolecMoleFractions_;
 
     //! List of the species in this ThermoPhase which are cation species
     vector<size_t> cationList_;
@@ -392,13 +392,13 @@ private:
     GibbsExcessVPSSTP* geThermo;
     // Temporary vectors that I don't want to allocate every time the function
     // is called
-    mutable vector<double> y_;
-    mutable vector<double> dlnActCoeff_NeutralMolecule_;
-    mutable vector<double> dX_NeutralMolecule_;
-    mutable vector<double> m_work; // length m_kk
+    mutable vector<CanteraDouble> y_;
+    mutable vector<CanteraDouble> dlnActCoeff_NeutralMolecule_;
+    mutable vector<CanteraDouble> dX_NeutralMolecule_;
+    mutable vector<CanteraDouble> m_work; // length m_kk
 
     //! Temporary mole fraction vector
-    mutable vector<double> moleFractionsTmp_;
+    mutable vector<CanteraDouble> moleFractionsTmp_;
 
     //! Storage vector for the neutral molecule chemical potentials
     /*!
@@ -408,7 +408,7 @@ private:
      *  - Units = Joules/kmol
      *  - Length =  numNeutralMoleculeSpecies_
      */
-    mutable vector<double> muNeutralMolecule_;
+    mutable vector<CanteraDouble> muNeutralMolecule_;
 
     //! Storage vector for the neutral molecule ln activity coefficients
     /*!
@@ -418,7 +418,7 @@ private:
      *  - Units = none
      *  - Length =  numNeutralMoleculeSpecies_
      */
-    mutable vector<double> lnActCoeff_NeutralMolecule_;
+    mutable vector<CanteraDouble> lnActCoeff_NeutralMolecule_;
 
     //! Storage vector for the neutral molecule d ln activity coefficients dT
     /*!
@@ -428,7 +428,7 @@ private:
      *  - Units =  1/Kelvin
      *  - Length =  numNeutralMoleculeSpecies_
      */
-    mutable vector<double> dlnActCoeffdT_NeutralMolecule_;
+    mutable vector<CanteraDouble> dlnActCoeffdT_NeutralMolecule_;
 
     //! Storage vector for the neutral molecule d ln activity coefficients dX -
     //! diagonal component
@@ -439,7 +439,7 @@ private:
      *  - Units =  none
      *  - Length =  numNeutralMoleculeSpecies_
      */
-    mutable vector<double> dlnActCoeffdlnX_diag_NeutralMolecule_;
+    mutable vector<CanteraDouble> dlnActCoeffdlnX_diag_NeutralMolecule_;
 
     //! Storage vector for the neutral molecule d ln activity coefficients dlnN
     //! - diagonal component
@@ -450,7 +450,7 @@ private:
      *  - Units =  none
      *  - Length =  numNeutralMoleculeSpecies_
      */
-    mutable vector<double> dlnActCoeffdlnN_diag_NeutralMolecule_;
+    mutable vector<CanteraDouble> dlnActCoeffdlnN_diag_NeutralMolecule_;
 
     //! Storage vector for the neutral molecule d ln activity coefficients dlnN
     /*!

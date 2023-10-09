@@ -127,9 +127,9 @@ public:
         return { {"T", 0}, {"P", 1}, {"X", 2} };
     }
 
-    double minTemp(size_t k=npos) const override;
-    double maxTemp(size_t k=npos) const override;
-    double refPressure() const override;
+    CanteraDouble minTemp(size_t k=npos) const override;
+    CanteraDouble maxTemp(size_t k=npos) const override;
+    CanteraDouble refPressure() const override;
 
     //! This method returns the convention used in specification of the standard
     //! state, of which there are currently two, temperature based, and variable
@@ -154,7 +154,7 @@ public:
      *
      *  units J/kmol
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
     //! Return the Molar Internal Energy. Units: J/kmol.
     /*!
@@ -169,7 +169,7 @@ public:
      *
      *  units J/kmol
      */
-    double intEnergy_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
 
     //! Return the Molar Entropy. Units: J/kmol/K.
     /*!
@@ -184,7 +184,7 @@ public:
      *
      *  units J/kmol/K
      */
-    double entropy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
     //! Return the Molar Gibbs energy. Units: J/kmol.
     /*!
@@ -200,7 +200,7 @@ public:
      *
      *  units J/kmol
      */
-    double gibbs_mole() const override;
+    CanteraDouble gibbs_mole() const override;
 
     //! Return the constant pressure heat capacity. Units: J/kmol/K
     /*!
@@ -216,7 +216,7 @@ public:
      *
      *  units J/kmol/K
      */
-    double cp_mole() const override;
+    CanteraDouble cp_mole() const override;
 
     //! Return the constant volume heat capacity. Units: J/kmol/K
     /*!
@@ -232,7 +232,7 @@ public:
      *
      *  units J/kmol/K
      */
-    double cv_mole() const override {
+    CanteraDouble cv_mole() const override {
         return cp_mole();
     }
 
@@ -240,7 +240,7 @@ public:
     /*!
      *  This method simply returns the stored pressure value.
      */
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_press;
     }
 
@@ -248,7 +248,7 @@ public:
     /*!
      * @param p Pressure (units - Pa)
      */
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
     //! Calculate the density of the solid mixture
     /*!
@@ -260,7 +260,7 @@ public:
      *
      * where @f$ \rho_n @f$  is the density of the nth sublattice
      */
-    double calcDensity();
+    CanteraDouble calcDensity();
 
     //! Set the mole fractions to the specified values, and then normalize them
     //! so that they sum to 1.0 for each of the subphases
@@ -275,7 +275,7 @@ public:
      *           pass portions of this vector to the sublattices which assume
      *           that the portions individually sum to one. Length is m_kk.
      */
-    void setMoleFractions(const double* const x) override;
+    void setMoleFractions(const CanteraDouble* const x) override;
 
     //! Get the species mole fraction vector.
     /*!
@@ -290,33 +290,33 @@ public:
      *       methods for getting composition. See
      *       https://github.com/Cantera/cantera/issues/1310 for additional information.
      */
-    void getMoleFractions(double* const x) const;
+    void getMoleFractions(CanteraDouble* const x) const;
 
-    void setMassFractions(const double* const y) override {
+    void setMassFractions(const CanteraDouble* const y) override {
         throw NotImplementedError("LatticeSolidPhase::setMassFractions");
     }
 
-    void setMassFractions_NoNorm(const double* const y) override {
+    void setMassFractions_NoNorm(const CanteraDouble* const y) override {
         throw NotImplementedError("LatticeSolidPhase::setMassFractions_NoNorm");
     }
 
-    void getConcentrations(double* const c) const override {
+    void getConcentrations(CanteraDouble* const c) const override {
         throw NotImplementedError("LatticeSolidPhase::getConcentrations");
     }
 
-    double concentration(size_t k) const override {
+    CanteraDouble concentration(size_t k) const override {
         throw NotImplementedError("LatticeSolidPhase::concentration");
     }
 
-    void setConcentrations(const double* const conc) override {
+    void setConcentrations(const CanteraDouble* const conc) override {
         throw NotImplementedError("LatticeSolidPhase::setConcentrations");
     }
 
     Units standardConcentrationUnits() const override;
 
-    void getActivityConcentrations(double* c) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
     //! Get the species chemical potentials. Units: J/kmol.
     /*!
@@ -330,7 +330,7 @@ public:
      * @param mu  Output vector of species chemical potentials. Length: m_kk.
      *            Units: J/kmol
      */
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     //! Returns an array of partial molar enthalpies for the species in the
     //! mixture.
@@ -349,7 +349,7 @@ public:
      * @param hbar Output vector containing partial molar enthalpies.
      *             Length: m_kk.
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     /**
      * Returns an array of partial molar entropies of the species in the
@@ -368,7 +368,7 @@ public:
      * @param sbar Output vector containing partial molar entropies.
      *             Length: m_kk.
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
     /**
      * Returns an array of partial molar Heat Capacities at constant pressure of
@@ -377,7 +377,7 @@ public:
      *
      * @param cpbar  Output vector of partial heat capacities. Length: m_kk.
      */
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
     /**
      * returns an array of partial molar volumes of the species in the solution.
@@ -388,7 +388,7 @@ public:
      *
      * @param vbar  Output vector of partial molar volumes. Length: m_kk.
      */
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     //! Get the array of standard state chemical potentials at unit activity for
     //! the species at their standard states at the current *T* and *P* of the
@@ -404,16 +404,16 @@ public:
      * @param mu0    Output vector of chemical potentials.
      *               Length: m_kk. Units: J/kmol
      */
-    void getStandardChemPotentials(double* mu0) const override;
+    void getStandardChemPotentials(CanteraDouble* mu0) const override;
 
-    double standardConcentration(size_t k=0) const override;
-    double logStandardConc(size_t k=0) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
+    CanteraDouble logStandardConc(size_t k=0) const override;
 
     //! @name Thermodynamic Values for the Species Reference States
     //! @{
 
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
     //! @}
 
     bool addSpecies(shared_ptr<Species> spec) override;
@@ -438,15 +438,15 @@ public:
      */
     void setLatticeMoleFractionsByName(int n, const string& x);
 
-    void modifyOneHf298SS(const size_t k, const double Hf298New) override;
+    void modifyOneHf298SS(const size_t k, const CanteraDouble Hf298New) override;
     void resetHf298(const size_t k=npos) override;
 
 protected:
     //! Current value of the pressure
-    double m_press = -1.0;
+    CanteraDouble m_press = -1.0;
 
     //! Current value of the molar density
-    double m_molar_density = 0.0;
+    CanteraDouble m_molar_density = 0.0;
 
     //! Vector of sublattice ThermoPhase objects
     vector<shared_ptr<ThermoPhase>> m_lattice;
@@ -456,13 +456,13 @@ protected:
      *  Note these mole fractions sum to one when summed over all phases.
      *  However, this is not what's passed down to the lower m_lattice objects.
      */
-    mutable vector<double> m_x;
+    mutable vector<CanteraDouble> m_x;
 
     //! Lattice stoichiometric coefficients
-    vector<double> theta_;
+    vector<CanteraDouble> theta_;
 
     //! Temporary vector
-    mutable vector<double> tmpV_;
+    mutable vector<CanteraDouble> tmpV_;
 
     vector<size_t> lkstart_;
 

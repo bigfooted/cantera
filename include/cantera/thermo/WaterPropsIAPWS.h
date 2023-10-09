@@ -173,7 +173,7 @@ public:
      * @param rho           density  (kg m-3)
      * @deprecated To be removed after %Cantera 3.0; renamed to setState_TD()
      */
-    void setState_TR(double temperature, double rho);
+    void setState_TR(CanteraDouble temperature, CanteraDouble rho);
 
     //! Set the internal state of the object wrt temperature and density
     /*!
@@ -181,73 +181,73 @@ public:
      * @param rho           density  (kg m-3)
      * @since New in %Cantera 3.0.
      */
-    void setState_TD(double temperature, double rho);
+    void setState_TD(CanteraDouble temperature, CanteraDouble rho);
 
     //! Get the Gibbs free energy (J/kg) at the current temperature and density
-    double gibbs_mass() const;
+    CanteraDouble gibbs_mass() const;
 
     //! Get the enthalpy (J/kg) at the current temperature and density
-    double enthalpy_mass() const;
+    CanteraDouble enthalpy_mass() const;
 
     //! Get the internal energy (J/kg) at the current temperature and density
-    double intEnergy_mass() const;
+    CanteraDouble intEnergy_mass() const;
 
     //! Get the entropy (J/kg/K) at the current temperature and density
-    double entropy_mass() const;
+    CanteraDouble entropy_mass() const;
 
     //! Get the constant volume heat capacity (J/kg/K) at the current temperature and
     //! density
-    double cv_mass() const;
+    CanteraDouble cv_mass() const;
 
     //! Get the constant pressure heat capacity (J/kg/K) at the current temperature and
     //! density
-    double cp_mass() const;
+    CanteraDouble cp_mass() const;
 
     //! Calculate the Helmholtz free energy in mks units of J kmol-1 K-1,
     //! using the last temperature and density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double helmholtzFE() const;
+    CanteraDouble helmholtzFE() const;
 
     //! Calculate the Gibbs free energy in mks units of J kmol-1 K-1.
     //! using the last temperature and density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double Gibbs() const;
+    CanteraDouble Gibbs() const;
 
     //! Calculate the enthalpy in mks units of J kmol-1
     //! using the last temperature and density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double enthalpy() const;
+    CanteraDouble enthalpy() const;
 
     //! Calculate the internal energy in mks units of J kmol-1
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double intEnergy() const;
+    CanteraDouble intEnergy() const;
 
     //! Calculate the entropy in mks units of J kmol-1 K-1
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double entropy() const;
+    CanteraDouble entropy() const;
 
     //! Calculate the constant volume heat capacity in mks units of J kmol-1 K-1
     //! at the last temperature and density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double cv() const;
+    CanteraDouble cv() const;
 
     //! Calculate the constant pressure heat capacity in mks units of J kmol-1 K-1
     //! at the last temperature and density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double cp() const;
+    CanteraDouble cp() const;
 
     //! Calculate the molar volume (kmol m-3) at the last temperature and
     //! density
     //! @deprecated To be removed after %Cantera 3.0. This class provides mass-based
     //!     values only.
-    double molarVolume() const;
+    CanteraDouble molarVolume() const;
 
     //! Calculates the pressure (Pascals), given the current value of the
     //! temperature and density.
@@ -256,7 +256,7 @@ public:
      *
      *  @returns the pressure (Pascal)
      */
-    double pressure() const;
+    CanteraDouble pressure() const;
 
     //! Calculates the density given the temperature and the pressure,
     //! and a guess at the density. Sets the internal state.
@@ -282,8 +282,8 @@ public:
      * @returns the density. If an error is encountered in the calculation the
      *     value of -1.0 is returned.
      */
-    double density(double temperature, double pressure,
-                   int phase = -1, double rhoguess = -1.0);
+    CanteraDouble density(CanteraDouble temperature, CanteraDouble pressure,
+                   int phase = -1, CanteraDouble rhoguess = -1.0);
 
     //! Calculates the density given the temperature and the pressure,
     //! and a guess at the density, while not changing the internal state
@@ -308,7 +308,7 @@ public:
      * @returns the density. If an error is encountered in the calculation the
      *     value of -1.0 is returned.
      */
-    double density_const(double pressure, int phase = -1, double rhoguess = -1.0) const;
+    CanteraDouble density_const(CanteraDouble pressure, int phase = -1, CanteraDouble rhoguess = -1.0) const;
 
     //! Returns the density (kg m-3)
     /*!
@@ -316,13 +316,13 @@ public:
      *
      * @returns the density (kg m-3)
      */
-    double density() const;
+    CanteraDouble density() const;
 
     //! Returns the temperature (Kelvin)
     /*!
      * @return s the internally stored temperature
      */
-    double temperature() const;
+    CanteraDouble temperature() const;
 
     //! Returns the coefficient of thermal expansion.
     /*!
@@ -330,7 +330,7 @@ public:
      *
      * @returns the coefficient of thermal expansion
      */
-    double coeffThermExp() const;
+    CanteraDouble coeffThermExp() const;
 
     //! Returns the isochoric pressure derivative wrt temperature
     /*!
@@ -340,7 +340,7 @@ public:
      *
      *     beta = delta (phi0_d() + phiR_d()) - tau delta (phi0_dt() + phiR_dt())
      */
-    double coeffPresExp() const;
+    CanteraDouble coeffPresExp() const;
 
     //! Returns the coefficient of isothermal compressibility for the state of
     //! the object
@@ -351,7 +351,7 @@ public:
      *
      * @returns the isothermal compressibility
      */
-    double isothermalCompressibility() const;
+    CanteraDouble isothermalCompressibility() const;
 
     //! Returns the value of dp / drho at constant T for the state of the object
     /*!
@@ -359,7 +359,7 @@ public:
      *
      * @returns dpdrho
      */
-    double dpdrho() const;
+    CanteraDouble dpdrho() const;
 
     //! This function returns an estimated value for the saturation pressure.
     /*!
@@ -370,7 +370,7 @@ public:
      *
      * @returns the estimated saturation pressure
      */
-    double psat_est(double temperature) const;
+    CanteraDouble psat_est(CanteraDouble temperature) const;
 
     //! This function returns the saturation pressure given the temperature as
     //! an input parameter, and sets the internal state to the saturated
@@ -389,21 +389,21 @@ public:
      * @param waterState    integer specifying the water state
      * @returns the saturation pressure. units = Pascal
      */
-    double psat(double temperature, int waterState = WATER_LIQUID);
+    CanteraDouble psat(CanteraDouble temperature, int waterState = WATER_LIQUID);
 
     //! Return the value of the density at the water spinodal point (on the
     //! liquid side) for the current temperature.
     /*!
      * @returns the density with units of kg m-3
      */
-    double densSpinodalWater() const;
+    CanteraDouble densSpinodalWater() const;
 
     //! Return the value of the density at the water spinodal point (on the gas
     //! side) for the current temperature.
     /*!
      * @returns the density with units of kg m-3
      */
-    double densSpinodalSteam() const;
+    CanteraDouble densSpinodalSteam() const;
 
     //! Returns the Phase State flag for the current state of the object
     /*!
@@ -421,7 +421,7 @@ public:
     /*!
      * This is hard coded to the value 647.096 Kelvin
      */
-    double Tcrit() const {
+    CanteraDouble Tcrit() const {
         return 647.096;
     }
 
@@ -429,7 +429,7 @@ public:
     /*!
      * This is hard coded to the value of 22.064E6 pascals
      */
-    double Pcrit() const {
+    CanteraDouble Pcrit() const {
         return 22.064E6;
     }
 
@@ -437,7 +437,7 @@ public:
     /*!
      * This is equal to 322 kg m-3.
      */
-    double Rhocrit() const {
+    CanteraDouble Rhocrit() const {
         return 322.;
     }
 
@@ -447,7 +447,7 @@ private:
      * @param temperature   input temperature (kelvin)
      * @param rho           density in kg m-3
      */
-    void calcDim(double temperature, double rho);
+    void calcDim(CanteraDouble temperature, CanteraDouble rho);
 
     //! Utility routine in the calculation of the saturation pressure
     /*!
@@ -459,8 +459,8 @@ private:
      * @param densGas        output Density of gas
      * @param delGRT         output delGRT
      */
-    void corr(double temperature, double pressure, double& densLiq,
-              double& densGas, double& delGRT);
+    void corr(CanteraDouble temperature, CanteraDouble pressure, CanteraDouble& densLiq,
+              CanteraDouble& densGas, CanteraDouble& delGRT);
 
     //! Utility routine in the calculation of the saturation pressure
     /*!
@@ -470,17 +470,17 @@ private:
      * @param densGas        output Density of gas
      * @param pcorr          output corrected pressure
      */
-    void corr1(double temperature, double pressure, double& densLiq,
-               double& densGas, double& pcorr);
+    void corr1(CanteraDouble temperature, CanteraDouble pressure, CanteraDouble& densLiq,
+               CanteraDouble& densGas, CanteraDouble& pcorr);
 
     //! pointer to the underlying object that does the calculations.
     mutable WaterPropsIAPWSphi m_phi;
 
     //! Dimensionless temperature,  tau = T_C / T
-    double tau = -1.0;
+    CanteraDouble tau = -1.0;
 
     //! Dimensionless density, delta = rho / rho_c
-    mutable double delta = -1.0;
+    mutable CanteraDouble delta = -1.0;
 
     //! Current state of the system
     mutable int iState = -30000;

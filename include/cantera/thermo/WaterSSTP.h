@@ -84,31 +84,31 @@ public:
     //! @name  Molar Thermodynamic Properties of the Solution
     //! @{
 
-    double cv_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    double pressure() const override;
-    void setPressure(double p) override;
-    double isothermalCompressibility() const override;
-    double thermalExpansionCoeff() const override;
+    CanteraDouble pressure() const override;
+    void setPressure(CanteraDouble p) override;
+    CanteraDouble isothermalCompressibility() const override;
+    CanteraDouble thermalExpansionCoeff() const override;
 
     //! Return the derivative of the volumetric thermal expansion coefficient.
     //! Units: 1/K2.
-    double dthermalExpansionCoeffdT() const;
+    CanteraDouble dthermalExpansionCoeffdT() const;
 
     //! @}
     //! @name Properties of the Standard State of the Species in the Solution
     //! @{
 
-    void getStandardChemPotentials(double* gss) const override;
-    void getGibbs_RT(double* grt) const override;
-    void getEnthalpy_RT(double* hrt) const override;
-    void getEntropy_R(double* sr) const override;
-    void getCp_R(double* cpr) const override;
-    void getIntEnergy_RT(double* urt) const override;
+    void getStandardChemPotentials(CanteraDouble* gss) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
+    void getIntEnergy_RT(CanteraDouble* urt) const override;
 
     //! @}
     //! @name Thermodynamic Values for the Species Reference State
@@ -118,19 +118,19 @@ public:
     //! equation of state.
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getCp_R_ref(double* cprt) const override;
-    void getStandardVolumes_ref(double* vol) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
+    void getStandardVolumes_ref(CanteraDouble* vol) const override;
     //! @}
 
-    double critTemperature() const override;
-    double critPressure() const override;
-    double critDensity() const override;
+    CanteraDouble critTemperature() const override;
+    CanteraDouble critPressure() const override;
+    CanteraDouble critDensity() const override;
 
-    double satPressure(double t) override;
+    CanteraDouble satPressure(CanteraDouble t) override;
 
     bool compatibleWithMultiPhase() const override{
         return false;
@@ -142,7 +142,7 @@ public:
      * functionality of the routine. Above Tcrit, we query the density to toggle
      * between 0 and 1.
      */
-    double vaporFraction() const override;
+    CanteraDouble vaporFraction() const override;
 
     //! Set the temperature of the phase
     /*!
@@ -151,7 +151,7 @@ public:
      *
      * @param temp Temperature (Kelvin)
      */
-    void setTemperature(const double temp) override;
+    void setTemperature(const CanteraDouble temp) override;
 
     //! Set the density of the phase
     /*!
@@ -160,7 +160,7 @@ public:
      *
      * @param dens value of the density in kg m-3
      */
-    void setDensity(const double dens) override;
+    void setDensity(const CanteraDouble dens) override;
 
     void initThermo() override;
 
@@ -200,21 +200,21 @@ private:
     unique_ptr<WaterProps> m_waterProps;
 
     //! Molecular weight of Water -> %Cantera assumption
-    double m_mw = 0.0;
+    CanteraDouble m_mw = 0.0;
 
     //! Offset constants used to obtain consistency with the NIST database.
     /*!
      *  This is added to all internal energy and enthalpy results.
      *  units = J kmol-1.
      */
-    double EW_Offset = 0.0;
+    CanteraDouble EW_Offset = 0.0;
 
     //! Offset constant used to obtain consistency with NIST convention.
     /*!
      *  This is added to all internal entropy results.
      *  units = J kmol-1 K-1.
      */
-    double SW_Offset = 0.0;
+    CanteraDouble SW_Offset = 0.0;
 
     //! Boolean is true if object has been properly initialized for calculation
     bool m_ready = false;

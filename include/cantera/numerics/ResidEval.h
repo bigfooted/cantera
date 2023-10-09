@@ -87,22 +87,22 @@ public:
      * @param ydot rate of change of solution vector. (input)
      * @param r residual vector (output)
      */
-    virtual int eval(const double t, const double* const y,
-                     const double* const ydot,
-                     double* const r) {
+    virtual int eval(const CanteraDouble t, const CanteraDouble* const y,
+                     const CanteraDouble* const ydot,
+                     CanteraDouble* const r) {
         throw NotImplementedError("ResidEval::eval");
     }
 
-    virtual int evalSS(const double t, const double* const y,
-                       double* const r) {
+    virtual int evalSS(const CanteraDouble t, const CanteraDouble* const y,
+                       CanteraDouble* const r) {
         return eval(t, y, 0, r);
     }
 
-    virtual int evalSimpleTD(const double t, const double* const y,
-                             const double* const yold, double deltaT,
-                             double* const r) {
+    virtual int evalSimpleTD(const CanteraDouble t, const CanteraDouble* const y,
+                             const CanteraDouble* const yold, CanteraDouble deltaT,
+                             CanteraDouble* const r) {
         int nn = nEquations();
-        vector<double> ydot(nn);
+        vector<CanteraDouble> ydot(nn);
         for (int i = 0; i < nn; i++) {
             ydot[i] = (y[i] - yold[i]) / deltaT;
         }
@@ -121,8 +121,8 @@ public:
      *            1  Means a successful operation
      *           -0 or neg value Means an unsuccessful operation
      */
-    virtual int getInitialConditions(const double t0, double* const y,
-                                     double* const ydot) {
+    virtual int getInitialConditions(const CanteraDouble t0, CanteraDouble* const y,
+                                     CanteraDouble* const ydot) {
         initSizes();
         throw NotImplementedError("ResidEval::GetInitialConditions");
         return 1;
@@ -136,10 +136,10 @@ public:
      * ievent is a description of the event that caused this function to be
      * called.
      */
-    virtual void writeSolution(int ievent, const double time,
-                               const double deltaT,
+    virtual void writeSolution(int ievent, const CanteraDouble time,
+                               const CanteraDouble deltaT,
                                const int time_step_num,
-                               const double* y, const double* ydot) {
+                               const CanteraDouble* y, const CanteraDouble* ydot) {
         int k;
         writelog("ResidEval::writeSolution\n");
         writelogf("     Time = %g, ievent = %d, deltaT = %g\n", time, ievent, deltaT);

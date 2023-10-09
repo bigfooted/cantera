@@ -27,8 +27,8 @@ class AnyMap;
  *  @param coeffs The array of coefficients for the parameterization
  *  @returns The pointer to the newly allocated SpeciesThermoInterpType object
  */
-SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, double tlow,
-    double thigh, double pref, const double* coeffs);
+SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, CanteraDouble tlow,
+    CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs);
 
 //! Create a new SpeciesThermoInterpType object given a string
 /*!
@@ -40,7 +40,7 @@ SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, double tlow,
  *  @returns the pointer to the newly allocated SpeciesThermoInterpType object
  */
 SpeciesThermoInterpType* newSpeciesThermoInterpType(const string& type,
-    double tlow, double thigh, double pref, const double* coeffs);
+    CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs);
 
 //! Create a new SpeciesThermoInterpType object using the specified parameters
 /*!

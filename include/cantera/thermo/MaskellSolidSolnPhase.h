@@ -37,15 +37,15 @@ public:
     }
 
     Units standardConcentrationUnits() const override { return Units(1.0); }
-    void getActivityConcentrations(double* c) const override;
-    double standardConcentration(size_t k=0) const override { return 1.0; }
-    double logStandardConc(size_t k=0) const override { return 0.0; }
+    void getActivityConcentrations(CanteraDouble* c) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override { return 1.0; }
+    CanteraDouble logStandardConc(size_t k=0) const override { return 0.0; }
 
     //! @name Molar Thermodynamic Properties of the Solution
     //! @{
 
-    double enthalpy_mole() const override;
-    double entropy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
@@ -62,7 +62,7 @@ public:
      * For this incompressible system, we return the internally stored
      * independent value of the pressure.
      */
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_Pcurrent;
     }
 
@@ -73,7 +73,7 @@ public:
      *
      * @param p   Input Pressure (Pa)
      */
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
     void calcDensity() override;
 
@@ -81,21 +81,21 @@ public:
     //! @name Chemical Potentials and Activities
     //! @{
 
-    void getActivityCoefficients(double* ac) const override;
-    void getChemPotentials(double* mu) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
     //! @deprecated To be removed after %Cantera 3.0. Use getChemPotentials() instead.
-    void getChemPotentials_RT(double* mu) const override;
+    void getChemPotentials_RT(CanteraDouble* mu) const override;
 
     //! @}
     //! @name  Partial Molar Properties of the Solution
     //! @{
 
-    void getPartialMolarEnthalpies(double* hbar) const override;
-    void getPartialMolarEntropies(double* sbar) const override;
-    void getPartialMolarCp(double* cpbar) const override;
-    void getPartialMolarVolumes(double* vbar) const override;
-    void getPureGibbs(double* gpure) const override;
-    void getStandardChemPotentials(double* mu) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
+    void getPureGibbs(CanteraDouble* gpure) const override;
+    void getStandardChemPotentials(CanteraDouble* mu) const override;
 
     //! @}
     //! @name Utility Functions
@@ -104,7 +104,7 @@ public:
     void initThermo() override;
     void getParameters(AnyMap& phaseNode) const override;
 
-    void set_h_mix(const double hmix) { h_mixing = hmix; }
+    void set_h_mix(const CanteraDouble hmix) { h_mixing = hmix; }
 
     //! Set the product Species. Must be called after species have been added.
     void setProductSpecies(const string& name);
@@ -116,20 +116,20 @@ private:
      * pressure, but only of the mole fractions, we need to independently
      * specify the pressure.
      */
-    double m_Pcurrent = OneAtm;
+    CanteraDouble m_Pcurrent = OneAtm;
 
     //! Value of the enthalpy change on mixing due to protons changing from type
     //! B to type A configurations.
-    double h_mixing = 0.0;
+    CanteraDouble h_mixing = 0.0;
 
     //! Index of the species whose mole fraction defines the extent of reduction r
     int product_species_index = -1;
     int reactant_species_index = -1;
 
     // Functions to calculate some of the pieces of the mixing terms.
-    double s() const;
-    double fm(const double r) const;
-    double p(const double r) const;
+    CanteraDouble s() const;
+    CanteraDouble fm(const CanteraDouble r) const;
+    CanteraDouble p(const CanteraDouble r) const;
 };
 }
 
