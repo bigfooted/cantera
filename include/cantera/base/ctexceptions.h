@@ -15,6 +15,8 @@
 #include "cantera/base/fmt.h"
 #include <exception>
 
+#include "ct_ad_functionality.h"
+
 namespace Cantera
 {
 

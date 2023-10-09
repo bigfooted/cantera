@@ -492,7 +492,7 @@ struct convert<Cantera::AnyValue> {
                     // This exception is raised if the value doesn't fit in a
                     // long int, in which case we would rather store it
                     // (possibly inexactly) as a CanteraDouble.
-                    target = node.as<CanteraDouble>();
+                    target = CanteraDouble(node.as<CanteraDoublePassive>());
                 }
             } else if (isFloat(nodestr)) {
                 target = fpValue(nodestr);
