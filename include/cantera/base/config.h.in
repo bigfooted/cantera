@@ -14,7 +14,7 @@
 // corresponding Fortran data types on your system. The defaults
 // are OK for most systems
 
-typedef CanteraDouble doublereal;   // Fortran CanteraDouble precision
+typedef double doublereal;   // Fortran CanteraDouble precision
 typedef int integer;      // Fortran integer
 typedef int ftnlen;       // Fortran hidden string length type
 

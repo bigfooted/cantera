@@ -5,6 +5,7 @@
 #define CT_EIGEN_SPARSE_H
 
 #include "cantera/base/config.h"
+#include "cantera/base/ct_typedefs.h"
 #if CT_USE_SYSTEM_EIGEN
     #if CT_USE_SYSTEM_EIGEN_PREFIXED
     #include <eigen3/Eigen/Sparse>

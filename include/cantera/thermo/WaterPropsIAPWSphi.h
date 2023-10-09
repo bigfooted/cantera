@@ -13,6 +13,7 @@
 #ifndef WATERPROPSIAPWSPHI_H
 #define WATERPROPSIAPWSPHI_H
 
+#include "../base/ct_typedefs.h"
 #include "cantera/base/config.h"
 
 namespace Cantera

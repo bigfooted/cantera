@@ -8,6 +8,7 @@
 #ifndef CTC_DEFS_H
 #define CTC_DEFS_H
 
+#include "../base/ct_typedefs.h"
 #include "cantera/base/config.h"
 #include <stdlib.h>
 
