@@ -55,7 +55,7 @@ Nasa9PolyMultiTempRegion::Nasa9PolyMultiTempRegion(CanteraDouble tlow, CanteraDo
                                                    const CanteraDouble* coeffs)
     : SpeciesThermoInterpType(tlow, thigh, pref)
 {
-    size_t regions = static_cast<size_t>(coeffs[0]);
+    size_t regions = static_cast<size_t>(castToPassiveDouble(coeffs[0]));
 
     for (size_t i=0; i<regions; i++) {
         Nasa9Poly1* poly = new Nasa9Poly1(coeffs[11*i+1], coeffs[11*i+2],

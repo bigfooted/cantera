@@ -100,7 +100,7 @@ public:
 
     void getParameters(AnyMap& rateNode, const Units& rate_units) const;
     void getParameters(AnyMap& rateNode) const override {
-        return getParameters(rateNode, Units(0));
+        return getParameters(rateNode, Units(CanteraDouble(0)));
     }
 
     //! Update information specific to reaction

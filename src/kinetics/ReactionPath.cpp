@@ -68,7 +68,7 @@ void Path::writeLabel(ostream& s, CanteraDouble threshold)
             s << species << "\\l";
         } else if (v > threshold) {
             s << species;
-            int percent = int(100*v + 0.5);
+            int percent = cantera_cast<int>(100*v + 0.5);
             if (percent < 100) {
                 s << " (" << percent << "%)\\l";
             } else {
@@ -610,7 +610,7 @@ int ReactionPathBuilder::init(ostream& logfile, Kinetics& kin)
     m_sgroup.resize(m_ns);
     for (size_t j = 0; j < m_ns; j++) {
         for (size_t m = 0; m < m_nel; m++) {
-            comp[m] = int(m_atoms(j,m));
+            comp[m] = cantera_cast<int>(m_atoms(j,m));
         }
         m_sgroup[j] = Group(comp);
     }

@@ -152,7 +152,7 @@ void GasTransportData::getParameters(AnyMap& transportNode) const
         // convert from m^5 to Angstroms^5
         transportNode["dispersion-coefficient"] = dispersion_coefficient * 1e50;
     }
-    if (quadrupole_polarizability) {
+    if (0.0 != quadrupole_polarizability) {
         // convert from m^5 to Angstroms^5
         transportNode["quadrupole-polarizability"] = quadrupole_polarizability * 1e50;
     }

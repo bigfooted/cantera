@@ -104,7 +104,7 @@ CanteraDouble GibbsExcessVPSSTP::checkMFSum(const CanteraDouble* const x) const
 {
     warn_deprecated("GibbsExcessVPSSTP::checkMFSum",
                     "Unused. To be removed after Cantera 3.0");
-    CanteraDouble norm = std::accumulate(x, x + m_kk, 0.0);
+    CanteraDouble norm = std::accumulate(x, x + m_kk, CanteraDouble(0.0));
     if (fabs(norm - 1.0) > 1.0E-9) {
         throw CanteraError("GibbsExcessVPSSTP::checkMFSum",
             "(MF sum - 1) exceeded tolerance of 1.0E-9: {}", norm);

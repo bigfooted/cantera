@@ -471,7 +471,7 @@ protected:
                 ReturnType ret2;
                 int done = func(ret2, args ...);
                 if (done) {
-                    return ret1 + ret2;
+                    return ReturnType(ret1 + ret2);
                 } else {
                     return ret1;
                 }

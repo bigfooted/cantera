@@ -98,7 +98,7 @@ Composition parseCompString(const string& ss, const vector<string>& names)
                 throw;
             }
         }
-        if (getValue(x, name, 0.0) != 0.0) {
+        if (getValue(x, name, CanteraDouble(0.0)) != 0.0) {
             throw CanteraError("parseCompString",
                                "Duplicate key: '" + name + "'.");
         }

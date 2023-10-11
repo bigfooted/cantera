@@ -278,7 +278,7 @@ void SurfPhase::setCoveragesByName(const Composition& cov)
     vector<CanteraDouble> cv(m_kk, 0.0);
     bool ifound = false;
     for (size_t k = 0; k < m_kk; k++) {
-        CanteraDouble c = getValue(cov, speciesName(k), 0.0);
+        CanteraDouble c = getValue(cov, speciesName(k), CanteraDouble(0.0));
         if (c > 0.0) {
             ifound = true;
             cv[k] = c;

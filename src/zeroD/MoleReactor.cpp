@@ -199,7 +199,7 @@ void MoleReactor::updateState(CanteraDouble* y)
         pair<CanteraDouble, CanteraDouble> TT;
         try {
             TT = bmt::bracket_and_solve_root(
-                u_err, T, 1.2, true, bmt::eps_tolerance<CanteraDouble>(48), maxiter);
+                u_err, T, CanteraDouble(1.2), true, bmt::eps_tolerance<CanteraDouble>(48), maxiter);
         } catch (std::exception&) {
             // Try full-range bisection if bracketing fails (for example, near
             // temperature limits for the phase's equation of state)

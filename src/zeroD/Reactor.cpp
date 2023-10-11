@@ -146,7 +146,7 @@ void Reactor::updateState(CanteraDouble* y)
         pair<CanteraDouble, CanteraDouble> TT;
         try {
             TT = bmt::bracket_and_solve_root(
-                u_err, T, 1.2, true, bmt::eps_tolerance<CanteraDouble>(48), maxiter);
+                u_err, T, CanteraDouble(1.2), true, bmt::eps_tolerance<CanteraDouble>(48), maxiter);
         } catch (std::exception&) {
             // Try full-range bisection if bracketing fails (for example, near
             // temperature limits for the phase's equation of state)
@@ -324,13 +324,13 @@ Eigen::SparseMatrix<CanteraDouble> Reactor::finiteDifferenceJacobian()
     // clear former jacobian elements
     m_jac_trips.clear();
 
-    Eigen::ArrayXd yCurrent(m_nv);
+    Cantera::ArrayXd yCurrent(m_nv);
     getState(yCurrent.data());
     CanteraDouble time = (m_net != nullptr) ? m_net->time() : 0.0;
 
-    Eigen::ArrayXd yPerturbed = yCurrent;
-    Eigen::ArrayXd lhsPerturbed(m_nv), lhsCurrent(m_nv);
-    Eigen::ArrayXd rhsPerturbed(m_nv), rhsCurrent(m_nv);
+    Cantera::ArrayXd yPerturbed = yCurrent;
+    Cantera::ArrayXd lhsPerturbed(m_nv), lhsCurrent(m_nv);
+    Cantera::ArrayXd rhsPerturbed(m_nv), rhsCurrent(m_nv);
     lhsCurrent = 1.0;
     rhsCurrent = 0.0;
     updateState(yCurrent.data());

@@ -26,7 +26,7 @@ Mu0Poly::Mu0Poly(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, co
     m_H298(0.0)
 {
     map<CanteraDouble, CanteraDouble> T_mu;
-    size_t nPoints = (size_t) coeffs[0];
+    size_t nPoints = (size_t) castToPassiveDouble(coeffs[0]);
     for (size_t i = 0; i < nPoints; i++) {
         T_mu[coeffs[2*i+2]] = coeffs[2*i+3];
     }

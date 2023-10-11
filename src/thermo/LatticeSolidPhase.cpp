@@ -376,7 +376,7 @@ void LatticeSolidPhase::addLattice(shared_ptr<ThermoPhase> lattice)
 void LatticeSolidPhase::setLatticeStoichiometry(const Composition& comp)
 {
     for (size_t i = 0; i < m_lattice.size(); i++) {
-        theta_[i] = getValue(comp, m_lattice[i]->name(), 0.0);
+        theta_[i] = getValue(comp, m_lattice[i]->name(), CanteraDouble(0.0));
     }
     // Add in the lattice stoichiometry constraint
     for (size_t i = 1; i < m_lattice.size(); i++) {

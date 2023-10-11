@@ -76,7 +76,7 @@ void AdaptivePreconditioner::updatePreconditioner()
     // convert to preconditioner
     m_precon_matrix = m_identity - m_gamma * m_precon_matrix;
     // prune by threshold if desired
-    if (m_prune_precon) {
+    if (0.0 != m_prune_precon) {
         prunePreconditioner();
     }
 }
@@ -97,8 +97,10 @@ void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_ve
     output)
 {
     // creating vectors in the form of Ax=b
-    Eigen::Map<Eigen::VectorXd> bVector(rhs_vector, stateSize);
-    Eigen::Map<Eigen::VectorXd> xVector(output, stateSize);
+    //Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
+    //Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
+    Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
+    Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
     // solve for xVector
     xVector = m_solver.solve(bVector);
     if (m_solver.info() != Eigen::Success) {
@@ -110,7 +112,7 @@ void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_ve
 void AdaptivePreconditioner::printPreconditioner() {
     std::stringstream ss;
     Eigen::IOFormat HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-    ss << Eigen::MatrixXd(m_precon_matrix).format(HeavyFmt);
+    ss << Cantera::MatrixXd(m_precon_matrix).format(HeavyFmt);
     writelog(ss.str());
 }
 
@@ -118,7 +120,7 @@ void AdaptivePreconditioner::printJacobian() {
     std::stringstream ss;
     Eigen::SparseMatrix<CanteraDouble> jacobian(m_dim, m_dim);
     jacobian.setFromTriplets(m_jac_trips.begin(), m_jac_trips.end());
-    ss << Eigen::MatrixXd(jacobian);
+    ss << Cantera::MatrixXd(jacobian);
     writelog(ss.str());
 }
 

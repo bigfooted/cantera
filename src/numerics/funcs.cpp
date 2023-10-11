@@ -26,7 +26,7 @@ CanteraDouble linearInterp(CanteraDouble x, const vector<CanteraDouble>& xpts, c
     return ff;
 }
 
-CanteraDouble trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble trapezoidal(const Cantera::ArrayXd& f, const Cantera::ArrayXd& x)
 {
     // check length
     if (f.size() != x.size()) {
@@ -34,9 +34,9 @@ CanteraDouble trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
                            "Vector lengths need to be the same.");
     }
     // Vector of f(i+1) + f(i)
-    Eigen::VectorXd f_av = f.tail(f.size() - 1) + f.head(f.size() - 1);
+    Cantera::VectorXd f_av = f.tail(f.size() - 1) + f.head(f.size() - 1);
     // Vector of x(i+1) - x(i)
-    Eigen::VectorXd x_diff = x.tail(x.size() - 1) - x.head(x.size() - 1);
+    Cantera::VectorXd x_diff = x.tail(x.size() - 1) - x.head(x.size() - 1);
     // check if the coordinate is a monotonically increase vector.
     if ((x_diff.array() <= 0.0).any()) {
         throw CanteraError("trapezoidal",
@@ -56,7 +56,7 @@ CanteraDouble trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
  * @param  f vector of function value
  * @param  x vector of function coordinate
  */
-CanteraDouble basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble basicSimpson(const Cantera::ArrayXd& f, const Cantera::ArrayXd& x)
 {
     if (f.size() < 2) {
         throw CanteraError("basicSimpson",
@@ -68,7 +68,7 @@ CanteraDouble basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
     }
 
     size_t N = f.size() - 1;
-    Eigen::VectorXd h = x.tail(N) - x.head(N);
+    Cantera::VectorXd h = x.tail(N) - x.head(N);
 
     CanteraDouble sum = 0.0;
     for (size_t i = 1; i < N; i+=2) {
@@ -84,9 +84,9 @@ CanteraDouble basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
     return sum;
 }
 
-CanteraDouble simpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble simpson(const Cantera::ArrayXd& f, const Cantera::ArrayXd& x)
 {
-    Eigen::ArrayXd h = x.tail(x.size() - 1) - x.head(x.size() - 1);
+    Cantera::ArrayXd h = x.tail(x.size() - 1) - x.head(x.size() - 1);
     if ((h <= 0.0).any()) {
         throw CanteraError("simpson",
             "Values of x need to be positive and monotonically increasing.");
@@ -110,8 +110,8 @@ CanteraDouble simpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
 }
 
 CanteraDouble numericalQuadrature(const string& method,
-                           const Eigen::ArrayXd& f,
-                           const Eigen::ArrayXd& x)
+                           const Cantera::ArrayXd& f,
+                           const Cantera::ArrayXd& x)
 {
     if (method == "simpson") {
         return simpson(f, x);

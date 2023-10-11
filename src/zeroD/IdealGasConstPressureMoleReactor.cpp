@@ -147,7 +147,7 @@ Eigen::SparseMatrix<CanteraDouble> IdealGasConstPressureMoleReactor::jacobian()
         dnk_dnj.setFromTriplets(species_trips.begin(), species_trips.end());
     }
     // get net production rates
-    Eigen::VectorXd netProductionRates = Eigen::VectorXd::Zero(ssize);
+    Cantera::VectorXd netProductionRates = Cantera::VectorXd::Zero(ssize);
     // gas phase net production rates
     m_kin->getNetProductionRates(netProductionRates.data());
     // surface phase net production rates mapped to reactor gas phase
@@ -206,8 +206,8 @@ Eigen::SparseMatrix<CanteraDouble> IdealGasConstPressureMoleReactor::jacobian()
         }
         // d T_dot/dnj
         // allocate vectors for whole system
-        Eigen::VectorXd enthalpy = Eigen::VectorXd::Zero(ssize);
-        Eigen::VectorXd specificHeat = Eigen::VectorXd::Zero(ssize);
+        Cantera::VectorXd enthalpy = Cantera::VectorXd::Zero(ssize);
+        Cantera::VectorXd specificHeat = Cantera::VectorXd::Zero(ssize);
         // gas phase
         m_thermo->getPartialMolarCp(specificHeat.data());
         m_thermo->getPartialMolarEnthalpies(enthalpy.data());
@@ -223,7 +223,7 @@ Eigen::SparseMatrix<CanteraDouble> IdealGasConstPressureMoleReactor::jacobian()
             NCp += moles[i] * specificHeat[i];
         }
         CanteraDouble denom = 1 / (NCp * NCp);
-        Eigen::VectorXd hk_dnkdnj_sums = dnk_dnj.transpose() * enthalpy;
+        Cantera::VectorXd hk_dnkdnj_sums = dnk_dnj.transpose() * enthalpy;
         // Add derivatives to jac by spanning columns
         for (size_t j = 0; j < ssize; j++) {
             m_jac_trips.emplace_back(0, static_cast<int>(j + m_sidx),

@@ -1384,7 +1384,7 @@ public:
     }
 
     CanteraDouble eval(CanteraDouble t) const override {
-        int np = int(t/m_c);
+        int np = int(castToPassiveDouble(t/m_c));
         CanteraDouble time = t - np*m_c;
         return m_f1->eval(time);
     }

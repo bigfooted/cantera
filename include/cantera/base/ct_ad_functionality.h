@@ -4,6 +4,31 @@
 
 #if AD_ENABLED
 
+template <typename ... Args>
+inline std::string sprintfOverload(char const* message, Args&& ... args) {
+
+    return fmt::sprintf(message, codi::RealTraits::getPassiveValue(std::forward<Args>(args))...);
+}
+
+template<typename To, typename From, typename = void>
+struct ADStaticCastImpl {
+    inline static To cast(From const& from) {
+        return static_cast<To>(from);
+    }
+};
+
+template<typename To, typename From>
+struct ADStaticCastImpl<To, From, codi::ExpressionTraits::EnableIfExpression<From>> {
+    inline static To cast(From const& from) {
+        return static_cast<To>(from.getValue());
+    }
+};
+
+template<typename To, typename From>
+inline To ad_static_cast(From const& from) {
+    return ADStaticCastImpl<To, From>::cast(from);
+}
+#define cantera_cast ad_static_cast
 
 template <> struct fmt::formatter<CanteraDouble> : fmt::formatter<double> {
 
@@ -12,11 +37,25 @@ template <> struct fmt::formatter<CanteraDouble> : fmt::formatter<double> {
   }
 };
 
-CanteraDoublePassive castToPassiveDouble(CanteraDouble const& value) {
+template <typename R, typename Exp, template<typename> class Op> struct fmt::formatter<codi::UnaryExpression<R, Exp, Op>> : fmt::formatter<double> {
+
+  auto format(const CanteraDouble& p, format_context& ctx) const {
+    return fmt::formatter<double>::format(p.getValue(), ctx);
+  }
+};
+
+template <typename R, typename Exp1, typename Exp2, template<typename> class Op> struct fmt::formatter<codi::BinaryExpression<R, Exp1, Exp2, Op>> : fmt::formatter<double> {
+
+  auto format(const CanteraDouble& p, format_context& ctx) const {
+    return fmt::formatter<double>::format(p.getValue(), ctx);
+  }
+};
+
+inline CanteraDoublePassive castToPassiveDouble(CanteraDouble const& value) {
   return value.getValue();
 }
 
-std::vector<CanteraDouble> castToDoubleVector(std::vector<CanteraDoublePassive> const& vec) {
+inline std::vector<CanteraDouble> castToDoubleVector(std::vector<CanteraDoublePassive> const& vec) {
   std::vector<CanteraDouble> res(vec.size());
   
   for(size_t i = 0; i < vec.size(); i += 1) {
@@ -25,7 +64,7 @@ std::vector<CanteraDouble> castToDoubleVector(std::vector<CanteraDoublePassive> 
   return res;
 }
 
-std::vector<std::vector<CanteraDouble>> castToDoubleVectorVector(std::vector<std::vector<CanteraDoublePassive>> const& vec) {
+inline std::vector<std::vector<CanteraDouble>> castToDoubleVectorVector(std::vector<std::vector<CanteraDoublePassive>> const& vec) {
   std::vector<std::vector<CanteraDouble>> res(vec.size(), std::vector<CanteraDouble>(0));
   
   for(size_t i = 0; i < vec.size(); i += 1) {
@@ -34,7 +73,7 @@ std::vector<std::vector<CanteraDouble>> castToDoubleVectorVector(std::vector<std
   return res;
 }
 
-std::vector<CanteraDoublePassive> castToPassiveDoubleVector(std::vector<CanteraDouble> const& vec) {
+inline std::vector<CanteraDoublePassive> castToPassiveDoubleVector(std::vector<CanteraDouble> const& vec) {
   std::vector<CanteraDoublePassive> res(vec.size());
   
   for(size_t i = 0; i < vec.size(); i += 1) {
@@ -43,7 +82,7 @@ std::vector<CanteraDoublePassive> castToPassiveDoubleVector(std::vector<CanteraD
   return res;
 }
 
-std::vector<std::vector<CanteraDoublePassive>> castToPassiveDoubleVectorVector(std::vector<std::vector<CanteraDouble>> const& vec) {
+inline std::vector<std::vector<CanteraDoublePassive>> castToPassiveDoubleVectorVector(std::vector<std::vector<CanteraDouble>> const& vec) {
   std::vector<std::vector<CanteraDoublePassive>> res(vec.size(), std::vector<CanteraDoublePassive>(0));
   
   for(size_t i = 0; i < vec.size(); i += 1) {
@@ -52,22 +91,20 @@ std::vector<std::vector<CanteraDoublePassive>> castToPassiveDoubleVectorVector(s
   return res;
 }
 #else
+#define cantera_cast static_cast
+#define sprintfOverload fmt::sprintf
 
-CanteraDoublePassive castToPassiveDouble(CanteraDouble const& value) {
-  return value;
-}
-
-std::vector<CanteraDouble> const& castToDoubleVector(std::vector<CanteraDoublePassive> const& vec) {
+inline std::vector<CanteraDouble> const& castToDoubleVector(std::vector<CanteraDoublePassive> const& vec) {
   return vec;
 }
 
-std::vector<std::vector<CanteraDouble>> const& castToDoubleVectorVector(std::vector<std::vector<CanteraDoublePassive>> const& vec) {
+inline std::vector<std::vector<CanteraDouble>> const& castToDoubleVectorVector(std::vector<std::vector<CanteraDoublePassive>> const& vec) {
   return vec;
 }
-std::vector<CanteraDoublePassive> const& castToPassiveDoubleVector(std::vector<CanteraDouble> const& vec) {
+inline std::vector<CanteraDoublePassive> const& castToPassiveDoubleVector(std::vector<CanteraDouble> const& vec) {
   return vec;
 }
-std::vector<std::vector<CanteraDoublePassive>> const& castToPassiveDoubleVectorVector(std::vector<std::vector<CanteraDouble>> const& vec) {
+inline std::vector<std::vector<CanteraDoublePassive>> const& castToPassiveDoubleVectorVector(std::vector<std::vector<CanteraDouble>> const& vec) {
   return vec;
 }
 #endif

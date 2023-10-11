@@ -358,12 +358,12 @@ void Phase::setMassFractions(const CanteraDouble* const y)
     for (size_t k = 0; k < m_kk; k++) {
         m_y[k] = std::max(y[k], 0.0); // Ignore negative mass fractions
     }
-    CanteraDouble norm = accumulate(m_y.begin(), m_y.end(), 0.0);
+    CanteraDouble norm = accumulate(m_y.begin(), m_y.end(), CanteraDouble(0.0));
     scale(m_y.begin(), m_y.end(), m_y.begin(), 1.0/norm);
 
     transform(m_y.begin(), m_y.end(), m_rmolwts.begin(),
               m_ym.begin(), multiplies<CanteraDouble>());
-    m_mmw = 1.0 / accumulate(m_ym.begin(), m_ym.end(), 0.0);
+    m_mmw = 1.0 / accumulate(m_ym.begin(), m_ym.end(), CanteraDouble(0.0));
     compositionChanged();
 }
 
@@ -373,7 +373,7 @@ void Phase::setMassFractions_NoNorm(const CanteraDouble* const y)
     copy(y, y + m_kk, m_y.begin());
     transform(m_y.begin(), m_y.end(), m_rmolwts.begin(), m_ym.begin(),
               multiplies<CanteraDouble>());
-    sum = accumulate(m_ym.begin(), m_ym.end(), 0.0);
+    sum = accumulate(m_ym.begin(), m_ym.end(), CanteraDouble(0.0));
     m_mmw = 1.0/sum;
     compositionChanged();
 }
@@ -642,11 +642,11 @@ void Phase::setMolesNoTruncate(const CanteraDouble* const N)
 {
     // get total moles
     copy(N, N + m_kk, m_ym.begin());
-    CanteraDouble totalMoles = accumulate(m_ym.begin(), m_ym.end(), 0.0);
+    CanteraDouble totalMoles = accumulate(m_ym.begin(), m_ym.end(), CanteraDouble(0.0));
     // get total mass
     copy(N, N + m_kk, m_y.begin());
     transform(m_y.begin(), m_y.end(), m_molwts.begin(), m_y.begin(), multiplies<CanteraDouble>());
-    CanteraDouble totalMass = accumulate(m_y.begin(), m_y.end(), 0.0);
+    CanteraDouble totalMass = accumulate(m_y.begin(), m_y.end(), CanteraDouble(0.0));
     // mean molecular weight
     m_mmw = totalMass/totalMoles;
     // mass fractions
@@ -736,12 +736,12 @@ CanteraDouble Phase::chargeDensity() const
 
 CanteraDouble Phase::mean_X(const CanteraDouble* const Q) const
 {
-    return m_mmw*std::inner_product(m_ym.begin(), m_ym.end(), Q, 0.0);
+    return m_mmw*std::inner_product(m_ym.begin(), m_ym.end(), Q, CanteraDouble(0.0));
 }
 
 CanteraDouble Phase::mean_X(const vector<CanteraDouble>& Q) const
 {
-    return m_mmw*std::inner_product(m_ym.begin(), m_ym.end(), Q.begin(), 0.0);
+    return m_mmw*std::inner_product(m_ym.begin(), m_ym.end(), Q.begin(), CanteraDouble(0.0));
 }
 
 CanteraDouble Phase::sum_xlogx() const
@@ -1020,7 +1020,7 @@ void Phase::setMolecularWeight(const int k, const CanteraDouble mw)
 
     transform(m_y.begin(), m_y.end(), m_rmolwts.begin(), m_ym.begin(),
               multiplies<CanteraDouble>());
-    m_mmw = 1.0 / accumulate(m_ym.begin(), m_ym.end(), 0.0);
+    m_mmw = 1.0 / accumulate(m_ym.begin(), m_ym.end(), CanteraDouble(0.0));
 }
 
 void Phase::compositionChanged() {
