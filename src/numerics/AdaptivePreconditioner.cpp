@@ -97,8 +97,6 @@ void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_ve
     output)
 {
     // creating vectors in the form of Ax=b
-    //Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
-    //Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
     Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
     Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
     // solve for xVector
