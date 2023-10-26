@@ -21,13 +21,6 @@ namespace Cantera
 //! @addtogroup matrices
 //! @{
 
-//typedef Eigen::Map<Eigen::MatrixXd> MappedMatrix;
-//typedef Eigen::Map<const Eigen::MatrixXd> ConstMappedMatrix;
-//typedef Eigen::Map<Eigen::VectorXd> MappedVector;
-//typedef Eigen::Map<const Eigen::VectorXd> ConstMappedVector;
-//typedef Eigen::Map<Eigen::RowVectorXd> MappedRowVector;
-//typedef Eigen::Map<const Eigen::RowVectorXd> ConstMappedRowVector;
-
 typedef Eigen::Map<Eigen::Matrix<CanteraDouble,Eigen::Dynamic,Eigen::Dynamic>> MappedMatrix;
 typedef Eigen::Map<const Eigen::Matrix<CanteraDouble,Eigen::Dynamic,Eigen::Dynamic>> ConstMappedMatrix;
 
