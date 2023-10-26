@@ -23,3 +23,6 @@
 	path = data/example_data
 	url = https://github.com/cantera/cantera-example-data
 	shallow = true
+[submodule "ext/codipack"]
+	path = ext/codipack
+	url = git@github.com:SciCompKL/CoDiPack.git
