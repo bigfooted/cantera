@@ -270,6 +270,16 @@ config_options = [
            Cython) are installed. Note: 'y' is a synonym for 'full' and 'n'
            is a synonym for 'none'.""",
         "default", ("full", "minimal", "none", "n", "y", "default")),
+    EnumOption(
+        "ad_mode",
+        """Select the AD mode.""",
+        "none", ("none", "forward", "reverse")),
+    PathOption(
+        "codipack_include",
+        """The directory where the CoDiPack header files are installed. Not needed
+           if 'ad_mode=none' or if the default CoDiPack in 'ext/codipack' should be
+           used.""",
+        "", PathVariable.PathAccept),
     BoolOption(
         "python_sdist",
         """Setting this option to True builds the Python sdist.""",
@@ -1305,6 +1315,39 @@ if env['googletest'] in ('submodule', 'default'):
 
 if env['googletest'] == 'none':
     logger.info("Not using Googletest -- unable to run complete test suite")
+
+if env['ad_mode'] != 'none':
+    env.Append(CPPDEFINES=['AD_ENABLED'])
+    if env['ad_mode'] == 'forward':
+      env.Append(CPPDEFINES=['AD_FORWARD'])
+    if env['ad_mode'] == 'reverse':
+      env.Append(CPPDEFINES=['AD_REVERSE'])
+
+    codi_include = ""
+    if env["codipack_include"]:
+        env["codipack_include"] = Path(env["codipack_include"]).as_posix()
+        add_system_include(env, env["codipack_include"])
+        codi_include = env["codipack_include"]
+    else:
+        if not os.path.exists("ext/codipack/include/codi.hpp"):
+            if not os.path.exists(".git"):
+                config_error("CoDiPack is missing. Install CoDiPack in ext/codipack or specify 'codipack_include' .")
+
+            try:
+                code = subprocess.call(["git","submodule","update","--init",
+                                        "--recursive","ext/codipack"])
+            except Exception:
+                code = -1
+            if code:
+                config_error("CoDipack not found and submodule checkout failed.\n"
+                             "Try manually checking out the submodule with:\n\n"
+                             "    git submodule update --init --recursive ext/codipack\n"
+                             " or by providing 'codipack_include=<...>'")
+        codi_include = '"ext/codipack/include"'
+
+    logger.status(F"Using AD mode: {env['ad_mode']}", print_level=False)
+    logger.info(F"Using CoDiPack include '{codi_include}'")
+    add_system_include(env, codi_include)
 
 # Check for Eigen and checkout submodule if needed
 if env["system_eigen"] in ("y", "default"):
