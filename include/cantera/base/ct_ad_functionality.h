@@ -94,6 +94,8 @@ inline std::vector<std::vector<CanteraDoublePassive>> castToPassiveDoubleVectorV
 #define cantera_cast static_cast
 #define sprintfOverload fmt::sprintf
 
+inline CanteraDoublePassive castToPassiveDouble(CanteraDouble const& value) { return value; }
+
 inline std::vector<CanteraDouble> const& castToDoubleVector(std::vector<CanteraDoublePassive> const& vec) {
   return vec;
 }
