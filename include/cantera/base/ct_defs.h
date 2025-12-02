@@ -28,6 +28,8 @@
 #include <memory>
 #include <functional>
 
+#include "ct_typedefs.h"
+
 /**
  * Namespace for the Cantera kernel.
  */

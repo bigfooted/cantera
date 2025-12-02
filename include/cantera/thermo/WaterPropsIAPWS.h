@@ -11,6 +11,7 @@
 #ifndef WATERPROPSIAPWS_H
 #define WATERPROPSIAPWS_H
 
+#include "../base/ct_typedefs.h"
 #include "WaterPropsIAPWSphi.h"
 
 namespace Cantera

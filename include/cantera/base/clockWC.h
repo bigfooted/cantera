@@ -10,6 +10,7 @@
 #ifndef CT_CLOCKWC_H
 #define CT_CLOCKWC_H
 
+#include "ct_typedefs.h" 
 #include <time.h>
 namespace Cantera
 {
