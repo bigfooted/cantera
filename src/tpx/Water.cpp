@@ -76,15 +76,15 @@ static const CanteraDouble taua[] = {1.544912, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5};
 CanteraDouble water::C(int i)
 {
     CanteraDouble tau = Ta/T;
-    return (i == 0 ? R*T : R*T*(tau - tauc)*pow(tau - taua[i],i-1));
+    return (i == 0 ? CanteraDouble(R*T) : CanteraDouble(R*T*(tau - tauc)*pow(tau - taua[i],i-1)));
 }
 
 CanteraDouble water::Cprime(int i)
 {
     CanteraDouble tau = Ta/T;
-    return (i == 0 ? R : (i == 1 ? -R*tauc :
-                          -R*pow(tau - taua[i],i-2)*(tauc*(tau - taua[i])
-                                  + (i-1)*tau*(tau - tauc))));
+    return (i == 0 ? CanteraDouble(R) : (i == 1 ? CanteraDouble(-R*tauc) :
+                          CanteraDouble(-R*pow(tau - taua[i],i-2)*(tauc*(tau - taua[i])
+                                  + (i-1)*tau*(tau - tauc)))));
 }
 
 CanteraDouble water::I(int j)

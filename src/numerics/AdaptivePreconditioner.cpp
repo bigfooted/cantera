@@ -39,7 +39,7 @@ void AdaptivePreconditioner::initialize(size_t networkSize)
 
 void AdaptivePreconditioner::factorize()
 {
-    if (m_prune_precon) {
+    if (0.0 != m_prune_precon) {
         prunePreconditioner();
     }
     // compress sparse matrix structure
@@ -69,8 +69,10 @@ void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_ve
     output)
 {
     // creating vectors in the form of Ax=b
-    Eigen::Map<Eigen::VectorXd> bVector(rhs_vector, stateSize);
-    Eigen::Map<Eigen::VectorXd> xVector(output, stateSize);
+    //Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
+    //Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
+    Eigen::Map<Cantera::VectorXd> bVector(rhs_vector, stateSize);
+    Eigen::Map<Cantera::VectorXd> xVector(output, stateSize);
     // solve for xVector
     xVector = m_solver.solve(bVector);
     if (m_solver.info() != Eigen::Success) {

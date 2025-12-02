@@ -8,6 +8,7 @@
 
 #include "cantera/equil/vcs_solve.h"
 #include "cantera/base/ctexceptions.h"
+#include "cantera/base/ct_ad_functionality.h"
 #include "cantera/base/stringUtils.h"
 #include "cantera/equil/vcs_VolPhase.h"
 #include "cantera/equil/vcs_species_thermo.h"
@@ -907,25 +908,25 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                         m_deltaMolNumSpecies[kspec] = m_totalMolNum * VCS_SMALL_MULTIPHASE_SPECIES;
                         if (m_speciesStatus[kspec] == VCS_SPECIES_STOICHZERO) {
                             m_deltaMolNumSpecies[kspec] = 0.0;
-                            ANOTE = fmt::sprintf("MultSpec (%s): Species not born due to STOICH/PHASEPOP even though DG = %11.3E",
+                            ANOTE = sprintfOverload("MultSpec (%s): Species not born due to STOICH/PHASEPOP even though DG = %11.3E",
                                 vcs_speciesType_string(m_speciesStatus[kspec], 15), m_deltaGRxn_new[irxn]);
                         } else {
                             m_deltaMolNumSpecies[kspec] = m_totalMolNum * VCS_SMALL_MULTIPHASE_SPECIES * 10.0;
-                            ANOTE = fmt::sprintf("MultSpec (%s): small species born again DG = %11.3E",
+                            ANOTE = sprintfOverload("MultSpec (%s): small species born again DG = %11.3E",
                                 vcs_speciesType_string(m_speciesStatus[kspec], 15), m_deltaGRxn_new[irxn]);
                         }
                     } else {
-                        ANOTE = fmt::sprintf("MultSpec (%s):still dead, no phase pop, even though DG = %11.3E",
+                        ANOTE = sprintfOverload("MultSpec (%s):still dead, no phase pop, even though DG = %11.3E",
                             vcs_speciesType_string(m_speciesStatus[kspec], 15), m_deltaGRxn_new[irxn]);
                         m_deltaMolNumSpecies[kspec] = 0.0;
                         if (Vphase->exists() > 0 && trphmoles > 0.0) {
                             m_deltaMolNumSpecies[kspec] = m_totalMolNum * VCS_SMALL_MULTIPHASE_SPECIES * 10.;
-                            ANOTE = fmt::sprintf("MultSpec (%s): birthed species because it was zero in a small existing phase with DG = %11.3E",
+                            ANOTE = sprintfOverload("MultSpec (%s): birthed species because it was zero in a small existing phase with DG = %11.3E",
                                 vcs_speciesType_string(m_speciesStatus[kspec], 15), m_deltaGRxn_new[irxn]);
                         }
                     }
                 } else {
-                    ANOTE = fmt::sprintf("MultSpec (%s): still dead DG = %11.3E",
+                    ANOTE = sprintfOverload("MultSpec (%s): still dead DG = %11.3E",
                         vcs_speciesType_string(m_speciesStatus[kspec], 15), m_deltaGRxn_new[irxn]);
                     m_deltaMolNumSpecies[kspec] = 0.0;
                 }
@@ -936,7 +937,7 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                 // bother if superconvergence has already been achieved in this
                 // mode.
                 if (fabs(m_deltaGRxn_new[irxn]) <= m_tolmaj2) {
-                    ANOTE = fmt::sprintf("Skipped: superconverged DG = %11.3E", m_deltaGRxn_new[irxn]);
+                    ANOTE = sprintfOverload("Skipped: superconverged DG = %11.3E", m_deltaGRxn_new[irxn]);
                     if (m_debug_print_lvl >= 2) {
                         plogf("   --- %-12.12s", m_speciesName[kspec]);
                         plogf("  %12.4E %12.4E %12.4E | %s\n",
@@ -949,7 +950,7 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                 // Don't calculate for minor or nonexistent species if their
                 // values are to be decreasing anyway.
                 if ((m_speciesStatus[kspec] != VCS_SPECIES_MAJOR) && (m_deltaGRxn_new[irxn] >= 0.0)) {
-                    ANOTE = fmt::sprintf("Skipped: IC = %3d and DG >0: %11.3E",
+                    ANOTE = sprintfOverload("Skipped: IC = %3d and DG >0: %11.3E",
                         m_speciesStatus[kspec], m_deltaGRxn_new[irxn]);
                     if (m_debug_print_lvl >= 2) {
                         plogf("   --- %-12.12s", m_speciesName[kspec]);
@@ -985,7 +986,7 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                     if (m_useActCoeffJac) {
                         CanteraDouble s_old = s;
                         s = vcs_Hessian_diag_adj(irxn, s_old);
-                        ANOTE = fmt::sprintf("Normal calc: diag adjusted from %g "
+                        ANOTE = sprintfOverload("Normal calc: diag adjusted from %g "
                             "to %g due to act coeff", s_old, s);
                     }
 
@@ -997,12 +998,12 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                             CanteraDouble negChangeComp = -stoicC * m_deltaMolNumSpecies[kspec];
                             if (negChangeComp > m_molNumSpecies_old[j]) {
                                 if (m_molNumSpecies_old[j] > 0.0) {
-                                    ANOTE = fmt::sprintf("Delta damped from %g "
+                                    ANOTE = sprintfOverload("Delta damped from %g "
                                         "to %g due to component %d (%10s) going neg", m_deltaMolNumSpecies[kspec],
                                         -m_molNumSpecies_old[j] / stoicC, j, m_speciesName[j]);
                                     m_deltaMolNumSpecies[kspec] = -m_molNumSpecies_old[j] / stoicC;
                                 } else {
-                                    ANOTE = fmt::sprintf("Delta damped from %g "
+                                    ANOTE = sprintfOverload("Delta damped from %g "
                                         "to %g due to component %d (%10s) zero", m_deltaMolNumSpecies[kspec],
                                         -m_molNumSpecies_old[j] / stoicC, j, m_speciesName[j]);
                                     m_deltaMolNumSpecies[kspec] = 0.0;
@@ -1013,7 +1014,7 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                     // Implement a damping term that limits m_deltaMolNumSpecies
                     // to the size of the mole number
                     if (-m_deltaMolNumSpecies[kspec] > m_molNumSpecies_old[kspec]) {
-                        ANOTE = fmt::sprintf("Delta damped from %g "
+                        ANOTE = sprintfOverload("Delta damped from %g "
                             "to %g due to %s going negative", m_deltaMolNumSpecies[kspec], -m_molNumSpecies_old[kspec],
                             m_speciesName[kspec]);
                         m_deltaMolNumSpecies[kspec] = -m_molNumSpecies_old[kspec];
@@ -1068,7 +1069,7 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                             // having all of the mole numbers of that phases. it
                             // seems that we can suggest a zero of the species
                             // and the code will recover.
-                            ANOTE = fmt::sprintf("Delta damped from %g to %g due to delete %s", m_deltaMolNumSpecies[kspec],
+                            ANOTE = sprintfOverload("Delta damped from %g to %g due to delete %s", m_deltaMolNumSpecies[kspec],
                                 -m_molNumSpecies_old[kspec], m_speciesName[kspec]);
                             m_deltaMolNumSpecies[kspec] = -m_molNumSpecies_old[kspec];
                             if (m_debug_print_lvl >= 2) {
@@ -1093,10 +1094,10 @@ size_t VCS_SOLVE::vcs_RxnStepSizes(int& forceComponentCalc, size_t& kSpecial)
                         kSpecial = k;
 
                         if (k != kspec) {
-                            ANOTE = fmt::sprintf("Delete component SS phase %d named %s - SS phases only",
+                            ANOTE = sprintfOverload("Delete component SS phase %d named %s - SS phases only",
                                 iphDel, m_speciesName[k]);
                         } else {
-                            ANOTE = fmt::sprintf("Delete this SS phase %d - SS components only", iphDel);
+                            ANOTE = sprintfOverload("Delete this SS phase %d - SS components only", iphDel);
                         }
                         if (m_debug_print_lvl >= 2) {
                             plogf("   --- %-12.12s", m_speciesName[kspec]);

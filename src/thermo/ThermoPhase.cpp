@@ -793,8 +793,8 @@ void ThermoPhase::setEquivalenceRatio(CanteraDouble phi, const CanteraDouble* fu
 
     CanteraDouble AFR_st = stoichAirFuelRatio(fuelComp, oxComp, ThermoBasis::mass);
 
-    CanteraDouble sum_f = std::accumulate(fuelComp, fuelComp+m_kk, 0.0);
-    CanteraDouble sum_o = std::accumulate(oxComp, oxComp+m_kk, 0.0);
+    CanteraDouble sum_f = std::accumulate(fuelComp, fuelComp+m_kk, CanteraDouble(0.0));
+    CanteraDouble sum_o = std::accumulate(oxComp, oxComp+m_kk, CanteraDouble(0.0));
 
     vector<CanteraDouble> y(m_kk);
     for (size_t k = 0; k != m_kk; ++k) {
@@ -916,8 +916,8 @@ void ThermoPhase::setMixtureFraction(CanteraDouble mixFrac, const CanteraDouble*
         oxComp = ox.data();
     }
 
-    CanteraDouble sum_yf = std::accumulate(fuelComp, fuelComp+m_kk, 0.0);
-    CanteraDouble sum_yo = std::accumulate(oxComp, oxComp+m_kk, 0.0);
+    CanteraDouble sum_yf = std::accumulate(fuelComp, fuelComp+m_kk, CanteraDouble(0.0));
+    CanteraDouble sum_yo = std::accumulate(oxComp, oxComp+m_kk, CanteraDouble(0.0));
 
     if (sum_yf == 0.0 || sum_yo == 0.0) {
         throw CanteraError("ThermoPhase::setMixtureFraction",
@@ -993,8 +993,8 @@ CanteraDouble ThermoPhase::mixtureFraction(const CanteraDouble* fuelComp, const 
         return std::min(std::max(Z, 0.0), 1.0);
     } else {
         // compute the mixture fraction from a single element
-        CanteraDouble sum_yf = std::accumulate(fuelComp, fuelComp+m_kk, 0.0);
-        CanteraDouble sum_yo = std::accumulate(oxComp, oxComp+m_kk, 0.0);
+        CanteraDouble sum_yf = std::accumulate(fuelComp, fuelComp+m_kk, CanteraDouble(0.0));
+        CanteraDouble sum_yo = std::accumulate(oxComp, oxComp+m_kk, CanteraDouble(0.0));
 
         if (sum_yf == 0.0 || sum_yo == 0.0) {
             throw CanteraError("ThermoPhase::mixtureFraction",

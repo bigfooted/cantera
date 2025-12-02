@@ -114,7 +114,7 @@ public:
     //! Get electron energy levels.
     //! @param  levels The vector of electron energy levels (eV). Length: #m_nPoints
     void getElectronEnergyLevels(CanteraDouble* levels) const {
-        Eigen::Map<Eigen::ArrayXd>(levels, m_nPoints) = m_electronEnergyLevels;
+        Eigen::Map<Cantera::ArrayXd>(levels, m_nPoints) = m_electronEnergyLevels;
     }
 
     //! Set discretized electron energy distribution.
@@ -131,7 +131,7 @@ public:
     //! @param  distrb The vector of electron energy distribution.
     //!                Length: #m_nPoints.
     void getElectronEnergyDistribution(CanteraDouble* distrb) const {
-        Eigen::Map<Eigen::ArrayXd>(distrb, m_nPoints) = m_electronEnergyDist;
+        Eigen::Map<Cantera::ArrayXd>(distrb, m_nPoints) = m_electronEnergyDist;
     }
 
     //! Set the shape factor of isotropic electron energy distribution.
@@ -433,11 +433,11 @@ protected:
     size_t m_nPoints = 1001;
 
     //! electron energy levels [ev]. Length: #m_nPoints
-    Eigen::ArrayXd m_electronEnergyLevels;
+    Cantera::ArrayXd m_electronEnergyLevels;
 
     //! Normalized electron energy distribution vector [-]
     //! Length: #m_nPoints
-    Eigen::ArrayXd m_electronEnergyDist;
+    Cantera::ArrayXd m_electronEnergyDist;
 
     //! Index of electron species
     size_t m_electronSpeciesIndex = npos;

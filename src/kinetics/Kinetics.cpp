@@ -435,8 +435,8 @@ void Kinetics::getNetProductionRates(CanteraDouble* net)
 
 void Kinetics::getCreationRates_ddT(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the forward direction creates product species
     getFwdRatesOfProgress_ddT(buf.data());
     out = m_productStoich.stoichCoeffs() * buf;
@@ -447,8 +447,8 @@ void Kinetics::getCreationRates_ddT(CanteraDouble* dwdot)
 
 void Kinetics::getCreationRates_ddP(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the forward direction creates product species
     getFwdRatesOfProgress_ddP(buf.data());
     out = m_productStoich.stoichCoeffs() * buf;
@@ -459,8 +459,8 @@ void Kinetics::getCreationRates_ddP(CanteraDouble* dwdot)
 
 void Kinetics::getCreationRates_ddC(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the forward direction creates product species
     getFwdRatesOfProgress_ddC(buf.data());
     out = m_productStoich.stoichCoeffs() * buf;
@@ -491,8 +491,8 @@ Eigen::SparseMatrix<CanteraDouble> Kinetics::creationRates_ddCi()
 
 void Kinetics::getDestructionRates_ddT(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the reverse direction destroys products in reversible reactions
     getRevRatesOfProgress_ddT(buf.data());
     out = m_revProductStoich.stoichCoeffs() * buf;
@@ -503,8 +503,8 @@ void Kinetics::getDestructionRates_ddT(CanteraDouble* dwdot)
 
 void Kinetics::getDestructionRates_ddP(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the reverse direction destroys products in reversible reactions
     getRevRatesOfProgress_ddP(buf.data());
     out = m_revProductStoich.stoichCoeffs() * buf;
@@ -515,8 +515,8 @@ void Kinetics::getDestructionRates_ddP(CanteraDouble* dwdot)
 
 void Kinetics::getDestructionRates_ddC(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     // the reverse direction destroys products in reversible reactions
     getRevRatesOfProgress_ddC(buf.data());
     out = m_revProductStoich.stoichCoeffs() * buf;
@@ -547,24 +547,24 @@ Eigen::SparseMatrix<CanteraDouble> Kinetics::destructionRates_ddCi()
 
 void Kinetics::getNetProductionRates_ddT(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     getNetRatesOfProgress_ddT(buf.data());
     out = m_stoichMatrix * buf;
 }
 
 void Kinetics::getNetProductionRates_ddP(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     getNetRatesOfProgress_ddP(buf.data());
     out = m_stoichMatrix * buf;
 }
 
 void Kinetics::getNetProductionRates_ddC(CanteraDouble* dwdot)
 {
-    Eigen::Map<Eigen::VectorXd> out(dwdot, m_kk);
-    Eigen::Map<Eigen::VectorXd> buf(m_rbuf.data(), nReactions());
+    Eigen::Map<Cantera::VectorXd> out(dwdot, m_kk);
+    Eigen::Map<Cantera::VectorXd> buf(m_rbuf.data(), nReactions());
     getNetRatesOfProgress_ddC(buf.data());
     out = m_stoichMatrix * buf;
 }

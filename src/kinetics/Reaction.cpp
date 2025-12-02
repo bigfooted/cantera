@@ -497,18 +497,18 @@ void Reaction::setEquation(const string& equation, const Kinetics* kin)
 
         // ensure that all reactants have integer stoichiometric coefficients
         for (const auto& [name, stoich] : reactants) {
-            if (trunc(stoich) != stoich) {
+            if (trunc(castToPassiveDouble(stoich)) != castToPassiveDouble(stoich)) {
                 return;
             }
-            nreac += static_cast<size_t>(stoich);
+            nreac += cantera_cast<size_t>(stoich);
         }
 
         // ensure that all products have integer stoichiometric coefficients
         for (const auto& [name, stoich] : products) {
-            if (trunc(stoich) != stoich) {
+            if (trunc(castToPassiveDouble(stoich)) != castToPassiveDouble(stoich)) {
                 return;
             }
-            nprod += static_cast<size_t>(stoich);
+            nprod += cantera_cast<size_t>(stoich);
         }
 
         // either reactant or product side involves exactly three species
@@ -535,7 +535,7 @@ void Reaction::setEquation(const string& equation, const Kinetics* kin)
         throw InputFileError("Reaction::setEquation", input,
             "Logic error interpreting apparent third-body reaction");
     }
-    if (trunc(reac->second) != 1) {
+    if (trunc(castToPassiveDouble(reac->second)) != 1) {
         reac->second -= 1.;
     } else {
         reactants.erase(reac);
@@ -547,7 +547,7 @@ void Reaction::setEquation(const string& equation, const Kinetics* kin)
         throw InputFileError("Reaction::setEquation", input,
             "Logic error interpreting apparent third-body reaction");
     }
-    if (trunc(prod->second) != 1) {
+    if (trunc(castToPassiveDouble(prod->second)) != 1) {
         prod->second -= 1.;
     } else {
         products.erase(prod);

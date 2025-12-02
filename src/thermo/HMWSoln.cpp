@@ -369,7 +369,7 @@ void HMWSoln::setPsi(const string& sp1, const string& sp2,
     size_t k3 = speciesIndex(sp3, true);
 
     if (!charge(k1) || !charge(k2) || !charge(k3) ||
-        std::abs(sign(charge(k1) + sign(charge(k2)) + sign(charge(k3)))) != 1) {
+        std::abs(sign(CanteraDouble(charge(k1) + sign(charge(k2)) + sign(charge(k3))))) != 1) {
         throw CanteraError("HMWSoln::setPsi", "All species must be ions and"
             " must include at least one cation and one anion, but given species"
             " (charges) were: {} ({}), {} ({}), and {} ({}).",
@@ -721,7 +721,7 @@ void HMWSoln::getParameters(AnyMap& phaseNode) const
             // lambda: neutral-charged / neutral-neutral interactions
             bool lambda_found = false;
             for (size_t n = 0; n < nParams; n++) {
-                if (m_Lambda_nj_coeff(n, c)) {
+                if (0.0 != m_Lambda_nj_coeff(n, c)) {
                     lambda_found = true;
                     break;
                 }
@@ -785,7 +785,7 @@ void HMWSoln::getParameters(AnyMap& phaseNode) const
                     interaction["Cphi"] = Cphi;
                 }
                 interaction["alpha1"] = m_Alpha1MX_ij[c];
-                if (m_Alpha2MX_ij[c]) {
+                if (0.0 != m_Alpha2MX_ij[c]) {
                     interaction["alpha2"] = m_Alpha2MX_ij[c];
                 }
                 interactions.push_back(std::move(interaction));
@@ -795,7 +795,7 @@ void HMWSoln::getParameters(AnyMap& phaseNode) const
             // theta: like-charge interactions
             bool theta_found = false;
             for (size_t n = 0; n < nParams; n++) {
-                if (m_Theta_ij_coeff(n, c)) {
+                if (0.0 != m_Theta_ij_coeff(n, c)) {
                     theta_found = true;
                     break;
                 }
@@ -1898,8 +1898,8 @@ void HMWSoln::s_updatePitzer_lnMolalityActCoeff() const
             // both species have a non-zero charge, and one is positive and the
             // other is negative
             if (charge(i)*charge(j) > 0) {
-                int z1 = (int) fabs(charge(i));
-                int z2 = (int) fabs(charge(j));
+                int z1 = cantera_cast<int>(fabs(charge(i)));
+                int z2 = cantera_cast<int>(fabs(charge(j)));
                 m_Phi_IJ[counterIJ] = m_Theta_ij[counterIJ] + etheta[z1][z2];
                 m_Phiprime_IJ[counterIJ] = etheta_prime[z1][z2];
                 m_PhiPhi_IJ[counterIJ] = m_Phi_IJ[counterIJ] + Is * m_Phiprime_IJ[counterIJ];

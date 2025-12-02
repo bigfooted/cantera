@@ -349,7 +349,7 @@ void MultiPhase::setMolesByName(const Composition& xMap)
     size_t kk = nSpecies();
     vector<CanteraDouble> moles(kk, 0.0);
     for (size_t k = 0; k < kk; k++) {
-        moles[k] = std::max(getValue(xMap, speciesName(k), 0.0), 0.0);
+        moles[k] = std::max(getValue(xMap, speciesName(k), CanteraDouble(0.0)), CanteraDouble(0.0));
     }
     setMoles(moles.data());
 }

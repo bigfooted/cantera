@@ -247,9 +247,9 @@ Eigen::SparseMatrix<CanteraDouble> IdealGasMoleReactor::jacobian()
                                      (ydotPerturbed - ydotCurrent) / deltaTemp);
         }
         // d T_dot/dnj
-        Eigen::VectorXd netProductionRates = Eigen::VectorXd::Zero(ssize);
-        Eigen::VectorXd internal_energy = Eigen::VectorXd::Zero(ssize);
-        Eigen::VectorXd specificHeat = Eigen::VectorXd::Zero(ssize);
+        Cantera::VectorXd netProductionRates = Cantera::VectorXd::Zero(ssize);
+        Cantera::VectorXd internal_energy = Cantera::VectorXd::Zero(ssize);
+        Cantera::VectorXd specificHeat = Cantera::VectorXd::Zero(ssize);
         // getting species data
         m_thermo->getPartialMolarIntEnergies(internal_energy.data());
         m_kin->getNetProductionRates(netProductionRates.data());
@@ -269,7 +269,7 @@ Eigen::SparseMatrix<CanteraDouble> IdealGasMoleReactor::jacobian()
         }
         // make denominator beforehand
         CanteraDouble denom = 1 / (NCv * NCv);
-        Eigen::VectorXd uk_dnkdnj_sums = dnk_dnj.transpose() * internal_energy;
+        Cantera::VectorXd uk_dnkdnj_sums = dnk_dnj.transpose() * internal_energy;
         // add derivatives to jacobian
         for (size_t j = 0; j < ssize; j++) {
             m_jac_trips.emplace_back(0, static_cast<int>(j + m_sidx),

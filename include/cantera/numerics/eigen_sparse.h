@@ -20,6 +20,15 @@ namespace Cantera
 {
 //! @ingroup matrices
 typedef std::vector<Eigen::Triplet<CanteraDouble>> SparseTriplets;
+
+typedef Eigen::Matrix<CanteraDouble,Eigen::Dynamic,1> VectorXd;
+typedef Eigen::Matrix<CanteraDoublePassive,Eigen::Dynamic,1> PassiveVectorXd;
+
+typedef Eigen::Array<CanteraDouble,Eigen::Dynamic,1> ArrayXd;
+typedef Eigen::Array<CanteraDoublePassive,Eigen::Dynamic,1> PassiveArrayXd;
+
+typedef Eigen::Matrix<CanteraDouble,Eigen::Dynamic,Eigen::Dynamic> MatrixXd;
+
 }
 
 #endif

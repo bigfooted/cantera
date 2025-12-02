@@ -95,7 +95,7 @@ public:
      *  @param product   Product of law of mass action and rate terms.
      */
     Eigen::SparseMatrix<CanteraDouble> derivatives(const CanteraDouble* product) {
-        Eigen::Map<const Eigen::VectorXd> mapped(product, m_multipliers.rows());
+        Eigen::Map<const Cantera::VectorXd> mapped(product, m_multipliers.rows());
         return mapped.asDiagonal() * m_multipliers;
     }
 

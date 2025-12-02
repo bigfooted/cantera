@@ -88,7 +88,7 @@ void PlasmaPhase::updateElectronEnergyDistribution()
 }
 
 void PlasmaPhase::normalizeElectronEnergyDistribution() {
-    Eigen::ArrayXd eps32 = m_electronEnergyLevels.pow(3./2.);
+    Cantera::ArrayXd eps32 = m_electronEnergyLevels.pow(3./2.);
     CanteraDouble norm = 2./3. * numericalQuadrature(m_quadratureMethod,
                                               m_electronEnergyDist, eps32);
     if (norm < 0.0) {
@@ -115,8 +115,8 @@ void PlasmaPhase::setIsotropicElectronEnergyDistribution()
 {
     m_electronEnergyDist.resize(m_nPoints);
     CanteraDouble x = m_isotropicShapeFactor;
-    CanteraDouble gamma1 = boost::math::tgamma(3.0 / 2.0 / x);
-    CanteraDouble gamma2 = boost::math::tgamma(5.0 / 2.0 / x);
+    CanteraDouble gamma1 = std::tgamma(3.0 / 2.0 / x);
+    CanteraDouble gamma2 = std::tgamma(5.0 / 2.0 / x);
     CanteraDouble c1 = x * std::pow(gamma2, 1.5) / std::pow(gamma1, 2.5);
     CanteraDouble c2 = std::pow(gamma2 / gamma1, x);
     m_electronEnergyDist =
@@ -139,7 +139,7 @@ void PlasmaPhase::setMeanElectronEnergy(CanteraDouble energy) {
 void PlasmaPhase::setElectronEnergyLevels(const CanteraDouble* levels, size_t length)
 {
     m_nPoints = length;
-    m_electronEnergyLevels = Eigen::Map<const Eigen::ArrayXd>(levels, length);
+    m_electronEnergyLevels = Eigen::Map<const Cantera::ArrayXd>(levels, length);
     checkElectronEnergyLevels();
     electronEnergyLevelChanged();
     updateElectronEnergyDistribution();
@@ -167,7 +167,7 @@ void PlasmaPhase::electronEnergyLevelChanged()
 
 void PlasmaPhase::checkElectronEnergyLevels() const
 {
-    Eigen::ArrayXd h = m_electronEnergyLevels.tail(m_nPoints - 1) -
+    Cantera::ArrayXd h = m_electronEnergyLevels.tail(m_nPoints - 1) -
                        m_electronEnergyLevels.head(m_nPoints - 1);
     if (m_electronEnergyLevels[0] < 0.0 || (h <= 0.0).any()) {
         throw CanteraError("PlasmaPhase::checkElectronEnergyLevels",
@@ -178,7 +178,7 @@ void PlasmaPhase::checkElectronEnergyLevels() const
 
 void PlasmaPhase::checkElectronEnergyDistribution() const
 {
-    Eigen::ArrayXd h = m_electronEnergyLevels.tail(m_nPoints - 1) -
+    Cantera::ArrayXd h = m_electronEnergyLevels.tail(m_nPoints - 1) -
                        m_electronEnergyLevels.head(m_nPoints - 1);
     if ((m_electronEnergyDist < 0.0).any()) {
         throw CanteraError("PlasmaPhase::checkElectronEnergyDistribution",
@@ -200,9 +200,9 @@ void PlasmaPhase::setDiscretizedElectronEnergyDist(const CanteraDouble* levels,
     m_distributionType = "discretized";
     m_nPoints = length;
     m_electronEnergyLevels =
-        Eigen::Map<const Eigen::ArrayXd>(levels, length);
+        Eigen::Map<const Cantera::ArrayXd>(levels, length);
     m_electronEnergyDist =
-        Eigen::Map<const Eigen::ArrayXd>(dist, length);
+        Eigen::Map<const Cantera::ArrayXd>(dist, length);
     checkElectronEnergyLevels();
     if (m_do_normalizeElectronEnergyDist) {
         normalizeElectronEnergyDistribution();
@@ -217,7 +217,7 @@ void PlasmaPhase::setDiscretizedElectronEnergyDist(const CanteraDouble* levels,
 void PlasmaPhase::updateElectronTemperatureFromEnergyDist()
 {
     // calculate mean electron energy and electron temperature
-    Eigen::ArrayXd eps52 = m_electronEnergyLevels.pow(5./2.);
+    Cantera::ArrayXd eps52 = m_electronEnergyLevels.pow(5./2.);
     CanteraDouble epsilon_m = 2.0 / 5.0 * numericalQuadrature(m_quadratureMethod,
                                                        m_electronEnergyDist, eps52);
     if (epsilon_m < 0.0 && m_quadratureMethod == "simpson") {
@@ -245,14 +245,14 @@ void PlasmaPhase::getParameters(AnyMap& phaseNode) const
     AnyMap eedf;
     eedf["type"] = m_distributionType;
     vector<CanteraDouble> levels(m_nPoints);
-    Eigen::Map<Eigen::ArrayXd>(levels.data(), m_nPoints) = m_electronEnergyLevels;
+    Eigen::Map<Cantera::ArrayXd>(levels.data(), m_nPoints) = m_electronEnergyLevels;
     eedf["energy-levels"] = levels;
     if (m_distributionType == "isotropic") {
         eedf["shape-factor"] = m_isotropicShapeFactor;
         eedf["mean-electron-energy"].setQuantity(meanElectronEnergy(), "eV");
     } else if (m_distributionType == "discretized") {
         vector<CanteraDouble> dist(m_nPoints);
-        Eigen::Map<Eigen::ArrayXd>(dist.data(), m_nPoints) = m_electronEnergyDist;
+        Eigen::Map<Cantera::ArrayXd>(dist.data(), m_nPoints) = m_electronEnergyDist;
         eedf["distribution"] = dist;
         eedf["normalize"] = m_do_normalizeElectronEnergyDist;
     }

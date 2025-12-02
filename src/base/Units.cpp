@@ -260,7 +260,7 @@ string Units::str(bool skip_unity) const
         } else if (exponent > 0) {
             num.append(fmt::format(" * {}^{}", dimension, exponent));
         } else {
-            den.append(fmt::format(" / {}^{}", dimension, -exponent));
+            den.append(fmt::format(" / {}^{}", dimension, CanteraDouble(-exponent)));
         }
     }
 
@@ -324,7 +324,7 @@ CanteraDouble Units::dimension(const string& primary) const
 Units UnitStack::standardUnits() const
 {
     if (!stack.size()) {
-        return Units(0);
+        return Units(CanteraDouble(0.0));
     }
     return stack[0].first;
 }

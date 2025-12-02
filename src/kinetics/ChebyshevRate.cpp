@@ -79,7 +79,7 @@ void ChebyshevRate::setParameters(const AnyMap& node, const UnitStack& rate_unit
                 coeffs(i, j) = vcoeffs[i][j];
             }
         }
-        CanteraDouble offset = unit_system.convertRateCoeff(AnyValue(1.0), conversionUnits());
+        CanteraDouble offset = unit_system.convertRateCoeff(AnyValue(CanteraDouble(1.0)), conversionUnits());
         coeffs(0, 0) += std::log10(offset);
         setLimits(
             unit_system.convert(T_range[0], "K"),

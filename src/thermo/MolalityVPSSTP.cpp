@@ -112,7 +112,7 @@ void MolalityVPSSTP::setMolalitiesByName(const Composition& mMap)
     getMoleFractions(mf.data());
     CanteraDouble xmolSmin = std::max(mf[0], m_xmolSolventMIN);
     for (size_t k = 0; k < m_kk; k++) {
-        CanteraDouble mol_k = getValue(mMap, speciesName(k), 0.0);
+        CanteraDouble mol_k = getValue(mMap, speciesName(k), CanteraDouble(0.0));
         if (mol_k > 0) {
             mf[k] = mol_k * m_Mnaught * xmolSmin;
         }

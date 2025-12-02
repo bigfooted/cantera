@@ -17,6 +17,7 @@
 
 #include "ct_defs.h"
 #include "cantera/base/fmt.h"
+#include "ct_ad_functionality.h"
 
 namespace Cantera
 {
@@ -189,7 +190,7 @@ void writelog(const string& fmt, const Args&... args) {
  */
 template <typename... Args>
 void writelogf(const char* fmt, const Args& ... args) {
-    writelog_direct(fmt::sprintf(fmt, args...));
+    writelog_direct(sprintfOverload(fmt, args...));
 }
 
 //! Write an end of line character to the screen and flush output
@@ -322,8 +323,8 @@ void printStackTraceOnSegfault();
 
 //! Clip *value* such that lower <= value <= upper
 //! @ingroup mathTemplates
-template <class T>
-inline T clip(const T& value, const T& lower, const T& upper)
+template <class T, class L, class U>
+inline auto clip(const T& value, const L& lower, const U& upper) 
 {
     return std::max(lower, std::min(upper, value));
 }
