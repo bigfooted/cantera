@@ -11,7 +11,7 @@
 namespace Cantera
 {
 
-void BlowersMaselData::update(double T) {
+void BlowersMaselData::update(CanteraDouble T) {
     warn_user("BlowersMaselData::update",
         "This method does not update the change of reaction enthalpy.");
     ReactionData::update(T);
@@ -19,9 +19,9 @@ void BlowersMaselData::update(double T) {
 
 bool BlowersMaselData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double rho = phase.density();
+    CanteraDouble rho = phase.density();
     int mf = phase.stateMFNumber();
-    double T = phase.temperature();
+    CanteraDouble T = phase.temperature();
     bool changed = false;
     if (T != temperature) {
         ReactionData::update(T);
@@ -42,7 +42,7 @@ BlowersMaselRate::BlowersMaselRate()
     m_E4_str = "w";
 }
 
-BlowersMaselRate::BlowersMaselRate(double A, double b, double Ea0, double w)
+BlowersMaselRate::BlowersMaselRate(CanteraDouble A, CanteraDouble b, CanteraDouble Ea0, CanteraDouble w)
     : ArrheniusBase(A, b, Ea0)
 {
     m_Ea_str = "Ea0";
@@ -56,11 +56,11 @@ BlowersMaselRate::BlowersMaselRate(const AnyMap& node, const UnitStack& rate_uni
     setParameters(node, rate_units);
 }
 
-double BlowersMaselRate::ddTScaledFromStruct(const BlowersMaselData& shared_data) const
+CanteraDouble BlowersMaselRate::ddTScaledFromStruct(const BlowersMaselData& shared_data) const
 {
     warn_user("BlowersMaselRate::ddTScaledFromStruct",
         "Temperature derivative does not consider changes of reaction enthalpy.");
-    double Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
+    CanteraDouble Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
     return (Ea_R * shared_data.recipT + m_b) * shared_data.recipT;
 }
 

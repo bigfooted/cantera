@@ -29,7 +29,7 @@ class Reaction;
 //! type. In addition, derived classes may also implement the following methods:
 //! - `updateFromStruct(const DataType& shared_data)`, to update buffered data that
 //! is specific to a given reaction rate.
-//! - `modifyRateConstants(const DataType& shared_data, double& kf, double& kr)`, to
+//! - `modifyRateConstants(const DataType& shared_data, CanteraDouble& kf, CanteraDouble& kr)`, to
 //!   implement modifications to the forward and reverse rate constants for reactions
 //!   that do not follow mass action kinetics or use the equilibrium constant to
 //!   implement reversibility.
@@ -39,12 +39,12 @@ class Reaction;
 //!     `ddTScaledFromStruct(const DataType& shared_data)` for an analytical derivative
 //!     with respect to temperature.
 //!  -  Associated `DataType` containers may overload the method
-//!     `perturbTemperature(double deltaT)`, which is used for the calculation of
+//!     `perturbTemperature(CanteraDouble deltaT)`, which is used for the calculation of
 //!     numerical derivatives with respect to temperature if an analytic implementation
 //!     is not available.
 //!  -  For reaction rate constants that depend on pressure or third-body collision
 //!     partners, associated `DataType` containers should implement the methods
-//!     `perturbPressure(double deltaP)` and/or `perturbThirdBodies(double deltaM)`,
+//!     `perturbPressure(CanteraDouble deltaP)` and/or `perturbThirdBodies(CanteraDouble deltaM)`,
 //!     which allow for the calculation of numerical derivatives.
 //!  -  For additional information, refer to the @ref kinDerivs "Kinetics Derivatives"
 //!     documentation.
@@ -172,7 +172,7 @@ public:
     //! Used in conjunction with MultiRateBase::evalSingle / ReactionRate::eval.
     //! This method allows for testing of a reaction rate expression outside of
     //! Kinetics reaction rate evaluators.
-    double eval(double T) {
+    CanteraDouble eval(CanteraDouble T) {
         _evaluator().update(T);
         return _evaluator().evalSingle(*this);
     }
@@ -185,7 +185,7 @@ public:
     //! Used in conjunction with MultiRateBase::evalSingle / ReactionRate::eval.
     //! This method allows for testing of a reaction rate expression outside of
     //! Kinetics reaction rate evaluators.
-    double eval(double T, double extra) {
+    CanteraDouble eval(CanteraDouble T, CanteraDouble extra) {
         _evaluator().update(T, extra);
         return _evaluator().evalSingle(*this);
     }
@@ -200,7 +200,7 @@ public:
     //! Kinetics reaction rate evaluators.
     //! @warning  This method is an experimental part of the %Cantera API and
     //!     may be changed or removed without notice.
-    double eval(double T, const vector<double>& extra) {
+    CanteraDouble eval(CanteraDouble T, const vector<CanteraDouble>& extra) {
         _evaluator().update(T, extra);
         return _evaluator().evalSingle(*this);
     }

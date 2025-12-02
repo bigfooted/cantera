@@ -35,34 +35,34 @@ public:
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
 
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
-    double intEnergy_mole() const override;
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
-    double molarVolume() const override;
-    double density() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble molarVolume() const override;
+    CanteraDouble density() const override;
 
     //! @}
     //! @name Properties of the Reference State of the Species in the Solution
     //! @{
 
-    double refPressure() const {
+    CanteraDouble refPressure() const {
         return m_p0;
     }
 
-    double gibbs_RT_ref() const override;
-    double enthalpy_RT_ref() const override;
-    double entropy_R_ref() const override;
-    double cp_R_ref() const override;
-    double molarVolume_ref() const override;
+    CanteraDouble gibbs_RT_ref() const override;
+    CanteraDouble enthalpy_RT_ref() const override;
+    CanteraDouble entropy_R_ref() const override;
+    CanteraDouble cp_R_ref() const override;
+    CanteraDouble molarVolume_ref() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    void setState_TP(double temp, double pres) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
 
     //! @}
     //! @name Initialization of the Object
@@ -76,22 +76,22 @@ public:
     void initThermo() override;
 
      //! Set enthalpy of formation at Pr, Tr [J/kmol]
-    void setDeltaH0(double dh0);
+    void setDeltaH0(CanteraDouble dh0);
 
     //! Set Gibbs free energy of formation at Pr, Tr [J/kmol]
-    void setDeltaG0(double dg0);
+    void setDeltaG0(CanteraDouble dg0);
 
      //! Set entropy of formation at Pr, Tr [J/kmol/K]
-    void setS0(double s0);
+    void setS0(CanteraDouble s0);
 
     //! Set "a" coefficients (array of 4 elements). Units of each coefficient
     //! are [J/kmol/Pa, J/kmol, J*K/kmol/Pa, J*K/kmol]
-    void set_a(double* a);
+    void set_a(CanteraDouble* a);
 
     //! Set "c" coefficients (array of 2 elements). Units of each coefficient
     //! are [J/kmol/K, J*K/kmol]
-    void set_c(double* c);
-    void setOmega(double omega); //!< Set omega [J/kmol]
+    void set_c(CanteraDouble* c);
+    void setOmega(CanteraDouble omega); //!< Set omega [J/kmol]
 
     void getParameters(AnyMap& eosNode) const override;
     //! @}
@@ -105,7 +105,7 @@ private:
     /*!
      *  This is Eqn. 59 in Johnson et al. @cite johnson1992.
      */
-    double deltaG() const;
+    CanteraDouble deltaG() const;
 
     //! Main routine that actually calculates the entropy difference
     //! between the reference state at Tr, Pr and T,P
@@ -113,7 +113,7 @@ private:
      *  This is Eqn. 61 in Johnson et al. @cite johnson1992. Actually, there appears to
      *  be an error in the latter. This is a correction.
      */
-    double deltaS() const;
+    CanteraDouble deltaS() const;
 
     //! Internal formula for the calculation of a_g()
     /*!
@@ -126,7 +126,7 @@ private:
      *                 - 2 2nd derivative wrt temperature
      *                 - 3 derivative wrt pressure
      */
-    double ag(const double temp, const int ifunc = 0) const;
+    CanteraDouble ag(const CanteraDouble temp, const int ifunc = 0) const;
 
     //! Internal formula for the calculation of b_g()
     /*!
@@ -139,7 +139,7 @@ private:
      *                 - 2 2nd derivative wrt temperature
      *                 - 3 derivative wrt pressure
      */
-    double bg(const double temp, const int ifunc = 0) const;
+    CanteraDouble bg(const CanteraDouble temp, const int ifunc = 0) const;
 
     //! function g appearing in the formulation
     /*!
@@ -154,7 +154,7 @@ private:
      *                 - 2 2nd derivative wrt temperature
      *                 - 3 derivative wrt pressure
      */
-    double g(const double temp, const double pres, const int ifunc = 0) const;
+    CanteraDouble g(const CanteraDouble temp, const CanteraDouble pres, const int ifunc = 0) const;
 
     //! Difference function f appearing in the formulation
     /*!
@@ -169,7 +169,7 @@ private:
      *                 - 2 2nd derivative wrt temperature
      *                 - 3 derivative wrt pressure
      */
-    double f(const double temp, const double pres, const int ifunc = 0) const;
+    CanteraDouble f(const CanteraDouble temp, const CanteraDouble pres, const int ifunc = 0) const;
 
     //! Evaluate the Gstar value appearing in the HKFT formulation
     /*!
@@ -181,7 +181,7 @@ private:
      *                 - 2 2nd derivative wrt temperature
      *                 - 3 derivative wrt pressure
      */
-    double gstar(const double temp, const double pres, const int ifunc = 0) const;
+    CanteraDouble gstar(const CanteraDouble temp, const CanteraDouble pres, const int ifunc = 0) const;
 
     //! Function to look up Element Free Energies
     /*!
@@ -195,7 +195,7 @@ private:
      * @exception CanteraError
      *    If a match is not found, a CanteraError is thrown as well
      */
-    double LookupGe(const string& elemName);
+    CanteraDouble LookupGe(const string& elemName);
 
     //! Translate a Gibbs free energy of formation value to a NIST-based Chemical potential
     /*!
@@ -215,7 +215,7 @@ private:
     UnitSystem m_units;
 
     //! density of standard-state water. internal temporary variable
-    mutable double m_densWaterSS = -1.0;
+    mutable CanteraDouble m_densWaterSS = -1.0;
 
     //!  Pointer to the water property calculator
     unique_ptr<WaterProps> m_waterProps;
@@ -227,7 +227,7 @@ private:
      *  This is the delta G for the formation reaction of the
      *  ion from elements in their stable state at Tr, Pr.
      */
-    double m_deltaG_formation_tr_pr = NAN;
+    CanteraDouble m_deltaG_formation_tr_pr = NAN;
 
     //!  Input value of deltaH of Formation at Tr and Pr    (cal gmol-1)
     /*!
@@ -236,7 +236,7 @@ private:
      *  This is the delta H for the formation reaction of the
      *  ion from elements in their stable state at Tr, Pr.
      */
-    double m_deltaH_formation_tr_pr = NAN;
+    CanteraDouble m_deltaH_formation_tr_pr = NAN;
 
     //! Value of the Absolute Gibbs Free Energy NIST scale at T_r and P_r
     /*!
@@ -245,49 +245,49 @@ private:
      *
      *  J kmol-1
      */
-    double m_Mu0_tr_pr = 0.0;
+    CanteraDouble m_Mu0_tr_pr = 0.0;
 
     //! Input value of S_j at Tr and Pr    (cal gmol-1 K-1)
     /*!
      *  Tr = 298.15   Pr = 1 atm
      */
-    double m_Entrop_tr_pr = NAN;
+    CanteraDouble m_Entrop_tr_pr = NAN;
 
     //! Input a1 coefficient (cal gmol-1 bar-1)
-    double m_a1 = 0.0;
+    CanteraDouble m_a1 = 0.0;
 
     //!  Input a2 coefficient (cal gmol-1)
-    double m_a2 = 0.0;
+    CanteraDouble m_a2 = 0.0;
 
     //!  Input a3 coefficient (cal K gmol-1 bar-1)
-    double m_a3 = 0.0;
+    CanteraDouble m_a3 = 0.0;
 
     //!  Input a4 coefficient (cal K gmol-1)
-    double m_a4 = 0.0;
+    CanteraDouble m_a4 = 0.0;
 
     //!  Input c1 coefficient (cal gmol-1 K-1)
-    double m_c1 = 0.0;
+    CanteraDouble m_c1 = 0.0;
 
     //!  Input c2 coefficient (cal K gmol-1)
-    double m_c2 = 0.0;
+    CanteraDouble m_c2 = 0.0;
 
     //! Input  omega_pr_tr coefficient(cal gmol-1)
-    double m_omega_pr_tr = 0.0;
+    CanteraDouble m_omega_pr_tr = 0.0;
 
     //! y = dZdT = 1/(esp*esp) desp/dT at 298.15 and 1 bar
-    double m_Y_pr_tr = 0.0;
+    CanteraDouble m_Y_pr_tr = 0.0;
 
     //! Z = -1 / relEpsilon at 298.15 and 1 bar
-    double m_Z_pr_tr = 0.0;
+    CanteraDouble m_Z_pr_tr = 0.0;
 
     //! Reference pressure is 1 atm in units of bar= 1.0132
-    double m_presR_bar = OneAtm * 1.0E-5;
+    CanteraDouble m_presR_bar = OneAtm * 1.0E-5;
 
     //! small value that is not quite zero
-    double m_domega_jdT_prtr = 0.0;
+    CanteraDouble m_domega_jdT_prtr = 0.0;
 
     //! Charge of the ion
-    double m_charge_j = 0.0;
+    CanteraDouble m_charge_j = 0.0;
 
     //!  Static variable determining error exiting
     /*!

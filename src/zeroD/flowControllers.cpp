@@ -10,7 +10,7 @@
 namespace Cantera
 {
 
-void MassFlowController::setMassFlowRate(double mdot)
+void MassFlowController::setMassFlowRate(CanteraDouble mdot)
 {
     if (m_tfunc) {
         delete m_tfunc;
@@ -18,27 +18,27 @@ void MassFlowController::setMassFlowRate(double mdot)
     m_coeff = mdot;
 }
 
-void MassFlowController::updateMassFlowRate(double time)
+void MassFlowController::updateMassFlowRate(CanteraDouble time)
 {
     if (!ready()) {
         throw CanteraError("MassFlowController::updateMassFlowRate",
                            "Device is not ready; some parameters have not been set.");
     }
-    double mdot = m_coeff;
+    CanteraDouble mdot = m_coeff;
     if (m_tfunc) {
         mdot *= m_tfunc->eval(time);
     }
     m_mdot = std::max(mdot, 0.0);
 }
 
-void PressureController::updateMassFlowRate(double time)
+void PressureController::updateMassFlowRate(CanteraDouble time)
 {
     if (!ready()) {
         throw CanteraError("PressureController::updateMassFlowRate",
                            "Device is not ready; some parameters have not been set.");
     }
-    double mdot = m_coeff;
-    double delta_P = in().pressure() - out().pressure();
+    CanteraDouble mdot = m_coeff;
+    CanteraDouble delta_P = in().pressure() - out().pressure();
     if (m_pfunc) {
         mdot *= m_pfunc->eval(delta_P);
     } else {
@@ -60,17 +60,17 @@ void PressureController::setPrimary(shared_ptr<ConnectorNode> primary)
     m_primary = dev.get();
 }
 
-void Valve::updateMassFlowRate(double time)
+void Valve::updateMassFlowRate(CanteraDouble time)
 {
     if (!ready()) {
         throw CanteraError("Valve::updateMassFlowRate",
                            "Device is not ready; some parameters have not been set.");
     }
-    double mdot = m_coeff;
+    CanteraDouble mdot = m_coeff;
     if (m_tfunc) {
         mdot *= m_tfunc->eval(time);
     }
-    double delta_P = in().pressure() - out().pressure();
+    CanteraDouble delta_P = in().pressure() - out().pressure();
     if (m_pfunc) {
         mdot *= m_pfunc->eval(delta_P);
     } else {

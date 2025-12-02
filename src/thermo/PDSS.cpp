@@ -15,168 +15,168 @@
 namespace Cantera
 {
 
-double PDSS::enthalpy_mole() const
+CanteraDouble PDSS::enthalpy_mole() const
 {
     throw NotImplementedError("PDSS::enthalpy_mole");
 }
 
-double PDSS::enthalpy_RT() const
+CanteraDouble PDSS::enthalpy_RT() const
 {
     throw NotImplementedError("PDSS::enthalpy_RT");
 }
 
-double PDSS::intEnergy_mole() const
+CanteraDouble PDSS::intEnergy_mole() const
 {
     throw NotImplementedError("PDSS::intEnergy_mole");
 }
 
-double PDSS::entropy_mole() const
+CanteraDouble PDSS::entropy_mole() const
 {
     throw NotImplementedError("PDSS::entropy_mole");
 }
 
-double PDSS::entropy_R() const
+CanteraDouble PDSS::entropy_R() const
 {
     throw NotImplementedError("PDSS::entropy_R");
 }
 
-double PDSS::gibbs_mole() const
+CanteraDouble PDSS::gibbs_mole() const
 {
     throw NotImplementedError("PDSS::gibbs_mole");
 }
 
-double PDSS::gibbs_RT() const
+CanteraDouble PDSS::gibbs_RT() const
 {
     throw NotImplementedError("PDSS::gibbs_RT");
 }
 
-double PDSS::cp_mole() const
+CanteraDouble PDSS::cp_mole() const
 {
     throw NotImplementedError("PDSS::cp_mole");
 }
 
-double PDSS::cp_R() const
+CanteraDouble PDSS::cp_R() const
 {
     throw NotImplementedError("PDSS::cp_R");
 }
 
-double PDSS::molarVolume() const
+CanteraDouble PDSS::molarVolume() const
 {
     throw NotImplementedError("PDSS::molarVolume");
 }
 
-double PDSS::density() const
+CanteraDouble PDSS::density() const
 {
     throw NotImplementedError("PDSS::density");
 }
 
-double PDSS::cv_mole() const
+CanteraDouble PDSS::cv_mole() const
 {
     throw NotImplementedError("PDSS::cv_mole");
 }
 
-double PDSS::gibbs_RT_ref() const
+CanteraDouble PDSS::gibbs_RT_ref() const
 {
     throw NotImplementedError("PDSS::gibbs_RT_ref");
 }
 
-double PDSS::enthalpy_RT_ref() const
+CanteraDouble PDSS::enthalpy_RT_ref() const
 {
     throw NotImplementedError("PDSS::enthalpy_RT_ref");
 }
 
-double PDSS::entropy_R_ref() const
+CanteraDouble PDSS::entropy_R_ref() const
 {
     throw NotImplementedError("PDSS::entropy_RT_ref");
 }
 
-double PDSS::cp_R_ref() const
+CanteraDouble PDSS::cp_R_ref() const
 {
     throw NotImplementedError("PDSS::entropy_RT_ref");
 }
 
-double PDSS::molarVolume_ref() const
+CanteraDouble PDSS::molarVolume_ref() const
 {
     throw NotImplementedError("PDSS::molarVolume_ref");
 }
 
-double PDSS::pressure() const
+CanteraDouble PDSS::pressure() const
 {
     return m_pres;
 }
 
-double PDSS::thermalExpansionCoeff() const
+CanteraDouble PDSS::thermalExpansionCoeff() const
 {
     throw NotImplementedError("PDSS::thermalExpansionCoeff");
 }
 
-double PDSS::critTemperature() const
+CanteraDouble PDSS::critTemperature() const
 {
     throw NotImplementedError("PDSS::critTemperature");
 }
 
-double PDSS::critPressure() const
+CanteraDouble PDSS::critPressure() const
 {
     throw NotImplementedError("PDSS::critPressure");
 }
 
-double PDSS::critDensity() const
+CanteraDouble PDSS::critDensity() const
 {
     throw NotImplementedError("PDSS::critDensity");
 }
 
-void PDSS::setPressure(double pres)
+void PDSS::setPressure(CanteraDouble pres)
 {
     m_pres = pres;
 }
 
-double PDSS::temperature() const
+CanteraDouble PDSS::temperature() const
 {
     return m_temp;
 }
 
-void PDSS::setTemperature(double temp)
+void PDSS::setTemperature(CanteraDouble temp)
 {
     m_temp = temp;
 }
 
-double PDSS::molecularWeight() const
+CanteraDouble PDSS::molecularWeight() const
 {
     return m_mw;
 }
-void PDSS::setMolecularWeight(double mw)
+void PDSS::setMolecularWeight(CanteraDouble mw)
 {
     m_mw = mw;
 }
 
-void PDSS::setState_TP(double temp, double pres)
+void PDSS::setState_TP(CanteraDouble temp, CanteraDouble pres)
 {
     throw NotImplementedError("PDSS::setState_TP");
 }
 
-double PDSS::satPressure(double t)
+CanteraDouble PDSS::satPressure(CanteraDouble t)
 {
     throw NotImplementedError("PDSS::satPressure");
 }
 
 // PDSS_Molar methods
 
-double PDSS_Molar::enthalpy_RT() const
+CanteraDouble PDSS_Molar::enthalpy_RT() const
 {
     return enthalpy_mole() / (GasConstant * temperature());
 }
 
-double PDSS_Molar::entropy_R() const
+CanteraDouble PDSS_Molar::entropy_R() const
 {
     return entropy_mole() / GasConstant;
 }
 
-double PDSS_Molar::gibbs_RT() const
+CanteraDouble PDSS_Molar::gibbs_RT() const
 {
     return gibbs_mole() / (GasConstant * temperature());
 }
 
-double PDSS_Molar::cp_R() const
+CanteraDouble PDSS_Molar::cp_R() const
 {
     return cp_mole() / GasConstant;
 }
@@ -197,77 +197,77 @@ PDSS_Nondimensional::PDSS_Nondimensional()
 {
 }
 
-double PDSS_Nondimensional::enthalpy_mole() const
+CanteraDouble PDSS_Nondimensional::enthalpy_mole() const
 {
     return enthalpy_RT() * GasConstant * temperature();
 }
 
-double PDSS_Nondimensional::entropy_mole() const
+CanteraDouble PDSS_Nondimensional::entropy_mole() const
 {
     return entropy_R() * GasConstant;
 }
 
-double PDSS_Nondimensional::gibbs_mole() const
+CanteraDouble PDSS_Nondimensional::gibbs_mole() const
 {
     return gibbs_RT() * GasConstant * temperature();
 }
 
-double PDSS_Nondimensional::cp_mole() const
+CanteraDouble PDSS_Nondimensional::cp_mole() const
 {
     return cp_R() * GasConstant;
 }
 
-double PDSS_Nondimensional::gibbs_RT_ref() const
+CanteraDouble PDSS_Nondimensional::gibbs_RT_ref() const
 {
     return m_g0_RT;
 }
 
-double PDSS_Nondimensional::enthalpy_RT_ref() const
+CanteraDouble PDSS_Nondimensional::enthalpy_RT_ref() const
 {
     return m_h0_RT;
 }
 
-double PDSS_Nondimensional::entropy_R_ref() const
+CanteraDouble PDSS_Nondimensional::entropy_R_ref() const
 {
     return m_s0_R;
 }
 
-double PDSS_Nondimensional::cp_R_ref() const
+CanteraDouble PDSS_Nondimensional::cp_R_ref() const
 {
     return m_cp0_R;
 }
 
-double PDSS_Nondimensional::molarVolume_ref() const
+CanteraDouble PDSS_Nondimensional::molarVolume_ref() const
 {
     return m_V0;
 }
 
-double PDSS_Nondimensional::enthalpy_RT() const
+CanteraDouble PDSS_Nondimensional::enthalpy_RT() const
 {
     return m_hss_RT;
 }
 
-double PDSS_Nondimensional::entropy_R() const
+CanteraDouble PDSS_Nondimensional::entropy_R() const
 {
     return m_sss_R;
 }
 
-double PDSS_Nondimensional::gibbs_RT() const
+CanteraDouble PDSS_Nondimensional::gibbs_RT() const
 {
     return m_gss_RT;
 }
 
-double PDSS_Nondimensional::cp_R() const
+CanteraDouble PDSS_Nondimensional::cp_R() const
 {
     return m_cpss_R;
 }
 
-double PDSS_Nondimensional::molarVolume() const
+CanteraDouble PDSS_Nondimensional::molarVolume() const
 {
     return m_Vss;
 }
 
-double PDSS_Nondimensional::density() const
+CanteraDouble PDSS_Nondimensional::density() const
 {
     return m_mw / m_Vss;
 }

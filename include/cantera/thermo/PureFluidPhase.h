@@ -71,22 +71,22 @@ public:
     vector<string> fullStates() const override;
     vector<string> partialStates() const override;
 
-    double minTemp(size_t k=npos) const override;
-    double maxTemp(size_t k=npos) const override;
+    CanteraDouble minTemp(size_t k=npos) const override;
+    CanteraDouble maxTemp(size_t k=npos) const override;
 
-    double enthalpy_mole() const override;
-    double intEnergy_mole() const override;
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! Return the thermodynamic pressure (Pa).
     /*!
      * This method calculates the current pressure consistent with the
      * independent variables, T, rho.
      */
-    double pressure() const override;
+    CanteraDouble pressure() const override;
 
     //! sets the thermodynamic pressure (Pa).
     /*!
@@ -95,28 +95,28 @@ public:
      *
      * @param p  Pressure (Pa)
      */
-    void setPressure(double p) override;
-    void setTemperature(const double T) override;
-    void setDensity(const double rho) override;
+    void setPressure(CanteraDouble p) override;
+    void setTemperature(const CanteraDouble T) override;
+    void setDensity(const CanteraDouble rho) override;
 
-    void getChemPotentials(double* mu) const override{
+    void getChemPotentials(CanteraDouble* mu) const override{
         mu[0] = gibbs_mole();
     }
 
-    void getPartialMolarEnthalpies(double* hbar) const override;
-    void getPartialMolarEntropies(double* sbar) const override;
-    void getPartialMolarIntEnergies(double* ubar) const override;
-    void getPartialMolarCp(double* cpbar) const override;
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
+    void getPartialMolarIntEnergies(CanteraDouble* ubar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     Units standardConcentrationUnits() const override;
-    void getActivityConcentrations(double* c) const override;
-    double standardConcentration(size_t k=0) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
 
-    void getActivities(double* a) const override;
+    void getActivities(CanteraDouble* a) const override;
 
-    double isothermalCompressibility() const override;
-    double thermalExpansionCoeff() const override;
+    CanteraDouble isothermalCompressibility() const override;
+    CanteraDouble thermalExpansionCoeff() const override;
 
     //! Returns a reference to the substance object
     tpx::Substance& TPX_Substance();
@@ -129,10 +129,10 @@ public:
     //! activity of the fluid is always then defined to be equal to one.
     //! @{
 
-    void getStandardChemPotentials(double* mu) const override;
-    void getEnthalpy_RT(double* hrt) const override;
-    void getEntropy_R(double* sr) const override;
-    void getGibbs_RT(double* grt) const override;
+    void getStandardChemPotentials(CanteraDouble* mu) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
 
     //! @}
     //! @name Thermodynamic Values for the Species Reference States
@@ -141,10 +141,10 @@ public:
     //! the reference pressure and current temperature of the fluid.
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
 
     //! @}
     //! @name Setting the State
@@ -152,41 +152,41 @@ public:
     //! These methods set all or part of the thermodynamic state.
     //! @{
 
-    void setState_HP(double h, double p, double tol=1e-9) override;
-    void setState_UV(double u, double v, double tol=1e-9) override;
-    void setState_SV(double s, double v, double tol=1e-9) override;
-    void setState_SP(double s, double p, double tol=1e-9) override;
-    void setState_ST(double s, double t, double tol=1e-9) override;
-    void setState_TV(double t, double v, double tol=1e-9) override;
-    void setState_PV(double p, double v, double tol=1e-9) override;
-    void setState_UP(double u, double p, double tol=1e-9) override;
-    void setState_VH(double v, double h, double tol=1e-9) override;
-    void setState_TH(double t, double h, double tol=1e-9) override;
-    void setState_SH(double s, double h, double tol=1e-9) override;
+    void setState_HP(CanteraDouble h, CanteraDouble p, CanteraDouble tol=1e-9) override;
+    void setState_UV(CanteraDouble u, CanteraDouble v, CanteraDouble tol=1e-9) override;
+    void setState_SV(CanteraDouble s, CanteraDouble v, CanteraDouble tol=1e-9) override;
+    void setState_SP(CanteraDouble s, CanteraDouble p, CanteraDouble tol=1e-9) override;
+    void setState_ST(CanteraDouble s, CanteraDouble t, CanteraDouble tol=1e-9) override;
+    void setState_TV(CanteraDouble t, CanteraDouble v, CanteraDouble tol=1e-9) override;
+    void setState_PV(CanteraDouble p, CanteraDouble v, CanteraDouble tol=1e-9) override;
+    void setState_UP(CanteraDouble u, CanteraDouble p, CanteraDouble tol=1e-9) override;
+    void setState_VH(CanteraDouble v, CanteraDouble h, CanteraDouble tol=1e-9) override;
+    void setState_TH(CanteraDouble t, CanteraDouble h, CanteraDouble tol=1e-9) override;
+    void setState_SH(CanteraDouble s, CanteraDouble h, CanteraDouble tol=1e-9) override;
     //! @}
     //! @name Critical State Properties
     //! @{
 
-    double critTemperature() const override;
-    double critPressure() const override;
-    double critDensity() const override;
+    CanteraDouble critTemperature() const override;
+    CanteraDouble critPressure() const override;
+    CanteraDouble critDensity() const override;
 
     //! @}
     //! @name Saturation properties.
     //! @{
 
-    double satTemperature(double p) const override;
-    double satPressure(double t) override;
-    double vaporFraction() const override;
+    CanteraDouble satTemperature(CanteraDouble p) const override;
+    CanteraDouble satPressure(CanteraDouble t) override;
+    CanteraDouble vaporFraction() const override;
 
-    void setState_Tsat(double t, double x) override;
-    void setState_Psat(double p, double x) override;
+    void setState_Tsat(CanteraDouble t, CanteraDouble x) override;
+    void setState_Psat(CanteraDouble p, CanteraDouble x) override;
     //! @}
 
     void initThermo() override;
     void getParameters(AnyMap& phaseNode) const override;
 
-    string report(bool show_thermo=true, double threshold=1e-14) const override;
+    string report(bool show_thermo=true, CanteraDouble threshold=1e-14) const override;
 
     bool compatibleWithMultiPhase() const override {
         return false;
@@ -199,7 +199,7 @@ protected:
      * @param x  Value of the first component
      * @param y  Value of the second component
      */
-    void Set(tpx::PropertyPair::type n, double x, double y) const;
+    void Set(tpx::PropertyPair::type n, CanteraDouble x, CanteraDouble y) const;
 
 private:
     //! Pointer to the underlying tpx object Substance that does the work
@@ -209,7 +209,7 @@ private:
     string m_tpx_name;
 
     //! Molecular weight of the substance (kg kmol-1)
-    double m_mw = -1.0;
+    CanteraDouble m_mw = -1.0;
 
     //! flag to turn on some printing.
     bool m_verbose = false;

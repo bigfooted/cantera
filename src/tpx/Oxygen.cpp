@@ -10,7 +10,7 @@ using namespace Cantera;
 
 namespace tpx
 {
-static const double
+static const CanteraDouble
 M = 31.9994,
 Tmn = 54.34,
 Tmx = 2000.0,
@@ -24,7 +24,7 @@ beta = 2239.18105,
 u0 = 198884.2435,
 s0 = 668.542976;
 
-static const double Aoxy[] = {
+static const CanteraDouble Aoxy[] = {
     -4.26396872798684e-1, 3.48334938784107e1, -5.77516910418738e2,
     2.40961751553325e4, -1.23332307855543e6, 3.73585286319658e-4,
     -1.70178244046465e-1 ,-3.33226903068473e-4, 8.61334799901291e3,
@@ -38,22 +38,22 @@ static const double Aoxy[] = {
     -1.92361786708846e-23, 9.43758410350413e-23
 };
 
-static const double Foxy[] = {
+static const CanteraDouble Foxy[] = {
     -5.581932039e2, -1.0966262185e2, -8.3456211630e-2,
     2.6603644330e-3, 1.6875023830e-5, -2.1262477120e-7,
     9.5741096780e-10, -1.6617640450e-12, 2.7545605710e1
 };
 
-static const double Doxy[] =
+static const CanteraDouble Doxy[] =
 {  4.3615175e2, 7.5897189e2, -4.2576866e2, 2.3487106e3, -3.0474660e3, 1.4850169e3  };
 
-static const double Goxy[] = {
+static const CanteraDouble Goxy[] = {
     -1.29442711174062e6, 5.98231747005341e4, -8.97850772730944e2,
     6.55236176900400e2, -1.13131252131570e-2,
     3.4981070244228e-6, 4.21065222886885e-9, 2.67997030050139e2
 };
 
-double oxygen::C(int i, double rt, double rt2)
+CanteraDouble oxygen::C(int i, CanteraDouble rt, CanteraDouble rt2)
 {
     switch (i) {
     case 0:
@@ -89,7 +89,7 @@ double oxygen::C(int i, double rt, double rt2)
     }
 }
 
-double oxygen::Cprime(int i, double rt, double rt2, double rt3)
+CanteraDouble oxygen::Cprime(int i, CanteraDouble rt, CanteraDouble rt2, CanteraDouble rt3)
 {
     switch (i) {
     case 0:
@@ -125,30 +125,30 @@ double oxygen::Cprime(int i, double rt, double rt2, double rt3)
     }
 }
 
-double oxygen::W(int n, double egrho)
+CanteraDouble oxygen::W(int n, CanteraDouble egrho)
 {
     return (n == 0 ? (1.0 - egrho)/(2.0*Gamma) :
             (n*W(n-1, egrho) - 0.5*pow(Rho,2*n)*egrho)/Gamma);
 }
 
-double oxygen::H(int i, double egrho)
+CanteraDouble oxygen::H(int i, CanteraDouble egrho)
 {
     return (i < 8 ? pow(Rho,i+2) : pow(Rho,2*i-13)*egrho);
 }
 
-double oxygen::I(int i, double egrho)
+CanteraDouble oxygen::I(int i, CanteraDouble egrho)
 {
-    return (i < 8 ? pow(Rho,i+1)/double(i+1) : W(i-8, egrho));
+    return (i < 8 ? pow(Rho,i+1)/CanteraDouble(i+1) : W(i-8, egrho));
 }
 
-double oxygen::up()
+CanteraDouble oxygen::up()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (int i=0; i<14; i++) {
         sum += (C(i,rt,rt2) - T*Cprime(i,rt,rt2,rt3))*I(i,egrho);
     }
@@ -157,14 +157,14 @@ double oxygen::up()
     return sum + m_energy_offset;
 }
 
-double oxygen::sp()
+CanteraDouble oxygen::sp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double rt3 = rt*rt2;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble rt3 = rt*rt2;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     sum = s0 - R*log(Rho);
     for (int i=0; i<14; i++) {
         sum -= Cprime(i,rt,rt2,rt3)*I(i,egrho);
@@ -176,22 +176,22 @@ double oxygen::sp()
     return sum + m_entropy_offset;
 }
 
-double oxygen::Pp()
+CanteraDouble oxygen::Pp()
 {
-    double rt = 1.0/T;
-    double rt2 = rt*rt;
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble rt = 1.0/T;
+    CanteraDouble rt2 = rt*rt;
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<14; i++) {
         P += C(i,rt,rt2)*H(i,egrho);
     }
     return P;
 }
 
-double oxygen::Psat()
+CanteraDouble oxygen::Psat()
 {
-    double lnp;
+    CanteraDouble lnp;
     int i;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("oxygen::Psat",
@@ -208,40 +208,40 @@ double oxygen::Psat()
     return exp(lnp);
 }
 
-double oxygen::ldens()
+CanteraDouble oxygen::ldens()
 {
-    double xx=1-T/Tc, sum=0;
+    CanteraDouble xx=1-T/Tc, sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("oxygen::ldens",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=0; i<=5; i++) {
-        sum+=Doxy[i]*pow(xx,double(i)/3.0);
+        sum+=Doxy[i]*pow(xx,CanteraDouble(i)/3.0);
     }
     return sum;
 }
 
-double oxygen::Tcrit()
+CanteraDouble oxygen::Tcrit()
 {
     return Tc;
 }
-double oxygen::Pcrit()
+CanteraDouble oxygen::Pcrit()
 {
     return Pc;
 }
-double oxygen::Vcrit()
+CanteraDouble oxygen::Vcrit()
 {
     return 1.0/Roc;
 }
-double oxygen::Tmin()
+CanteraDouble oxygen::Tmin()
 {
     return Tmn;
 }
-double oxygen::Tmax()
+CanteraDouble oxygen::Tmax()
 {
     return Tmx;
 }
-double oxygen::MolWt()
+CanteraDouble oxygen::MolWt()
 {
     return M;
 }

@@ -173,27 +173,27 @@ public:
      * @param rho           density  (kg m-3)
      * @since New in %Cantera 3.0.
      */
-    void setState_TD(double temperature, double rho);
+    void setState_TD(CanteraDouble temperature, CanteraDouble rho);
 
     //! Get the Gibbs free energy (J/kg) at the current temperature and density
-    double gibbs_mass() const;
+    CanteraDouble gibbs_mass() const;
 
     //! Get the enthalpy (J/kg) at the current temperature and density
-    double enthalpy_mass() const;
+    CanteraDouble enthalpy_mass() const;
 
     //! Get the internal energy (J/kg) at the current temperature and density
-    double intEnergy_mass() const;
+    CanteraDouble intEnergy_mass() const;
 
     //! Get the entropy (J/kg/K) at the current temperature and density
-    double entropy_mass() const;
+    CanteraDouble entropy_mass() const;
 
     //! Get the constant volume heat capacity (J/kg/K) at the current temperature and
     //! density
-    double cv_mass() const;
+    CanteraDouble cv_mass() const;
 
     //! Get the constant pressure heat capacity (J/kg/K) at the current temperature and
     //! density
-    double cp_mass() const;
+    CanteraDouble cp_mass() const;
 
     //! Calculates the pressure (Pascals), given the current value of the
     //! temperature and density.
@@ -202,7 +202,7 @@ public:
      *
      *  @returns the pressure (Pascal)
      */
-    double pressure() const;
+    CanteraDouble pressure() const;
 
     //! Calculates the density given the temperature and the pressure,
     //! and a guess at the density. Sets the internal state.
@@ -228,8 +228,8 @@ public:
      * @returns the density. If an error is encountered in the calculation the
      *     value of -1.0 is returned.
      */
-    double density(double temperature, double pressure,
-                   int phase = -1, double rhoguess = -1.0);
+    CanteraDouble density(CanteraDouble temperature, CanteraDouble pressure,
+                   int phase = -1, CanteraDouble rhoguess = -1.0);
 
     //! Returns the density (kg m-3)
     /*!
@@ -237,13 +237,13 @@ public:
      *
      * @returns the density (kg m-3)
      */
-    double density() const;
+    CanteraDouble density() const;
 
     //! Returns the temperature (Kelvin)
     /*!
      * @return s the internally stored temperature
      */
-    double temperature() const;
+    CanteraDouble temperature() const;
 
     //! Returns the coefficient of thermal expansion.
     /*!
@@ -251,7 +251,7 @@ public:
      *
      * @returns the coefficient of thermal expansion
      */
-    double coeffThermExp() const;
+    CanteraDouble coeffThermExp() const;
 
     //! Returns the isochoric pressure derivative wrt temperature
     /*!
@@ -261,7 +261,7 @@ public:
      *
      *     beta = delta (phi0_d() + phiR_d()) - tau delta (phi0_dt() + phiR_dt())
      */
-    double coeffPresExp() const;
+    CanteraDouble coeffPresExp() const;
 
     //! Returns the coefficient of isothermal compressibility for the state of
     //! the object
@@ -272,7 +272,7 @@ public:
      *
      * @returns the isothermal compressibility
      */
-    double isothermalCompressibility() const;
+    CanteraDouble isothermalCompressibility() const;
 
     //! Returns the value of dp / drho at constant T for the state of the object
     /*!
@@ -280,7 +280,7 @@ public:
      *
      * @returns dpdrho
      */
-    double dpdrho() const;
+    CanteraDouble dpdrho() const;
 
     //! This function returns an estimated value for the saturation pressure.
     /*!
@@ -291,7 +291,7 @@ public:
      *
      * @returns the estimated saturation pressure
      */
-    double psat_est(double temperature) const;
+    CanteraDouble psat_est(CanteraDouble temperature) const;
 
     //! This function returns the saturation pressure given the temperature as
     //! an input parameter, and sets the internal state to the saturated
@@ -310,7 +310,7 @@ public:
      * @param waterState    integer specifying the water state
      * @returns the saturation pressure. units = Pascal
      */
-    double psat(double temperature, int waterState = WATER_LIQUID);
+    CanteraDouble psat(CanteraDouble temperature, int waterState = WATER_LIQUID);
 
     //! Returns the Phase State flag for the current state of the object
     /*!
@@ -328,7 +328,7 @@ public:
     /*!
      * This is hard coded to the value 647.096 Kelvin
      */
-    double Tcrit() const {
+    CanteraDouble Tcrit() const {
         return 647.096;
     }
 
@@ -336,7 +336,7 @@ public:
     /*!
      * This is hard coded to the value of 22.064E6 pascals
      */
-    double Pcrit() const {
+    CanteraDouble Pcrit() const {
         return 22.064E6;
     }
 
@@ -344,7 +344,7 @@ public:
     /*!
      * This is equal to 322 kg m-3.
      */
-    double Rhocrit() const {
+    CanteraDouble Rhocrit() const {
         return 322.;
     }
 
@@ -354,7 +354,7 @@ private:
      * @param temperature   input temperature (kelvin)
      * @param rho           density in kg m-3
      */
-    void calcDim(double temperature, double rho);
+    void calcDim(CanteraDouble temperature, CanteraDouble rho);
 
     //! Utility routine in the calculation of the saturation pressure
     /*!
@@ -366,17 +366,17 @@ private:
      * @param densGas        output Density of gas
      * @param delGRT         output delGRT
      */
-    void corr(double temperature, double pressure, double& densLiq,
-              double& densGas, double& delGRT);
+    void corr(CanteraDouble temperature, CanteraDouble pressure, CanteraDouble& densLiq,
+              CanteraDouble& densGas, CanteraDouble& delGRT);
 
     //! pointer to the underlying object that does the calculations.
     mutable WaterPropsIAPWSphi m_phi;
 
     //! Dimensionless temperature,  tau = T_C / T
-    double tau = -1.0;
+    CanteraDouble tau = -1.0;
 
     //! Dimensionless density, delta = rho / rho_c
-    mutable double delta = -1.0;
+    mutable CanteraDouble delta = -1.0;
 
     //! Current state of the system
     mutable int iState = -30000;

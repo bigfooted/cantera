@@ -94,17 +94,17 @@ IdasIntegrator::~IdasIntegrator()
     }
 }
 
-double& IdasIntegrator::solution(size_t k)
+CanteraDouble& IdasIntegrator::solution(size_t k)
 {
     return NV_Ith_S(m_y, k);
 }
 
-double* IdasIntegrator::solution()
+CanteraDouble* IdasIntegrator::solution()
 {
     return NV_DATA_S(m_y);
 }
 
-void IdasIntegrator::setTolerances(double reltol, size_t n, double* abstol)
+void IdasIntegrator::setTolerances(CanteraDouble reltol, size_t n, CanteraDouble* abstol)
 {
     m_itol = IDA_SV;
     if (n != m_nabs) {
@@ -120,14 +120,14 @@ void IdasIntegrator::setTolerances(double reltol, size_t n, double* abstol)
     m_reltol = reltol;
 }
 
-void IdasIntegrator::setTolerances(double reltol, double abstol)
+void IdasIntegrator::setTolerances(CanteraDouble reltol, CanteraDouble abstol)
 {
     m_itol = IDA_SS;
     m_reltol = reltol;
     m_abstols = abstol;
 }
 
-void IdasIntegrator::setSensitivityTolerances(double reltol, double abstol)
+void IdasIntegrator::setSensitivityTolerances(CanteraDouble reltol, CanteraDouble abstol)
 {
     m_reltolsens = reltol;
     m_abstolsens = abstol;
@@ -148,7 +148,7 @@ void IdasIntegrator::setMaxOrder(int n)
     m_maxord = n;
 }
 
-void IdasIntegrator::setMaxStepSize(double hmax)
+void IdasIntegrator::setMaxStepSize(CanteraDouble hmax)
 {
     m_hmax = hmax;
     if (m_ida_mem) {
@@ -229,7 +229,7 @@ void IdasIntegrator::includeAlgebraicInErrorTest(bool yesno)
     }
 }
 
-void IdasIntegrator::initialize(double t0, FuncEval& func)
+void IdasIntegrator::initialize(CanteraDouble t0, FuncEval& func)
 {
     m_neq = func.neq();
     m_t0 = t0;
@@ -325,7 +325,7 @@ void IdasIntegrator::initialize(double t0, FuncEval& func)
     applyOptions();
 }
 
-void IdasIntegrator::reinitialize(double t0, FuncEval& func)
+void IdasIntegrator::reinitialize(CanteraDouble t0, FuncEval& func)
 {
     m_t0 = t0;
     m_time = t0;
@@ -414,7 +414,7 @@ void IdasIntegrator::applyOptions()
     }
 }
 
-void IdasIntegrator::sensInit(double t0, FuncEval& func)
+void IdasIntegrator::sensInit(CanteraDouble t0, FuncEval& func)
 {
     m_np = func.nparams();
     m_sens_ok = false;
@@ -443,7 +443,7 @@ void IdasIntegrator::sensInit(double t0, FuncEval& func)
                            IDA_STAGGERED, IDASensResFn(0), m_yS, m_ySdot);
     checkError(flag, "sensInit", "IDASensInit");
 
-    vector<double> atol(m_np);
+    vector<CanteraDouble> atol(m_np);
     for (size_t n = 0; n < m_np; n++) {
         // This scaling factor is tuned so that reaction and species enthalpy
         // sensitivities can be computed simultaneously with the same abstol.
@@ -453,7 +453,7 @@ void IdasIntegrator::sensInit(double t0, FuncEval& func)
     checkError(flag, "sensInit", "IDASensSStolerances");
 }
 
-void IdasIntegrator::integrate(double tout)
+void IdasIntegrator::integrate(CanteraDouble tout)
 {
     if (tout == m_time) {
         return;
@@ -490,7 +490,7 @@ void IdasIntegrator::integrate(double tout)
     m_time = tout;
 }
 
-double IdasIntegrator::step(double tout)
+CanteraDouble IdasIntegrator::step(CanteraDouble tout)
 {
     int flag = IDASolve(m_ida_mem, tout, &m_tInteg, m_y, m_ydot, IDA_ONE_STEP);
     if (flag != IDA_SUCCESS) {
@@ -509,7 +509,7 @@ double IdasIntegrator::step(double tout)
     return m_time;
 }
 
-double IdasIntegrator::sensitivity(size_t k, size_t p)
+CanteraDouble IdasIntegrator::sensitivity(size_t k, size_t p)
 {
     if (m_time == m_t0) {
         // calls to IDAGetSens are only allowed after a successful time step.
@@ -539,9 +539,9 @@ string IdasIntegrator::getErrorInfo(int N)
     IDAGetErrWeights(m_ida_mem, errw);
     IDAGetEstLocalErrors(m_ida_mem, errs);
 
-    vector<tuple<double, double, size_t>> weightedErrors;
+    vector<tuple<CanteraDouble, CanteraDouble, size_t>> weightedErrors;
     for (size_t i=0; i<m_neq; i++) {
-        double err = NV_Ith_S(errs, i) * NV_Ith_S(errw, i);
+        CanteraDouble err = NV_Ith_S(errs, i) * NV_Ith_S(errw, i);
         weightedErrors.emplace_back(-abs(err), err, i);
     }
     N_VDestroy(errs);

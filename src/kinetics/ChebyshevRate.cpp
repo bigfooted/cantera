@@ -9,7 +9,7 @@
 namespace Cantera
 {
 
-void ChebyshevData::update(double T)
+void ChebyshevData::update(CanteraDouble T)
 {
     throw CanteraError("ChebyshevData::update",
         "Missing state information: 'ChebyshevData' requires pressure.");
@@ -17,8 +17,8 @@ void ChebyshevData::update(double T)
 
 bool ChebyshevData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double T = phase.temperature();
-    double P = phase.pressure();
+    CanteraDouble T = phase.temperature();
+    CanteraDouble P = phase.pressure();
     if (P != pressure || T != temperature) {
         update(T, P);
         return true;
@@ -26,7 +26,7 @@ bool ChebyshevData::update(const ThermoPhase& phase, const Kinetics& kin)
     return false;
 }
 
-void ChebyshevData::perturbPressure(double deltaP)
+void ChebyshevData::perturbPressure(CanteraDouble deltaP)
 {
     if (m_pressure_buf > 0.) {
         throw CanteraError("ChebyshevData::perturbPressure",
@@ -47,7 +47,7 @@ void ChebyshevData::restore()
     m_pressure_buf = -1.;
 }
 
-ChebyshevRate::ChebyshevRate(double Tmin, double Tmax, double Pmin, double Pmax,
+ChebyshevRate::ChebyshevRate(CanteraDouble Tmin, CanteraDouble Tmax, CanteraDouble Pmin, CanteraDouble Pmax,
                              const Array2D& coeffs) : ChebyshevRate()
 {
     setLimits(Tmin, Tmax, Pmin, Pmax);
@@ -68,7 +68,7 @@ void ChebyshevRate::setParameters(const AnyMap& node, const UnitStack& rate_unit
     if (node.hasKey("data")) {
         const auto& T_range = node["temperature-range"].asVector<AnyValue>(2);
         const auto& P_range = node["pressure-range"].asVector<AnyValue>(2);
-        auto& vcoeffs = node["data"].asVector<vector<double>>();
+        auto& vcoeffs = node["data"].asVector<vector<CanteraDouble>>();
         coeffs = Array2D(vcoeffs.size(), vcoeffs[0].size());
         for (size_t i = 0; i < coeffs.nRows(); i++) {
             if (vcoeffs[i].size() != vcoeffs[0].size()) {
@@ -79,7 +79,7 @@ void ChebyshevRate::setParameters(const AnyMap& node, const UnitStack& rate_unit
                 coeffs(i, j) = vcoeffs[i][j];
             }
         }
-        double offset = unit_system.convertRateCoeff(AnyValue(1.0), conversionUnits());
+        CanteraDouble offset = unit_system.convertRateCoeff(AnyValue(1.0), conversionUnits());
         coeffs(0, 0) += std::log10(offset);
         setLimits(
             unit_system.convert(T_range[0], "K"),
@@ -93,12 +93,12 @@ void ChebyshevRate::setParameters(const AnyMap& node, const UnitStack& rate_unit
     setData(coeffs);
 }
 
-void ChebyshevRate::setLimits(double Tmin, double Tmax, double Pmin, double Pmax)
+void ChebyshevRate::setLimits(CanteraDouble Tmin, CanteraDouble Tmax, CanteraDouble Pmin, CanteraDouble Pmax)
 {
-    double logPmin = std::log10(Pmin);
-    double logPmax = std::log10(Pmax);
-    double TminInv = 1.0 / Tmin;
-    double TmaxInv = 1.0 / Tmax;
+    CanteraDouble logPmin = std::log10(Pmin);
+    CanteraDouble logPmax = std::log10(Pmax);
+    CanteraDouble TminInv = 1.0 / Tmin;
+    CanteraDouble TmaxInv = 1.0 / Tmax;
 
     TrNum_ = - TminInv - TmaxInv;
     TrDen_ = 1.0 / (TmaxInv - TminInv);
@@ -133,7 +133,7 @@ void ChebyshevRate::getParameters(AnyMap& rateNode) const
     rateNode["pressure-range"].setQuantity({Pmin(), Pmax()}, "Pa");
     size_t nT = m_coeffs.nRows();
     size_t nP = m_coeffs.nColumns();
-    vector<vector<double>> coeffs2d(nT, vector<double>(nP));
+    vector<vector<CanteraDouble>> coeffs2d(nT, vector<CanteraDouble>(nP));
     for (size_t i = 0; i < nT; i++) {
         for (size_t j = 0; j < nP; j++) {
             coeffs2d[i][j] = m_coeffs(i, j);
@@ -144,7 +144,7 @@ void ChebyshevRate::getParameters(AnyMap& rateNode) const
     Units rate_units2 = conversionUnits();
     auto converter = [rate_units2](AnyValue& coeffs, const UnitSystem& units) {
         if (rate_units2.factor() != 0.0) {
-            coeffs.asVector<vector<double>>()[0][0] += \
+            coeffs.asVector<vector<CanteraDouble>>()[0][0] += \
                 std::log10(units.convertFrom(1.0, rate_units2));
         } else if (units.getDelta(UnitSystem()).size()) {
             throw CanteraError("ChebyshevRate::getParameters lambda",

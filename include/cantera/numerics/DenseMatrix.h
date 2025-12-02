@@ -52,7 +52,7 @@ public:
      * @param m  New number of columns
      * @param v  Default fill value. defaults to zero.
      */
-    DenseMatrix(size_t n, size_t m, double v = 0.0);
+    DenseMatrix(size_t n, size_t m, CanteraDouble v = 0.0);
 
     DenseMatrix(const DenseMatrix& y);
     DenseMatrix& operator=(const DenseMatrix& y);
@@ -65,9 +65,9 @@ public:
      * @param m  New number of columns
      * @param v  Default fill value. defaults to zero.
      */
-    void resize(size_t n, size_t m, double v=0.0) override;
+    void resize(size_t n, size_t m, CanteraDouble v=0.0) override;
 
-    virtual double* const* colPts();
+    virtual CanteraDouble* const* colPts();
 
     //! Return a const vector of const pointers to the columns
     /*!
@@ -76,9 +76,9 @@ public:
      *
      * @returns a vector of pointers to the top of the columns of the matrices.
      */
-    const double* const* const_colPts() const;
+    const CanteraDouble* const* const_colPts() const;
 
-    virtual void mult(const double* b, double* prod) const;
+    virtual void mult(const CanteraDouble* b, CanteraDouble* prod) const;
 
     //! Multiply A*B and write result to @c prod.
     /*!
@@ -95,7 +95,7 @@ public:
      * @param prod  Resulting vector. This is of length m, the number of columns
      *              in the matrix
      */
-    virtual void leftMult(const double* const b, double* const prod) const;
+    virtual void leftMult(const CanteraDouble* const b, CanteraDouble* const prod) const;
 
     //! Return a changeable value of the pivot vector
     /*!
@@ -116,7 +116,7 @@ protected:
     vector<int> m_ipiv;
 
     //! Vector of column pointers
-    vector<double*> m_colPts;
+    vector<CanteraDouble*> m_colPts;
 };
 
 
@@ -139,7 +139,7 @@ protected:
  * @param nrhs Number of right hand sides to solve
  * @param ldb  Leading dimension of b, if nrhs > 1
  */
-void solve(DenseMatrix& A, double* b, size_t nrhs=1, size_t ldb=0);
+void solve(DenseMatrix& A, CanteraDouble* b, size_t nrhs=1, size_t ldb=0);
 
 //! Solve Ax = b for multiple right-hand-side vectors.
 /*!
@@ -158,7 +158,7 @@ void solve(DenseMatrix& A, DenseMatrix& b);
  * @param[in]  b     vector b with length N
  * @param[out] prod  vector prod length = M
  */
-void multiply(const DenseMatrix& A, const double* const b, double* const prod);
+void multiply(const DenseMatrix& A, const CanteraDouble* const b, CanteraDouble* const prod);
 
 //! Multiply @c A*b and add it to the result in @c prod. Uses BLAS routine DGEMV.
 /*!
@@ -170,7 +170,7 @@ void multiply(const DenseMatrix& A, const double* const b, double* const prod);
  * @param[in]  b     vector b with length N
  * @param[out] prod  vector prod length = M
  */
-void increment(const DenseMatrix& A, const double* const b, double* const prod);
+void increment(const DenseMatrix& A, const CanteraDouble* const b, CanteraDouble* const prod);
 
 //! invert A. A is overwritten with A^-1.
 /*!

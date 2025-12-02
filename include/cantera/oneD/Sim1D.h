@@ -52,7 +52,7 @@ protected:
      * @param value  the value.
      * @since New in %Cantera 3.2. Previously part of public interface.
      */
-    void _setValue(size_t dom, size_t comp, size_t localPoint, double value);
+    void _setValue(size_t dom, size_t comp, size_t localPoint, CanteraDouble value);
 
     /**
      * Get one entry in the solution vector.
@@ -62,7 +62,7 @@ protected:
      *     the leftmost grid point in the domain.
      * @since New in %Cantera 3.2. Previously part of public interface.
      */
-    double _value(size_t dom, size_t comp, size_t localPoint) const;
+    CanteraDouble _value(size_t dom, size_t comp, size_t localPoint) const;
 
     /**
      * Get an entry in the work vector, which may contain either a new system state
@@ -72,7 +72,7 @@ protected:
      * @param localPoint  grid point within the domain
      * @since New in %Cantera 3.2. Previously part of public interface.
      */
-    double _workValue(size_t dom, size_t comp, size_t localPoint) const;
+    CanteraDouble _workValue(size_t dom, size_t comp, size_t localPoint) const;
     //! @}
 
 public:
@@ -207,13 +207,13 @@ public:
      */
     void solve(int loglevel = 0, bool refine_grid = true);
 
-    void eval(double rdt=-1.0, int count = 1) {
+    void eval(CanteraDouble rdt=-1.0, int count = 1) {
         OneDim::eval(npos, m_state->data(), m_xnew.data(), rdt, count);
     }
     using OneDim::eval;
 
     //! Evaluate the governing equations and return the vector of residuals
-    void getResidual(double rdt, double* resid) {
+    void getResidual(CanteraDouble rdt, CanteraDouble* resid) {
         OneDim::eval(npos, m_state->data(), resid, rdt, 0);
     }
 
@@ -227,13 +227,13 @@ public:
     int refine(int loglevel=0);
 
     //! Add node for fixed temperature point of freely propagating flame
-    int setFixedTemperature(double t);
+    int setFixedTemperature(CanteraDouble t);
 
     //! Return temperature at the point used to fix the flame location
-    double fixedTemperature();
+    CanteraDouble fixedTemperature();
 
     //! Return location of the point where temperature is fixed
-    double fixedTemperatureLocation();
+    CanteraDouble fixedTemperatureLocation();
 
     /**
      * Set the left control point location using the specified temperature.
@@ -245,7 +245,7 @@ public:
      * equal to or exceeds the specified temperature will be used to locate the
      * left control point's coordinate.
      */
-    void setLeftControlPoint(double temperature);
+    void setLeftControlPoint(CanteraDouble temperature);
 
     /**
      * Set the right control point location using the specified temperature.
@@ -257,23 +257,23 @@ public:
      * equal to or exceeds the specified temperature will be used to locate the
      * right control point's coordinate.
      */
-    void setRightControlPoint(double temperature);
+    void setRightControlPoint(CanteraDouble temperature);
 
     /**
      * Set grid refinement criteria. If dom >= 0, then the settings
      * apply only to the specified domain.  If dom < 0, the settings
      * are applied to each domain.  @see Refiner::setCriteria.
      */
-    void setRefineCriteria(int dom = -1, double ratio = 10.0,
-                           double slope = 0.8, double curve = 0.8,
-                           double prune = -0.1);
+    void setRefineCriteria(int dom = -1, CanteraDouble ratio = 10.0,
+                           CanteraDouble slope = 0.8, CanteraDouble curve = 0.8,
+                           CanteraDouble prune = -0.1);
 
     /**
      * Get the grid refinement criteria. dom must be greater than
      * or equal to zero (that is, the domain must be specified).
      * @see Refiner::getCriteria
      */
-    vector<double> getRefineCriteria(int dom);
+    vector<CanteraDouble> getRefineCriteria(int dom);
 
     /**
      * Set the maximum number of grid points in the domain. If dom >= 0,
@@ -295,7 +295,7 @@ public:
      *             to all domains.
      * @param gridmin  The minimum allowable grid spacing [m]
      */
-    void setGridMin(int dom, double gridmin);
+    void setGridMin(int dom, CanteraDouble gridmin);
 
     //! Set the current solution vector to the last successful time-stepping
     //! solution. This can be used to examine the solver progress after a failed
@@ -326,7 +326,7 @@ public:
      *         - \lambda^T \frac{\partial f}{\partial p}
      * @f]
      */
-    void solveAdjoint(const double* b, double* lambda);
+    void solveAdjoint(const CanteraDouble* b, CanteraDouble* lambda);
 
     void resize() override;
 
@@ -340,11 +340,11 @@ public:
 protected:
     //! the solution vector after the last successful steady-state solve (stored
     //! before grid refinement)
-    vector<double> m_xlast_ss;
+    vector<CanteraDouble> m_xlast_ss;
 
     //! the grids for each domain after the last successful steady-state solve
     //! (stored before grid refinement)
-    vector<vector<double>> m_grid_last_ss;
+    vector<vector<CanteraDouble>> m_grid_last_ss;
 
     //! User-supplied function called after a successful steady-state solve.
     Func1* m_steady_callback;

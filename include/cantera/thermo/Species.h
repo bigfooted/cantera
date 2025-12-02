@@ -28,7 +28,7 @@ public:
 
     //! Constructor
     Species(const string& name, const Composition& comp,
-            double charge=0.0, double size=1.0);
+            CanteraDouble charge=0.0, CanteraDouble size=1.0);
 
     //! Species objects are not copyable or assignable
     Species(const Species&) = delete;
@@ -45,11 +45,11 @@ public:
     Composition composition;
 
     //! The electrical charge on the species, in units of the elementary charge.
-    double charge = 0.0;
+    CanteraDouble charge = 0.0;
 
     //! The effective size of the species. Currently used only for surface
     //! species, where it represents the number of sites occupied.
-    double size = 1.0;
+    CanteraDouble size = 1.0;
 
     //! The molecular weight [amu] of the species.
     /*!
@@ -59,7 +59,7 @@ public:
      *
      * @since New in version 3.0
      */
-    double molecularWeight();
+    CanteraDouble molecularWeight();
 
     //! Set the molecular weight of the species.
     /*!
@@ -72,7 +72,7 @@ public:
      *
      * @since New in version 3.0
      */
-    void setMolecularWeight(double weight);
+    void setMolecularWeight(CanteraDouble weight);
 
     shared_ptr<TransportData> transport;
 
@@ -86,7 +86,7 @@ protected:
 
     //! The molecular weight of the species, in atomic mass units. Includes
     //! electron mass for charged species.
-    double m_molecularWeight = Undef;
+    CanteraDouble m_molecularWeight = Undef;
 };
 
 //! Create a new Species object from an AnyMap specification

@@ -13,7 +13,7 @@
 namespace Cantera
 {
 
-void IdealGasReactor::getState(double* y)
+void IdealGasReactor::getState(CanteraDouble* y)
 {
     if (m_thermo == 0) {
         throw CanteraError("IdealGasReactor::getState",
@@ -39,7 +39,7 @@ void IdealGasReactor::getState(double* y)
     getSurfaceInitialConditions(y + m_nsp + 3);
 }
 
-void IdealGasReactor::initialize(double t0)
+void IdealGasReactor::initialize(CanteraDouble t0)
 {
     //! @todo: Add a method to ThermoPhase that indicates whether a given
     //! subclass is compatible with this reactor model
@@ -51,7 +51,7 @@ void IdealGasReactor::initialize(double t0)
     m_uk.resize(m_nsp, 0.0);
 }
 
-void IdealGasReactor::updateState(double* y)
+void IdealGasReactor::updateState(CanteraDouble* y)
 {
     // The components of y are [0] the total mass, [1] the total volume,
     // [2] the temperature, [3...K+3] are the mass fractions of each species,
@@ -64,24 +64,24 @@ void IdealGasReactor::updateState(double* y)
     updateSurfaceState(y + m_nsp + 3);
 }
 
-void IdealGasReactor::eval(double time, double* LHS, double* RHS)
+void IdealGasReactor::eval(CanteraDouble time, CanteraDouble* LHS, CanteraDouble* RHS)
 {
-    double& dmdt = RHS[0]; // dm/dt (gas phase)
-    double& mcvdTdt = RHS[2]; // m * c_v * dT/dt
-    double* mdYdt = RHS + 3; // mass * dY/dt
+    CanteraDouble& dmdt = RHS[0]; // dm/dt (gas phase)
+    CanteraDouble& mcvdTdt = RHS[2]; // m * c_v * dT/dt
+    CanteraDouble* mdYdt = RHS + 3; // mass * dY/dt
 
     evalWalls(time);
     m_thermo->restoreState(m_state);
     m_thermo->getPartialMolarIntEnergies(&m_uk[0]);
-    const vector<double>& mw = m_thermo->molecularWeights();
-    const double* Y = m_thermo->massFractions();
+    const vector<CanteraDouble>& mw = m_thermo->molecularWeights();
+    const CanteraDouble* Y = m_thermo->massFractions();
 
     if (m_chem) {
         m_kin->getNetProductionRates(&m_wdot[0]); // "omega dot"
     }
 
     evalSurfaces(LHS + m_nsp + 3, RHS + m_nsp + 3, m_sdot.data());
-    double mdot_surf = dot(m_sdot.begin(), m_sdot.end(), mw.begin());
+    CanteraDouble mdot_surf = dot(m_sdot.begin(), m_sdot.end(), mw.begin());
     dmdt += mdot_surf;
 
     // compression work and external heat transfer
@@ -101,18 +101,18 @@ void IdealGasReactor::eval(double time, double* LHS, double* RHS)
 
     // add terms for outlets
     for (auto outlet : m_outlet) {
-        double mdot = outlet->massFlowRate();
+        CanteraDouble mdot = outlet->massFlowRate();
         dmdt -= mdot; // mass flow out of system
         mcvdTdt -= mdot * m_pressure * m_vol / m_mass; // flow work
     }
 
     // add terms for inlets
     for (auto inlet : m_inlet) {
-        double mdot = inlet->massFlowRate();
+        CanteraDouble mdot = inlet->massFlowRate();
         dmdt += mdot; // mass flow into system
         mcvdTdt += inlet->enthalpy_mass() * mdot;
         for (size_t n = 0; n < m_nsp; n++) {
-            double mdot_spec = inlet->outletSpeciesMassFlowRate(n);
+            CanteraDouble mdot_spec = inlet->outletSpeciesMassFlowRate(n);
             // flow of species into system and dilution by other species
             mdYdt[n] += mdot_spec - mdot * Y[n];
 
@@ -172,7 +172,7 @@ string IdealGasReactor::componentName(size_t k) {
     }
 }
 
-double IdealGasReactor::upperBound(size_t k) const {
+CanteraDouble IdealGasReactor::upperBound(size_t k) const {
     if (k == 2) {
         //@todo: Revise pending resolution of https://github.com/Cantera/enhancements/issues/229
         return 1.5 * m_thermo->maxTemp();
@@ -181,7 +181,7 @@ double IdealGasReactor::upperBound(size_t k) const {
     }
 }
 
-double IdealGasReactor::lowerBound(size_t k) const {
+CanteraDouble IdealGasReactor::lowerBound(size_t k) const {
     if (k == 2) {
         //@todo: Revise pending resolution of https://github.com/Cantera/enhancements/issues/229
         return 0.5 * m_thermo->minTemp();

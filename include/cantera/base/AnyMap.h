@@ -77,7 +77,7 @@ class AnyMap;
  * overloaded for specific types so that only those types are allowed to be
  * used in an AnyValue. The allowed types are:
  * - `AnyMap`
- * - `double`
+ * - `CanteraDouble`
  * - `long int`
  * - `bool`
  * - `string`
@@ -129,25 +129,25 @@ public:
     bool is() const;
 
     //! Returns `true` if the held value is a vector of the specified type, such as
-    //! `vector<double>`.
+    //! `vector<CanteraDouble>`.
     //! @since New in %Cantera 3.0.
     template<class T>
     bool isVector() const;
 
     //! Returns `true` if the held value is a matrix of the specified type and a
-    //! consistent number of columns, such as `vector<vector<double>>`. If the
+    //! consistent number of columns, such as `vector<vector<CanteraDouble>>`. If the
     //! number of columns is provided, a match is required.
     //! @since New in %Cantera 3.0.
     template<class T>
     bool isMatrix(size_t cols=npos) const;
 
-    //! Returns `true` if the held value is a scalar type (such as `double`,
+    //! Returns `true` if the held value is a scalar type (such as `CanteraDouble`,
     //! `long int`, `string`, or `bool`).
     bool isScalar() const;
 
     //! Returns size of the held vector.
     //! If not a vector or the type is not supported npos is returned.
-    //! Types considered include `vector<double>`, `vector<long int>`, `vector<string>`,
+    //! Types considered include `vector<CanteraDouble>`, `vector<long int>`, `vector<string>`,
     //! and `vector<bool`.
     //! @since New in %Cantera 3.0.
     size_t vectorSize() const;
@@ -155,7 +155,7 @@ public:
     //! Returns rows and columns of a matrix.
     //! If the number of columns is not consistent, the number of columns is set to
     //! npos; if the type is not supported, a npos pair is returned.
-    //! Types considered include `vector<vector<double>>`, `vector<vector<long int>>`,
+    //! Types considered include `vector<vector<CanteraDouble>>`, `vector<vector<long int>>`,
     //! `vector<vector<string>>` and `vector<vector<bool>>`.
     //! @since New in %Cantera 3.0.
     pair<size_t, size_t> matrixShape() const;
@@ -181,15 +181,15 @@ public:
     //! Assign a scalar quantity with units as a string, for example
     //! `{3.0, "m^2"}`. If the `is_act_energy` flag is set to `true`, the units
     //! will be converted using the special rules for activation energies.
-    void setQuantity(double value, const string& units, bool is_act_energy=false);
+    void setQuantity(CanteraDouble value, const string& units, bool is_act_energy=false);
 
     //! Assign a scalar quantity with units as a Units object, for cases where
     //! the units vary and are determined dynamically, such as reaction
     //! pre-exponential factors
-    void setQuantity(double value, const Units& units);
+    void setQuantity(CanteraDouble value, const Units& units);
 
     //! Assign a vector where all the values have the same units
-    void setQuantity(const vector<double>& values, const string& units);
+    void setQuantity(const vector<CanteraDouble>& values, const string& units);
 
     typedef function<void(AnyValue&, const UnitSystem&)> unitConverter;
 
@@ -198,15 +198,15 @@ public:
     void setQuantity(const AnyValue& value, const unitConverter& converter);
     //! @} end group quantity conversions
 
-    explicit AnyValue(double value);
-    AnyValue& operator=(double value);
-    //! Return the held value as a `double`, if it is a `double` or a `long int`.
-    double& asDouble();
-    const double& asDouble() const;
-    bool operator==(const double& other) const;
-    bool operator!=(const double& other) const;
-    friend bool operator==(const double& lhs, const AnyValue& rhs);
-    friend bool operator!=(const double& lhs, const AnyValue& rhs);
+    explicit AnyValue(CanteraDouble value);
+    AnyValue& operator=(CanteraDouble value);
+    //! Return the held value as a `CanteraDouble`, if it is a `CanteraDouble` or a `long int`.
+    CanteraDouble& asDouble();
+    const CanteraDouble& asDouble() const;
+    bool operator==(const CanteraDouble& other) const;
+    bool operator!=(const CanteraDouble& other) const;
+    friend bool operator==(const CanteraDouble& lhs, const AnyValue& rhs);
+    friend bool operator!=(const CanteraDouble& lhs, const AnyValue& rhs);
 
     explicit AnyValue(bool value);
     AnyValue& operator=(bool value);
@@ -314,12 +314,12 @@ private:
     static bool eq_comparer(const std::any& lhs, const std::any& rhs);
 
     //! Helper function for comparing vectors of different (but comparable)
-    //! types, for example `vector<double>` and `vector<long int>`
+    //! types, for example `vector<CanteraDouble>` and `vector<long int>`
     template<class T, class U>
     static bool vector_eq(const std::any& lhs, const std::any& rhs);
 
     //! Helper function for comparing nested vectors of different (but
-    //! comparable) types, for example `vector<vector<double>>` and
+    //! comparable) types, for example `vector<vector<CanteraDouble>>` and
     //! `vector<vector<long int>>`
     template<class T, class U>
     static bool vector2_eq(const std::any& lhs, const std::any& rhs);
@@ -336,20 +336,20 @@ const vector<AnyValue>& AnyValue::asVector<AnyValue>(size_t nMin, size_t nMax) c
 template<>
 vector<AnyValue>& AnyValue::asVector<AnyValue>(size_t nMin, size_t nMax);
 
-//! Implicit conversion of long int to double if accessed as a vector<double>
+//! Implicit conversion of long int to CanteraDouble if accessed as a vector<CanteraDouble>
 template<>
-const vector<double>& AnyValue::asVector<double>(size_t nMin, size_t nMax) const;
+const vector<CanteraDouble>& AnyValue::asVector<CanteraDouble>(size_t nMin, size_t nMax) const;
 
 template<>
-vector<double>& AnyValue::asVector<double>(size_t nMin, size_t nMax);
+vector<CanteraDouble>& AnyValue::asVector<CanteraDouble>(size_t nMin, size_t nMax);
 
-//! Implicit conversion of long int to double if accessed as a vector<vector<double>>
+//! Implicit conversion of long int to CanteraDouble if accessed as a vector<vector<CanteraDouble>>
 template<>
-const vector<vector<double>>& AnyValue::asVector<vector<double>>(size_t nMin,
+const vector<vector<CanteraDouble>>& AnyValue::asVector<vector<CanteraDouble>>(size_t nMin,
                                                                  size_t nMax) const;
 
 template<>
-vector<vector<double>>& AnyValue::asVector<vector<double>>(size_t nMin, size_t nMax);
+vector<vector<CanteraDouble>>& AnyValue::asVector<vector<CanteraDouble>>(size_t nMin, size_t nMax);
 
 //! Implicit conversion of AnyMap to a vector<AnyMap> of length 1, or an empty
 //! vector<AnyValue> an empty vector<AnyMap>
@@ -368,16 +368,16 @@ vector<AnyMap>& AnyValue::asVector<AnyMap>(size_t nMin, size_t nMax);
  *
  * ```
  * AnyMap breakfast;
- * breakfast["spam"] = 123.4; // Creates a value of type 'double'
+ * breakfast["spam"] = 123.4; // Creates a value of type 'CanteraDouble'
  * breakfast["eggs"] = "scrambled"; // Creates a value of type 'string'
  *
  * // Create a nested AnyMap named "beans" which has a key named "baked"
- * // whose value is a vector<double>
- * vector<double> v{3.14, 1.59, 2.65};
+ * // whose value is a vector<CanteraDouble>
+ * vector<CanteraDouble> v{3.14, 1.59, 2.65};
  * breakfast["beans"]["baked"] = v;
  *
  * // Create a nested AnyMap with values of the same type
- * map<string, double> breads{{"wheat", 4.0}, {"white", 2.5}};
+ * map<string, CanteraDouble> breads{{"wheat", 4.0}, {"white", 2.5}};
  * breakfast["toast"] = breads;
  * // Equivalent to:
  * breakfast["toast"]["wheat"] = 4.0
@@ -387,11 +387,11 @@ vector<AnyMap>& AnyValue::asVector<AnyMap>(size_t nMin, size_t nMax);
  * ## Accessing elements
  *
  * ```
- * double val1 = breakfast["spam"].asDouble();
+ * CanteraDouble val1 = breakfast["spam"].asDouble();
  * string val2 = breakfast["eggs"].asString();
- * vector<double> val3 = breakfast["beans"]["baked"].asVector<double>();
+ * vector<CanteraDouble> val3 = breakfast["beans"]["baked"].asVector<CanteraDouble>();
  *
- * map<string, double> = breakfast["toast"].asMap<double>();
+ * map<string, CanteraDouble> = breakfast["toast"].asMap<CanteraDouble>();
  * ```
  *
  * ## Checking for elements
@@ -419,8 +419,8 @@ vector<AnyMap>& AnyValue::asVector<AnyMap>(size_t nMin, size_t nMax);
  * ## Checking element types
  *
  * ```
- * if (breakfast["sausage"].is<vector<double>>()) {
- *     // access using asVector<double>
+ * if (breakfast["sausage"].is<vector<CanteraDouble>>()) {
+ *     // access using asVector<CanteraDouble>
  * } else if (breakfast["sausage"].type() == typeid(vector<string>)) {
  *     // access using asVector<string>
  * }
@@ -504,31 +504,31 @@ public:
     //! If `key` exists, return it as a `long int`, otherwise return `default_`.
     long int getInt(const string& key, long int default_) const;
 
-    //! If `key` exists, return it as a `double`, otherwise return `default_`.
-    double getDouble(const string& key, double default_) const;
+    //! If `key` exists, return it as a `CanteraDouble`, otherwise return `default_`.
+    CanteraDouble getDouble(const string& key, CanteraDouble default_) const;
 
     //! If `key` exists, return it as a `string`, otherwise return `default_`.
     const string& getString(const string& key,
                             const string& default_) const;
 
     //! Convert the item stored by the given `key` to the units specified in
-    //! `units`. If the stored value is a double, convert it using the default
+    //! `units`. If the stored value is a CanteraDouble, convert it using the default
     //! units. If the input is a string, treat this as a dimensioned value, such
     //! as '988 kg/m^3' and convert from the specified units.
-    double convert(const string& key, const string& units) const;
-    double convert(const string& key, const Units& units) const;
+    CanteraDouble convert(const string& key, const string& units) const;
+    CanteraDouble convert(const string& key, const Units& units) const;
 
     //! Convert the item stored by the given `key` to the units specified in
-    //! `units`. If the stored value is a double, convert it using the default
+    //! `units`. If the stored value is a CanteraDouble, convert it using the default
     //! units. If the input is a string, treat this as a dimensioned value, such
     //! as '988 kg/m^3' and convert from the specified units. If the key is
     //! missing, the `default_` value is returned.
-    double convert(const string& key, const string& units,
-                   double default_) const;
+    CanteraDouble convert(const string& key, const string& units,
+                   CanteraDouble default_) const;
 
     //! Convert a vector of dimensional values
     /*!
-     * For each item in the vector, if the stored value is a double, convert it
+     * For each item in the vector, if the stored value is a CanteraDouble, convert it
      * using the default units. If the value is a string, treat it as a
      * dimensioned value, such as '988 kg/m^3', and convert from the specified
      * units.
@@ -541,11 +541,11 @@ public:
      * @param nMax   Maximum allowed length of the vector. An exception is
      *     thrown if this condition is not met.
      */
-    vector<double> convertVector(const string& key, const string& units,
+    vector<CanteraDouble> convertVector(const string& key, const string& units,
                                  size_t nMin=npos, size_t nMax=npos) const;
 
     //! Defined to allow use with range-based for loops. Iteration automatically
-    //! skips over keys that start and end with double underscores.
+    //! skips over keys that start and end with CanteraDouble underscores.
     class Iterator {
     public:
         Iterator() {}

@@ -42,7 +42,7 @@ public:
      *                be at least `ld` times the number of species in length.
      * @see GasTransport::fitDiffCoeffs()
      */
-    void getBinaryDiffCoeffs(const size_t ld, double* const d) override;
+    void getBinaryDiffCoeffs(const size_t ld, CanteraDouble* const d) override;
 
     /**
      * Returns the mixture-averaged diffusion coefficients [m²/s].
@@ -54,7 +54,7 @@ public:
      * @param[out] d  Vector of mixture diffusion coefficients, @f$ D_{km}' @f$ ,
      *                for each species. length #m_nsp.
      */
-    void getMixDiffCoeffs(double* const d) override;
+    void getMixDiffCoeffs(CanteraDouble* const d) override;
 
     /**
      *  Returns the mixture-averaged diffusion coefficients [m²/s].
@@ -66,7 +66,7 @@ public:
      * @param[out] d vector of mixture-averaged diffusion coefficients for
      *               each species, length #m_nsp.
      */
-    void getMixDiffCoeffsMole(double* const d) override;
+    void getMixDiffCoeffsMole(CanteraDouble* const d) override;
 
     /**
      * Returns the mixture-averaged diffusion coefficients [m²/s].
@@ -78,7 +78,7 @@ public:
      * @param[out] d vector of mixture-averaged diffusion coefficients for
      *               each species, length #m_nsp.
      */
-    void getMixDiffCoeffsMass(double* const d) override;
+    void getMixDiffCoeffsMass(CanteraDouble* const d) override;
 
     /**
      * Updates the matrix of species-pair Takahashi correction factors for use in
@@ -115,21 +115,21 @@ protected:
     void initializeCriticalProperties();
 
     //! Returns the stored value of the critical temperature for species 'i'.
-    double Tcrit_i(size_t i);
+    CanteraDouble Tcrit_i(size_t i);
 
     //! Returns the stored value of the critical pressure for species 'i'.
-    double Pcrit_i(size_t i);
+    CanteraDouble Pcrit_i(size_t i);
 
     //! Returns the stored value of the critical volume for species 'i'.
-    double Vcrit_i(size_t i);
+    CanteraDouble Vcrit_i(size_t i);
 
     //! Returns the stored value of the critical compressibility for species 'i'.
-    double Zcrit_i(size_t i);
+    CanteraDouble Zcrit_i(size_t i);
 
-    vector<double> m_Tcrit; //!< Critical temperature [K] of each species
-    vector<double> m_Pcrit; //!< Critical pressure [Pa] of each species
-    vector<double> m_Vcrit; //!< Critical volume [m³/kmol] of each species
-    vector<double> m_Zcrit; //!< Critical compressibility [unitless] of each species
+    vector<CanteraDouble> m_Tcrit; //!< Critical temperature [K] of each species
+    vector<CanteraDouble> m_Pcrit; //!< Critical pressure [Pa] of each species
+    vector<CanteraDouble> m_Vcrit; //!< Critical volume [m³/kmol] of each species
+    vector<CanteraDouble> m_Zcrit; //!< Critical compressibility [unitless] of each species
 
     //! Matrix of Takahashi binary diffusion coefficient corrections. Size is
     //! #m_nsp x #m_nsp.
@@ -355,7 +355,7 @@ public:
      *       elyHanleyDiluteReferenceViscosity() and
      *       elyHanleyReferenceThermalConductivity()
      */
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
      /**
      * Returns the mixture high-pressure viscosity [Pa·s] using the Lucas method.
@@ -371,7 +371,7 @@ public:
      * Equation 9-5.20. The mixture values of the low-pressure polarity and quantum
      * correction factors are computed using Equations 9-5.21 and 9-5.22.
      */
-    double viscosity() override;
+    CanteraDouble viscosity() override;
 
     friend class TransportFactory;
 
@@ -426,9 +426,9 @@ protected:
      * @param acentric_factor Acentric factor of the species
      * @param mw Molecular weight of the species
      */
-    double elyHanleyDilutePureSpeciesViscosity(double V, double Tc, double Vc,
-                                               double Zc, double acentric_factor,
-                                               double mw);
+    CanteraDouble elyHanleyDilutePureSpeciesViscosity(CanteraDouble V, CanteraDouble Tc, CanteraDouble Vc,
+                                               CanteraDouble Zc, CanteraDouble acentric_factor,
+                                               CanteraDouble mw);
 
     /**
      * Returns the theta shape factor of Leach and Leland for a pure species.
@@ -475,7 +475,7 @@ protected:
      * @param Vr Reduced volume
      * @param acentric_factor Acentric factor
      */
-    double thetaShapeFactor(double Tr, double Vr, double acentric_factor);
+    CanteraDouble thetaShapeFactor(CanteraDouble Tr, CanteraDouble Vr, CanteraDouble acentric_factor);
 
 
     /**
@@ -526,7 +526,7 @@ protected:
      * @param Zc Critical compressibility
      * @param acentric_factor Acentric factor
      */
-    double phiShapeFactor(double Tr, double Vr, double Zc, double acentric_factor);
+    CanteraDouble phiShapeFactor(CanteraDouble Tr, CanteraDouble Vr, CanteraDouble Zc, CanteraDouble acentric_factor);
 
     /**
      * Returns the viscosity [Pa·s] for the reference fluid (methane) for low pressures.
@@ -538,7 +538,7 @@ protected:
      *
      * @param T0 Temperature of the reference fluid
      */
-    double elyHanleyDiluteReferenceViscosity(double T0);
+    CanteraDouble elyHanleyDiluteReferenceViscosity(CanteraDouble T0);
 
     /**
      * Returns the thermal conductivity [W/m/K] of the reference fluid of methane
@@ -589,7 +589,7 @@ protected:
      * @param rho0 Density of the reference fluid
      * @param T0 Temperature of the reference fluid
      */
-    double elyHanleyReferenceThermalConductivity(double rho0, double T0);
+    CanteraDouble elyHanleyReferenceThermalConductivity(CanteraDouble rho0, CanteraDouble T0);
 
     /**
      * Computes the composition-dependent values of parameters that are needed for the
@@ -692,7 +692,7 @@ protected:
      * @param FP Polarity correction factor [unitless]
      * @param FQ Quantum correction factor [unitless]
      */
-    double lowPressureNondimensionalViscosity(double Tr, double FP, double FQ);
+    CanteraDouble lowPressureNondimensionalViscosity(CanteraDouble Tr, CanteraDouble FP, CanteraDouble FQ);
 
     /**
      * Returns the non-dimensional high-pressure mixture viscosity in using the Lucas
@@ -720,9 +720,9 @@ protected:
      * @param P_vap Vapor pressure [Pa]
      * @param P_crit Critical pressure [Pa]
      */
-    double highPressureNondimensionalViscosity(double Tr, double Pr, double FP_low,
-                                              double FQ_low, double P_vap,
-                                              double P_crit);
+    CanteraDouble highPressureNondimensionalViscosity(CanteraDouble Tr, CanteraDouble Pr, CanteraDouble FP_low,
+                                              CanteraDouble FQ_low, CanteraDouble P_vap,
+                                              CanteraDouble P_crit);
 
     /**
      * Calculates quantum correction term of the Lucas method for a species based
@@ -740,7 +740,7 @@ protected:
      * @param Tr  Reduced temperature [unitless]
      * @param MW  Molecular weight [kg/kmol]
      */
-    double quantumCorrectionFactor(double Q, double Tr, double MW);
+    CanteraDouble quantumCorrectionFactor(CanteraDouble Q, CanteraDouble Tr, CanteraDouble MW);
 
     /**
      * Returns the polarity correction term for a species based on reduced temperature,
@@ -770,7 +770,7 @@ protected:
      * @param Tr  Reduced temperature
      * @param Z_c  Species Critical compressibility
      */
-    double polarityCorrectionFactor(double mu_r, double Tr, double Z_c);
+    CanteraDouble polarityCorrectionFactor(CanteraDouble mu_r, CanteraDouble Tr, CanteraDouble Z_c);
 
 
 private:
@@ -781,12 +781,12 @@ private:
      *  These are used by the thermalConductivity() method.
      * @{
      */
-    const double m_ref_MW = 16.04; //!< Molecular weight [kg/kmol]
-    const double m_ref_Tc = 190.4; //!< Critical temperature [K]
-    const double m_ref_Vc = 0.0986; //!< Critical volume [m^3/kmol]
-    const double m_ref_Zc = 0.288; //!< Critical compressibility [unitless]
-    const double m_ref_rhoc = 0.1628; //!< Critical density [g/cm^3]
-    const double m_ref_acentric_factor = 0.011; //!< Acentric factor [unitless]
+    const CanteraDouble m_ref_MW = 16.04; //!< Molecular weight [kg/kmol]
+    const CanteraDouble m_ref_Tc = 190.4; //!< Critical temperature [K]
+    const CanteraDouble m_ref_Vc = 0.0986; //!< Critical volume [m^3/kmol]
+    const CanteraDouble m_ref_Zc = 0.288; //!< Critical compressibility [unitless]
+    const CanteraDouble m_ref_rhoc = 0.1628; //!< Critical density [g/cm^3]
+    const CanteraDouble m_ref_acentric_factor = 0.011; //!< Acentric factor [unitless]
     /** @} */
 
     /**
@@ -795,14 +795,14 @@ private:
      *  Lucas method.
      * @{
      */
-    double m_FQ_mix_o; //!< Quantum correction factor
-    double m_FP_mix_o; //!< Polarity correction factor
-    double m_Tr_mix; //!< Reduced temperature
-    double m_Pr_mix; //!< Reduced pressure
-    double m_Pc_mix; //!< Critical pressure
-    double m_Tc_mix; //!< Critical temperature
-    double m_MW_mix; //!< Molecular weight
-    double m_P_vap_mix; //!< Vapor pressure
+    CanteraDouble m_FQ_mix_o; //!< Quantum correction factor
+    CanteraDouble m_FP_mix_o; //!< Polarity correction factor
+    CanteraDouble m_Tr_mix; //!< Reduced temperature
+    CanteraDouble m_Pr_mix; //!< Reduced pressure
+    CanteraDouble m_Pc_mix; //!< Critical pressure
+    CanteraDouble m_Tc_mix; //!< Critical temperature
+    CanteraDouble m_MW_mix; //!< Molecular weight
+    CanteraDouble m_P_vap_mix; //!< Vapor pressure
     /** @} */
 };
 
@@ -849,7 +849,7 @@ public:
      * Because this method is using the high-pressure viscosity model with mixture
      * parameters, see highPressureViscosity() for details on the model.
      */
-    double viscosity() override;
+    CanteraDouble viscosity() override;
 
     /**
     * Calculates the high-pressure mixture thermal conductivity using the Chung method.
@@ -875,7 +875,7 @@ public:
     * Where @f$ C_{v,i} @f$ is the specific heat of species i, and @f$ X_i @f$ is the
     * mole fraction of species i.
     */
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
     friend class TransportFactory;
 
@@ -1076,9 +1076,9 @@ protected:
      * @param sigma  Lennard-Jones collision diameter [Angstroms]
      * @param kappa  Polar correction factor [unitless]
      */
-    double lowPressureViscosity(double T, double T_star, double MW,
-                                double acentric_factor, double mu_r,
-                                double sigma, double kappa);
+    CanteraDouble lowPressureViscosity(CanteraDouble T, CanteraDouble T_star, CanteraDouble MW,
+                                CanteraDouble acentric_factor, CanteraDouble mu_r,
+                                CanteraDouble sigma, CanteraDouble kappa);
 
     /**
      * Returns the high-pressure mixture viscosity [micropoise] using the Chung
@@ -1141,8 +1141,8 @@ protected:
      * @param mu_r  Dipole moment [Debye]
      * @param kappa  Polar correction factor [unitless]
      */
-    double highPressureViscosity(double T_star, double MW, double rho, double Vc,
-        double Tc, double acentric_factor, double mu_r, double kappa);
+    CanteraDouble highPressureViscosity(CanteraDouble T_star, CanteraDouble MW, CanteraDouble rho, CanteraDouble Vc,
+        CanteraDouble Tc, CanteraDouble acentric_factor, CanteraDouble mu_r, CanteraDouble kappa);
 
     /**
      * Computes the high-pressure thermal conductivity [W/m/K] using the Chung method.
@@ -1256,9 +1256,9 @@ protected:
      * @param kappa  Polar correction factor [unitless]
      * @return High pressure thermal conductivity [W/m/K]
      */
-    double highPressureThermalConductivity(double T, double T_star, double MW,
-        double rho, double Cv, double Vc, double Tc, double sigma,
-        double acentric_factor, double mu_r, double kappa);
+    CanteraDouble highPressureThermalConductivity(CanteraDouble T, CanteraDouble T_star, CanteraDouble MW,
+        CanteraDouble rho, CanteraDouble Cv, CanteraDouble Vc, CanteraDouble Tc, CanteraDouble sigma,
+        CanteraDouble acentric_factor, CanteraDouble mu_r, CanteraDouble kappa);
 
 private:
 
@@ -1268,11 +1268,11 @@ private:
      * the mixture properties for the Chung viscosity and thermal conductivity models.
      * @{
      */
-    vector<double> m_sigma_i; //!< Effective molecular diameter [Angstroms]
-    vector<double> m_epsilon_over_k_i; //!< Characteristic temperature [K]
-    vector<double> m_MW_i; //!< Molecular weight [kg/kmol]
-    vector<double> m_acentric_factor_i; //!< Acentric factor [unitless]
-    vector<double> m_kappa_i; //!< Association factor [unitless]
+    vector<CanteraDouble> m_sigma_i; //!< Effective molecular diameter [Angstroms]
+    vector<CanteraDouble> m_epsilon_over_k_i; //!< Characteristic temperature [K]
+    vector<CanteraDouble> m_MW_i; //!< Molecular weight [kg/kmol]
+    vector<CanteraDouble> m_acentric_factor_i; //!< Acentric factor [unitless]
+    vector<CanteraDouble> m_kappa_i; //!< Association factor [unitless]
     /** @} */
 
 
@@ -1282,18 +1282,18 @@ private:
      * conductivity using the Chung method.
      * @{
      */
-    double m_Vc_mix = 0; //!< Mixture critical volume [m³/kmol]
-    double m_Tc_mix = 0; //!< Mixture critical temperature [K]
+    CanteraDouble m_Vc_mix = 0; //!< Mixture critical volume [m³/kmol]
+    CanteraDouble m_Tc_mix = 0; //!< Mixture critical temperature [K]
 
-    double m_sigma_mix = 0; //!< Effective mixture molecular diameter [Angstroms]
-    double m_epsilon_over_k_mix = 0; //!< Mixture characteristic temperature [K]
-    double m_MW_mix = 0; //!< Effective mixture molecular weight [kg/kmol]
+    CanteraDouble m_sigma_mix = 0; //!< Effective mixture molecular diameter [Angstroms]
+    CanteraDouble m_epsilon_over_k_mix = 0; //!< Mixture characteristic temperature [K]
+    CanteraDouble m_MW_mix = 0; //!< Effective mixture molecular weight [kg/kmol]
 
     // These are used to compute the Fc factor in the Chung viscosity model
-    double m_mu_mix = 0; //!< Mixture dipole moment [Debye]
-    double m_mu_r_mix = 0; //!< Mixture reduced dipole moment [unitless]
-    double m_acentric_factor_mix = 0; //!< Mixture acentric factor [unitless]
-    double m_kappa_mix = 0; //!< Mixture association factor [unitless]
+    CanteraDouble m_mu_mix = 0; //!< Mixture dipole moment [Debye]
+    CanteraDouble m_mu_r_mix = 0; //!< Mixture reduced dipole moment [unitless]
+    CanteraDouble m_acentric_factor_mix = 0; //!< Mixture acentric factor [unitless]
+    CanteraDouble m_kappa_mix = 0; //!< Mixture association factor [unitless]
 
     /** @} */
 

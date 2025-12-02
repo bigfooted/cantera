@@ -16,8 +16,8 @@ namespace Cantera
 {
 
 ImplicitSurfChem::ImplicitSurfChem(
-        vector<InterfaceKinetics*> k, double rtol, double atol,
-        double maxStepSize, size_t maxSteps,
+        vector<InterfaceKinetics*> k, CanteraDouble rtol, CanteraDouble atol,
+        CanteraDouble maxStepSize, size_t maxSteps,
         size_t maxErrTestFails) :
     m_atol(atol),
     m_rtol(rtol),
@@ -85,7 +85,7 @@ int ImplicitSurfChem::checkMatch(vector<ThermoPhase*> m_vec, ThermoPhase* thPtr)
     return retn;
 }
 
-void ImplicitSurfChem::getState(double* c)
+void ImplicitSurfChem::getState(CanteraDouble* c)
 {
     size_t loc = 0;
     for (size_t n = 0; n < m_surf.size(); n++) {
@@ -94,7 +94,7 @@ void ImplicitSurfChem::getState(double* c)
     }
 }
 
-void ImplicitSurfChem::setMaxStepSize(double maxstep)
+void ImplicitSurfChem::setMaxStepSize(CanteraDouble maxstep)
 {
     m_maxstep = maxstep;
     if (m_maxstep > 0) {
@@ -102,7 +102,7 @@ void ImplicitSurfChem::setMaxStepSize(double maxstep)
     }
 }
 
-void ImplicitSurfChem::setTolerances(double rtol, double atol)
+void ImplicitSurfChem::setTolerances(CanteraDouble rtol, CanteraDouble atol)
 {
     m_rtol = rtol;
     m_atol = atol;
@@ -121,7 +121,7 @@ void ImplicitSurfChem::setMaxErrTestFails(size_t maxErrTestFails)
     m_integ->setMaxErrTestFails(static_cast<int>(m_maxErrTestFails));
 }
 
-void ImplicitSurfChem::initialize(double t0)
+void ImplicitSurfChem::initialize(CanteraDouble t0)
 {
     this->setTolerances(m_rtol, m_atol);
     this->setMaxStepSize(m_maxstep);
@@ -130,7 +130,7 @@ void ImplicitSurfChem::initialize(double t0)
     m_integ->initialize(t0, *this);
 }
 
-void ImplicitSurfChem::integrate(double t0, double t1)
+void ImplicitSurfChem::integrate(CanteraDouble t0, CanteraDouble t1)
 {
     this->initialize(t0);
     if (fabs(t1 - t0) < m_maxstep || m_maxstep == 0) {
@@ -141,13 +141,13 @@ void ImplicitSurfChem::integrate(double t0, double t1)
     updateState(m_integ->solution());
 }
 
-void ImplicitSurfChem::integrate0(double t0, double t1)
+void ImplicitSurfChem::integrate0(CanteraDouble t0, CanteraDouble t1)
 {
     m_integ->integrate(t1);
     updateState(m_integ->solution());
 }
 
-void ImplicitSurfChem::updateState(double* c)
+void ImplicitSurfChem::updateState(CanteraDouble* c)
 {
     size_t loc = 0;
     for (size_t n = 0; n < m_surf.size(); n++) {
@@ -156,14 +156,14 @@ void ImplicitSurfChem::updateState(double* c)
     }
 }
 
-void ImplicitSurfChem::eval(double time, double* y, double* ydot, double* p)
+void ImplicitSurfChem::eval(CanteraDouble time, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* p)
 {
     updateState(y); // synchronize the surface state(s) with y
     size_t loc = 0;
     for (size_t n = 0; n < m_surf.size(); n++) {
-        double rs0 = 1.0/m_surf[n]->siteDensity();
+        CanteraDouble rs0 = 1.0/m_surf[n]->siteDensity();
         m_vecKinPtrs[n]->getNetProductionRates(m_work.data());
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t k = 1; k < m_nsp[n]; k++) {
             ydot[k + loc] = m_work[k] * rs0 * m_surf[n]->size(k);
             sum -= ydot[k];
@@ -174,13 +174,13 @@ void ImplicitSurfChem::eval(double time, double* y, double* ydot, double* p)
 }
 
 void ImplicitSurfChem::solvePseudoSteadyStateProblem(int ifuncOverride,
-        double timeScaleOverride)
+        CanteraDouble timeScaleOverride)
 {
     int ifunc;
     // set bulkFunc. We assume that the bulk concentrations are constant.
     int bulkFunc = BULK_ETCH;
     // time scale - time over which to integrate equations
-    double time_scale = timeScaleOverride;
+    CanteraDouble time_scale = timeScaleOverride;
     if (!m_surfSolver) {
         m_surfSolver = make_unique<solveSP>(this, bulkFunc);
         // set ifunc, which sets the algorithm.
@@ -202,8 +202,8 @@ void ImplicitSurfChem::solvePseudoSteadyStateProblem(int ifuncOverride,
     getConcSpecies(m_concSpecies.data());
     InterfaceKinetics* ik = m_vecKinPtrs[0];
     ThermoPhase& tp = ik->thermo(0);
-    double TKelvin = tp.temperature();
-    double PGas = tp.pressure();
+    CanteraDouble TKelvin = tp.temperature();
+    CanteraDouble PGas = tp.pressure();
 
     // Make sure that there is a common temperature and pressure for all
     // ThermoPhase objects belonging to the interfacial kinetics object, if it
@@ -212,8 +212,8 @@ void ImplicitSurfChem::solvePseudoSteadyStateProblem(int ifuncOverride,
         setCommonState_TP(TKelvin, PGas);
     }
 
-    double reltol = 1.0E-6;
-    double atol = 1.0E-20;
+    CanteraDouble reltol = 1.0E-6;
+    CanteraDouble atol = 1.0E-20;
 
     // Install a filter for negative concentrations. One of the few ways solveSP
     // can fail is if concentrations on input are below zero.
@@ -249,7 +249,7 @@ void ImplicitSurfChem::solvePseudoSteadyStateProblem(int ifuncOverride,
     }
 }
 
-void ImplicitSurfChem::getConcSpecies(double* const vecConcSpecies) const
+void ImplicitSurfChem::getConcSpecies(CanteraDouble* const vecConcSpecies) const
 {
     size_t kstart;
     for (size_t ip = 0; ip < m_surf.size(); ip++) {
@@ -265,7 +265,7 @@ void ImplicitSurfChem::getConcSpecies(double* const vecConcSpecies) const
     }
 }
 
-void ImplicitSurfChem::setConcSpecies(const double* const vecConcSpecies)
+void ImplicitSurfChem::setConcSpecies(const CanteraDouble* const vecConcSpecies)
 {
     size_t kstart;
     for (size_t ip = 0; ip < m_surf.size(); ip++) {
@@ -281,7 +281,7 @@ void ImplicitSurfChem::setConcSpecies(const double* const vecConcSpecies)
     }
 }
 
-void ImplicitSurfChem::setCommonState_TP(double TKelvin, double PresPa)
+void ImplicitSurfChem::setCommonState_TP(CanteraDouble TKelvin, CanteraDouble PresPa)
 {
     for (size_t ip = 0; ip < m_surf.size(); ip++) {
         ThermoPhase* TP_ptr = m_surf[ip];

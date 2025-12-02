@@ -11,7 +11,7 @@ using namespace Cantera;
 namespace tpx
 {
 
-const double
+const CanteraDouble
 M = 102.032,
 Tmn = 170.0,
 Tmx = 455.0,
@@ -20,7 +20,7 @@ Pc = 4056290.0,
 Roc = 508.0,
 R = 81.48885644;
 
-const double a134[] = {
+const CanteraDouble a134[] = {
     0.5586817e-1,
     0.4982230,
     0.2458698e-1,
@@ -44,7 +44,7 @@ const double a134[] = {
     -0.1285458e-3
 };
 
-const double t134[] = {
+const CanteraDouble t134[] = {
     -0.5, 0.0, 0.0, 0.0, 1.5, 1.5, 2.0, 2.0, 1.0, 3.0, 5.0,
     1.0, 5.0, 5.0, 6.0, 10.0, 10.0, 10.0, 18.0, 22.0, 50.0
 };
@@ -54,7 +54,7 @@ const int d134[] = {
     4, 1, 4, 1, 2, 4, 1, 5, 3, 10
 };
 
-const double b134[] = {
+const CanteraDouble b134[] = {
     -1.019535,
     9.047135,
     -1.629789,
@@ -62,14 +62,14 @@ const double b134[] = {
     -3.927170
 };
 
-double HFC134a::fp()
+CanteraDouble HFC134a::fp()
 {
-    double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
+    CanteraDouble sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
            sum4 = 0.0, sum5 = 0.0;
-    double tau = Tc/T;
-    double delta = Rho/Roc;
+    CanteraDouble tau = Tc/T;
+    CanteraDouble delta = Rho/Roc;
 
-    double phi0 = b134[0] + b134[1]*tau + b134[2]*log(tau)
+    CanteraDouble phi0 = b134[0] + b134[1]*tau + b134[2]*log(tau)
                   + log(delta) + b134[3]/sqrt(tau) + b134[4]*pow(tau,-0.75);
     int i;
     for (i = 0; i<8; i++) {
@@ -85,20 +85,20 @@ double HFC134a::fp()
         sum4 += a134[i]*pow(tau,t134[i])*pow(delta,d134[i]);
     }
     sum5 = a134[20]*pow(tau,t134[20])*pow(delta,d134[20]);
-    double phir = sum1 + exp(-delta)*sum2 + exp(-delta*delta)*sum3
+    CanteraDouble phir = sum1 + exp(-delta)*sum2 + exp(-delta*delta)*sum3
                   + exp(-delta*delta*delta)*sum4
                   + exp(-delta*delta*delta*delta)*sum5;
     return R*T*(phir + phi0);
 }
 
-double HFC134a::up()
+CanteraDouble HFC134a::up()
 {
-    double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
+    CanteraDouble sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
            sum4 = 0.0, sum5 = 0.0;
-    double tau = Tc/T;
-    double delta = Rho/Roc;
+    CanteraDouble tau = Tc/T;
+    CanteraDouble delta = Rho/Roc;
 
-    double phi0t = b134[1]*tau + b134[2]
+    CanteraDouble phi0t = b134[1]*tau + b134[2]
                    - 0.5*b134[3]*pow(tau,-0.5) - 0.75*b134[4]*pow(tau,-0.75);
     int i;
     for (i = 0; i<8; i++) {
@@ -114,19 +114,19 @@ double HFC134a::up()
         sum4 += a134[i]*t134[i]*pow(tau,t134[i])*pow(delta,d134[i]);
     }
     sum5 = a134[20]*t134[20]*pow(tau,t134[20])*pow(delta,d134[20]);
-    double phirt = sum1 + exp(-delta)*sum2 + exp(-delta*delta)*sum3
+    CanteraDouble phirt = sum1 + exp(-delta)*sum2 + exp(-delta*delta)*sum3
                    + exp(-delta*delta*delta)*sum4
                    + exp(-delta*delta*delta*delta)*sum5;
     return R*T*(phirt + phi0t) + m_energy_offset;
 }
 
-double HFC134a::Pp()
+CanteraDouble HFC134a::Pp()
 {
-    double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
+    CanteraDouble sum1 = 0.0, sum2 = 0.0, sum3 = 0.0,
            sum4 = 0.0, sum5 = 0.0;
-    double tau = Tc/T;
-    double delta = Rho/Roc;
-    double phi0d = 1.0/delta;
+    CanteraDouble tau = Tc/T;
+    CanteraDouble delta = Rho/Roc;
+    CanteraDouble phi0d = 1.0/delta;
 
     int i;
     for (i = 0; i<8; i++) {
@@ -136,7 +136,7 @@ double HFC134a::Pp()
         sum2 += a134[i]*pow(tau,t134[i])*(d134[i] - delta)*pow(delta,d134[i]-1);
     }
     sum2 *= exp(-delta);
-    double dk = delta*delta;
+    CanteraDouble dk = delta*delta;
     for (i = 11; i<17; i++) {
         sum3 += a134[i]*pow(tau,t134[i])*(d134[i] - 2.0*dk)*pow(delta,d134[i]-1);
     }
@@ -149,56 +149,56 @@ double HFC134a::Pp()
     dk *= delta;
     sum5 = a134[20]*pow(tau,t134[20])*(d134[20] - 4.0*dk)*pow(delta,d134[20]-1);
     sum5 *= exp(-dk);
-    double phird = sum1 + sum2 + sum3 + sum4 + sum5;
+    CanteraDouble phird = sum1 + sum2 + sum3 + sum4 + sum5;
     return R*T*delta*delta*Roc*(phird + phi0d);
 }
 
-double HFC134a::Psat()
+CanteraDouble HFC134a::Psat()
 {
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("HFC134a::Psat",
                            "Temperature out of range. T = {}", T);
     }
-    double x1 = T/Tc;
-    double x2 = 1.0 - x1;
-    double f = -7.686556*x2 + 2.311791*pow(x2,1.5)
+    CanteraDouble x1 = T/Tc;
+    CanteraDouble x2 = 1.0 - x1;
+    CanteraDouble f = -7.686556*x2 + 2.311791*pow(x2,1.5)
                - 2.039554*x2*x2 - 3.583758*pow(x2,4);
     return Pc*exp(f/x1);
 }
 
-double HFC134a::ldens()
+CanteraDouble HFC134a::ldens()
 {
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("HFC134a::ldens",
                            "Temperature out of range. T = {}", T);
     }
-    double x1 = T/Tc;
-    double x2 = 1.0 - x1;
+    CanteraDouble x1 = T/Tc;
+    CanteraDouble x2 = 1.0 - x1;
     return 518.2 + 884.13*pow(x2,1.0/3.0) + 485.84*pow(x2,2.0/3.0)
            + 193.29*pow(x2,10.0/3.0);
 }
 
-double HFC134a::Tcrit()
+CanteraDouble HFC134a::Tcrit()
 {
     return 374.21;
 }
-double HFC134a::Pcrit()
+CanteraDouble HFC134a::Pcrit()
 {
     return 4059280.0;
 }
-double HFC134a::Vcrit()
+CanteraDouble HFC134a::Vcrit()
 {
     return 1.0/511.95;
 }
-double HFC134a::Tmin()
+CanteraDouble HFC134a::Tmin()
 {
     return Tmn;
 }
-double HFC134a::Tmax()
+CanteraDouble HFC134a::Tmax()
 {
     return Tmx;
 }
-double HFC134a::MolWt()
+CanteraDouble HFC134a::MolWt()
 {
     return M;
 }

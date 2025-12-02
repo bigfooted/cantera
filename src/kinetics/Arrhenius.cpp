@@ -9,7 +9,7 @@
 namespace Cantera
 {
 
-ArrheniusBase::ArrheniusBase(double A, double b, double Ea)
+ArrheniusBase::ArrheniusBase(CanteraDouble A, CanteraDouble b, CanteraDouble Ea)
     : m_A(A)
     , m_b(b)
     , m_Ea_R(Ea / GasConstant)
@@ -145,7 +145,7 @@ void ArrheniusBase::validate(const string& equation, const Kinetics& kin)
 
 bool ArrheniusData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double T = phase.temperature();
+    CanteraDouble T = phase.temperature();
     if (T == temperature) {
         return false;
     }

@@ -14,7 +14,7 @@ AdaptivePreconditioner::AdaptivePreconditioner()
     setPreconditionerSide("right");
 }
 
-void AdaptivePreconditioner::stateAdjustment(vector<double>& state) {
+void AdaptivePreconditioner::stateAdjustment(vector<CanteraDouble>& state) {
     // Only keep positive composition based on given tol
     for (size_t i = 0; i < state.size(); i++) {
         state[i] = std::max(state[i], m_atol);
@@ -56,7 +56,7 @@ void AdaptivePreconditioner::factorize()
 void AdaptivePreconditioner::prunePreconditioner()
 {
     for (int k=0; k<m_matrix.outerSize(); ++k) {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(m_matrix, k); it;
+        for (Eigen::SparseMatrix<CanteraDouble>::InnerIterator it(m_matrix, k); it;
             ++it) {
             if (std::abs(it.value()) < m_threshold && it.row() != it.col()) {
                 it.valueRef() = 0;
@@ -65,7 +65,7 @@ void AdaptivePreconditioner::prunePreconditioner()
     }
 }
 
-void AdaptivePreconditioner::solve(const size_t stateSize, double* rhs_vector, double*
+void AdaptivePreconditioner::solve(const size_t stateSize, CanteraDouble* rhs_vector, CanteraDouble*
     output)
 {
     // creating vectors in the form of Ax=b

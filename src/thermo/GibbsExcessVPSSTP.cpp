@@ -31,12 +31,12 @@ void GibbsExcessVPSSTP::compositionChanged()
 
 void GibbsExcessVPSSTP::calcDensity()
 {
-    const vector<double>& vbar = getStandardVolumes();
-    double vtotal = 0.0;
+    const vector<CanteraDouble>& vbar = getStandardVolumes();
+    CanteraDouble vtotal = 0.0;
     for (size_t i = 0; i < m_kk; i++) {
         vtotal += vbar[i] * moleFractions_[i];
     }
-    double dd = meanMolecularWeight() / vtotal;
+    CanteraDouble dd = meanMolecularWeight() / vtotal;
     Phase::assignDensity(dd);
 }
 
@@ -47,22 +47,22 @@ Units GibbsExcessVPSSTP::standardConcentrationUnits() const
     return Units(1.0); // dimensionless
 }
 
-void GibbsExcessVPSSTP::getActivityConcentrations(double* c) const
+void GibbsExcessVPSSTP::getActivityConcentrations(CanteraDouble* c) const
 {
     getActivities(c);
 }
 
-double GibbsExcessVPSSTP::standardConcentration(size_t k) const
+CanteraDouble GibbsExcessVPSSTP::standardConcentration(size_t k) const
 {
     return 1.0;
 }
 
-double GibbsExcessVPSSTP::logStandardConc(size_t k) const
+CanteraDouble GibbsExcessVPSSTP::logStandardConc(size_t k) const
 {
     return 0.0;
 }
 
-void GibbsExcessVPSSTP::getActivities(double* ac) const
+void GibbsExcessVPSSTP::getActivities(CanteraDouble* ac) const
 {
     getActivityCoefficients(ac);
     getMoleFractions(moleFractions_.data());
@@ -71,7 +71,7 @@ void GibbsExcessVPSSTP::getActivities(double* ac) const
     }
 }
 
-void GibbsExcessVPSSTP::getActivityCoefficients(double* const ac) const
+void GibbsExcessVPSSTP::getActivityCoefficients(CanteraDouble* const ac) const
 {
     getLnActivityCoefficients(ac);
     for (size_t k = 0; k < m_kk; k++) {
@@ -87,7 +87,7 @@ void GibbsExcessVPSSTP::getActivityCoefficients(double* const ac) const
 
 // ------------ Partial Molar Properties of the Solution ------------
 
-void GibbsExcessVPSSTP::getPartialMolarVolumes(double* vbar) const
+void GibbsExcessVPSSTP::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     // Get the standard state values in m^3 kmol-1
     getStandardVolumes(vbar);

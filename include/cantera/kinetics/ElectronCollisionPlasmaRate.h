@@ -34,8 +34,8 @@ struct ElectronCollisionPlasmaData : public ReactionData
         m_dist_number = -1;
     }
 
-    vector<double> energyLevels; //!< electron energy levels
-    vector<double> distribution; //!< electron energy distribution
+    vector<CanteraDouble> energyLevels; //!< electron energy levels
+    vector<CanteraDouble> distribution; //!< electron energy distribution
 
     //! integer that is incremented when electron energy levels change
     int levelNumber = -1;
@@ -136,19 +136,19 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const ElectronCollisionPlasmaData& shared_data);
+    CanteraDouble evalFromStruct(const ElectronCollisionPlasmaData& shared_data);
 
     //! Calculate the reverse rate coefficient for super-elastic collisions
     //! @param shared_data Data structure with energy levels and EEDF
     //! @param kf Forward rate coefficient (input, unused)
     //! @param kr Reverse rate coefficient (output, modified)
     void modifyRateConstants(const ElectronCollisionPlasmaData& shared_data,
-                             double& kf, double& kr);
+                             CanteraDouble& kf, CanteraDouble& kr);
 
     //! Evaluate derivative of reaction rate with respect to temperature
     //! divided by reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double ddTScaledFromStruct(const ElectronCollisionPlasmaData& shared_data) const {
+    CanteraDouble ddTScaledFromStruct(const ElectronCollisionPlasmaData& shared_data) const {
         throw NotImplementedError("ElectronCollisionPlasmaRate::ddTScaledFromStruct");
     }
 
@@ -189,27 +189,27 @@ public:
     //! value, rather than the first non-zero energy point in the data table.
     //!
     //! @since New in Cantera 3.2.
-    double threshold() const {
+    CanteraDouble threshold() const {
         return m_threshold;
     }
 
     //! The value of #m_energyLevels [eV]
-    const vector<double>& energyLevels() const {
+    const vector<CanteraDouble>& energyLevels() const {
         return m_energyLevels;
     }
 
     //! The value of #m_crossSections [m2]
-    const vector<double>& crossSections() const {
+    const vector<CanteraDouble>& crossSections() const {
         return m_crossSections;
     }
 
     //! The value of #m_crossSectionsInterpolated [m2]
-    const vector<double>& crossSectionInterpolated() const {
+    const vector<CanteraDouble>& crossSectionInterpolated() const {
         return m_crossSectionsInterpolated;
     }
 
     //! Update the value of #m_crossSectionsInterpolated [m2]
-    void updateInterpolatedCrossSection(const vector<double>&);
+    void updateInterpolatedCrossSection(const vector<CanteraDouble>&);
 
 private:
     //! The name of the kind of electron collision
@@ -222,10 +222,10 @@ private:
     string m_product;
 
     //! The energy threshold of electron collision
-    double m_threshold;
+    CanteraDouble m_threshold;
 
     //! electron energy levels [eV]
-    vector<double> m_energyLevels;
+    vector<CanteraDouble> m_energyLevels;
 
     //! Counter used to indicate when #m_energyLevels needs to be synced with the phase
     int m_levelNumber = -3;
@@ -235,10 +235,10 @@ private:
     int m_levelNumberSuperelastic = -2;
 
     //! collision cross sections [m2] at #m_energyLevels
-    vector<double> m_crossSections;
+    vector<CanteraDouble> m_crossSections;
 
     //! collision cross sections [m2] after interpolation
-    vector<double> m_crossSectionsInterpolated;
+    vector<CanteraDouble> m_crossSectionsInterpolated;
 
     //! collision cross section [m2] interpolated on #m_energyLevels offset by the
     //! threshold energy (the first energy level).

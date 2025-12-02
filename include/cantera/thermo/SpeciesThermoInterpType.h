@@ -114,7 +114,7 @@ class SpeciesThermoInterpType
 public:
     SpeciesThermoInterpType() = default;
 
-    SpeciesThermoInterpType(double tlow, double thigh, double pref);
+    SpeciesThermoInterpType(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref);
 
     // SpeciesThermoInterpType objects are not copyable or assignable
     SpeciesThermoInterpType(const SpeciesThermoInterpType& b) = delete;
@@ -124,33 +124,33 @@ public:
 
     //! Returns the minimum temperature that the thermo parameterization is
     //! valid
-    virtual double minTemp() const {
+    virtual CanteraDouble minTemp() const {
         return m_lowT;
     }
 
     //! Set the minimum temperature at which the thermo parameterization is valid
-    virtual void setMinTemp(double Tmin) {
+    virtual void setMinTemp(CanteraDouble Tmin) {
         m_lowT = Tmin;
     }
 
     //! Returns the maximum temperature that the thermo parameterization is
     //! valid
-    virtual double maxTemp() const {
+    virtual CanteraDouble maxTemp() const {
         return m_highT;
     }
 
     //! Set the maximum temperature at which the thermo parameterization is valid
-    virtual void setMaxTemp(double Tmax) {
+    virtual void setMaxTemp(CanteraDouble Tmax) {
         m_highT = Tmax;
     }
 
     //! Returns the reference pressure (Pa)
-    virtual double refPressure() const {
+    virtual CanteraDouble refPressure() const {
         return m_Pref;
     }
 
     //! Set the reference pressure [Pa]
-    virtual void setRefPressure(double Pref) {
+    virtual void setRefPressure(CanteraDouble Pref) {
         m_Pref = Pref;
     }
 
@@ -166,7 +166,7 @@ public:
 
     //! Given the temperature *T*, compute the terms of the temperature
     //! polynomial *T_poly*.
-    virtual void updateTemperaturePoly(double T, double* T_poly) const {
+    virtual void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const {
         T_poly[0] = T;
     }
 
@@ -185,8 +185,8 @@ public:
      * @param h_RT    Vector of Dimensionless enthalpies. (length m_kk).
      * @param s_R     Vector of Dimensionless entropies. (length m_kk).
      */
-    virtual void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                                  double* s_R) const;
+    virtual void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                                  CanteraDouble* s_R) const;
 
     //! Compute the reference-state property of one species
     /*!
@@ -199,10 +199,10 @@ public:
      * @param h_RT    Vector of Dimensionless enthalpies. (length m_kk).
      * @param s_R     Vector of Dimensionless entropies. (length m_kk).
      */
-    virtual void updatePropertiesTemp(const double temp,
-                                      double* cp_R,
-                                      double* h_RT,
-                                      double* s_R) const;
+    virtual void updatePropertiesTemp(const CanteraDouble temp,
+                                      CanteraDouble* cp_R,
+                                      CanteraDouble* h_RT,
+                                      CanteraDouble* s_R) const;
 
     //! This utility function returns the number of coefficients
     //! for a given type of species parameterization
@@ -221,9 +221,9 @@ public:
      * @param coeffs    Vector of coefficients used to set the
      *                  parameters for the standard state.
      */
-    virtual void reportParameters(size_t& index, int& type, double& minTemp,
-                                  double& maxTemp, double& refPressure,
-                                  double* const coeffs) const;
+    virtual void reportParameters(size_t& index, int& type, CanteraDouble& minTemp,
+                                  CanteraDouble& maxTemp, CanteraDouble& refPressure,
+                                  CanteraDouble* const coeffs) const;
 
     //! Return the parameters of the species thermo object such that an
     //! identical species thermo object could be reconstructed using the
@@ -247,7 +247,7 @@ public:
      * @return the current value of the Heat of Formation at 298K and 1 bar for
      *               species m_speciesIndex.
      */
-    virtual double reportHf298(double* const h298 = 0) const;
+    virtual CanteraDouble reportHf298(CanteraDouble* const h298 = 0) const;
 
     //! Modify the value of the 298 K Heat of Formation of one species in the
     //! phase (J kmol-1)
@@ -260,7 +260,7 @@ public:
      * @param  Hf298New    Specify the new value of the Heat of Formation at
      *                     298K and 1 bar
      */
-    virtual void modifyOneHf298(const size_t k, const double Hf298New);
+    virtual void modifyOneHf298(const size_t k, const CanteraDouble Hf298New);
 
     //! Restore the original heat of formation for this species
     /*!
@@ -281,11 +281,11 @@ protected:
     virtual void getParameters(AnyMap& thermo) const;
 
     //!  lowest valid temperature
-    double m_lowT = 0.0;
+    CanteraDouble m_lowT = 0.0;
     //! Highest valid temperature
-    double m_highT = 0.0;
+    CanteraDouble m_highT = 0.0;
     //! Reference state pressure
-    double m_Pref = 0.0;
+    CanteraDouble m_Pref = 0.0;
 
     AnyMap m_input;
 };

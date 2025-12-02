@@ -16,16 +16,16 @@
 namespace Cantera
 {
 Mu0Poly::Mu0Poly()
-    : SpeciesThermoInterpType(0.0, std::numeric_limits<double>::infinity(), 0.0)
+    : SpeciesThermoInterpType(0.0, std::numeric_limits<CanteraDouble>::infinity(), 0.0)
 {
 }
 
-Mu0Poly::Mu0Poly(double tlow, double thigh, double pref, const double* coeffs) :
+Mu0Poly::Mu0Poly(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs) :
     SpeciesThermoInterpType(tlow, thigh, pref),
     m_numIntervals(0),
     m_H298(0.0)
 {
-    map<double, double> T_mu;
+    map<CanteraDouble, CanteraDouble> T_mu;
     size_t nPoints = (size_t) coeffs[0];
     for (size_t i = 0; i < nPoints; i++) {
         T_mu[coeffs[2*i+2]] = coeffs[2*i+3];
@@ -33,7 +33,7 @@ Mu0Poly::Mu0Poly(double tlow, double thigh, double pref, const double* coeffs) :
     setParameters(coeffs[1], T_mu);
 }
 
-void Mu0Poly::setParameters(double h0, const map<double, double>& T_mu)
+void Mu0Poly::setParameters(CanteraDouble h0, const map<CanteraDouble, CanteraDouble>& T_mu)
 {
     size_t nPoints = T_mu.size();
     if (nPoints < 2) {
@@ -66,12 +66,12 @@ void Mu0Poly::setParameters(double h0, const map<double, double>& T_mu)
     m_h0_R_int[iT298] = m_H298;
     m_s0_R_int[iT298] = - (m_mu0_R_int[iT298] - m_h0_R_int[iT298]) / m_t0_int[iT298];
     for (size_t i = iT298; i < m_numIntervals; i++) {
-        double T1 = m_t0_int[i];
-        double s1 = m_s0_R_int[i];
-        double T2 = m_t0_int[i+1];
-        double deltaMu = m_mu0_R_int[i+1] - m_mu0_R_int[i];
-        double deltaT = T2 - T1;
-        double cpi = (deltaMu - T1 * s1 + T2 * s1) / (deltaT - T2 * log(T2/T1));
+        CanteraDouble T1 = m_t0_int[i];
+        CanteraDouble s1 = m_s0_R_int[i];
+        CanteraDouble T2 = m_t0_int[i+1];
+        CanteraDouble deltaMu = m_mu0_R_int[i+1] - m_mu0_R_int[i];
+        CanteraDouble deltaT = T2 - T1;
+        CanteraDouble cpi = (deltaMu - T1 * s1 + T2 * s1) / (deltaT - T2 * log(T2/T1));
         m_cp0_R_int[i] = cpi;
         m_h0_R_int[i+1] = m_h0_R_int[i] + cpi * deltaT;
         m_s0_R_int[i+1] = s1 + cpi * log(T2/T1);
@@ -83,12 +83,12 @@ void Mu0Poly::setParameters(double h0, const map<double, double>& T_mu)
         m_h0_R_int[iT298] = m_H298;
         m_s0_R_int[iT298] = - (m_mu0_R_int[iT298] - m_h0_R_int[iT298]) / m_t0_int[iT298];
         for (size_t i = iT298 - 1; i != npos; i--) {
-            double T1 = m_t0_int[i];
-            double T2 = m_t0_int[i+1];
-            double s2 = m_s0_R_int[i+1];
-            double deltaMu = m_mu0_R_int[i+1] - m_mu0_R_int[i];
-            double deltaT = T2 - T1;
-            double cpi = (deltaMu - T1 * s2 + T2 * s2) / (deltaT - T1 * log(T2/T1));
+            CanteraDouble T1 = m_t0_int[i];
+            CanteraDouble T2 = m_t0_int[i+1];
+            CanteraDouble s2 = m_s0_R_int[i+1];
+            CanteraDouble deltaMu = m_mu0_R_int[i+1] - m_mu0_R_int[i];
+            CanteraDouble deltaT = T2 - T1;
+            CanteraDouble cpi = (deltaMu - T1 * s2 + T2 * s2) / (deltaT - T1 * log(T2/T1));
             m_cp0_R_int[i] = cpi;
             m_h0_R_int[i] = m_h0_R_int[i+1] - cpi * deltaT;
             m_s0_R_int[i] = s2 - cpi * log(T2/T1);
@@ -99,29 +99,29 @@ void Mu0Poly::setParameters(double h0, const map<double, double>& T_mu)
     }
 }
 
-void Mu0Poly::updateProperties(const double* tt, double* cp_R,
-                               double* h_RT, double* s_R) const
+void Mu0Poly::updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R,
+                               CanteraDouble* h_RT, CanteraDouble* s_R) const
 {
     size_t j = m_numIntervals;
-    double T = *tt;
+    CanteraDouble T = *tt;
     for (size_t i = 0; i < m_numIntervals; i++) {
-        double T2 = m_t0_int[i+1];
+        CanteraDouble T2 = m_t0_int[i+1];
         if (T <=T2) {
             j = i;
             break;
         }
     }
-    double T1 = m_t0_int[j];
-    double cp_Rj = m_cp0_R_int[j];
+    CanteraDouble T1 = m_t0_int[j];
+    CanteraDouble cp_Rj = m_cp0_R_int[j];
     *cp_R = cp_Rj;
     *h_RT = (m_h0_R_int[j] + (T - T1) * cp_Rj)/T;
     *s_R = m_s0_R_int[j] + cp_Rj * (log(T/T1));
 }
 
-void Mu0Poly::updatePropertiesTemp(const double T,
-                                   double* cp_R,
-                                   double* h_RT,
-                                   double* s_R) const
+void Mu0Poly::updatePropertiesTemp(const CanteraDouble T,
+                                   CanteraDouble* cp_R,
+                                   CanteraDouble* h_RT,
+                                   CanteraDouble* s_R) const
 {
     updateProperties(&T, cp_R, h_RT, s_R);
 }
@@ -131,8 +131,8 @@ size_t Mu0Poly::nCoeffs() const
   return 2*m_numIntervals + 4;
 }
 
-void Mu0Poly::reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                               double& pref, double* const coeffs) const
+void Mu0Poly::reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                               CanteraDouble& pref, CanteraDouble* const coeffs) const
 {
     n = 0;
     type = MU0_INTERP;

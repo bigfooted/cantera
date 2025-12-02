@@ -10,7 +10,7 @@
 namespace Cantera
 {
 
-double linearInterp(double x, const vector<double>& xpts, const vector<double>& fpts)
+CanteraDouble linearInterp(CanteraDouble x, const vector<CanteraDouble>& xpts, const vector<CanteraDouble>& fpts)
 {
     AssertThrowMsg(!xpts.empty(), "linearInterp", "x data empty");
     AssertThrowMsg(!fpts.empty(), "linearInterp", "f(x) data empty");
@@ -24,13 +24,13 @@ double linearInterp(double x, const vector<double>& xpts, const vector<double>& 
     }
     auto loc = lower_bound(xpts.begin(), xpts.end(), x);
     int iloc = int(loc - xpts.begin()) - 1;
-    double ff = fpts[iloc] +
+    CanteraDouble ff = fpts[iloc] +
                 (x - xpts[iloc])*(fpts[iloc + 1]
                                   - fpts[iloc])/(xpts[iloc + 1] - xpts[iloc]);
     return ff;
 }
 
-double trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
 {
     // check length
     if (f.size() != x.size()) {
@@ -60,7 +60,7 @@ double trapezoidal(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
  * @param  f vector of function value
  * @param  x vector of function coordinate
  */
-double basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
 {
     if (f.size() < 2) {
         throw CanteraError("basicSimpson",
@@ -74,13 +74,13 @@ double basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
     size_t N = f.size() - 1;
     Eigen::VectorXd h = x.tail(N) - x.head(N);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t i = 1; i < N; i+=2) {
-        double h0 = h[i-1];
-        double h1 = h[i];
-        double hph = h1 + h0;
-        double hdh = h1 / h0;
-        double hmh = h1 * h0;
+        CanteraDouble h0 = h[i-1];
+        CanteraDouble h1 = h[i];
+        CanteraDouble hph = h1 + h0;
+        CanteraDouble hdh = h1 / h0;
+        CanteraDouble hmh = h1 * h0;
         sum += (hph / 6.0) * (
                     (2.0 - hdh) * f[i - 1] + (pow(hph, 2) / hmh) * f[i] +
                     (2.0 - 1.0 / hdh) * f[i + 1]);
@@ -88,7 +88,7 @@ double basicSimpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
     return sum;
 }
 
-double simpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
+CanteraDouble simpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
 {
     Eigen::ArrayXd h = x.tail(x.size() - 1) - x.head(x.size() - 1);
     if ((h <= 0.0).any()) {
@@ -106,14 +106,14 @@ double simpson(const Eigen::ArrayXd& f, const Eigen::ArrayXd& x)
     } else {
         size_t N = f.size() - 1;
         // pick first N-1 point for simpson
-        double headSimps = basicSimpson(f.head(N), x.head(N));
+        CanteraDouble headSimps = basicSimpson(f.head(N), x.head(N));
         // Use trapezoidal rules for the last interval
-        double tailTrap = 0.5 * h[N-1] * (f[N] + f[N-1]);
+        CanteraDouble tailTrap = 0.5 * h[N-1] * (f[N] + f[N-1]);
         return headSimps + tailTrap;
     }
 }
 
-double numericalQuadrature(const string& method,
+CanteraDouble numericalQuadrature(const string& method,
                            const Eigen::ArrayXd& f,
                            const Eigen::ArrayXd& x)
 {

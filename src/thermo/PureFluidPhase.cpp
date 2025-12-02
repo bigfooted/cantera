@@ -29,8 +29,8 @@ void PureFluidPhase::initThermo()
     m_mw = m_sub->MolWt();
     setMolecularWeight(0,m_mw);
 
-    double cp0_R, h0_RT, s0_R, p;
-    double T0 = 298.15;
+    CanteraDouble cp0_R, h0_RT, s0_R, p;
+    CanteraDouble T0 = 298.15;
     if (T0 < m_sub->Tcrit()) {
         m_sub->Set(tpx::PropertyPair::TX, T0, 1.0);
         p = 0.01*m_sub->P();
@@ -41,7 +41,7 @@ void PureFluidPhase::initThermo()
     m_sub->Set(tpx::PropertyPair::TP, T0, p);
 
     m_spthermo.update_single(0, T0, &cp0_R, &h0_RT, &s0_R);
-    double s_R = s0_R - log(p/refPressure());
+    CanteraDouble s_R = s0_R - log(p/refPressure());
     m_sub->setStdState(h0_RT*GasConstant*298.15/m_mw,
                        s_R*GasConstant/m_mw, T0, p);
     debuglog("PureFluidPhase::initThermo: initialized phase "
@@ -78,80 +78,80 @@ string PureFluidPhase::phaseOfMatter() const
     }
 }
 
-double PureFluidPhase::minTemp(size_t k) const
+CanteraDouble PureFluidPhase::minTemp(size_t k) const
 {
     return m_sub->Tmin();
 }
 
-double PureFluidPhase::maxTemp(size_t k) const
+CanteraDouble PureFluidPhase::maxTemp(size_t k) const
 {
     return m_sub->Tmax();
 }
 
-double PureFluidPhase::enthalpy_mole() const
+CanteraDouble PureFluidPhase::enthalpy_mole() const
 {
     return m_sub->h() * m_mw;
 }
 
-double PureFluidPhase::intEnergy_mole() const
+CanteraDouble PureFluidPhase::intEnergy_mole() const
 {
     return m_sub->u() * m_mw;
 }
 
-double PureFluidPhase::entropy_mole() const
+CanteraDouble PureFluidPhase::entropy_mole() const
 {
     return m_sub->s() * m_mw;
 }
 
-double PureFluidPhase::gibbs_mole() const
+CanteraDouble PureFluidPhase::gibbs_mole() const
 {
     return m_sub->g() * m_mw;
 }
 
-double PureFluidPhase::cp_mole() const
+CanteraDouble PureFluidPhase::cp_mole() const
 {
     return m_sub->cp() * m_mw;
 }
 
-double PureFluidPhase::cv_mole() const
+CanteraDouble PureFluidPhase::cv_mole() const
 {
     return m_sub->cv() * m_mw;
 }
 
-double PureFluidPhase::pressure() const
+CanteraDouble PureFluidPhase::pressure() const
 {
     return m_sub->P();
 }
 
-void PureFluidPhase::setPressure(double p)
+void PureFluidPhase::setPressure(CanteraDouble p)
 {
     Set(tpx::PropertyPair::TP, temperature(), p);
     ThermoPhase::setDensity(1.0/m_sub->v());
 }
 
-void PureFluidPhase::setTemperature(double T)
+void PureFluidPhase::setTemperature(CanteraDouble T)
 {
     ThermoPhase::setTemperature(T);
     Set(tpx::PropertyPair::TV, T, m_sub->v());
 }
 
-void PureFluidPhase::setDensity(double rho)
+void PureFluidPhase::setDensity(CanteraDouble rho)
 {
     ThermoPhase::setDensity(rho);
     Set(tpx::PropertyPair::TV, m_sub->Temp(), 1.0/rho);
 }
 
-void PureFluidPhase::Set(tpx::PropertyPair::type n, double x, double y) const
+void PureFluidPhase::Set(tpx::PropertyPair::type n, CanteraDouble x, CanteraDouble y) const
 {
     m_sub->Set(n, x, y);
 }
 
-double PureFluidPhase::isothermalCompressibility() const
+CanteraDouble PureFluidPhase::isothermalCompressibility() const
 {
     return m_sub->isothermalCompressibility();
 }
 
-double PureFluidPhase::thermalExpansionCoeff() const
+CanteraDouble PureFluidPhase::thermalExpansionCoeff() const
 {
     return m_sub->thermalExpansionCoeff();
 }
@@ -161,27 +161,27 @@ tpx::Substance& PureFluidPhase::TPX_Substance()
     return *m_sub;
 }
 
-void PureFluidPhase::getPartialMolarEnthalpies(double* hbar) const
+void PureFluidPhase::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     hbar[0] = enthalpy_mole();
 }
 
-void PureFluidPhase::getPartialMolarEntropies(double* sbar) const
+void PureFluidPhase::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     sbar[0] = entropy_mole();
 }
 
-void PureFluidPhase::getPartialMolarIntEnergies(double* ubar) const
+void PureFluidPhase::getPartialMolarIntEnergies(CanteraDouble* ubar) const
 {
     ubar[0] = intEnergy_mole();
 }
 
-void PureFluidPhase::getPartialMolarCp(double* cpbar) const
+void PureFluidPhase::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     cpbar[0] = cp_mole();
 }
 
-void PureFluidPhase::getPartialMolarVolumes(double* vbar) const
+void PureFluidPhase::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     vbar[0] = 1.0 / molarDensity();
 }
@@ -191,98 +191,98 @@ Units PureFluidPhase::standardConcentrationUnits() const
     return Units(1.0);
 }
 
-void PureFluidPhase::getActivityConcentrations(double* c) const
+void PureFluidPhase::getActivityConcentrations(CanteraDouble* c) const
 {
     c[0] = 1.0;
 }
 
-double PureFluidPhase::standardConcentration(size_t k) const
+CanteraDouble PureFluidPhase::standardConcentration(size_t k) const
 {
     return 1.0;
 }
 
-void PureFluidPhase::getActivities(double* a) const
+void PureFluidPhase::getActivities(CanteraDouble* a) const
 {
     a[0] = 1.0;
 }
 
-void PureFluidPhase::getStandardChemPotentials(double* mu) const
+void PureFluidPhase::getStandardChemPotentials(CanteraDouble* mu) const
 {
     mu[0] = gibbs_mole();
 }
 
-void PureFluidPhase::getEnthalpy_RT(double* hrt) const
+void PureFluidPhase::getEnthalpy_RT(CanteraDouble* hrt) const
 {
     hrt[0] = enthalpy_mole() / RT();
 }
 
-void PureFluidPhase::getEntropy_R(double* sr) const
+void PureFluidPhase::getEntropy_R(CanteraDouble* sr) const
 {
     sr[0] = entropy_mole() / GasConstant;
 }
 
-void PureFluidPhase::getGibbs_RT(double* grt) const
+void PureFluidPhase::getGibbs_RT(CanteraDouble* grt) const
 {
     grt[0] = gibbs_mole() / RT();
 }
 
-void PureFluidPhase::getEnthalpy_RT_ref(double* hrt) const
+void PureFluidPhase::getEnthalpy_RT_ref(CanteraDouble* hrt) const
 {
-    double rhoSave = density();
-    double t = temperature();
-    double plow = 1.0E-8;
+    CanteraDouble rhoSave = density();
+    CanteraDouble t = temperature();
+    CanteraDouble plow = 1.0E-8;
     Set(tpx::PropertyPair::TP, t, plow);
     getEnthalpy_RT(hrt);
     Set(tpx::PropertyPair::TV, t, 1 / rhoSave);
 
 }
 
-void PureFluidPhase::getGibbs_RT_ref(double* grt) const
+void PureFluidPhase::getGibbs_RT_ref(CanteraDouble* grt) const
 {
-    double rhoSave = density();
-    double t = temperature();
-    double pref = refPressure();
-    double plow = 1.0E-8;
+    CanteraDouble rhoSave = density();
+    CanteraDouble t = temperature();
+    CanteraDouble pref = refPressure();
+    CanteraDouble plow = 1.0E-8;
     Set(tpx::PropertyPair::TP, t, plow);
     getGibbs_RT(grt);
     grt[0] += log(pref/plow);
     Set(tpx::PropertyPair::TV, t, 1 / rhoSave);
 }
 
-void PureFluidPhase::getGibbs_ref(double* g) const
+void PureFluidPhase::getGibbs_ref(CanteraDouble* g) const
 {
     getGibbs_RT_ref(g);
     g[0] *= RT();
 }
 
-void PureFluidPhase::getEntropy_R_ref(double* er) const
+void PureFluidPhase::getEntropy_R_ref(CanteraDouble* er) const
 {
-    double rhoSave = density();
-    double t = temperature();
-    double pref = refPressure();
-    double plow = 1.0E-8;
+    CanteraDouble rhoSave = density();
+    CanteraDouble t = temperature();
+    CanteraDouble pref = refPressure();
+    CanteraDouble plow = 1.0E-8;
     Set(tpx::PropertyPair::TP, t, plow);
     getEntropy_R(er);
     er[0] -= log(pref/plow);
     Set(tpx::PropertyPair::TV, t, 1 / rhoSave);
 }
 
-double PureFluidPhase::critTemperature() const
+CanteraDouble PureFluidPhase::critTemperature() const
 {
     return m_sub->Tcrit();
 }
 
-double PureFluidPhase::critPressure() const
+CanteraDouble PureFluidPhase::critPressure() const
 {
     return m_sub->Pcrit();
 }
 
-double PureFluidPhase::critDensity() const
+CanteraDouble PureFluidPhase::critDensity() const
 {
     return 1.0/m_sub->Vcrit();
 }
 
-double PureFluidPhase::satTemperature(double p) const
+CanteraDouble PureFluidPhase::satTemperature(CanteraDouble p) const
 {
     return m_sub->Tsat(p);
 }
@@ -292,98 +292,98 @@ double PureFluidPhase::satTemperature(double p) const
  * to the newly computed temperature and density of the Substance.
  */
 
-void PureFluidPhase::setState_HP(double h, double p, double tol)
+void PureFluidPhase::setState_HP(CanteraDouble h, CanteraDouble p, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::HP, h, p);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_UV(double u, double v, double tol)
+void PureFluidPhase::setState_UV(CanteraDouble u, CanteraDouble v, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::UV, u, v);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_SV(double s, double v, double tol)
+void PureFluidPhase::setState_SV(CanteraDouble s, CanteraDouble v, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::SV, s, v);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_SP(double s, double p, double tol)
+void PureFluidPhase::setState_SP(CanteraDouble s, CanteraDouble p, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::SP, s, p);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_ST(double s, double t, double tol)
+void PureFluidPhase::setState_ST(CanteraDouble s, CanteraDouble t, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::ST, s, t);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_TV(double t, double v, double tol)
+void PureFluidPhase::setState_TV(CanteraDouble t, CanteraDouble v, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::TV, t, v);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_PV(double p, double v, double tol)
+void PureFluidPhase::setState_PV(CanteraDouble p, CanteraDouble v, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::PV, p, v);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_UP(double u, double p, double tol)
+void PureFluidPhase::setState_UP(CanteraDouble u, CanteraDouble p, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::UP, u, p);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_VH(double v, double h, double tol)
+void PureFluidPhase::setState_VH(CanteraDouble v, CanteraDouble h, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::VH, v, h);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_TH(double t, double h, double tol)
+void PureFluidPhase::setState_TH(CanteraDouble t, CanteraDouble h, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::TH, t, h);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_SH(double s, double h, double tol)
+void PureFluidPhase::setState_SH(CanteraDouble s, CanteraDouble h, CanteraDouble tol)
 {
     Set(tpx::PropertyPair::SH, s, h);
     setState_TD(m_sub->Temp(), 1.0/m_sub->v());
 }
 
-double PureFluidPhase::satPressure(double t)
+CanteraDouble PureFluidPhase::satPressure(CanteraDouble t)
 {
     Set(tpx::PropertyPair::TV, t, m_sub->v());
     return m_sub->Ps();
 }
 
-double PureFluidPhase::vaporFraction() const
+CanteraDouble PureFluidPhase::vaporFraction() const
 {
     return m_sub->x();
 }
 
-void PureFluidPhase::setState_Tsat(double t, double x)
+void PureFluidPhase::setState_Tsat(CanteraDouble t, CanteraDouble x)
 {
     Set(tpx::PropertyPair::TX, t, x);
     ThermoPhase::setTemperature(t);
     ThermoPhase::setDensity(1.0/m_sub->v());
 }
 
-void PureFluidPhase::setState_Psat(double p, double x)
+void PureFluidPhase::setState_Psat(CanteraDouble p, CanteraDouble x)
 {
     Set(tpx::PropertyPair::PX, p, x);
     ThermoPhase::setTemperature(m_sub->Temp());
     ThermoPhase::setDensity(1.0/m_sub->v());
 }
 
-string PureFluidPhase::report(bool show_thermo, double threshold) const
+string PureFluidPhase::report(bool show_thermo, CanteraDouble threshold) const
 {
     fmt::memory_buffer b;
     // This is the width of the first column of names in the report.

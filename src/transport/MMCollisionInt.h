@@ -67,47 +67,47 @@ public:
      *  @param tsmin       Minimum value of Tstar to carry out the fitting
      *  @param tsmax       Maximum value of Tstar to carry out the fitting
      */
-    void init(double tsmin, double tsmax);
+    void init(CanteraDouble tsmin, CanteraDouble tsmax);
 
-    double omega22(double ts, double deltastar);
-    double astar(double ts, double deltastar);
-    double bstar(double ts, double deltastar);
-    double cstar(double ts, double deltastar);
-    void fit(int degree, double deltastar, double* astar, double* bstar, double* cstar);
-    void fit_omega22(int degree, double deltastar, double* om22);
-    double omega11(double ts, double deltastar) {
+    CanteraDouble omega22(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble astar(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble bstar(CanteraDouble ts, CanteraDouble deltastar);
+    CanteraDouble cstar(CanteraDouble ts, CanteraDouble deltastar);
+    void fit(int degree, CanteraDouble deltastar, CanteraDouble* astar, CanteraDouble* bstar, CanteraDouble* cstar);
+    void fit_omega22(int degree, CanteraDouble deltastar, CanteraDouble* om22);
+    CanteraDouble omega11(CanteraDouble ts, CanteraDouble deltastar) {
         return omega22(ts, deltastar)/astar(ts, deltastar);
     }
 
 private:
-    double fitDelta(int table, int ntstar, int degree, double* c);
-    double quadInterp(double x0, double* x, double* y);
+    CanteraDouble fitDelta(int table, int ntstar, int degree, CanteraDouble* c);
+    CanteraDouble quadInterp(CanteraDouble x0, CanteraDouble* x, CanteraDouble* y);
 
-    vector<vector<double>> m_o22poly;
-    vector<vector<double>> m_apoly;
-    vector<vector<double>> m_bpoly;
-    vector<vector<double>> m_cpoly;
+    vector<vector<CanteraDouble>> m_o22poly;
+    vector<vector<CanteraDouble>> m_apoly;
+    vector<vector<CanteraDouble>> m_bpoly;
+    vector<vector<CanteraDouble>> m_cpoly;
 
-    static double delta[8];
-    static double tstar22[37];
+    static CanteraDouble delta[8];
+    static CanteraDouble tstar22[37];
 
     //! Table of omega22 values
-    static double omega22_table[37*8];
+    static CanteraDouble omega22_table[37*8];
 
     //! T* values (reduced temperature)
-    static double tstar[39];
+    static CanteraDouble tstar[39];
 
     //! astar table
-    static double astar_table[39*8];
+    static CanteraDouble astar_table[39*8];
 
     //! bstar table
-    static double bstar_table[39*8];
+    static CanteraDouble bstar_table[39*8];
 
     //! cstar table
-    static double cstar_table[39*8];
+    static CanteraDouble cstar_table[39*8];
 
     //! Log temp
-    vector<double> m_logTemp;
+    vector<CanteraDouble> m_logTemp;
 
     //! Index of the tstar array that encompasses the minimum temperature
     //! fitting range value of tsmin.

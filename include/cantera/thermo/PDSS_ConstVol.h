@@ -29,17 +29,17 @@ public:
     //! @{
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
-    double intEnergy_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    void setPressure(double pres) override;
-    void setTemperature(double temp) override;
-    void setState_TP(double temp, double pres) override;
-    double satPressure(double t) override;
+    void setPressure(CanteraDouble pres) override;
+    void setTemperature(CanteraDouble temp) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
+    CanteraDouble satPressure(CanteraDouble t) override;
 
     //! @}
     //! @name Initialization of the Object
@@ -50,7 +50,7 @@ public:
 
     //! Set the (constant) molar volume [m3/kmol] of the species. Must be called before
     //! initThermo().
-    void setMolarVolume(double v) {
+    void setMolarVolume(CanteraDouble v) {
         m_constMolarVolume = v;
     }
 
@@ -61,7 +61,7 @@ private:
     /*!
      *    m3 / kmol
      */
-    double m_constMolarVolume;
+    CanteraDouble m_constMolarVolume;
 };
 
 }

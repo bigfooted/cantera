@@ -109,11 +109,11 @@ public:
     //! @param  levels The vector of electron energy levels (eV).
     //!                Length: #m_nPoints.
     //! @param  length The length of the @c levels.
-    void setElectronEnergyLevels(const double* levels, size_t length);
+    void setElectronEnergyLevels(const CanteraDouble* levels, size_t length);
 
     //! Get electron energy levels.
     //! @param  levels The vector of electron energy levels (eV). Length: #m_nPoints
-    void getElectronEnergyLevels(double* levels) const {
+    void getElectronEnergyLevels(CanteraDouble* levels) const {
         Eigen::Map<Eigen::ArrayXd>(levels, m_nPoints) = m_electronEnergyLevels;
     }
 
@@ -123,14 +123,14 @@ public:
     //! @param  distrb The vector of electron energy distribution.
     //!                Length: #m_nPoints.
     //! @param  length The length of the vectors, which equals #m_nPoints.
-    void setDiscretizedElectronEnergyDist(const double* levels,
-                                          const double* distrb,
+    void setDiscretizedElectronEnergyDist(const CanteraDouble* levels,
+                                          const CanteraDouble* distrb,
                                           size_t length);
 
     //! Get electron energy distribution.
     //! @param  distrb The vector of electron energy distribution.
     //!                Length: #m_nPoints.
-    void getElectronEnergyDistribution(double* distrb) const {
+    void getElectronEnergyDistribution(CanteraDouble* distrb) const {
         Eigen::Map<Eigen::ArrayXd>(distrb, m_nPoints) = m_electronEnergyDist;
     }
 
@@ -138,20 +138,20 @@ public:
     //! Note that @f$ x = 1 @f$ and @f$ x = 2 @f$ correspond to the
     //! Maxwellian and Druyvesteyn distribution, respectively.
     //! @param  x The shape factor
-    void setIsotropicShapeFactor(double x);
+    void setIsotropicShapeFactor(CanteraDouble x);
 
     //! The shape factor of isotropic electron energy distribution
-    double isotropicShapeFactor() const {
+    CanteraDouble isotropicShapeFactor() const {
         return m_isotropicShapeFactor;
     }
 
     //! Set the internally stored electron temperature of the phase (K).
     //! @param  Te Electron temperature in Kelvin
-    void setElectronTemperature(double Te) override;
+    void setElectronTemperature(CanteraDouble Te) override;
 
     //! Set mean electron energy [eV]. This method also sets electron temperature
     //! accordingly.
-    void setMeanElectronEnergy(double energy);
+    void setMeanElectronEnergy(CanteraDouble energy);
 
     //! Get electron energy distribution type
     string electronEnergyDistributionType() const {
@@ -173,7 +173,7 @@ public:
     }
 
     //! Mean electron energy [eV]
-    double meanElectronEnergy() const {
+    CanteraDouble meanElectronEnergy() const {
         return 3.0 / 2.0 * electronTemperature() * Boltzmann / ElectronCharge;
     }
 
@@ -193,7 +193,7 @@ public:
 
     //! Electron Temperature (K)
     //!     @return The electron temperature of the phase
-    double electronTemperature() const override {
+    CanteraDouble electronTemperature() const override {
         return m_electronTemp;
     }
 
@@ -201,7 +201,7 @@ public:
     /*!
      *  The units are Joules kmol-1
      */
-    double RTe() const {
+    CanteraDouble RTe() const {
         return electronTemperature() * GasConstant;
     }
 
@@ -209,7 +209,7 @@ public:
      * Electron pressure. Units: Pa.
      * @f[P = n_{k_e} R T_e @f]
      */
-    virtual double electronPressure() const {
+    virtual CanteraDouble electronPressure() const {
         return GasConstant * concentration(m_electronSpeciesIndex) *
                electronTemperature();
     }
@@ -254,41 +254,41 @@ public:
      *
      * @see MultiSpeciesThermo
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
-    double cp_mole() const override {
+    CanteraDouble cp_mole() const override {
         throw NotImplementedError("PlasmaPhase::cp_mole");
     }
 
-    double entropy_mole() const override {
+    CanteraDouble entropy_mole() const override {
         throw NotImplementedError("PlasmaPhase::entropy_mole");
     }
 
-    double gibbs_mole() const override {
+    CanteraDouble gibbs_mole() const override {
         throw NotImplementedError("PlasmaPhase::gibbs_mole");
     }
 
-    double intEnergy_mole() const override {
+    CanteraDouble intEnergy_mole() const override {
         throw NotImplementedError("PlasmaPhase::intEnergy_mole");
     }
 
-    void getEntropy_R(double* sr) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
 
-    void getGibbs_RT(double* grt) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
 
-    void getGibbs_ref(double* g) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
 
-    void getStandardVolumes_ref(double* vol) const override;
+    void getStandardVolumes_ref(CanteraDouble* vol) const override;
 
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
-    void getStandardChemPotentials(double* muStar) const override;
+    void getStandardChemPotentials(CanteraDouble* muStar) const override;
 
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
-    void getPartialMolarIntEnergies(double* ubar) const override;
+    void getPartialMolarIntEnergies(CanteraDouble* ubar) const override;
 
     void getParameters(AnyMap& phaseNode) const override;
 
@@ -333,34 +333,34 @@ public:
 
     //! Get the frequency of the applied electric field [Hz]
     //! @since New in %Cantera 3.2.
-    double electricFieldFrequency() const {
+    CanteraDouble electricFieldFrequency() const {
         return m_electricFieldFrequency;
     }
 
     //! Get the applied electric field strength [V/m]
-    double electricField() const {
+    CanteraDouble electricField() const {
         return m_electricField;
     }
 
     //! Set the absolute electric field strength [V/m]
-    void setElectricField(double E) {
+    void setElectricField(CanteraDouble E) {
         m_electricField = E;
     }
 
     //! Calculate the degree of ionization
-    //double ionDegree() const {
-    //    double ne = concentration(m_electronSpeciesIndex); // [kmol/m³]
-    //    double n_total = molarDensity();                   // [kmol/m³]
+    //CanteraDouble ionDegree() const {
+    //    CanteraDouble ne = concentration(m_electronSpeciesIndex); // [kmol/m³]
+    //    CanteraDouble n_total = molarDensity();                   // [kmol/m³]
     //    return ne / n_total;
     //}
 
     //! Get the reduced electric field strength [V·m²]
-    double reducedElectricField() const {
+    CanteraDouble reducedElectricField() const {
         return m_electricField / (molarDensity() * Avogadro);
     }
 
     //! Set reduced electric field given in [V·m²]
-    void setReducedElectricField(double EN) {
+    void setReducedElectricField(CanteraDouble EN) {
         m_electricField = EN * molarDensity() * Avogadro; // [V/m]
     }
 
@@ -375,7 +375,7 @@ public:
      * target species and electrons, respectively. @f$ K_k @f$ is the elastic
      * electron energy loss coefficient (eV-m³/s).
      */
-    double elasticPowerLoss();
+    CanteraDouble elasticPowerLoss();
 
 protected:
     void updateThermo() const override;
@@ -427,7 +427,7 @@ protected:
     void updateElectronEnergyDistDifference();
 
     // Electron energy order in the exponential term
-    double m_isotropicShapeFactor = 1.0;
+    CanteraDouble m_isotropicShapeFactor = 1.0;
 
     //! Number of points of electron energy levels
     size_t m_nPoints = 1001;
@@ -443,7 +443,7 @@ protected:
     size_t m_electronSpeciesIndex = npos;
 
     //! Electron temperature [K]
-    double m_electronTemp;
+    CanteraDouble m_electronTemp;
 
     //! Electron energy distribution type
     string m_distributionType = "isotropic";
@@ -461,21 +461,21 @@ protected:
     vector<size_t> m_kElastic;
 
     //! electric field [V/m]
-    double m_electricField = 0.0;
+    CanteraDouble m_electricField = 0.0;
 
     //! electric field freq [Hz]
-    double m_electricFieldFrequency = 0.0;
+    CanteraDouble m_electricFieldFrequency = 0.0;
 
     //! Cross section data. m_crossSections[i][j], where i is the specific process,
     //! j is the index of vector. Unit: [m^2]
-    vector<vector<double>> m_crossSections;
+    vector<vector<CanteraDouble>> m_crossSections;
 
     //! Electron energy levels corresponding to the cross section data. m_energyLevels[i][j],
     //! where i is the specific process, j is the index of vector. Unit: [eV]
-    vector<vector<double>> m_energyLevels;
+    vector<vector<CanteraDouble>> m_energyLevels;
 
     //! ionization degree for the electron-electron collisions (tmp is the previous one)
-    //double m_ionDegree = 0.0;
+    //CanteraDouble m_ionDegree = 0.0;
 
     //! Electron energy distribution Difference dF/dε (V^-5/2)
     Eigen::ArrayXd m_electronEnergyDistDiff;
@@ -491,7 +491,7 @@ protected:
      * electron energy, @f$ \sigma_k @f$ [m2] is the reaction collision cross section,
      * @f$ F_0 @f$ [V^(-3/2)] is the normalized electron energy distribution function.
      */
-    vector<double> m_elasticElectronEnergyLossCoefficients;
+    vector<CanteraDouble> m_elasticElectronEnergyLossCoefficients;
 
     //! Updates the elastic electron energy loss coefficient for collision index i
     /*! Calculates the elastic energy loss coefficient using the current electron

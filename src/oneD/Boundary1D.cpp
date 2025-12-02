@@ -99,13 +99,13 @@ Inlet1D::Inlet1D(shared_ptr<Solution> phase, const string& id)
 }
 
 //! set spreading rate
-void Inlet1D::setSpreadRate(double V0)
+void Inlet1D::setSpreadRate(CanteraDouble V0)
 {
     m_V0 = V0;
     needJacUpdate();
 }
 
-void Inlet1D::setTemperature(double T)
+void Inlet1D::setTemperature(CanteraDouble T)
 {
     Boundary1D::setTemperature(T);
     // Adjust flow domain temperature bounds based on inlet temperature
@@ -114,7 +114,7 @@ void Inlet1D::setTemperature(double T)
     }
 }
 
-void Inlet1D::show(const double* x)
+void Inlet1D::show(const CanteraDouble* x)
 {
     writelog("    Mass Flux:   {:10.4g} kg/m^2/s \n", m_mdot);
     writelog("    Temperature: {:10.4g} K \n", m_temp);
@@ -142,7 +142,7 @@ void Inlet1D::setMoleFractions(const string& xin)
     }
 }
 
-void Inlet1D::setMoleFractions(const double* xin)
+void Inlet1D::setMoleFractions(const CanteraDouble* xin)
 {
     if (m_solution) {
         auto thermo = m_solution->thermo();
@@ -197,8 +197,8 @@ void Inlet1D::init()
     }
 }
 
-void Inlet1D::eval(size_t jg, double* xg, double* rg,
-                   integer* diagg, double rdt)
+void Inlet1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg,
+                   integer* diagg, CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2 < firstPoint() || jg > lastPoint() + 2)) {
         return;
@@ -206,8 +206,8 @@ void Inlet1D::eval(size_t jg, double* xg, double* rg,
 
     if (m_ilr == LeftInlet) {
         // Array elements corresponding to the first point of the flow domain
-        double* xb = xg + m_flow->loc();
-        double* rb = rg + m_flow->loc();
+        CanteraDouble* xb = xg + m_flow->loc();
+        CanteraDouble* rb = rg + m_flow->loc();
 
         // The first flow residual is for u. This, however, is not modified by
         // the inlet, since this is set within the flow domain from the
@@ -257,8 +257,8 @@ void Inlet1D::eval(size_t jg, double* xg, double* rg,
     } else {
         // right inlet (should only be used for counter-flow flames)
         // Array elements corresponding to the last point in the flow domain
-        double* rb = rg + loc() - m_flow->nComponents();
-        double* xb = xg + loc() - m_flow->nComponents();
+        CanteraDouble* rb = rg + loc() - m_flow->nComponents();
+        CanteraDouble* xb = xg + loc() - m_flow->nComponents();
         size_t last_index = m_flow->nPoints() - 1;
 
         rb[c_offset_V] -= m_V0;
@@ -292,10 +292,10 @@ shared_ptr<SolutionArray> Inlet1D::toArray(bool normalize)
     auto arr = SolutionArray::create(m_solution, 1, meta);
 
     // set gas state (using pressure from adjacent domain)
-    double pressure = m_flow->phase().pressure();
+    CanteraDouble pressure = m_flow->phase().pressure();
     auto thermo = m_solution->thermo();
     thermo->setState_TPY(m_temp, pressure, m_yin.data());
-    vector<double> data(thermo->stateSize());
+    vector<CanteraDouble> data(thermo->stateSize());
     thermo->saveState(data);
 
     arr->setState(0, data);
@@ -317,7 +317,7 @@ void Inlet1D::fromArray(const shared_ptr<SolutionArray>& arr)
     } else {
         // convert data format used by Python h5py export (Cantera < 3.0)
         auto aux = arr->getAuxiliary(0);
-        m_mdot = thermo->density() * aux.at("velocity").as<double>();
+        m_mdot = thermo->density() * aux.at("velocity").as<CanteraDouble>();
     }
     thermo->getMassFractions(m_yin.data());
 }
@@ -329,8 +329,8 @@ void Empty1D::init()
     _init(0);
 }
 
-void Empty1D::eval(size_t jg, double* xg, double* rg,
-     integer* diagg, double rdt)
+void Empty1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg,
+     integer* diagg, CanteraDouble rdt)
 {
 }
 
@@ -347,22 +347,22 @@ void Symm1D::init()
     _init(0);
 }
 
-void Symm1D::eval(size_t jg, double* xg, double* rg, integer* diagg,
-                  double rdt)
+void Symm1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg,
+                  CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2< firstPoint() || jg > lastPoint() + 2)) {
         return;
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* r = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* r = rg + loc();
     integer* diag = diagg + loc();
 
     if (m_flow_right) {
         size_t nc = m_flow_right->nComponents();
-        double* xb = x;
-        double* rb = r;
+        CanteraDouble* xb = x;
+        CanteraDouble* rb = r;
         int* db = diag;
         db[c_offset_V] = 0;
         db[c_offset_T] = 0;
@@ -374,8 +374,8 @@ void Symm1D::eval(size_t jg, double* xg, double* rg, integer* diagg,
 
     if (m_flow_left) {
         size_t nc = m_flow_left->nComponents();
-        double* xb = x - nc;
-        double* rb = r - nc;
+        CanteraDouble* xb = x - nc;
+        CanteraDouble* rb = r - nc;
         int* db = diag - nc;
         db[c_offset_V] = 0;
         db[c_offset_T] = 0;
@@ -421,22 +421,22 @@ void Outlet1D::init()
     }
 }
 
-void Outlet1D::eval(size_t jg, double* xg, double* rg, integer* diagg,
-                    double rdt)
+void Outlet1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg, integer* diagg,
+                    CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2 < firstPoint() || jg > lastPoint() + 2)) {
         return;
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* r = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* r = rg + loc();
     integer* diag = diagg + loc();
 
     // flow is left-to-right
     size_t nc = m_flow_left->nComponents();
-    double* xb = x - nc;
-    double* rb = r - nc;
+    CanteraDouble* xb = x - nc;
+    CanteraDouble* rb = r - nc;
     int* db = diag - nc;
 
     size_t last = m_flow_left->nPoints() - 1;
@@ -472,7 +472,7 @@ void OutletRes1D::setMoleFractions(const string& xres)
     }
 }
 
-void OutletRes1D::setMoleFractions(const double* xres)
+void OutletRes1D::setMoleFractions(const CanteraDouble* xres)
 {
     if (m_flow) {
         m_flow->phase().setMoleFractions(xres);
@@ -504,21 +504,21 @@ void OutletRes1D::init()
     }
 }
 
-void OutletRes1D::eval(size_t jg, double* xg, double* rg,
-                       integer* diagg, double rdt)
+void OutletRes1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg,
+                       integer* diagg, CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2 < firstPoint() || jg > lastPoint() + 2)) {
         return;
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* r = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* r = rg + loc();
     integer* diag = diagg + loc();
 
     size_t nc = m_flow_left->nComponents();
-    double* xb = x - nc;
-    double* rb = r - nc;
+    CanteraDouble* xb = x - nc;
+    CanteraDouble* rb = r - nc;
     int* db = diag - nc;
 
     size_t last = m_flow_left->nPoints() - 1;
@@ -543,10 +543,10 @@ shared_ptr<SolutionArray> OutletRes1D::toArray(bool normalize)
     auto arr = SolutionArray::create(m_solution, 1, meta);
 
     // set gas state (using pressure from adjacent domain)
-    double pressure = m_flow->phase().pressure();
+    CanteraDouble pressure = m_flow->phase().pressure();
     auto thermo = m_solution->thermo();
     thermo->setState_TPY(m_temp, pressure, &m_yres[0]);
-    vector<double> data(thermo->stateSize());
+    vector<CanteraDouble> data(thermo->stateSize());
     thermo->saveState(data);
 
     arr->setState(0, data);
@@ -573,27 +573,27 @@ void Surf1D::init()
     _init(0);
 }
 
-void Surf1D::eval(size_t jg, double* xg, double* rg,
-                  integer* diagg, double rdt)
+void Surf1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg,
+                  integer* diagg, CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2 < firstPoint() || jg > lastPoint() + 2)) {
         return;
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* r = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* r = rg + loc();
 
     if (m_flow_right) {
-        double* rb = r;
-        double* xb = x;
+        CanteraDouble* rb = r;
+        CanteraDouble* xb = x;
         rb[c_offset_T] = xb[c_offset_T] - m_temp; // specified T
     }
 
     if (m_flow_left) {
         size_t nc = m_flow_left->nComponents();
-        double* rb = r - nc;
-        double* xb = x - nc;
+        CanteraDouble* rb = r - nc;
+        CanteraDouble* xb = x - nc;
         rb[c_offset_T] = xb[c_offset_T] - m_temp; // specified T
     }
 }
@@ -613,7 +613,7 @@ void Surf1D::fromArray(const shared_ptr<SolutionArray>& arr)
     Boundary1D::setMeta(meta);
 }
 
-void Surf1D::show(const double* x)
+void Surf1D::show(const CanteraDouble* x)
 {
     writelog("    Temperature: {:10.4g} K \n\n", m_temp);
 }
@@ -675,26 +675,26 @@ void ReactingSurf1D::init()
     }
 }
 
-void ReactingSurf1D::resetBadValues(double* xg) {
-    double* x = xg + loc();
+void ReactingSurf1D::resetBadValues(CanteraDouble* xg) {
+    CanteraDouble* x = xg + loc();
     m_sphase->setCoverages(x);
     m_sphase->getCoverages(x);
 }
 
-void ReactingSurf1D::eval(size_t jg, double* xg, double* rg,
-                          integer* diagg, double rdt)
+void ReactingSurf1D::eval(size_t jg, CanteraDouble* xg, CanteraDouble* rg,
+                          integer* diagg, CanteraDouble rdt)
 {
     if (jg != npos && (jg + 2 < firstPoint() || jg > lastPoint() + 2)) {
         return;
     }
 
     // start of local part of global arrays
-    double* x = xg + loc();
-    double* r = rg + loc();
+    CanteraDouble* x = xg + loc();
+    CanteraDouble* r = rg + loc();
     integer* diag = diagg + loc();
 
     // set the coverages
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t k = 0; k < m_nsp; k++) {
         m_work[k] = x[k];
         sum += x[k];
@@ -719,7 +719,7 @@ void ReactingSurf1D::eval(size_t jg, double* xg, double* rg,
     }
 
     m_kin->getNetProductionRates(m_work.data());
-    double rs0 = 1.0/m_sphase->siteDensity();
+    CanteraDouble rs0 = 1.0/m_sphase->siteDensity();
 
     if (m_enabled) {
         for (size_t k = 0; k < m_nsp; k++) {
@@ -737,15 +737,15 @@ void ReactingSurf1D::eval(size_t jg, double* xg, double* rg,
     }
 
     if (m_flow_right) {
-        double* rb = r + m_nsp;
-        double* xb = x + m_nsp;
+        CanteraDouble* rb = r + m_nsp;
+        CanteraDouble* xb = x + m_nsp;
         rb[c_offset_T] = xb[c_offset_T] - m_temp; // specified T
     }
     if (m_flow_left) {
         size_t nc = m_flow_left->nComponents();
-        const vector<double>& mwleft = m_phase_left->molecularWeights();
-        double* rb = r - nc;
-        double* xb = x - nc;
+        const vector<CanteraDouble>& mwleft = m_phase_left->molecularWeights();
+        CanteraDouble* rb = r - nc;
+        CanteraDouble* xb = x - nc;
         rb[c_offset_T] = xb[c_offset_T] - m_temp; // specified T
         size_t nSkip = m_flow_left->rightExcessSpecies();
         size_t l_offset = 0;
@@ -764,14 +764,14 @@ void ReactingSurf1D::eval(size_t jg, double* xg, double* rg,
     }
 }
 
-double ReactingSurf1D::value(const string& component) const
+CanteraDouble ReactingSurf1D::value(const string& component) const
 {
     if (!m_state) {
         throw CanteraError("ReactingSurf1D::value",
             "Domain needs to be installed in a container.");
     }
     auto i = componentIndex(component);
-    const double* soln = m_state->data() + m_iloc;
+    const CanteraDouble* soln = m_state->data() + m_iloc;
     return soln[index(i, 0)];
 }
 
@@ -781,7 +781,7 @@ shared_ptr<SolutionArray> ReactingSurf1D::toArray(bool normalize)
         throw CanteraError("ReactingSurf1D::toArray",
             "Domain needs to be installed in a container before calling toArray.");
     }
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
     AnyMap meta = Boundary1D::getMeta();
     meta["temperature"] = m_temp;
     meta["phase"]["name"] = m_sphase->name();
@@ -791,7 +791,7 @@ shared_ptr<SolutionArray> ReactingSurf1D::toArray(bool normalize)
     // set state of surface phase
     m_sphase->setState_TP(m_temp, m_sphase->pressure());
     m_sphase->setCoverages(soln);
-    vector<double> data(m_sphase->stateSize());
+    vector<CanteraDouble> data(m_sphase->stateSize());
     m_sphase->saveState(data.size(), &data[0]);
 
     auto arr = SolutionArray::create(m_solution, 1, meta);
@@ -810,7 +810,7 @@ void ReactingSurf1D::fromArray(const shared_ptr<SolutionArray>& arr)
     }
     resize(nComponents(), arr->size());
     m_container->resize();
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
 
     Boundary1D::setMeta(arr->meta());
     arr->setLoc(0);
@@ -824,7 +824,7 @@ void ReactingSurf1D::fromArray(const shared_ptr<SolutionArray>& arr)
     _finalize(soln);
 }
 
-void ReactingSurf1D::show(const double* x)
+void ReactingSurf1D::show(const CanteraDouble* x)
 {
     writelog("    Temperature: {:10.4g} K \n", m_temp);
     writelog("    Coverages: \n");

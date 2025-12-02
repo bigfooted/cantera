@@ -18,10 +18,10 @@ public:
     EigenSparseDirectJacobian() = default;
     const string type() const override { return "eigen-sparse-direct"; }
     void factorize() override;
-    void solve(const size_t stateSize, double* rhs_vector, double* output) override;
+    void solve(const size_t stateSize, CanteraDouble* rhs_vector, CanteraDouble* output) override;
 
 protected:
-    Eigen::SparseLU<Eigen::SparseMatrix<double>> m_solver;
+    Eigen::SparseLU<Eigen::SparseMatrix<CanteraDouble>> m_solver;
 };
 
 }

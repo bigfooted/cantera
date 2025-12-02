@@ -17,14 +17,14 @@
 namespace Cantera
 {
 
-void FlowReactor::getStateDae(double* y, double* ydot)
+void FlowReactor::getStateDae(CanteraDouble* y, CanteraDouble* ydot)
 {
     if (m_thermo == nullptr) {
         throw CanteraError("FlowReactor::getStateDae", "Error: reactor is empty.");
     }
     m_thermo->restoreState(m_state);
     m_thermo->getMassFractions(y+m_offset_Y);
-    const vector<double>& mw = m_thermo->molecularWeights();
+    const vector<CanteraDouble>& mw = m_thermo->molecularWeights();
 
     // set the first component to the initial density
     y[0] = m_rho;
@@ -55,7 +55,7 @@ void FlowReactor::getStateDae(double* y, double* ydot)
         kin->advanceCoverages(100.0, m_ss_rtol, m_ss_atol, 0, m_max_ss_steps,
                               m_max_ss_error_fails);
         auto& surf = dynamic_cast<SurfPhase&>(kin->thermo(0));
-        vector<double> cov(surf.nSpecies());
+        vector<CanteraDouble> cov(surf.nSpecies());
         surf.getCoverages(cov.data());
         m_surf->setCoverages(cov.data());
     }
@@ -97,7 +97,7 @@ void FlowReactor::getStateDae(double* y, double* ydot)
     a(2, 2) = 1; // 1 * P'
 
     // initialize the fourth row from conservation of energy (Kee 16.58), adiabatic
-    double cp_mass = m_thermo->cp_mass();
+    CanteraDouble cp_mass = m_thermo->cp_mass();
     a(3, 3) = m_rho * m_u * cp_mass; // rho * u * cp * T'
 
     // initialize the next rows from the mass-fraction equations (Kee 16.51)
@@ -108,8 +108,8 @@ void FlowReactor::getStateDae(double* y, double* ydot)
     // now set the RHS vector
 
     // get (perim / Ac) * sum(sk' * wk), used multiple places
-    double h_sk_wk = 0;
-    double hydraulic = surfaceAreaToVolumeRatio();
+    CanteraDouble h_sk_wk = 0;
+    CanteraDouble hydraulic = surfaceAreaToVolumeRatio();
     for (size_t i = 0; i < m_nsp; ++i) {
         h_sk_wk += hydraulic * m_sdot[i] * mw[i];
     }
@@ -152,7 +152,7 @@ void FlowReactor::getStateDae(double* y, double* ydot)
     solve(a, ydot, 1, 0);
 }
 
-void FlowReactor::initialize(double t0)
+void FlowReactor::initialize(CanteraDouble t0)
 {
     Reactor::initialize(t0);
     m_thermo->restoreState(m_state);
@@ -190,14 +190,14 @@ void FlowReactor::syncState()
     m_T = m_thermo->temperature();
 }
 
-void FlowReactor::updateState(double* y)
+void FlowReactor::updateState(CanteraDouble* y)
 {
     // Set the mass fractions and density of the mixture.
     m_rho = y[0];
     m_u = y[1];
     m_P = y[2];
     m_T = y[3];
-    double* mss = y + m_offset_Y;
+    CanteraDouble* mss = y + m_offset_Y;
     m_thermo->setMassFractions_NoNorm(mss);
     m_thermo->setState_TP(m_T, m_P);
 
@@ -207,19 +207,19 @@ void FlowReactor::updateState(double* y)
     m_thermo->saveState(m_state);
 }
 
-void FlowReactor::setMassFlowRate(double mdot)
+void FlowReactor::setMassFlowRate(CanteraDouble mdot)
 {
     m_rho = m_thermo->density();
     m_u = mdot/(m_rho * m_area);
 }
 
-void FlowReactor::setArea(double area) {
-    double mdot = m_rho * m_u * m_area;
+void FlowReactor::setArea(CanteraDouble area) {
+    CanteraDouble mdot = m_rho * m_u * m_area;
     m_area = area;
     setMassFlowRate(mdot);
 }
 
-double FlowReactor::surfaceAreaToVolumeRatio() const {
+CanteraDouble FlowReactor::surfaceAreaToVolumeRatio() const {
     if (m_sa_to_vol > 0) {
         return m_sa_to_vol;
     }
@@ -230,7 +230,7 @@ double FlowReactor::surfaceAreaToVolumeRatio() const {
     return 2.0 / sqrt(m_area / Pi);
 }
 
-void FlowReactor::updateSurfaceState(double* y)
+void FlowReactor::updateSurfaceState(CanteraDouble* y)
 {
     size_t loc = 0;
     for (auto& S : m_surfaces) {
@@ -243,13 +243,13 @@ void FlowReactor::updateSurfaceState(double* y)
     }
 }
 
-void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual)
+void FlowReactor::evalDae(CanteraDouble time, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* residual)
 {
     m_thermo->restoreState(m_state);
 
     evalSurfaces(ydot + m_nsp + 4, m_sdot.data());
-    const vector<double>& mw = m_thermo->molecularWeights();
-    double sk_wk = 0;
+    const vector<CanteraDouble>& mw = m_thermo->molecularWeights();
+    CanteraDouble sk_wk = 0;
     for (size_t i = 0; i < m_nsp; ++i) {
         sk_wk = m_sdot[i] * mw[i];
     }
@@ -260,17 +260,17 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
     }
 
     // set dphi/dz variables
-    double drhodz = ydot[0];
-    double dudz = ydot[1];
-    double dPdz = ydot[2];
-    double dTdz = ydot[3];
+    CanteraDouble drhodz = ydot[0];
+    CanteraDouble dudz = ydot[1];
+    CanteraDouble dPdz = ydot[2];
+    CanteraDouble dTdz = ydot[3];
 
     // use equation of state for density residual
     residual[0] = m_rho - m_thermo->density();
 
     //! use mass continuity for velocity residual
     //! Kee.'s Chemically Reacting Flow, Eq. 16.48
-    double hydraulic = surfaceAreaToVolumeRatio();
+    CanteraDouble hydraulic = surfaceAreaToVolumeRatio();
     residual[1] = m_u * drhodz + m_rho * dudz - sk_wk * hydraulic;
 
     //! Use conservation of momentum for pressure residual
@@ -286,7 +286,7 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
     //       hence:
     //              h_mass * Wk = h_mol
     if (m_energy) {
-        double cp_mass = m_thermo->cp_mass();
+        CanteraDouble cp_mass = m_thermo->cp_mass();
         residual[3] = m_rho * m_u * cp_mass * dTdz;
         for (size_t i = 0; i < m_nsp; ++i) {
             residual[3] += m_hk[i] * (m_wdot[i] + hydraulic * m_sdot[i]);
@@ -297,7 +297,7 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
 
     //! species conservation equations
     //! Kee.'s Chemically Reacting Flow, Eq. 16.51
-    double dSumYdz = 0;
+    CanteraDouble dSumYdz = 0;
     for (size_t i = 0; i < m_nsp; ++i) {
         residual[i + m_offset_Y] = m_rho * m_u * ydot[i + m_offset_Y] +
             y[i + m_offset_Y] * hydraulic * sk_wk -
@@ -306,7 +306,7 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
     }
     // Spread d/dz(sum(Y)) = 0 constraint across all species equations. `scale` is
     // defined to make the size of the error in sum(Y) comparable to the overall rtol.
-    double scale = 0.1 * m_rho * m_u / m_ss_rtol;
+    CanteraDouble scale = 0.1 * m_rho * m_u / m_ss_rtol;
     for (size_t i = 0; i < m_nsp; ++i) {
         residual[i + m_offset_Y] += scale * std::max(0.0, y[i + m_offset_Y]) * dSumYdz;
     }
@@ -318,7 +318,7 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
             Kinetics* kin = m_surf->kinetics();
             size_t nk = m_surf->thermo()->nSpecies();
             kin->getNetProductionRates(m_sdot_temp.data());
-            double sum = y[loc];
+            CanteraDouble sum = y[loc];
             for (size_t i = 1; i < nk; ++i) {
                 //! net surface production rate residuals
                 //! Kee.'s Chemically Reacting Flow, Eq. 16.63
@@ -338,7 +338,7 @@ void FlowReactor::evalDae(double time, double* y, double* ydot, double* residual
     }
 }
 
-void FlowReactor::getConstraints(double* constraints) {
+void FlowReactor::getConstraints(CanteraDouble* constraints) {
     // mark all variables differential equations unless otherwise specified
     std::fill(constraints, constraints + m_nv, 1.0);
     // the species coverages are algebraic constraints

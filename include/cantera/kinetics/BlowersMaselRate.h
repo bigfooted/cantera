@@ -20,7 +20,7 @@ struct BlowersMaselData : public ReactionData
 {
     BlowersMaselData() = default;
 
-    void update(double T) override;
+    void update(CanteraDouble T) override;
     bool update(const ThermoPhase& phase, const Kinetics& kin) override;
     using ReactionData::update;
 
@@ -30,8 +30,8 @@ struct BlowersMaselData : public ReactionData
     }
 
     bool ready = false; //!< boolean indicating whether vectors are accessible
-    double density = NAN; //!< used to determine if updates are needed
-    vector<double> partialMolarEnthalpies; //!< partial molar enthalpies
+    CanteraDouble density = NAN; //!< used to determine if updates are needed
+    vector<CanteraDouble> partialMolarEnthalpies; //!< partial molar enthalpies
 
 protected:
     int m_state_mf_number = -1; //!< integer that is incremented when composition changes
@@ -81,7 +81,7 @@ public:
      *  @param w  Average bond dissociation energy of the bond being formed and
      *      broken in the reaction, in energy units [J/kmol]
      */
-    BlowersMaselRate(double A, double b, double Ea0, double w);
+    BlowersMaselRate(CanteraDouble A, CanteraDouble b, CanteraDouble Ea0, CanteraDouble w);
 
     explicit BlowersMaselRate(const AnyMap& node,
                               const UnitStack& rate_units={});
@@ -97,8 +97,8 @@ public:
     void setContext(const Reaction& rxn, const Kinetics& kin) override;
 
     //! Evaluate reaction rate
-    double evalRate(double logT, double recipT) const {
-        double Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
+    CanteraDouble evalRate(CanteraDouble logT, CanteraDouble recipT) const {
+        CanteraDouble Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
         return m_A * std::exp(m_b * logT - Ea_R * recipT);
     }
 
@@ -117,8 +117,8 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const BlowersMaselData& shared_data) const {
-        double Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
+    CanteraDouble evalFromStruct(const BlowersMaselData& shared_data) const {
+        CanteraDouble Ea_R = effectiveActivationEnergy_R(m_deltaH_R);
         return m_A * std::exp(m_b * shared_data.logT - Ea_R * shared_data.recipT);
     }
 
@@ -129,12 +129,12 @@ public:
      *  enthalpy. A corresponding warning is raised.
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double ddTScaledFromStruct(const BlowersMaselData& shared_data) const;
+    CanteraDouble ddTScaledFromStruct(const BlowersMaselData& shared_data) const;
 
 protected:
     //! Return the effective activation energy (a function of the delta H of reaction)
     //! divided by the gas constant (that is, the activation temperature) [K]
-    double effectiveActivationEnergy_R(double deltaH_R) const {
+    CanteraDouble effectiveActivationEnergy_R(CanteraDouble deltaH_R) const {
         if (deltaH_R <= -4 * m_Ea_R) {
             return 0.;
         }
@@ -142,24 +142,24 @@ protected:
             return deltaH_R;
         }
         // m_E4_R is the bond dissociation energy "w" (in temperature units)
-        double vp = 2 * m_E4_R * ((m_E4_R + m_Ea_R) / (m_E4_R - m_Ea_R)); // in Kelvin
-        double vp_2w_dH = (vp - 2 * m_E4_R + deltaH_R); // (Vp - 2 w + dH)
+        CanteraDouble vp = 2 * m_E4_R * ((m_E4_R + m_Ea_R) / (m_E4_R - m_Ea_R)); // in Kelvin
+        CanteraDouble vp_2w_dH = (vp - 2 * m_E4_R + deltaH_R); // (Vp - 2 w + dH)
         return (m_E4_R + deltaH_R / 2) * (vp_2w_dH * vp_2w_dH) /
             (vp * vp - 4 * m_E4_R * m_E4_R + deltaH_R * deltaH_R); // in Kelvin
     }
 
 public:
-    double activationEnergy() const override {
+    CanteraDouble activationEnergy() const override {
         return effectiveActivationEnergy_R(m_deltaH_R) * GasConstant;
     }
 
     //! Return the bond dissociation energy *w* [J/kmol]
-    double bondEnergy() const {
+    CanteraDouble bondEnergy() const {
         return m_E4_R * GasConstant;
     }
 
     //! Return current enthalpy change of reaction [J/kmol]
-    double deltaH() const {
+    CanteraDouble deltaH() const {
         return m_deltaH_R * GasConstant;
     }
 
@@ -171,15 +171,15 @@ public:
      *  @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    void setDeltaH(double deltaH) {
+    void setDeltaH(CanteraDouble deltaH) {
         m_deltaH_R = deltaH / GasConstant;
     }
 
 protected:
     //! Pairs of species indices and multipliers to calculate enthalpy change
-    vector<pair<size_t, double>> m_stoich_coeffs;
+    vector<pair<size_t, CanteraDouble>> m_stoich_coeffs;
 
-    double m_deltaH_R = 0.0; //!< enthalpy change of reaction (in temperature units)
+    CanteraDouble m_deltaH_R = 0.0; //!< enthalpy change of reaction (in temperature units)
 };
 
 }

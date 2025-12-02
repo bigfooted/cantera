@@ -42,11 +42,11 @@ public:
      *
      * @param dt  Vector of thermal diffusion coefficients.
      */
-    void getThermalDiffCoeffs(double* const dt) override;
+    void getThermalDiffCoeffs(CanteraDouble* const dt) override;
 
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
-    void getMultiDiffCoeffs(const size_t ld, double* const d) override;
+    void getMultiDiffCoeffs(const size_t ld, CanteraDouble* const d) override;
 
     //! Get the species diffusive mass fluxes [kg/m²/s] with respect to the mass
     //! averaged velocity, given the gradients in mole fraction and temperature
@@ -64,9 +64,9 @@ public:
      *     @f$ j_{kn} = \tt{ fluxes[n*ldf+k]} @f$ is the flux of species *k*
      *     in dimension *n*. Length is `ldf` * `ndim`.
      */
-    void getSpeciesFluxes(size_t ndim, const double* const grad_T,
-                          size_t ldx, const double* const grad_X,
-                          size_t ldf, double* const fluxes) override;
+    void getSpeciesFluxes(size_t ndim, const CanteraDouble* const grad_T,
+                          size_t ldx, const CanteraDouble* const grad_X,
+                          size_t ldf, CanteraDouble* const fluxes) override;
 
     //! Get the molar diffusional fluxes [kmol/m²/s] of the species, given the
     //! thermodynamic state at two nearby points.
@@ -82,8 +82,8 @@ public:
      * @param fluxes Array containing the diffusive molar fluxes of species from
      *     `state1` to `state2`; Length is number of species.
      */
-    void getMolarFluxes(const double* const state1, const double* const state2,
-                        const double delta, double* const fluxes) override;
+    void getMolarFluxes(const CanteraDouble* const state1, const CanteraDouble* const state2,
+                        const CanteraDouble delta, CanteraDouble* const fluxes) override;
 
     //! Get the mass diffusional fluxes [kg/m²/s] of the species, given the
     //! thermodynamic state at two nearby points.
@@ -99,8 +99,8 @@ public:
      * @param fluxes Array containing the diffusive mass fluxes of species from
      *     `state1` to `state2`; length is number of species.
      */
-    void getMassFluxes(const double* state1, const double* state2, double delta,
-                       double* fluxes) override;
+    void getMassFluxes(const CanteraDouble* state1, const CanteraDouble* state2, CanteraDouble delta,
+                       CanteraDouble* fluxes) override;
 
     void init(shared_ptr<ThermoPhase> thermo, int mode=0) override;
 
@@ -119,7 +119,7 @@ protected:
     //! conductivity and thermal diffusion coefficients.
     void updateThermal_T();
 
-    double m_thermal_tlast;
+    CanteraDouble m_thermal_tlast;
 
     //! Dense matrix for astar
     DenseMatrix m_astar;
@@ -130,26 +130,26 @@ protected:
     //! Dense matrix for cstar
     DenseMatrix m_cstar;
 
-    vector<double> m_cinternal;
+    vector<CanteraDouble> m_cinternal;
 
-    vector<double> m_sqrt_eps_k;
+    vector<CanteraDouble> m_sqrt_eps_k;
     DenseMatrix m_log_eps_k;
-    vector<double> m_frot_298;
-    vector<double> m_rotrelax;
+    vector<CanteraDouble> m_frot_298;
+    vector<CanteraDouble> m_rotrelax;
 
-    double m_lambda;
+    CanteraDouble m_lambda;
 
     // L matrix quantities
     DenseMatrix m_Lmatrix;
     DenseMatrix m_aa;
-    vector<double> m_a;
-    vector<double> m_b;
+    vector<CanteraDouble> m_a;
+    vector<CanteraDouble> m_b;
 
     // work space
-    vector<double> m_spwork1, m_spwork2, m_spwork3;
+    vector<CanteraDouble> m_spwork1, m_spwork2, m_spwork3;
 
     //! Mole fraction vector from last L-matrix evaluation
-    vector<double> m_molefracs_last;
+    vector<CanteraDouble> m_molefracs_last;
 
     //! Boolean indicating viscosity is up to date
     bool m_l0000_ok;
@@ -160,26 +160,26 @@ protected:
      *  Evaluate the upper-left block of the L matrix.
      *  @param x vector of species mole fractions
      */
-    void eval_L0000(const double* const x);
+    void eval_L0000(const CanteraDouble* const x);
 
     //! Evaluate the L0010 matrices
     /*!
      *  @param x vector of species mole fractions
      */
-    void eval_L0010(const double* const x);
+    void eval_L0010(const CanteraDouble* const x);
 
     //! Evaluate the L1000 matrices
     void eval_L1000();
 
     void eval_L0100();
     void eval_L0001();
-    void eval_L1010(const double* x);
-    void eval_L1001(const double* x);
+    void eval_L1010(const CanteraDouble* x);
+    void eval_L1001(const CanteraDouble* x);
     void eval_L0110();
-    void eval_L0101(const double* x);
+    void eval_L0101(const CanteraDouble* x);
     bool hasInternalModes(size_t j);
 
-    double pressure_ig();
+    CanteraDouble pressure_ig();
 
     virtual void solveLMatrixEquation();
     bool m_debug;

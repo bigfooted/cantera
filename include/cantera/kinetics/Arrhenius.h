@@ -53,7 +53,7 @@ public:
      *  @param b  Temperature exponent (non-dimensional)
      *  @param Ea  Activation energy in energy units [J/kmol]
      */
-    ArrheniusBase(double A, double b, double Ea);
+    ArrheniusBase(CanteraDouble A, CanteraDouble b, CanteraDouble Ea);
 
     //! Constructor based on AnyValue content
     ArrheniusBase(const AnyValue& rate, const UnitSystem& units,
@@ -94,7 +94,7 @@ public:
      * Class specializations may provide alternate definitions that describe
      * an effective pre-exponential factor that depends on the thermodynamic state.
      */
-    virtual double preExponentialFactor() const {
+    virtual CanteraDouble preExponentialFactor() const {
         return m_A;
     }
 
@@ -103,7 +103,7 @@ public:
      * Class specializations may provide alternate definitions that describe
      * an effective temperature exponent that depends on the thermodynamic state.
      */
-    virtual double temperatureExponent() const {
+    virtual CanteraDouble temperatureExponent() const {
         return m_b;
     }
 
@@ -113,12 +113,12 @@ public:
      * Class specializations may provide alternate definitions that describe
      * an effective activation energy that depends on the thermodynamic state.
      */
-    virtual double activationEnergy() const {
+    virtual CanteraDouble activationEnergy() const {
         return m_Ea_R * GasConstant;
     }
 
     //! Return reaction order associated with the reaction rate
-    double order() const {
+    CanteraDouble order() const {
         return m_order;
     }
 
@@ -144,12 +144,12 @@ public:
 
 protected:
     bool m_negativeA_ok = false; //!< Permissible negative A values
-    double m_A = NAN; //!< Pre-exponential factor
-    double m_b = NAN; //!< Temperature exponent
-    double m_Ea_R = 0.; //!< Activation energy (in temperature units)
-    double m_E4_R = 0.; //!< Optional 4th energy parameter (in temperature units)
-    double m_logA = NAN; //!< Logarithm of pre-exponential factor
-    double m_order = NAN; //!< Reaction order
+    CanteraDouble m_A = NAN; //!< Pre-exponential factor
+    CanteraDouble m_b = NAN; //!< Temperature exponent
+    CanteraDouble m_Ea_R = 0.; //!< Activation energy (in temperature units)
+    CanteraDouble m_E4_R = 0.; //!< Optional 4th energy parameter (in temperature units)
+    CanteraDouble m_logA = NAN; //!< Logarithm of pre-exponential factor
+    CanteraDouble m_order = NAN; //!< Reaction order
     string m_A_str = "A"; //!< The string for the pre-exponential factor
     string m_b_str = "b"; //!< The string for temperature exponent
     string m_Ea_str = "Ea"; //!< The string for activation energy
@@ -180,12 +180,12 @@ public:
     }
 
     //! Evaluate reaction rate
-    double evalRate(double logT, double recipT) const {
+    CanteraDouble evalRate(CanteraDouble logT, CanteraDouble recipT) const {
         return m_A * std::exp(m_b * logT - m_Ea_R * recipT);
     }
 
     //! Evaluate natural logarithm of the rate constant.
-    double evalLog(double logT, double recipT) const {
+    CanteraDouble evalLog(CanteraDouble logT, CanteraDouble recipT) const {
         return m_logA + m_b * logT - m_Ea_R * recipT;
     }
 
@@ -193,7 +193,7 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const ArrheniusData& shared_data) const {
+    CanteraDouble evalFromStruct(const ArrheniusData& shared_data) const {
         return m_A * std::exp(m_b * shared_data.logT - m_Ea_R * shared_data.recipT);
     }
 
@@ -202,7 +202,7 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double ddTScaledFromStruct(const ArrheniusData& shared_data) const {
+    CanteraDouble ddTScaledFromStruct(const ArrheniusData& shared_data) const {
         return (m_Ea_R * shared_data.recipT + m_b) * shared_data.recipT;
     }
 };

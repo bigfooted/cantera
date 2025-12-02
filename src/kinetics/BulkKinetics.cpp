@@ -24,7 +24,7 @@ bool BulkKinetics::addReaction(shared_ptr<Reaction> r, bool resize)
         // undeclared species, etc.
         return false;
     }
-    double dn = 0.0;
+    CanteraDouble dn = 0.0;
     for (const auto& [name, stoich] : r->products) {
         dn += stoich;
     }
@@ -64,7 +64,7 @@ bool BulkKinetics::addReaction(shared_ptr<Reaction> r, bool resize)
 
 void BulkKinetics::addThirdBody(shared_ptr<Reaction> r)
 {
-    map<size_t, double> efficiencies;
+    map<size_t, CanteraDouble> efficiencies;
     for (const auto& [name, efficiency] : r->thirdBody()->efficiencies) {
         size_t k = kineticsSpeciesIndex(name, false);
         if (k != npos) {
@@ -136,7 +136,7 @@ void BulkKinetics::resizeReactions()
     }
 }
 
-void BulkKinetics::setMultiplier(size_t i, double f)
+void BulkKinetics::setMultiplier(size_t i, CanteraDouble f)
 {
     Kinetics::setMultiplier(i, f);
     m_ROP_ok = false;
@@ -148,7 +148,7 @@ void BulkKinetics::invalidateCache()
     m_ROP_ok = false;
 }
 
-void BulkKinetics::getFwdRateConstants(double* kfwd)
+void BulkKinetics::getFwdRateConstants(CanteraDouble* kfwd)
 {
     updateROP();
     copy(m_rfn.begin(), m_rfn.end(), kfwd);
@@ -157,24 +157,24 @@ void BulkKinetics::getFwdRateConstants(double* kfwd)
     }
 }
 
-void BulkKinetics::getEquilibriumConstants(double* kc)
+void BulkKinetics::getEquilibriumConstants(CanteraDouble* kc)
 {
     updateROP();
 
-    vector<double>& delta_gibbs0 = m_rbuf0;
+    vector<CanteraDouble>& delta_gibbs0 = m_rbuf0;
     fill(delta_gibbs0.begin(), delta_gibbs0.end(), 0.0);
 
     // compute Delta G^0 for all reactions
     getReactionDelta(m_grt.data(), delta_gibbs0.data());
 
-    double rrt = 1.0 / thermo().RT();
-    double logStandConc = log(thermo().standardConcentration());
+    CanteraDouble rrt = 1.0 / thermo().RT();
+    CanteraDouble logStandConc = log(thermo().standardConcentration());
     for (size_t i = 0; i < nReactions(); i++) {
         kc[i] = exp(-delta_gibbs0[i] * rrt + m_dn[i] * logStandConc);
     }
 }
 
-void BulkKinetics::getRevRateConstants(double* krev, bool doIrreversible)
+void BulkKinetics::getRevRateConstants(CanteraDouble* krev, bool doIrreversible)
 {
     // go get the forward rate constants. -> note, we don't really care about
     // speed or redundancy in these informational routines.
@@ -193,7 +193,7 @@ void BulkKinetics::getRevRateConstants(double* krev, bool doIrreversible)
     }
 }
 
-void BulkKinetics::getDeltaGibbs(double* deltaG)
+void BulkKinetics::getDeltaGibbs(CanteraDouble* deltaG)
 {
     // Get the chemical potentials for each species
     thermo().getChemPotentials(m_sbuf0.data());
@@ -201,7 +201,7 @@ void BulkKinetics::getDeltaGibbs(double* deltaG)
     getReactionDelta(m_sbuf0.data(), deltaG);
 }
 
-void BulkKinetics::getDeltaEnthalpy(double* deltaH)
+void BulkKinetics::getDeltaEnthalpy(CanteraDouble* deltaH)
 {
     // Get the partial molar enthalpy for each species
     thermo().getPartialMolarEnthalpies(m_sbuf0.data());
@@ -209,7 +209,7 @@ void BulkKinetics::getDeltaEnthalpy(double* deltaH)
     getReactionDelta(m_sbuf0.data(), deltaH);
 }
 
-void BulkKinetics::getDeltaEntropy(double* deltaS)
+void BulkKinetics::getDeltaEntropy(CanteraDouble* deltaS)
 {
     // Get the partial molar entropy for each species
     thermo().getPartialMolarEntropies(m_sbuf0.data());
@@ -217,7 +217,7 @@ void BulkKinetics::getDeltaEntropy(double* deltaS)
     getReactionDelta(m_sbuf0.data(), deltaS);
 }
 
-void BulkKinetics::getDeltaSSGibbs(double* deltaG)
+void BulkKinetics::getDeltaSSGibbs(CanteraDouble* deltaG)
 {
     // Get the standard state chemical potentials of the species. This is the
     // array of chemical potentials at unit activity. We define these here as
@@ -228,7 +228,7 @@ void BulkKinetics::getDeltaSSGibbs(double* deltaG)
     getReactionDelta(m_sbuf0.data(), deltaG);
 }
 
-void BulkKinetics::getDeltaSSEnthalpy(double* deltaH)
+void BulkKinetics::getDeltaSSEnthalpy(CanteraDouble* deltaH)
 {
     // Get the standard state enthalpies of the species.
     thermo().getEnthalpy_RT(m_sbuf0.data());
@@ -239,7 +239,7 @@ void BulkKinetics::getDeltaSSEnthalpy(double* deltaH)
     getReactionDelta(m_sbuf0.data(), deltaH);
 }
 
-void BulkKinetics::getDeltaSSEntropy(double* deltaS)
+void BulkKinetics::getDeltaSSEntropy(CanteraDouble* deltaS)
 {
     // Get the standard state entropy of the species. We define these here as
     // the entropies of the pure species at the temperature and pressure of the
@@ -273,21 +273,21 @@ void BulkKinetics::setDerivativeSettings(const AnyMap& settings)
     }
 }
 
-void BulkKinetics::getFwdRateConstants_ddT(double* dkfwd)
+void BulkKinetics::getFwdRateConstants_ddT(CanteraDouble* dkfwd)
 {
     assertDerivativesValid("BulkKinetics::getFwdRateConstants_ddT");
     updateROP();
     process_ddT(m_rfn, dkfwd);
 }
 
-void BulkKinetics::getFwdRatesOfProgress_ddT(double* drop)
+void BulkKinetics::getFwdRatesOfProgress_ddT(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getFwdRatesOfProgress_ddT");
     updateROP();
     process_ddT(m_ropf, drop);
 }
 
-void BulkKinetics::getRevRatesOfProgress_ddT(double* drop)
+void BulkKinetics::getRevRatesOfProgress_ddT(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getRevRatesOfProgress_ddT");
     updateROP();
@@ -301,7 +301,7 @@ void BulkKinetics::getRevRatesOfProgress_ddT(double* drop)
     dRevRop += dRevRop2;
 }
 
-void BulkKinetics::getNetRatesOfProgress_ddT(double* drop)
+void BulkKinetics::getNetRatesOfProgress_ddT(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getNetRatesOfProgress_ddT");
     updateROP();
@@ -315,56 +315,56 @@ void BulkKinetics::getNetRatesOfProgress_ddT(double* drop)
     dNetRop -= dNetRop2;
 }
 
-void BulkKinetics::getFwdRateConstants_ddP(double* dkfwd)
+void BulkKinetics::getFwdRateConstants_ddP(CanteraDouble* dkfwd)
 {
     assertDerivativesValid("BulkKinetics::getFwdRateConstants_ddP");
     updateROP();
     process_ddP(m_rfn, dkfwd);
 }
 
-void BulkKinetics::getFwdRatesOfProgress_ddP(double* drop)
+void BulkKinetics::getFwdRatesOfProgress_ddP(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getFwdRatesOfProgress_ddP");
     updateROP();
     process_ddP(m_ropf, drop);
 }
 
-void BulkKinetics::getRevRatesOfProgress_ddP(double* drop)
+void BulkKinetics::getRevRatesOfProgress_ddP(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getRevRatesOfProgress_ddP");
     updateROP();
     process_ddP(m_ropr, drop);
 }
 
-void BulkKinetics::getNetRatesOfProgress_ddP(double* drop)
+void BulkKinetics::getNetRatesOfProgress_ddP(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getNetRatesOfProgress_ddP");
     updateROP();
     process_ddP(m_ropnet, drop);
 }
 
-void BulkKinetics::getFwdRateConstants_ddC(double* dkfwd)
+void BulkKinetics::getFwdRateConstants_ddC(CanteraDouble* dkfwd)
 {
     assertDerivativesValid("BulkKinetics::getFwdRateConstants_ddC");
     updateROP();
     process_ddC(m_reactantStoich, m_rfn, dkfwd, false);
 }
 
-void BulkKinetics::getFwdRatesOfProgress_ddC(double* drop)
+void BulkKinetics::getFwdRatesOfProgress_ddC(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getFwdRatesOfProgress_ddC");
     updateROP();
     process_ddC(m_reactantStoich, m_ropf, drop);
 }
 
-void BulkKinetics::getRevRatesOfProgress_ddC(double* drop)
+void BulkKinetics::getRevRatesOfProgress_ddC(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getRevRatesOfProgress_ddC");
     updateROP();
     return process_ddC(m_revProductStoich, m_ropr, drop);
 }
 
-void BulkKinetics::getNetRatesOfProgress_ddC(double* drop)
+void BulkKinetics::getNetRatesOfProgress_ddC(CanteraDouble* drop)
 {
     assertDerivativesValid("BulkKinetics::getNetRatesOfProgress_ddC");
     updateROP();
@@ -376,33 +376,33 @@ void BulkKinetics::getNetRatesOfProgress_ddC(double* drop)
     dNetRop -= dNetRop2;
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::fwdRatesOfProgress_ddX()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::fwdRatesOfProgress_ddX()
 {
     assertDerivativesValid("BulkKinetics::fwdRatesOfProgress_ddX");
 
     // forward reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     return calculateCompositionDerivatives(m_reactantStoich, rop_rates);
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::revRatesOfProgress_ddX()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::revRatesOfProgress_ddX()
 {
     assertDerivativesValid("BulkKinetics::revRatesOfProgress_ddX");
 
     // reverse reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     applyEquilibriumConstants(rop_rates.data());
     return calculateCompositionDerivatives(m_revProductStoich, rop_rates);
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::netRatesOfProgress_ddX()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::netRatesOfProgress_ddX()
 {
     assertDerivativesValid("BulkKinetics::netRatesOfProgress_ddX");
 
     // forward reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     auto jac = calculateCompositionDerivatives(m_reactantStoich, rop_rates);
 
@@ -411,33 +411,33 @@ Eigen::SparseMatrix<double> BulkKinetics::netRatesOfProgress_ddX()
     return jac - calculateCompositionDerivatives(m_revProductStoich, rop_rates);
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::fwdRatesOfProgress_ddCi()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::fwdRatesOfProgress_ddCi()
 {
     assertDerivativesValid("BulkKinetics::fwdRatesOfProgress_ddCi");
 
     // forward reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     return calculateCompositionDerivatives(m_reactantStoich, rop_rates, false);
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::revRatesOfProgress_ddCi()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::revRatesOfProgress_ddCi()
 {
     assertDerivativesValid("BulkKinetics::revRatesOfProgress_ddCi");
 
     // reverse reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     applyEquilibriumConstants(rop_rates.data());
     return calculateCompositionDerivatives(m_revProductStoich, rop_rates, false);
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::netRatesOfProgress_ddCi()
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::netRatesOfProgress_ddCi()
 {
     assertDerivativesValid("BulkKinetics::netRatesOfProgress_ddCi");
 
     // forward reaction rate coefficients
-    vector<double>& rop_rates = m_rbuf0;
+    vector<CanteraDouble>& rop_rates = m_rbuf0;
     getFwdRateConstants(rop_rates.data());
     auto jac = calculateCompositionDerivatives(m_reactantStoich, rop_rates, false);
 
@@ -450,20 +450,20 @@ void BulkKinetics::updateROP()
 {
     static const int cacheId = m_cache.getId();
     CachedScalar last = m_cache.getScalar(cacheId);
-    double T = thermo().temperature();
-    double rho = thermo().density();
+    CanteraDouble T = thermo().temperature();
+    CanteraDouble rho = thermo().density();
     int statenum = thermo().stateMFNumber();
 
     if (last.state1 != T || last.state2 != rho) {
         // Update properties that are independent of the composition
         thermo().getStandardChemPotentials(m_grt.data());
         fill(m_delta_gibbs0.begin(), m_delta_gibbs0.end(), 0.0);
-        double logStandConc = log(thermo().standardConcentration());
+        CanteraDouble logStandConc = log(thermo().standardConcentration());
 
         // compute Delta G^0 for all reversible reactions
         getRevReactionDelta(m_grt.data(), m_delta_gibbs0.data());
 
-        double rrt = 1.0 / thermo().RT();
+        CanteraDouble rrt = 1.0 / thermo().RT();
         for (size_t i = 0; i < m_revindex.size(); i++) {
             size_t irxn = m_revindex[i];
             m_rkcn[irxn] = std::min(
@@ -479,7 +479,7 @@ void BulkKinetics::updateROP()
         // Update terms dependent on species concentrations and temperature
         thermo().getActivityConcentrations(m_act_conc.data());
         thermo().getConcentrations(m_phys_conc.data());
-        double ctot = thermo().molarDensity();
+        CanteraDouble ctot = thermo().molarDensity();
 
         // Third-body objects interacting with MultiRate evaluator
         m_multi_concm.update(m_phys_conc, ctot, m_concm.data());
@@ -536,13 +536,13 @@ void BulkKinetics::updateROP()
     m_ROP_ok = true;
 }
 
-void BulkKinetics::getThirdBodyConcentrations(double* concm)
+void BulkKinetics::getThirdBodyConcentrations(CanteraDouble* concm)
 {
     updateROP();
     std::copy(m_concm.begin(), m_concm.end(), concm);
 }
 
-void BulkKinetics::processThirdBodies(double* rop)
+void BulkKinetics::processThirdBodies(CanteraDouble* rop)
 {
     // reactions involving third body
     if (!m_concm.empty()) {
@@ -550,7 +550,7 @@ void BulkKinetics::processThirdBodies(double* rop)
     }
 }
 
-void BulkKinetics::applyEquilibriumConstants(double* rop)
+void BulkKinetics::applyEquilibriumConstants(CanteraDouble* rop)
 {
     // For reverse rates computed from thermochemistry, multiply the forward
     // rate coefficients by the reciprocals of the equilibrium constants
@@ -559,14 +559,14 @@ void BulkKinetics::applyEquilibriumConstants(double* rop)
     }
 }
 
-void BulkKinetics::applyEquilibriumConstants_ddT(double* drkcn)
+void BulkKinetics::applyEquilibriumConstants_ddT(CanteraDouble* drkcn)
 {
-    double T = thermo().temperature();
-    double P = thermo().pressure();
-    double rrt = 1. / thermo().RT();
+    CanteraDouble T = thermo().temperature();
+    CanteraDouble P = thermo().pressure();
+    CanteraDouble rrt = 1. / thermo().RT();
 
-    vector<double>& grt = m_sbuf0;
-    vector<double>& delta_gibbs0 = m_rbuf1;
+    vector<CanteraDouble>& grt = m_sbuf0;
+    vector<CanteraDouble>& delta_gibbs0 = m_rbuf1;
     fill(delta_gibbs0.begin(), delta_gibbs0.end(), 0.0);
 
     // compute perturbed Delta G^0 for all reversible reactions
@@ -576,12 +576,12 @@ void BulkKinetics::applyEquilibriumConstants_ddT(double* drkcn)
     getRevReactionDelta(grt.data(), delta_gibbs0.data());
 
     // apply scaling for derivative of inverse equilibrium constant
-    double Tinv = 1. / T;
-    double rrt_dTinv = rrt * Tinv / m_jac_rtol_delta;
-    double rrtt = rrt * Tinv;
+    CanteraDouble Tinv = 1. / T;
+    CanteraDouble rrt_dTinv = rrt * Tinv / m_jac_rtol_delta;
+    CanteraDouble rrtt = rrt * Tinv;
     for (size_t i = 0; i < m_revindex.size(); i++) {
         size_t irxn = m_revindex[i];
-        double factor = delta_gibbs0[irxn] - m_delta_gibbs0[irxn];
+        CanteraDouble factor = delta_gibbs0[irxn] - m_delta_gibbs0[irxn];
         factor *= rrt_dTinv;
         factor += m_dn[irxn] * Tinv - m_delta_gibbs0[irxn] * rrtt;
         drkcn[irxn] *= factor;
@@ -594,7 +594,7 @@ void BulkKinetics::applyEquilibriumConstants_ddT(double* drkcn)
     thermo().restoreState(m_state);
 }
 
-void BulkKinetics::process_ddT(const vector<double>& in, double* drop)
+void BulkKinetics::process_ddT(const vector<CanteraDouble>& in, CanteraDouble* drop)
 {
     // apply temperature derivative
     copy(in.begin(), in.end(), drop);
@@ -603,7 +603,7 @@ void BulkKinetics::process_ddT(const vector<double>& in, double* drop)
     }
 }
 
-void BulkKinetics::process_ddP(const vector<double>& in, double* drop)
+void BulkKinetics::process_ddP(const vector<CanteraDouble>& in, CanteraDouble* drop)
 {
     // apply pressure derivative
     copy(in.begin(), in.end(), drop);
@@ -612,12 +612,12 @@ void BulkKinetics::process_ddP(const vector<double>& in, double* drop)
     }
 }
 
-void BulkKinetics::process_ddC(StoichManagerN& stoich, const vector<double>& in,
-                               double* drop, bool mass_action)
+void BulkKinetics::process_ddC(StoichManagerN& stoich, const vector<CanteraDouble>& in,
+                               CanteraDouble* drop, bool mass_action)
 {
     Eigen::Map<Eigen::VectorXd> out(drop, nReactions());
     out.setZero();
-    double ctot_inv = 1. / thermo().molarDensity();
+    CanteraDouble ctot_inv = 1. / thermo().molarDensity();
 
     // derivatives due to concentrations in law of mass action
     if (mass_action) {
@@ -647,17 +647,17 @@ void BulkKinetics::process_ddC(StoichManagerN& stoich, const vector<double>& in,
     }
 }
 
-Eigen::SparseMatrix<double> BulkKinetics::calculateCompositionDerivatives(
-    StoichManagerN& stoich, const vector<double>& in, bool ddX)
+Eigen::SparseMatrix<CanteraDouble> BulkKinetics::calculateCompositionDerivatives(
+    StoichManagerN& stoich, const vector<CanteraDouble>& in, bool ddX)
 {
-    Eigen::SparseMatrix<double> out;
-    vector<double>& scaled = m_rbuf1;
-    vector<double>& outV = m_rbuf2;
+    Eigen::SparseMatrix<CanteraDouble> out;
+    vector<CanteraDouble>& scaled = m_rbuf1;
+    vector<CanteraDouble>& outV = m_rbuf2;
 
     // convert from concentration to mole fraction output
     copy(in.begin(), in.end(), scaled.begin());
     if (ddX) {
-        double ctot = thermo().molarDensity();
+        CanteraDouble ctot = thermo().molarDensity();
         for (size_t i = 0; i < nReactions(); ++i) {
             scaled[i] *= ctot;
         }

@@ -36,7 +36,7 @@ struct CachedValue {
     //! Check whether the currently cached value is valid based on
     //! a single state variable. If it is not valid it updates the stored
     //! state to the new state in addition to returning false.
-    bool validate(double state1New) {
+    bool validate(CanteraDouble state1New) {
       if(state1 == state1New) {
         return true;
       } else {
@@ -48,7 +48,7 @@ struct CachedValue {
     //! Check whether the currently cached value is valid based on
     //! state1 and state2. If it is not valid it updates the stored
     //! state to the new state in addition to returning false.
-    bool validate(double state1New, double state2New) {
+    bool validate(CanteraDouble state1New, CanteraDouble state2New) {
       if(state1 == state1New && state2 == state2New) {
         return true;
       } else {
@@ -61,7 +61,7 @@ struct CachedValue {
     //! Check whether the currently cached value is valid based on
     //! state1 and stateNum. If it is not valid it updates the stored
     //! state to the new state in addition to returning false.
-    bool validate(double state1New, int stateNumNew) {
+    bool validate(CanteraDouble state1New, int stateNumNew) {
       if(state1 == state1New && stateNum == stateNumNew) {
         return true;
       } else {
@@ -86,7 +86,7 @@ struct CachedValue {
     //! Check whether the currently cached value is valid based on
     //! state1, state2, and stateNum. If it is not valid it updates the stored
     //! state to the new state in addition to returning false.
-    bool validate(double state1New, double state2New, int stateNumNew) {
+    bool validate(CanteraDouble state1New, CanteraDouble state2New, int stateNumNew) {
       if(state1 == state1New && state2 == state2New && stateNum == stateNumNew) {
         return true;
       } else {
@@ -99,11 +99,11 @@ struct CachedValue {
 
     //! Value of the first state variable for the state at which #value was
     //! evaluated, for example temperature.
-    double state1 = std::numeric_limits<double>::quiet_NaN();
+    CanteraDouble state1 = std::numeric_limits<CanteraDouble>::quiet_NaN();
 
     //! Value of the second state variable for the state at which #value was
     //! evaluated, for example density or pressure.
-    double state2 = std::numeric_limits<double>::quiet_NaN();
+    CanteraDouble state2 = std::numeric_limits<CanteraDouble>::quiet_NaN();
 
     //! A surrogate for the composition. For cached properties of Phase,
     //! this should be set to Phase::stateMFNumber()
@@ -113,8 +113,8 @@ struct CachedValue {
     T value = T();
 };
 
-typedef CachedValue<double>& CachedScalar;
-typedef CachedValue<vector<double>>& CachedArray;
+typedef CachedValue<CanteraDouble>& CachedScalar;
+typedef CachedValue<vector<CanteraDouble>>& CachedArray;
 
 /**
  * Storage for cached values.
@@ -136,7 +136,7 @@ typedef CachedValue<vector<double>>& CachedArray;
  * @code
  * class Example {
  *     ValueCache m_cache;
- *     double get_property(double T, double P) {
+ *     CanteraDouble get_property(CanteraDouble T, CanteraDouble P) {
  *         const static int cacheId = m_cache.getId();
  *         CachedScalar cached = m_cache.getScalar(cacheId);
  *         if (T != cached.state1 || P != cached.state2) {
@@ -157,12 +157,12 @@ public:
     int getId();
 
     //! Get a reference to a CachedValue object representing a scalar
-    //! (double) with the given id.
+    //! (CanteraDouble) with the given id.
     CachedScalar getScalar(int id) {
         return m_scalarCache[id];
     }
 
-    //! Get a reference to a CachedValue object representing an array (vector<double>)
+    //! Get a reference to a CachedValue object representing an array (vector<CanteraDouble>)
     //! with the given id.
     CachedArray getArray(int id) {
         return m_arrayCache[id];
@@ -176,10 +176,10 @@ public:
 
 protected:
     //! Cached scalar values
-    map<int, CachedValue<double>> m_scalarCache;
+    map<int, CachedValue<CanteraDouble>> m_scalarCache;
 
     //! Cached array values
-    map<int, CachedValue<vector<double>>> m_arrayCache;
+    map<int, CachedValue<vector<CanteraDouble>>> m_arrayCache;
 
     //! The last assigned id. Automatically incremented by the getId() method.
     static int m_last_id;

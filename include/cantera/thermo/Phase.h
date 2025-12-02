@@ -51,7 +51,7 @@ class Kinetics;
  * Class Phase contains a number of utility functions that will set the state
  * of the phase in its entirety, by first setting the composition, and then
  * temperature and pressure. An example of this is the function
- * Phase::setState_TPY(double t, double p, const double* y).
+ * Phase::setState_TPY(CanteraDouble t, CanteraDouble p, const CanteraDouble* y).
  *
  * For bulk (3-dimensional) phases, the mass density has units of kg/m^3, and the molar
  * density and concentrations have units of kmol/m^3, and the units listed in the
@@ -164,13 +164,13 @@ public:
 
     //! Atomic weight of element m.
     //!     @param m  Element index
-    double atomicWeight(size_t m) const;
+    CanteraDouble atomicWeight(size_t m) const;
 
     //! Entropy of the element in its standard state at 298 K and 1 bar.
     //! If no entropy value was provided when the phase was constructed,
     //! returns the value `ENTROPY298_UNKNOWN`.
     //!     @param m  Element index
-    double entropyElement298(size_t m) const;
+    CanteraDouble entropyElement298(size_t m) const;
 
     //! Atomic number of element m.
     //!     @param m Element index
@@ -201,7 +201,7 @@ public:
     int changeElementType(int m, int elem_type);
 
     //! Return a read-only reference to the vector of atomic weights.
-    const vector<double>& atomicWeights() const;
+    const vector<CanteraDouble>& atomicWeights() const;
 
     //! Number of elements.
     size_t nElements() const;
@@ -216,7 +216,7 @@ public:
     //! Number of atoms of element @c m in species @c k.
     //!     @param k    species index
     //!     @param m    element index
-    double nAtoms(size_t k, size_t m) const;
+    CanteraDouble nAtoms(size_t k, size_t m) const;
 
     //! Returns the index of a species named 'name' within the Phase object.
     /*!
@@ -322,7 +322,7 @@ public:
     //! @param[out] state  Array of state variables, in the order defined by
     //!     nativeState().
     //! @since New in %Cantera 3.2
-    virtual void savePartialState(size_t lenstate, double* state) const;
+    virtual void savePartialState(size_t lenstate, CanteraDouble* state) const;
 
     //! Set the internal thermodynamic state of the phase, excluding composition.
     //! The default implementation corresponds to the default implementation of
@@ -331,7 +331,7 @@ public:
     //! @param[in] state  Array of state variables, in the order defined by
     //!     nativeState().
     //! @since New in %Cantera 3.2
-    virtual void restorePartialState(size_t lenstate, const double* state);
+    virtual void restorePartialState(size_t lenstate, const CanteraDouble* state);
 
     //! Return size of vector defining internal state of the phase.
     //! Used by saveState() and restoreState().
@@ -340,22 +340,22 @@ public:
     //! Save the current internal state of the phase.
     //! Write to vector 'state' the current internal state.
     //!     @param state output vector. Will be resized to stateSize().
-    void saveState(vector<double>& state) const;
+    void saveState(vector<CanteraDouble>& state) const;
 
     //! Write to array 'state' the current internal state.
     //!     @param lenstate length of the state array. Must be >= stateSize()
     //!     @param state    output vector. Must be of length stateSizes() or
     //!                     greater.
-    virtual void saveState(size_t lenstate, double* state) const;
+    virtual void saveState(size_t lenstate, CanteraDouble* state) const;
 
     //! Restore a state saved on a previous call to saveState.
     //!     @param state State vector containing the previously saved state.
-    void restoreState(const vector<double>& state);
+    void restoreState(const vector<CanteraDouble>& state);
 
     //! Restore the state of the phase from a previously saved state vector.
     //!     @param lenstate   Length of the state vector
     //!     @param state      Vector of state conditions.
-    virtual void restoreState(size_t lenstate, const double* state);
+    virtual void restoreState(size_t lenstate, const CanteraDouble* state);
 
     //! @name Set Thermodynamic State
     //!
@@ -390,30 +390,30 @@ public:
     //!     @param t     Temperature in kelvin
     //!     @param rho   Density (kg/m^3)
     //!     @since New in %Cantera 3.0.
-    void setState_TD(double t, double rho);
+    void setState_TD(CanteraDouble t, CanteraDouble rho);
 
     //! @} end group set thermo state
 
     //! Molecular weight of species @c k.
     //!     @param k   index of species @c k
     //!     @returns the molecular weight of species @c k.
-    double molecularWeight(size_t k) const;
+    CanteraDouble molecularWeight(size_t k) const;
 
     //! Copy the vector of molecular weights into array weights.
     //!     @param weights  Output array of molecular weights (kg/kmol)
-    void getMolecularWeights(double* weights) const;
+    void getMolecularWeights(CanteraDouble* weights) const;
 
     //! Return a const reference to the internal vector of molecular weights.
     //! units = kg / kmol
-    const vector<double>& molecularWeights() const;
+    const vector<CanteraDouble>& molecularWeights() const;
 
     //! Return a const reference to the internal vector of molecular weights.
     //! units = kmol / kg
-    const vector<double>& inverseMolecularWeights() const;
+    const vector<CanteraDouble>& inverseMolecularWeights() const;
 
     //! Copy the vector of species charges into array charges.
     //!     @param charges Output array of species charges (elem. charge)
-    void getCharges(double* charges) const;
+    void getCharges(CanteraDouble* charges) const;
 
     //! @name Composition
     //! @{
@@ -422,38 +422,38 @@ public:
     //!     @param threshold   Exclude species with mole fractions less than or
     //!                        equal to this threshold.
     //!     @return Map of species names to mole fractions
-    Composition getMoleFractionsByName(double threshold=0.0) const;
+    Composition getMoleFractionsByName(CanteraDouble threshold=0.0) const;
 
     //! Return the mole fraction of a single species
     //!     @param  k  species index
     //!     @return Mole fraction of the species
-    double moleFraction(size_t k) const;
+    CanteraDouble moleFraction(size_t k) const;
 
     //! Return the mole fraction of a single species
     //!     @param  name  String name of the species
     //!     @return Mole fraction of the species
-    double moleFraction(const string& name) const;
+    CanteraDouble moleFraction(const string& name) const;
 
     //! Get the mass fractions by name.
     //!     @param threshold   Exclude species with mass fractions less than or
     //!                        equal to this threshold.
     //!     @return Map of species names to mass fractions
-    Composition getMassFractionsByName(double threshold=0.0) const;
+    Composition getMassFractionsByName(CanteraDouble threshold=0.0) const;
 
     //! Return the mass fraction of a single species
     //!     @param  k species index
     //!     @return Mass fraction of the species
-    double massFraction(size_t k) const;
+    CanteraDouble massFraction(size_t k) const;
 
     //! Return the mass fraction of a single species
     //!     @param  name  String name of the species
     //!     @return Mass Fraction of the species
-    double massFraction(const string& name) const;
+    CanteraDouble massFraction(const string& name) const;
 
     //! Get the species mole fraction vector.
     //!     @param x On return, x contains the mole fractions. Must have a
     //!          length greater than or equal to the number of species.
-    void getMoleFractions(double* const x) const;
+    void getMoleFractions(CanteraDouble* const x) const;
 
     //! Set the mole fractions to the specified values.
     //! There is no restriction on the sum of the mole fraction vector.
@@ -461,21 +461,21 @@ public:
     //! its contents.
     //!     @param x Array of unnormalized mole fraction values (input). Must
     //! have a length greater than or equal to the number of species, m_kk.
-    virtual void setMoleFractions(const double* const x);
+    virtual void setMoleFractions(const CanteraDouble* const x);
 
     //! Set the mole fractions to the specified values without normalizing.
     //! This is useful when the normalization condition is being handled by
     //! some other means, for example by a constraint equation as part of a
     //! larger set of equations.
     //!     @param x  Input vector of mole fractions. Length is m_kk.
-    virtual void setMoleFractions_NoNorm(const double* const x);
+    virtual void setMoleFractions_NoNorm(const CanteraDouble* const x);
 
     //! Get the species mass fractions.
     //!     @param[out] y Array of mass fractions, length nSpecies()
-    void getMassFractions(double* const y) const;
+    void getMassFractions(CanteraDouble* const y) const;
 
     //! Return a const pointer to the mass fraction array
-    const double* massFractions() const {
+    const CanteraDouble* massFractions() const {
         return &m_y[0];
     }
 
@@ -484,14 +484,14 @@ public:
     //!                  must be greater than or equal to the number of
     //!                  species. The Phase object will normalize this vector
     //!                  before storing its contents.
-    virtual void setMassFractions(const double* const y);
+    virtual void setMassFractions(const CanteraDouble* const y);
 
     //! Set the mass fractions to the specified values without normalizing.
     //! This is useful when the normalization condition is being handled by
     //! some other means, for example by a constraint equation as part of a
     //! larger set of equations.
     //!     @param y  Input vector of mass fractions. Length is m_kk.
-    virtual void setMassFractions_NoNorm(const double* const y);
+    virtual void setMassFractions_NoNorm(const CanteraDouble* const y);
 
     //! Get the species concentrations (kmol/m^3).
     /*!
@@ -499,7 +499,7 @@ public:
      *                  kmol/m^3. The length of the vector must be greater than
      *                  or equal to the number of species within the phase.
      */
-    virtual void getConcentrations(double* const c) const;
+    virtual void getConcentrations(CanteraDouble* const c) const;
 
     //! Concentration of species k.
     //! If k is outside the valid range, an exception will be thrown.
@@ -508,7 +508,7 @@ public:
      *
      *    @returns the concentration of species k (kmol m-3).
      */
-    virtual double concentration(const size_t k) const;
+    virtual CanteraDouble concentration(const size_t k) const;
 
     //! Set the concentrations to the specified values within the phase.
     //! We set the concentrations here and therefore we set the overall density
@@ -520,14 +520,14 @@ public:
     //!                     species in kmol/m3. For surface phases, c[k] is the
     //!                     concentration in kmol/m2. The length of the vector
     //!                     is the number of species in the phase.
-    virtual void setConcentrations(const double* const conc);
+    virtual void setConcentrations(const CanteraDouble* const conc);
 
     //! Set the concentrations without ignoring negative concentrations
-    virtual void setConcentrationsNoNorm(const double* const conc);
+    virtual void setConcentrationsNoNorm(const CanteraDouble* const conc);
     //! @}
 
     //! Set the state of the object with moles in [kmol]
-    virtual void setMolesNoTruncate(const double* const N);
+    virtual void setMolesNoTruncate(const CanteraDouble* const N);
 
     //! Elemental mass fraction of element m
     /*!
@@ -546,7 +546,7 @@ public:
      *
      *  @return the elemental mass fraction of element m.
      */
-    double elementalMassFraction(const size_t m) const;
+    CanteraDouble elementalMassFraction(const size_t m) const;
 
     //! Elemental mole fraction of element m
     /*!
@@ -566,17 +566,17 @@ public:
      *               valid range, an exception will be thrown.
      *  @return the elemental mole fraction of element m.
      */
-    double elementalMoleFraction(const size_t m) const;
+    CanteraDouble elementalMoleFraction(const size_t m) const;
 
     //! Dimensionless electrical charge of a single molecule of species k
     //! The charge is normalized by the the magnitude of the electron charge
     //!     @param k species index
-    double charge(size_t k) const {
+    CanteraDouble charge(size_t k) const {
         return m_speciesCharge[k];
     }
 
     //! Charge density [C/m^3].
-    double chargeDensity() const;
+    CanteraDouble chargeDensity() const;
 
     //! Returns the number of spatial dimensions (1, 2, or 3)
     size_t nDim() const {
@@ -595,13 +595,13 @@ public:
 
     //! Temperature (K).
     //!     @return The temperature of the phase
-    double temperature() const {
+    CanteraDouble temperature() const {
         return m_temp;
     }
 
     //! Electron Temperature (K)
     //!     @return The electron temperature of the phase
-    virtual double electronTemperature() const {
+    virtual CanteraDouble electronTemperature() const {
         return m_temp;
     }
 
@@ -613,29 +613,29 @@ public:
      *  use these values to implement the mechanical equation of state @f$ P(T,
      *  \rho, Y_1, \dots, Y_K) @f$. Alternatively, it returns a stored value.
      */
-    virtual double pressure() const {
+    virtual CanteraDouble pressure() const {
         throw NotImplementedError("Phase::pressure",
             "Not implemented for thermo model '{}'", type());
     }
 
     //! Density (kg/m^3).
     //!     @return The density of the phase
-    virtual double density() const {
+    virtual CanteraDouble density() const {
         return m_dens;
     }
 
     //! Molar density (kmol/m^3).
     //!     @return The molar density of the phase
-    virtual double molarDensity() const;
+    virtual CanteraDouble molarDensity() const;
 
     //! Molar volume (m^3/kmol).
     //!     @return The molar volume of the phase
-    virtual double molarVolume() const;
+    virtual CanteraDouble molarVolume() const;
 
     //! Set the internally stored density (kg/m^3) of the phase.
     //! Note the density of a phase is an independent variable.
     //!     @param[in] density_ density (kg/m^3).
-    virtual void setDensity(const double density_);
+    virtual void setDensity(const CanteraDouble density_);
 
     //! Set the internally stored pressure (Pa) at constant temperature and
     //! composition
@@ -649,14 +649,14 @@ public:
      *
      *  @param p input Pressure (Pa)
      */
-    virtual void setPressure(double p) {
+    virtual void setPressure(CanteraDouble p) {
         throw NotImplementedError("Phase::setPressure",
             "Not implemented for thermo model '{}'", type());
     }
 
     //! Set the internally stored temperature of the phase (K).
     //!     @param temp Temperature in Kelvin
-    virtual void setTemperature(double temp) {
+    virtual void setTemperature(CanteraDouble temp) {
         if (temp > 0) {
             m_temp = temp;
         } else {
@@ -667,7 +667,7 @@ public:
 
     //! Set the internally stored electron temperature of the phase (K).
     //!     @param etemp Electron temperature in Kelvin
-    virtual void setElectronTemperature(double etemp) {
+    virtual void setElectronTemperature(CanteraDouble etemp) {
         throw NotImplementedError("Phase::setElectronTemperature",
             "Not implemented for thermo model '{}'", type());
     }
@@ -682,19 +682,19 @@ public:
     //! Q should contain pure-species molar property values.
     //!     @param[in] Q Array of length m_kk that is to be averaged.
     //!     @return mole-fraction-weighted mean of Q
-    double mean_X(const double* const Q) const;
+    CanteraDouble mean_X(const CanteraDouble* const Q) const;
 
-    //! @copydoc Phase::mean_X(const double* const Q) const
-    double mean_X(const vector<double>& Q) const;
+    //! @copydoc Phase::mean_X(const CanteraDouble* const Q) const
+    CanteraDouble mean_X(const vector<CanteraDouble>& Q) const;
 
     //!  The mean molecular weight. Units: (kg/kmol)
-    double meanMolecularWeight() const {
+    CanteraDouble meanMolecularWeight() const {
         return m_mmw;
     }
 
     //! Evaluate @f$ \sum_k X_k \ln X_k @f$.
     //! @return The indicated sum. Dimensionless.
-    double sum_xlogx() const;
+    CanteraDouble sum_xlogx() const;
 
     //! @}
     //! @name Adding Elements and Species
@@ -718,8 +718,8 @@ public:
     //!     @param elem_type Specifies the type of the element constraint
     //!         equation. This defaults to CT_ELEM_TYPE_ABSPOS, that is, an element.
     //!     @return index of the element added
-    size_t addElement(const string& symbol, double weight=-12345.0,
-                      int atomicNumber=0, double entropy298=ENTROPY298_UNKNOWN,
+    size_t addElement(const string& symbol, CanteraDouble weight=-12345.0,
+                      int atomicNumber=0, CanteraDouble entropy298=ENTROPY298_UNKNOWN,
                       int elem_type=CT_ELEM_TYPE_ABSPOS);
 
     //! Add a Species to this Phase. Returns `true` if the species was
@@ -831,17 +831,17 @@ public:
      * @param[in] comp Composition containing the mixture composition
      * @return vector with length m_kk
      */
-    vector<double> getCompositionFromMap(const Composition& comp) const;
+    vector<CanteraDouble> getCompositionFromMap(const Composition& comp) const;
 
     //! Converts a mixture composition from mole fractions to mass fractions
     //!     @param[in] Y mixture composition in mass fractions (length m_kk)
     //!     @param[out] X mixture composition in mole fractions (length m_kk)
-    void massFractionsToMoleFractions(const double* Y, double* X) const;
+    void massFractionsToMoleFractions(const CanteraDouble* Y, CanteraDouble* X) const;
 
     //! Converts a mixture composition from mass fractions to mole fractions
     //!     @param[in] X mixture composition in mole fractions (length m_kk)
     //!     @param[out] Y mixture composition in mass fractions (length m_kk)
-    void moleFractionsToMassFractions(const double* X, double* Y) const;
+    void moleFractionsToMassFractions(const CanteraDouble* X, CanteraDouble* Y) const;
 
 protected:
     //! Ensure that phase is compressible.
@@ -860,7 +860,7 @@ protected:
     //! Used for incompressible phases where the density is not an independent
     //! variable, that is, density does not affect pressure in state calculations.
     //!     @param[in] density_ density (kg/m^3).
-    void assignDensity(const double density_);
+    void assignDensity(const CanteraDouble density_);
 
     //! Cached for saved calculations within each ThermoPhase.
     /*!
@@ -876,7 +876,7 @@ protected:
     //! value computed from the chemical formula.
     //!     @param k       id of the species
     //!     @param mw      Molecular Weight (kg kmol-1)
-    void setMolecularWeight(const int k, const double mw);
+    void setMolecularWeight(const int k, const CanteraDouble mw);
 
     //! Apply changes to the state which are needed after the composition
     //! changes. This function is called after any call to setMassFractions(),
@@ -896,9 +896,9 @@ protected:
     //! Atomic composition of the species. The number of atoms of element i
     //! in species k is equal to m_speciesComp[k * m_mm + i]
     //! The length of this vector is equal to m_kk * m_mm
-    vector<double> m_speciesComp;
+    vector<CanteraDouble> m_speciesComp;
 
-    vector<double> m_speciesCharge; //!< Vector of species charges. length m_kk.
+    vector<CanteraDouble> m_speciesCharge; //!< Vector of species charges. length m_kk.
 
     map<string, shared_ptr<Species>> m_species; //!< Map of Species objects
 
@@ -911,7 +911,7 @@ protected:
     bool m_caseSensitiveSpecies = false;
 
     //! Vector of size m_kk, used as a temporary holding area.
-    mutable vector<double> m_workS;
+    mutable vector<CanteraDouble> m_workS;
 
 private:
     //! Find lowercase species name in m_speciesIndices when case sensitive
@@ -924,30 +924,30 @@ private:
     //! to another value during the course of a calculation.
     string m_name;
 
-    double m_temp = 0.001; //!< Temperature (K). This is an independent variable
+    CanteraDouble m_temp = 0.001; //!< Temperature (K). This is an independent variable
 
     //! Density (kg m-3). This is an independent variable except in the case
     //! of incompressible phases, where it has to be changed using the
     //! assignDensity() method. For compressible substances, the pressure is
     //! determined from this variable rather than other way round.
-    double m_dens = 0.001;
+    CanteraDouble m_dens = 0.001;
 
-    double m_mmw = 0.0; //!< mean molecular weight of the mixture (kg kmol-1)
+    CanteraDouble m_mmw = 0.0; //!< mean molecular weight of the mixture (kg kmol-1)
 
     //! m_ym[k] = mole fraction of species k divided by the mean molecular
     //! weight of mixture.
-    mutable vector<double> m_ym;
+    mutable vector<CanteraDouble> m_ym;
 
     //! Mass fractions of the species
     /*!
      *   Note, this vector
      *   Length is m_kk
      */
-    mutable vector<double> m_y;
+    mutable vector<CanteraDouble> m_y;
 
-    vector<double> m_molwts; //!< species molecular weights (kg kmol-1)
+    vector<CanteraDouble> m_molwts; //!< species molecular weights (kg kmol-1)
 
-    vector<double> m_rmolwts; //!< inverse of species molecular weights (kmol kg-1)
+    vector<CanteraDouble> m_rmolwts; //!< inverse of species molecular weights (kmol kg-1)
 
     //! State Change variable. Whenever the mole fraction vector changes,
     //! this int is incremented.
@@ -963,13 +963,13 @@ private:
     map<string, size_t> m_speciesLower;
 
     size_t m_mm = 0; //!< Number of elements.
-    vector<double> m_atomicWeights; //!< element atomic weights (kg kmol-1)
+    vector<CanteraDouble> m_atomicWeights; //!< element atomic weights (kg kmol-1)
     vector<int> m_atomicNumbers; //!< element atomic numbers
     vector<string> m_elementNames; //!< element names
     vector<int> m_elem_type; //!< Vector of element types
 
     //! Entropy at 298.15 K and 1 bar of stable state pure elements (J kmol-1)
-    vector<double> m_entropy298;
+    vector<CanteraDouble> m_entropy298;
 };
 
 }

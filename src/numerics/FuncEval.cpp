@@ -4,7 +4,7 @@
 namespace Cantera
 {
 
-int FuncEval::evalNoThrow(double t, double* y, double* ydot)
+int FuncEval::evalNoThrow(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot)
 {
     try {
         eval(t, y, ydot, m_sens_params.data());
@@ -36,7 +36,7 @@ int FuncEval::evalNoThrow(double t, double* y, double* ydot)
     return 0; // successful evaluation
 }
 
-int FuncEval::evalDaeNoThrow(double t, double* y, double* ydot, double* r)
+int FuncEval::evalDaeNoThrow(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* r)
 {
     try {
         evalDae(t, y, ydot, m_sens_params.data(), r);
@@ -77,7 +77,7 @@ string FuncEval::getErrors() const {
     return errs.str();
 }
 
-int FuncEval::preconditioner_setup_nothrow(double t, double* y, double gamma)
+int FuncEval::preconditioner_setup_nothrow(CanteraDouble t, CanteraDouble* y, CanteraDouble gamma)
 {
     try {
         preconditionerSetup(t, y, gamma);
@@ -110,7 +110,7 @@ int FuncEval::preconditioner_setup_nothrow(double t, double* y, double gamma)
     return 0; // successful evaluation
 }
 
-int FuncEval::preconditioner_solve_nothrow(double* rhs, double* output)
+int FuncEval::preconditioner_solve_nothrow(CanteraDouble* rhs, CanteraDouble* output)
 {
     try {
         preconditionerSolve(rhs, output); // perform preconditioner solve
@@ -143,7 +143,7 @@ int FuncEval::preconditioner_solve_nothrow(double* rhs, double* output)
     return 0; // successful evaluation
 }
 
-int FuncEval::evalRootFunctionsNoThrow(double t, const double* y, double* gout)
+int FuncEval::evalRootFunctionsNoThrow(CanteraDouble t, const CanteraDouble* y, CanteraDouble* gout)
 {
     try {
         evalRootFunctions(t, y, gout);

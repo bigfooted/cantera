@@ -31,16 +31,16 @@ public:
      */
     IdasIntegrator();
     ~IdasIntegrator() override;
-    void setTolerances(double reltol, size_t n, double* abstol) override;
-    void setTolerances(double reltol, double abstol) override;
-    void setSensitivityTolerances(double reltol, double abstol) override;
+    void setTolerances(CanteraDouble reltol, size_t n, CanteraDouble* abstol) override;
+    void setTolerances(CanteraDouble reltol, CanteraDouble abstol) override;
+    void setSensitivityTolerances(CanteraDouble reltol, CanteraDouble abstol) override;
     void setLinearSolverType(const string& linearSolverType) override;
-    void initialize(double t0, FuncEval& func) override;
-    void reinitialize(double t0, FuncEval& func) override;
-    void integrate(double tout) override;
-    double step(double tout) override;
-    double& solution(size_t k) override;
-    double* solution() override;
+    void initialize(CanteraDouble t0, FuncEval& func) override;
+    void reinitialize(CanteraDouble t0, FuncEval& func) override;
+    void integrate(CanteraDouble tout) override;
+    CanteraDouble step(CanteraDouble tout) override;
+    CanteraDouble& solution(size_t k) override;
+    CanteraDouble* solution() override;
     int nEquations() const override {
         return static_cast<int>(m_neq);
     }
@@ -48,7 +48,7 @@ public:
         return m_maxord;
     }
     void setMaxOrder(int n) override;
-    void setMaxStepSize(double hmax) override;
+    void setMaxStepSize(CanteraDouble hmax) override;
     void setMaxSteps(int nmax) override;
     int maxSteps() override;
     void setMaxErrTestFails(int n) override;
@@ -56,7 +56,7 @@ public:
     int nSensParams() override {
         return static_cast<int>(m_np);
     }
-    double sensitivity(size_t k, size_t p) override;
+    CanteraDouble sensitivity(size_t k, size_t p) override;
 
     //! Returns a string listing the weighted error estimates associated
     //! with each solution component.
@@ -82,7 +82,7 @@ public:
     }
     void includeAlgebraicInErrorTest(bool yesno) override;
 
-    double currentTime() const override {
+    CanteraDouble currentTime() const override {
         return m_time;
     }
 
@@ -95,7 +95,7 @@ protected:
     void applyOptions();
 
 private:
-    void sensInit(double t0, FuncEval& func);
+    void sensInit(CanteraDouble t0, FuncEval& func);
 
     //! Check whether an IDAS method indicated an error. If so, throw an exception
     //! containing the method name and the error code stashed by the ida_err() function.
@@ -110,11 +110,11 @@ private:
     //! Object implementing the DAE residual function @f$ f(t, y, \dot{y}) = 0 @f$
     FuncEval* m_func = nullptr;
 
-    double m_t0 = 0.0; //!< The start time for the integrator
-    double m_time; //!< The current integrator time, corresponding to #m_y
+    CanteraDouble m_t0 = 0.0; //!< The start time for the integrator
+    CanteraDouble m_time; //!< The current integrator time, corresponding to #m_y
 
     //! The latest time reached by the integrator. May be greater than #m_time
-    double m_tInteg;
+    CanteraDouble m_tInteg;
 
     N_Vector m_y = nullptr; //!< The current system state
     N_Vector m_ydot = nullptr; //!< The time derivatives of the system state
@@ -126,15 +126,15 @@ private:
     int m_itol;
 
     int m_maxord = 0; //!< Maximum order allowed for the BDF method
-    double m_reltol = 1.0e-9; //!< Relative tolerance for all state variables
-    double m_abstols = 1.0e-15; //!< Scalar absolute tolerance
-    double m_reltolsens; //!< Scalar relative tolerance for sensitivities
-    double m_abstolsens; //!< Scalar absolute tolerance for sensitivities
+    CanteraDouble m_reltol = 1.0e-9; //!< Relative tolerance for all state variables
+    CanteraDouble m_abstols = 1.0e-15; //!< Scalar absolute tolerance
+    CanteraDouble m_reltolsens; //!< Scalar relative tolerance for sensitivities
+    CanteraDouble m_abstolsens; //!< Scalar absolute tolerance for sensitivities
 
     //!! Number of variables for which absolute tolerances were provided
     size_t m_nabs = 0;
 
-    double m_hmax = 0.0; //!< Maximum time step size. Zero means infinity.
+    CanteraDouble m_hmax = 0.0; //!< Maximum time step size. Zero means infinity.
 
     //! Maximum number of internal steps taken in a call to integrate()
     int m_maxsteps = 20000;
@@ -164,7 +164,7 @@ private:
     bool m_setSuppressAlg = false;
 
     //! Initial IDA step size
-    double m_init_step = 1e-14;
+    CanteraDouble m_init_step = 1e-14;
 };
 
 }

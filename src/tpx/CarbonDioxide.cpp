@@ -19,21 +19,21 @@ namespace tpx
 /*
  * Carbon Dioxide constants
  */
-static const double Tmn = 216.54; // [K] minimum temperature for which calculations are valid
-static const double Tmx = 1500.0; // [K] maximum temperature for which calculations are valid
-static const double Tc=304.21; // [K] critical temperature
-static const double Roc=464.00; // [kg/m^3] critical density
-static const double To=216.54; // [K] reference Temperature
-static const double R=188.918; // [] gas constant for CO2 J/kg/K
-static const double Gamma=5.0E-6; // [??]
-static const double u0=3.2174105E5; // [] internal energy at To
-static const double s0=2.1396056E3; // [] entropy at To
-static const double Tp=250; // [K] ??
-static const double Pc=7.38350E6; // [Pa] critical pressure
-static const double M=44.01; // [kg/kmol] molar density
+static const CanteraDouble Tmn = 216.54; // [K] minimum temperature for which calculations are valid
+static const CanteraDouble Tmx = 1500.0; // [K] maximum temperature for which calculations are valid
+static const CanteraDouble Tc=304.21; // [K] critical temperature
+static const CanteraDouble Roc=464.00; // [kg/m^3] critical density
+static const CanteraDouble To=216.54; // [K] reference Temperature
+static const CanteraDouble R=188.918; // [] gas constant for CO2 J/kg/K
+static const CanteraDouble Gamma=5.0E-6; // [??]
+static const CanteraDouble u0=3.2174105E5; // [] internal energy at To
+static const CanteraDouble s0=2.1396056E3; // [] entropy at To
+static const CanteraDouble Tp=250; // [K] ??
+static const CanteraDouble Pc=7.38350E6; // [Pa] critical pressure
+static const CanteraDouble M=44.01; // [kg/kmol] molar density
 
 // array Acarbdi is used by the function named Pp
-static const double Acarbdi[]= {
+static const CanteraDouble Acarbdi[]= {
     2.2488558E-1,
     -1.3717965E2,
     -1.4430214E4,
@@ -56,7 +56,7 @@ static const double Acarbdi[]= {
 };
 
 // array F is used by the function named Psat
-static const double F[]= {
+static const CanteraDouble F[]= {
     -6.5412610,
     -2.7914636E-1,
     -3.4716202,
@@ -68,7 +68,7 @@ static const double F[]= {
 };
 
 // array D is used by the function ldens
-static const double D[]= {
+static const CanteraDouble D[]= {
     4.6400009E2,
     6.7938129E2,
     1.4776836E3,
@@ -78,7 +78,7 @@ static const double D[]= {
 };
 
 // array G is used by the function sp
-static const double G[]= {
+static const CanteraDouble G[]= {
     8.726361E3,
     1.840040E2,
     1.914025,
@@ -87,7 +87,7 @@ static const double G[]= {
     -1.255290E-10,
 };
 
-double CarbonDioxide::C(int j,double Tinverse, double T2inverse, double T3inverse, double T4inverse)
+CanteraDouble CarbonDioxide::C(int j,CanteraDouble Tinverse, CanteraDouble T2inverse, CanteraDouble T3inverse, CanteraDouble T4inverse)
 {
     switch (j) {
     case 0:
@@ -119,7 +119,7 @@ double CarbonDioxide::C(int j,double Tinverse, double T2inverse, double T3invers
     }
 }
 
-double CarbonDioxide::Cprime(int j, double T2inverse, double T3inverse, double T4inverse)
+CanteraDouble CarbonDioxide::Cprime(int j, CanteraDouble T2inverse, CanteraDouble T3inverse, CanteraDouble T4inverse)
 {
     switch (j) {
     case 0:
@@ -151,7 +151,7 @@ double CarbonDioxide::Cprime(int j, double T2inverse, double T3inverse, double T
     }
 }
 
-double CarbonDioxide::I(int j, double ergho, double Gamma)
+CanteraDouble CarbonDioxide::I(int j, CanteraDouble ergho, CanteraDouble Gamma)
 {
     switch (j) {
     case 0:
@@ -165,15 +165,15 @@ double CarbonDioxide::I(int j, double ergho, double Gamma)
     case 4:
         return pow(Rho, 5)/ 5;
     case 5:
-        return (1 - ergho) / double(2 * Gamma);
+        return (1 - ergho) / CanteraDouble(2 * Gamma);
     case 6:
-        return (1 - ergho * double(Gamma * pow(Rho,2) + double(1)))/ double(2 * Gamma * Gamma);
+        return (1 - ergho * CanteraDouble(Gamma * pow(Rho,2) + CanteraDouble(1)))/ CanteraDouble(2 * Gamma * Gamma);
     default:
         return 0.0;
     }
 }
 
-double CarbonDioxide::H(int i, double egrho)
+CanteraDouble CarbonDioxide::H(int i, CanteraDouble egrho)
 {
     if (i < 5) {
         return pow(Rho,i+2);
@@ -186,20 +186,20 @@ double CarbonDioxide::H(int i, double egrho)
     }
 }
 
-double CarbonDioxide::up()
+CanteraDouble CarbonDioxide::up()
 {
-    double Tinverse = 1.0/T;
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble Tinverse = 1.0/T;
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     // Equation C-6 integrated
     sum += G[0]*log(T/To);
     int i;
     for (i=1; i<=5; i++) {
-        sum += G[i]*(pow(T,i) - pow(To,i))/double(i);
+        sum += G[i]*(pow(T,i) - pow(To,i))/CanteraDouble(i);
     }
     for (i=0; i<=6; i++) {
         sum += I(i,egrho, Gamma) *
@@ -209,16 +209,16 @@ double CarbonDioxide::up()
     return sum + m_energy_offset;
 }
 
-double CarbonDioxide::sp()
+CanteraDouble CarbonDioxide::sp()
 {
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
 
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (int i=2; i<=5; i++) {
-        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/double(i-1);
+        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/CanteraDouble(i-1);
     }
     sum += G[1]*log(T/To);
     sum -= G[0]*(1.0/T - 1.0/To);
@@ -229,14 +229,14 @@ double CarbonDioxide::sp()
     return sum + m_entropy_offset;
 }
 
-double CarbonDioxide::Pp()
+CanteraDouble CarbonDioxide::Pp()
 {
-    double Tinverse = pow(T,-1);
-    double T2inverse = pow(T, -2);
-    double T3inverse = pow(T, -3);
-    double T4inverse = pow(T, -4);
-    double egrho = exp(-Gamma*Rho*Rho);
-    double P = Rho*R*T;
+    CanteraDouble Tinverse = pow(T,-1);
+    CanteraDouble T2inverse = pow(T, -2);
+    CanteraDouble T3inverse = pow(T, -3);
+    CanteraDouble T4inverse = pow(T, -4);
+    CanteraDouble egrho = exp(-Gamma*Rho*Rho);
+    CanteraDouble P = Rho*R*T;
 
     // when i=0 we are on second sum of equation (where rho^2)
     for (int i=0; i<=6; i++) {
@@ -245,15 +245,15 @@ double CarbonDioxide::Pp()
     return P;
 }
 
-double CarbonDioxide::Psat()
+CanteraDouble CarbonDioxide::Psat()
 {
-    double log, sum=0,P;
+    CanteraDouble log, sum=0,P;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("CarbonDixoide::Psat",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=1; i<=8; i++) {
-        sum += F[i-1] * pow((T/Tp -1),double(i-1));
+        sum += F[i-1] * pow((T/Tp -1),CanteraDouble(i-1));
     }
 
     log = ((Tc/T)-1)*sum;
@@ -261,15 +261,15 @@ double CarbonDioxide::Psat()
     return P;
 }
 
-double CarbonDioxide::ldens()
+CanteraDouble CarbonDioxide::ldens()
 {
-    double xx=1-(T/Tc), sum=0;
+    CanteraDouble xx=1-(T/Tc), sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("CarbonDixoide::ldens",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=1; i<=6; i++) {
-        sum+=D[i-1]*pow(xx,double(i-1)/3.0);
+        sum+=D[i-1]*pow(xx,CanteraDouble(i-1)/3.0);
     }
     return sum;
 }
@@ -277,27 +277,27 @@ double CarbonDioxide::ldens()
 // The following functions allow users to get the properties of CarbonDioxide
 // that are not dependent on the state
 
-double CarbonDioxide::Tcrit()
+CanteraDouble CarbonDioxide::Tcrit()
 {
     return Tc;
 }
-double CarbonDioxide::Pcrit()
+CanteraDouble CarbonDioxide::Pcrit()
 {
     return Pc;
 }
-double CarbonDioxide::Vcrit()
+CanteraDouble CarbonDioxide::Vcrit()
 {
     return 1.0/Roc;
 }
-double CarbonDioxide::Tmin()
+CanteraDouble CarbonDioxide::Tmin()
 {
     return Tmn;
 }
-double CarbonDioxide::Tmax()
+CanteraDouble CarbonDioxide::Tmax()
 {
     return Tmx;
 }
-double CarbonDioxide::MolWt()
+CanteraDouble CarbonDioxide::MolWt()
 {
     return M;
 }

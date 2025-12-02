@@ -24,7 +24,7 @@ struct LinearBurkeData : public ReactionData
 {
     LinearBurkeData();
 
-    void update(double T, double P) override
+    void update(CanteraDouble T, CanteraDouble P) override
     {
         ReactionData::update(T);
         pressure = P;
@@ -40,7 +40,7 @@ struct LinearBurkeData : public ReactionData
      * The method is used for the evaluation of numerical derivatives.
      * @param  deltaP  relative pressure perturbation
      */
-    void perturbPressure(double deltaP);
+    void perturbPressure(CanteraDouble deltaP);
 
     void restore() override;
 
@@ -56,14 +56,14 @@ struct LinearBurkeData : public ReactionData
         pressure = NAN;
     }
 
-    double pressure = NAN; //!< Pressure
-    double logP = 0.0; //!< Logarithm of pressure
+    CanteraDouble pressure = NAN; //!< Pressure
+    CanteraDouble logP = 0.0; //!< Logarithm of pressure
     bool ready = false; //!< Boolean indicating whether vectors are accessible
-    vector<double> moleFractions;
+    vector<CanteraDouble> moleFractions;
     int mf_number;
 
 protected:
-    double m_pressure_buf = -1.0;
+    CanteraDouble m_pressure_buf = -1.0;
 };
 
 //! Pressure-dependent and composition-dependent reaction rate calculated according to
@@ -102,7 +102,7 @@ public:
     //! Type alias that refers to PlogData, FalloffData, and ChebyshevData
     using DataTypes = std::variant<PlogData, FalloffData, ChebyshevData>;
 
-    double evalFromStruct(const LinearBurkeData& shared_data);
+    CanteraDouble evalFromStruct(const LinearBurkeData& shared_data);
 
     void setContext(const Reaction& rxn, const Kinetics& kin) override;
 
@@ -111,18 +111,18 @@ public:
 protected:
     //! Evaluate overall reaction rate using PLOG to evaluate pressure-dependent aspect
     //! of the reaction
-    double evalPlogRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
-                        RateTypes& rateObj, double logPeff);
+    CanteraDouble evalPlogRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
+                        RateTypes& rateObj, CanteraDouble logPeff);
 
     //! Evaluate overall reaction rate using Troe to evaluate pressure-dependent aspect
     //! of the reaction
-    double evalTroeRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
-                        RateTypes& rateObj, double logPeff);
+    CanteraDouble evalTroeRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
+                        RateTypes& rateObj, CanteraDouble logPeff);
 
     //! Evaluate overall reaction rate using Chebyshev to evaluate pressure-dependent
     //! aspect of the reaction
-    double evalChebyshevRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
-                             RateTypes& rateObj, double logPeff);
+    CanteraDouble evalChebyshevRate(const LinearBurkeData& shared_data, DataTypes& dataObj,
+                             RateTypes& rateObj, CanteraDouble logPeff);
 
     //! String name of each collider, appearing in the same order as that of the
     //! original reaction input.

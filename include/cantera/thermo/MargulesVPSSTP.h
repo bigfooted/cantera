@@ -230,7 +230,7 @@ public:
     //! @name  Molar Thermodynamic Properties
     //! @{
 
-    double cv_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Activities, Standard States, and Activity Concentrations
@@ -241,13 +241,13 @@ public:
     //! which depends only on temperature and pressure.
     //! @{
 
-    void getLnActivityCoefficients(double* lnac) const override;
+    void getLnActivityCoefficients(CanteraDouble* lnac) const override;
 
     //! @}
     //! @name  Partial Molar Properties of the Solution
     //! @{
 
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     //! Returns an array of partial molar enthalpies for the species in the
     //! mixture.
@@ -265,7 +265,7 @@ public:
      * @param hbar  Vector of returned partial molar enthalpies
      *              (length m_kk, units = J/kmol)
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     //! Returns an array of partial molar entropies for the species in the
     //! mixture.
@@ -285,7 +285,7 @@ public:
      * @param sbar  Vector of returned partial molar entropies
      *              (length m_kk, units = J/kmol/K)
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
     //! Returns an array of partial molar entropies for the species in the
     //! mixture.
@@ -307,9 +307,9 @@ public:
      * @param cpbar  Vector of returned partial molar heat capacities
      *              (length m_kk, units = J/kmol/K)
      */
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     //! Get the array of temperature second derivatives of the log activity
     //! coefficients
@@ -319,9 +319,9 @@ public:
      * @param d2lnActCoeffdT2  Output vector of temperature 2nd derivatives of
      *                         the log Activity Coefficients. length = m_kk
      */
-    void getd2lnActCoeffdT2(double* d2lnActCoeffdT2) const;
+    void getd2lnActCoeffdT2(CanteraDouble* d2lnActCoeffdT2) const;
 
-    void getdlnActCoeffdT(double* dlnActCoeffdT) const override;
+    void getdlnActCoeffdT(CanteraDouble* dlnActCoeffdT) const override;
 
     //! @}
     //! @name Initialization
@@ -349,18 +349,18 @@ public:
      * @param vs1        second entropy coefficient for excess volume [m^3/kmol/K]
      */
     void addBinaryInteraction(const string& speciesA,
-        const string& speciesB, double h0, double h1, double s0, double s1,
-        double vh0, double vh1, double vs0, double vs1);
+        const string& speciesB, CanteraDouble h0, CanteraDouble h1, CanteraDouble s0, CanteraDouble s1,
+        CanteraDouble vh0, CanteraDouble vh1, CanteraDouble vs0, CanteraDouble vs1);
 
     //! @}
     //! @name  Derivatives of Thermodynamic Variables needed for Applications
     //! @{
 
-    void getdlnActCoeffds(const double dTds, const double* const dXds,
-                          double* dlnActCoeffds) const override;
-    void getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const override;
-    void getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const override;
-    void getdlnActCoeffdlnN(const size_t ld, double* const dlnActCoeffdlnN) override;
+    void getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+                          CanteraDouble* dlnActCoeffds) const override;
+    void getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const override;
+    void getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const override;
+    void getdlnActCoeffdlnN(const size_t ld, CanteraDouble* const dlnActCoeffdlnN) override;
 
     //! @}
 
@@ -416,35 +416,35 @@ protected:
 
     //! Enthalpy term for the binary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_HE_b_ij;
+    mutable vector<CanteraDouble> m_HE_b_ij;
 
     //! Enthalpy term for the ternary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_HE_c_ij;
+    mutable vector<CanteraDouble> m_HE_c_ij;
 
     //! Entropy term for the binary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_SE_b_ij;
+    mutable vector<CanteraDouble> m_SE_b_ij;
 
     //! Entropy term for the ternary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_SE_c_ij;
+    mutable vector<CanteraDouble> m_SE_c_ij;
 
     //! Enthalpy term for the binary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_VHE_b_ij;
+    mutable vector<CanteraDouble> m_VHE_b_ij;
 
     //! Enthalpy term for the ternary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_VHE_c_ij;
+    mutable vector<CanteraDouble> m_VHE_c_ij;
 
     //! Entropy term for the binary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_VSE_b_ij;
+    mutable vector<CanteraDouble> m_VSE_b_ij;
 
     //! Entropy term for the ternary mole fraction interaction of the
     //! excess Gibbs free energy expression
-    mutable vector<double> m_VSE_c_ij;
+    mutable vector<CanteraDouble> m_VSE_c_ij;
 
     //! vector of species indices representing species A in the interaction
     /*!

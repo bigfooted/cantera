@@ -100,7 +100,7 @@ const vector<string>& elementNames();
  *
  * @since New in version 3.0
  */
-const map<string, double>& elementWeights();
+const map<string, CanteraDouble>& elementWeights();
 
 //! Get the atomic weight of an element.
 /*!
@@ -112,7 +112,7 @@ const map<string, double>& elementWeights();
  * @exception CanteraError if a match for ename is not found or the
  * element has no stable isotopes, and therefore no standard atomic weight
  */
-double getElementWeight(const string& ename);
+CanteraDouble getElementWeight(const string& ename);
 
 //! Get the atomic weight of an element.
 /*!
@@ -128,7 +128,7 @@ double getElementWeight(const string& ename);
  * @exception CanteraError if the element has no stable isotopes, and
  * therefore no standard atomic weight
  */
-double getElementWeight(int atomicNumber);
+CanteraDouble getElementWeight(int atomicNumber);
 
 //! Get the symbol for an element
 /*!

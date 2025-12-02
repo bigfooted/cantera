@@ -37,9 +37,9 @@ public:
      * and for water, even near the critical point. Pressures above 500 MPa and
      * temperature above 900 C are suspect.
      */
-    double viscosity() override;
+    CanteraDouble viscosity() override;
 
-    double bulkViscosity() override {
+    CanteraDouble bulkViscosity() override {
         return 0.0;
     }
 
@@ -54,7 +54,7 @@ public:
      * and for water, even near the critical point. Pressures above 500 MPa and
      * temperature above 900 C are suspect.
      */
-    double thermalConductivity() override;
+    CanteraDouble thermalConductivity() override;
 
     void init(shared_ptr<ThermoPhase> thermo, int mode=0) override;
 };

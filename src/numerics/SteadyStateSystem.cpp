@@ -14,7 +14,7 @@ namespace Cantera
 
 SteadyStateSystem::SteadyStateSystem()
 {
-    m_state = make_shared<vector<double>>();
+    m_state = make_shared<vector<CanteraDouble>>();
     m_newt = make_unique<MultiNewton>(1);
 }
 
@@ -22,14 +22,14 @@ SteadyStateSystem::~SteadyStateSystem()
 {
 }
 
-void SteadyStateSystem::setInitialGuess(const double* x)
+void SteadyStateSystem::setInitialGuess(const CanteraDouble* x)
 {
     clearDebugFile();
     m_attempt_counter = 0;
     m_state->assign(x, x + size());
 }
 
-void SteadyStateSystem::getState(double* x) const
+void SteadyStateSystem::getState(CanteraDouble* x) const
 {
     copy(m_xnew.begin(), m_xnew.end(), x);
 }
@@ -39,7 +39,7 @@ void SteadyStateSystem::solve(int loglevel)
     size_t istep = 0;
     int nsteps = m_steps[istep];
     m_nsteps = 0;
-    double dt = m_tstep;
+    CanteraDouble dt = m_tstep;
 
     while (true) {
         // Keep the attempt_counter in the range of [1, max_history]
@@ -108,7 +108,7 @@ void SteadyStateSystem::solve(int loglevel)
     }
 }
 
-double SteadyStateSystem::timeStep(int nsteps, double dt, double* x, double* r, int loglevel)
+CanteraDouble SteadyStateSystem::timeStep(int nsteps, CanteraDouble dt, CanteraDouble* x, CanteraDouble* r, int loglevel)
 {
     // set the Jacobian age parameter to the transient value
     newton().setOptions(m_ts_jac_age);
@@ -124,10 +124,10 @@ double SteadyStateSystem::timeStep(int nsteps, double dt, double* x, double* r, 
     }
     while (n < nsteps) {
         if (loglevel == 1) { // At level 1, output concise information
-            double ss = ssnorm(x, r);
+            CanteraDouble ss = ssnorm(x, r);
             writelog("\n{:<5d}  {:<6.4e}   {:>7.4f}", n, dt, log10(ss));
         } else if (loglevel > 1) {
-            double ss = ssnorm(x, r);
+            CanteraDouble ss = ssnorm(x, r);
             writelog("\nTimestep ({}) dt= {:<11.4e}  log(ss)= {:<7.4f}", n, dt, log10(ss));
         }
 
@@ -189,11 +189,11 @@ double SteadyStateSystem::timeStep(int nsteps, double dt, double* x, double* r, 
 
     // Write the final step to the log
     if (loglevel == 1) {
-        double ss = ssnorm(x, r);
+        CanteraDouble ss = ssnorm(x, r);
         writelog("\n{:<5d}  {:<6.4e}   {:>7.4f}", n, dt, log10(ss));
         writelog("\n============================");
     } else if (loglevel > 1) {
-        double ss = ssnorm(x, r);
+        CanteraDouble ss = ssnorm(x, r);
         writelog("\nTimestep ({}) dt= {:<11.4e} log10(ss)= {:<7.4f}\n", n, dt, log10(ss));
     }
 
@@ -202,17 +202,17 @@ double SteadyStateSystem::timeStep(int nsteps, double dt, double* x, double* r, 
     return dt;
 }
 
-double SteadyStateSystem::ssnorm(double* x, double* r)
+CanteraDouble SteadyStateSystem::ssnorm(CanteraDouble* x, CanteraDouble* r)
 {
     eval(x, r, 0.0, 0);
-    double ss = 0.0;
+    CanteraDouble ss = 0.0;
     for (size_t i = 0; i < m_size; i++) {
         ss = std::max(fabs(r[i]),ss);
     }
     return ss;
 }
 
-void SteadyStateSystem::setTimeStep(double stepsize, size_t n, const int* tsteps)
+void SteadyStateSystem::setTimeStep(CanteraDouble stepsize, size_t n, const int* tsteps)
 {
     m_tstep = stepsize;
     m_steps.resize(n);
@@ -246,18 +246,18 @@ void SteadyStateSystem::setLinearSolver(shared_ptr<SystemJacobian> solver)
     m_jac_ok = false;
 }
 
-void SteadyStateSystem::evalSSJacobian(double* x, double* rsd)
+void SteadyStateSystem::evalSSJacobian(CanteraDouble* x, CanteraDouble* rsd)
 {
-    double rdt_save = m_rdt;
+    CanteraDouble rdt_save = m_rdt;
     m_jac_ok = false;
     setSteadyMode();
     evalJacobian(x);
     m_rdt = rdt_save;
 }
 
-void SteadyStateSystem::initTimeInteg(double dt, double* x)
+void SteadyStateSystem::initTimeInteg(CanteraDouble dt, CanteraDouble* x)
 {
-    double rdt_old = m_rdt;
+    CanteraDouble rdt_old = m_rdt;
     m_rdt = 1.0/dt;
 
     // if the stepsize has changed, then update the transient part of the Jacobian

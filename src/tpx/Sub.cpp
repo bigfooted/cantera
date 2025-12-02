@@ -21,73 +21,73 @@ string propertySymbols[] = {"H", "S", "U", "V", "P", "T"};
 namespace tpx
 {
 
-void Substance::setStdState(double h0, double s0, double t0, double p0)
+void Substance::setStdState(CanteraDouble h0, CanteraDouble s0, CanteraDouble t0, CanteraDouble p0)
 {
     Set(PropertyPair::TP, t0, p0);
-    double hh = h();
-    double ss = s();
-    double hoff = h0 - hh;
-    double soff = s0 - ss;
+    CanteraDouble hh = h();
+    CanteraDouble ss = s();
+    CanteraDouble hoff = h0 - hh;
+    CanteraDouble soff = s0 - ss;
     m_entropy_offset += soff;
     m_energy_offset += hoff;
 }
 
-double Substance::P()
+CanteraDouble Substance::P()
 {
     return TwoPhase() ? Ps() : Pp();
 }
 
-const double DeltaT = 0.000001;
+const CanteraDouble DeltaT = 0.000001;
 
-double Substance::cv()
+CanteraDouble Substance::cv()
 {
     if (TwoPhase(true)) {
         // While cv can be calculated for the two-phase region (the state can
         // always be continuously varied along an isochor on a T-v diagram),
         // this calculation is currently not implemented
-        return std::numeric_limits<double>::quiet_NaN();
+        return std::numeric_limits<CanteraDouble>::quiet_NaN();
     }
 
-    double Tsave = T, dt = 1.e-4 * T;
-    double x0 = x();
-    double T1 = std::max(Tmin(), Tsave - dt);
-    double T2 = std::min(Tmax(), Tsave + dt);
+    CanteraDouble Tsave = T, dt = 1.e-4 * T;
+    CanteraDouble x0 = x();
+    CanteraDouble T1 = std::max(Tmin(), Tsave - dt);
+    CanteraDouble T2 = std::min(Tmax(), Tsave + dt);
 
     set_T(T1);
-    double x1 = x();
+    CanteraDouble x1 = x();
     if ((x0 == 1.0 || x0 == 0.0) && x1 != x0) {
         // If the initial state was pure liquid or pure vapor, and the state at
         // T-dT is not, just take a one-sided difference
         T1 = Tsave;
         set_T(T1);
     }
-    double s1 = s();
+    CanteraDouble s1 = s();
 
     set_T(T2);
-    double x2 = x();
+    CanteraDouble x2 = x();
     if ((x0 == 1.0 || x0 == 0.0) && x2 != x0) {
         // If the initial state was pure liquid or pure vapor, and the state at
         // T+dT is not, just take a one-sided difference
         T2 = Tsave;
         set_T(T2);
     }
-    double s2 = s();
+    CanteraDouble s2 = s();
 
     set_T(Tsave);
     return T*(s2 - s1)/(T2-T1);
 }
 
-double Substance::cp()
+CanteraDouble Substance::cp()
 {
     if (TwoPhase(true)) {
         // In the two-phase region, cp is infinite
-        return std::numeric_limits<double>::infinity();
+        return std::numeric_limits<CanteraDouble>::infinity();
     }
 
-    double Tsave = T, dt = 1.e-4 * T;
-    double RhoSave = Rho;
-    double T1, T2, s1, s2;
-    double p0 = P();
+    CanteraDouble Tsave = T, dt = 1.e-4 * T;
+    CanteraDouble RhoSave = Rho;
+    CanteraDouble T1, T2, s1, s2;
+    CanteraDouble p0 = P();
 
     if (Rho >= Rhf) {
         // initial state is pure liquid
@@ -129,18 +129,18 @@ double Substance::cp()
     return T * (s2 - s1) / (T2 - T1);
 }
 
-double Substance::thermalExpansionCoeff()
+CanteraDouble Substance::thermalExpansionCoeff()
 {
     if (TwoPhase(true)) {
         // In the two-phase region, the thermal expansion coefficient is
         // infinite
-        return std::numeric_limits<double>::infinity();
+        return std::numeric_limits<CanteraDouble>::infinity();
     }
 
-    double Tsave = T, dt = 1.e-4 * T;
-    double RhoSave = Rho;
-    double T1, T2, v1, v2;
-    double p0 = P();
+    CanteraDouble Tsave = T, dt = 1.e-4 * T;
+    CanteraDouble RhoSave = Rho;
+    CanteraDouble T1, T2, v1, v2;
+    CanteraDouble p0 = P();
 
     if (Rho >= Rhf) {
         // initial state is pure liquid
@@ -182,17 +182,17 @@ double Substance::thermalExpansionCoeff()
     return 2.0 * (v2 - v1) / ((v2 + v1) * (T2 - T1));
 }
 
-double Substance::isothermalCompressibility()
+CanteraDouble Substance::isothermalCompressibility()
 {
     if (TwoPhase(true)) {
         // In the two-phase region, the isothermal compressibility is infinite
-        return std::numeric_limits<double>::infinity();
+        return std::numeric_limits<CanteraDouble>::infinity();
     }
 
-    double Psave = P(), dp = 1.e-4 * Psave;
-    double RhoSave = Rho;
-    double P1, P2, v1, v2;
-    double v0 = v();
+    CanteraDouble Psave = P(), dp = 1.e-4 * Psave;
+    CanteraDouble RhoSave = Rho;
+    CanteraDouble P1, P2, v1, v2;
+    CanteraDouble v0 = v();
 
     if (Rho >= Rhf) {
         // initial state is pure liquid
@@ -230,11 +230,11 @@ double Substance::isothermalCompressibility()
     return -(v2 - v1) / (v0 * (P2 - P1));
 }
 
-double Substance::dPsdT()
+CanteraDouble Substance::dPsdT()
 {
-    double tsave = T;
-    double ps1 = Ps();
-    double dpdt;
+    CanteraDouble tsave = T;
+    CanteraDouble ps1 = Ps();
+    CanteraDouble dpdt;
     if (T + DeltaT < Tcrit()) {
         T += DeltaT;
         dpdt = (Ps() - ps1)/DeltaT;
@@ -259,7 +259,7 @@ int Substance::TwoPhase(bool strict)
     return ((Rho >= Rhv) && (Rho <= Rhf) ? 1 : 0);
 }
 
-double Substance::x()
+CanteraDouble Substance::x()
 {
     if (T >= Tcrit()) {
         return (1.0/Rho < Vcrit() ? 0.0 : 1.0);
@@ -270,16 +270,16 @@ double Substance::x()
         } else if (Rho >= Rhf) {
             return 0.0;
         } else {
-            double vv = 1.0/Rhv;
-            double vl = 1.0/Rhf;
+            CanteraDouble vv = 1.0/Rhv;
+            CanteraDouble vl = 1.0/Rhf;
             return (1.0/Rho - vl)/(vv - vl);
         }
     }
 }
 
-double Substance::Tsat(double p)
+CanteraDouble Substance::Tsat(CanteraDouble p)
 {
-    double Tsave = T;
+    CanteraDouble Tsave = T;
     if (p <= 0. || p > Pcrit()) {
         // @todo: this check should also fail below the triple point pressure
         // (calculated as Ps() for Tmin() as it is not available as a numerical
@@ -294,18 +294,18 @@ double Substance::Tsat(double p)
     Tsave = T;
 
     int LoopCount = 0;
-    double tol = 1.e-6*p;
+    CanteraDouble tol = 1.e-6*p;
     if (T < Tmin() || T > Tcrit()) {
         T = 0.5*(Tcrit() - Tmin());
     }
-    double dp = 10*tol;
+    CanteraDouble dp = 10*tol;
     while (fabs(dp) > tol) {
         T = std::min(T, Tcrit());
         T = std::max(T, Tmin());
         dp = p - Ps();
-        double dt = dp/dPsdT();
-        double dta = fabs(dt);
-        double dtm = 0.1*T;
+        CanteraDouble dt = dp/dPsdT();
+        CanteraDouble dta = fabs(dt);
+        CanteraDouble dtm = 0.1*T;
         if (dta > dtm) {
             dt = dt*dtm/dta;
         }
@@ -316,23 +316,23 @@ double Substance::Tsat(double p)
             throw CanteraError("Substance::Tsat", "No convergence: p = {}", p);
         }
     }
-    double tsat = T;
+    CanteraDouble tsat = T;
     T = Tsave;
     return tsat;
 }
 
 // property tolerances
-static const double TolAbsH = 1.e-4; // J/kg
-static const double TolAbsU = 1.e-4;
-static const double TolAbsS = 1.e-7;
-static const double TolAbsP = 0.0; // Pa, this is supposed to be zero
-static const double TolAbsV = 1.e-8;
-static const double TolAbsT = 1.e-3;
-static const double TolRel = 1.e-8;
+static const CanteraDouble TolAbsH = 1.e-4; // J/kg
+static const CanteraDouble TolAbsU = 1.e-4;
+static const CanteraDouble TolAbsS = 1.e-7;
+static const CanteraDouble TolAbsP = 0.0; // Pa, this is supposed to be zero
+static const CanteraDouble TolAbsV = 1.e-8;
+static const CanteraDouble TolAbsT = 1.e-3;
+static const CanteraDouble TolRel = 1.e-8;
 
-void Substance::Set(PropertyPair::type XY, double x0, double y0)
+void Substance::Set(PropertyPair::type XY, CanteraDouble x0, CanteraDouble y0)
 {
-    double temp;
+    CanteraDouble temp;
 
     /* if inverted (PT) switch order and change sign of XY (TP = -PT) */
     if (XY < 0) {
@@ -454,7 +454,7 @@ void Substance::Set(PropertyPair::type XY, double x0, double y0)
 
 //------------------ Protected and Private Functions -------------------
 
-void Substance::set_Rho(double r0)
+void Substance::set_Rho(CanteraDouble r0)
 {
     if (r0 > 0.0) {
         Rho = r0;
@@ -463,7 +463,7 @@ void Substance::set_Rho(double r0)
     }
 }
 
-void Substance::set_T(double t0)
+void Substance::set_T(CanteraDouble t0)
 {
     if ((t0 >= Tmin()) && (t0 <= Tmax())) {
         T = t0;
@@ -472,7 +472,7 @@ void Substance::set_T(double t0)
     }
 }
 
-void Substance::set_v(double v0)
+void Substance::set_v(CanteraDouble v0)
 {
     if (v0 > 0) {
         Rho = 1.0/v0;
@@ -482,7 +482,7 @@ void Substance::set_v(double v0)
     }
 }
 
-double Substance::Ps()
+CanteraDouble Substance::Ps()
 {
     if (T < Tmin() || T > Tcrit()) {
         throw CanteraError("Substance::Ps",
@@ -495,9 +495,9 @@ double Substance::Ps()
 void Substance::update_sat()
 {
     if (T != Tslast) {
-        double Rho_save = Rho;
-        double pp = Psat(); // illegal temperatures are caught by Psat()
-        double lps = log(pp);
+        CanteraDouble Rho_save = Rho;
+        CanteraDouble pp = Psat(); // illegal temperatures are caught by Psat()
+        CanteraDouble lps = log(pp);
         // trial value = Psat from correlation
         int i;
         for (i = 0; i<20; i++) {
@@ -509,7 +509,7 @@ void Substance::update_sat()
             set_TPp(T,pp);
             Rhf = Rho; // sat liquid density
 
-            double gf = hp() - T*sp();
+            CanteraDouble gf = hp() - T*sp();
             if (i==0) {
                 Rho = pp*MolWt()/(GasConstant*T); // trial value = ideal gas
             } else {
@@ -518,8 +518,8 @@ void Substance::update_sat()
             set_TPp(T,pp);
 
             Rhv = Rho; // sat vapor density
-            double gv = hp() - T*sp();
-            double dg = gv - gf;
+            CanteraDouble gv = hp() - T*sp();
+            CanteraDouble dg = gv - gf;
             if (Rhv > Rhf) {
                 std::swap(Rhv, Rhf);
                 dg = - dg;
@@ -528,8 +528,8 @@ void Substance::update_sat()
             if (fabs(dg) < 0.001) {
                 break;
             }
-            double dp = dg/(1.0/Rhv - 1.0/Rhf);
-            double psold = pp;
+            CanteraDouble dp = dg/(1.0/Rhv - 1.0/Rhf);
+            CanteraDouble psold = pp;
             if (fabs(dp) > pp) {
                 lps -= dg/(pp*(1.0/Rhv - 1.0/Rhf));
                 pp = exp(lps);
@@ -556,7 +556,7 @@ void Substance::update_sat()
     }
 }
 
-double Substance::vprop(propertyFlag::type ijob)
+CanteraDouble Substance::vprop(propertyFlag::type ijob)
 {
     switch (ijob) {
     case propertyFlag::H:
@@ -574,11 +574,11 @@ double Substance::vprop(propertyFlag::type ijob)
     }
 }
 
-int Substance::Lever(int itp, double sat, double val, propertyFlag::type ifunc)
+int Substance::Lever(int itp, CanteraDouble sat, CanteraDouble val, propertyFlag::type ifunc)
 {
-    double psat;
-    double Tsave = T;
-    double Rhosave = Rho;
+    CanteraDouble psat;
+    CanteraDouble Tsave = T;
+    CanteraDouble Rhosave = Rho;
     if (itp == Tgiven) {
         if (sat >= Tcrit()) {
             return 0;
@@ -602,12 +602,12 @@ int Substance::Lever(int itp, double sat, double val, propertyFlag::type ifunc)
         throw CanteraError("Substance::Lever", "General error");
     }
     Set(PropertyPair::TX, T, 1.0);
-    double Valg = vprop(ifunc);
+    CanteraDouble Valg = vprop(ifunc);
     Set(PropertyPair::TX, T, 0.0);
-    double Valf = vprop(ifunc);
+    CanteraDouble Valf = vprop(ifunc);
     if (val >= Valf && val <= Valg) {
-        double xx = (val - Valf)/(Valg - Valf);
-        double vv = (1.0 - xx)/Rhf + xx/Rhv;
+        CanteraDouble xx = (val - Valf)/(Valg - Valf);
+        CanteraDouble vv = (1.0 - xx)/Rhf + xx/Rhv;
         set_v(vv);
         return 1;
     } else {
@@ -618,17 +618,17 @@ int Substance::Lever(int itp, double sat, double val, propertyFlag::type ifunc)
 }
 
 void Substance::set_xy(propertyFlag::type ifx, propertyFlag::type ify,
-                       double X, double Y,
-                       double atx, double aty,
-                       double rtx, double rty)
+                       CanteraDouble X, CanteraDouble Y,
+                       CanteraDouble atx, CanteraDouble aty,
+                       CanteraDouble rtx, CanteraDouble rty)
 {
-    double v_here, t_here;
-    double dvs1 = 2.0*Vcrit();
-    double dvs2 = 0.7*Vcrit();
+    CanteraDouble v_here, t_here;
+    CanteraDouble dvs1 = 2.0*Vcrit();
+    CanteraDouble dvs2 = 0.7*Vcrit();
     int LoopCount = 0;
 
-    double v_save = 1.0/Rho;
-    double t_save = T;
+    CanteraDouble v_save = 1.0/Rho;
+    CanteraDouble t_save = T;
 
     if ((T == Undef) && (Rho == Undef)) {
         // new object, try to pick a "reasonable" starting point
@@ -645,54 +645,54 @@ void Substance::set_xy(propertyFlag::type ifx, propertyFlag::type ify,
         t_here = t_save;
     }
 
-    double Xa = fabs(X);
-    double Ya = fabs(Y);
+    CanteraDouble Xa = fabs(X);
+    CanteraDouble Ya = fabs(Y);
     while (true) {
-        double x_here = prop(ifx);
-        double y_here = prop(ify);
-        double err_x = fabs(X - x_here);
-        double err_y = fabs(Y - y_here);
+        CanteraDouble x_here = prop(ifx);
+        CanteraDouble y_here = prop(ify);
+        CanteraDouble err_x = fabs(X - x_here);
+        CanteraDouble err_y = fabs(Y - y_here);
 
         if ((err_x < atx + rtx*Xa) && (err_y < aty + rty*Ya)) {
             break;
         }
 
         /* perturb t */
-        double dt = 0.001*t_here;
+        CanteraDouble dt = 0.001*t_here;
         if (t_here + dt > Tmax()) {
             dt *= -1.0;
         }
 
         /* perturb v */
-        double dv = 0.001*v_here;
+        CanteraDouble dv = 0.001*v_here;
         if (v_here <= Vcrit()) {
             dv *= -1.0;
         }
 
         /* derivatives with respect to T */
         Set(PropertyPair::TV, t_here + dt, v_here);
-        double dxdt = (prop(ifx) - x_here)/dt;
-        double dydt = (prop(ify) - y_here)/dt;
+        CanteraDouble dxdt = (prop(ifx) - x_here)/dt;
+        CanteraDouble dydt = (prop(ify) - y_here)/dt;
 
         /* derivatives with respect to v */
         Set(PropertyPair::TV, t_here, v_here + dv);
-        double dxdv = (prop(ifx) - x_here)/dv;
-        double dydv = (prop(ify) - y_here)/dv;
+        CanteraDouble dxdv = (prop(ifx) - x_here)/dv;
+        CanteraDouble dydv = (prop(ify) - y_here)/dv;
 
-        double det = dxdt*dydv - dydt*dxdv;
+        CanteraDouble det = dxdt*dydv - dydt*dxdv;
         dt = ((X - x_here)*dydv - (Y - y_here)*dxdv)/det;
         dv = ((Y - y_here)*dxdt - (X - x_here)*dydt)/det;
 
-        double dvm = 0.2*v_here;
+        CanteraDouble dvm = 0.2*v_here;
         if (v_here < dvs1) {
             dvm *= 0.5;
         }
         if (v_here < dvs2) {
             dvm *= 0.5;
         }
-        double dtm = 0.1*t_here;
-        double dva = fabs(dv);
-        double dta = fabs(dt);
+        CanteraDouble dtm = 0.1*t_here;
+        CanteraDouble dva = fabs(dv);
+        CanteraDouble dta = fabs(dt);
         if (dva > dvm) {
             dv *= dvm/dva;
         }
@@ -720,7 +720,7 @@ void Substance::set_xy(propertyFlag::type ifx, propertyFlag::type ify,
     }
 }
 
-double Substance::prop(propertyFlag::type ijob)
+CanteraDouble Substance::prop(propertyFlag::type ijob)
 {
     if (ijob == propertyFlag::P) {
         return P();
@@ -728,14 +728,14 @@ double Substance::prop(propertyFlag::type ijob)
     if (ijob == propertyFlag::T) {
         return T;
     }
-    double xx = x();
+    CanteraDouble xx = x();
     if ((xx > 0.0) && (xx < 1.0)) {
-        double Rho_save = Rho;
+        CanteraDouble Rho_save = Rho;
         Rho = Rhv;
-        double vp = vprop(ijob);
+        CanteraDouble vp = vprop(ijob);
         Rho = Rhf;
-        double lp = vprop(ijob);
-        double pp = (1.0 - xx)*lp + xx*vp;
+        CanteraDouble lp = vprop(ijob);
+        CanteraDouble pp = (1.0 - xx)*lp + xx*vp;
         Rho = Rho_save;
         return pp;
     } else {
@@ -743,10 +743,10 @@ double Substance::prop(propertyFlag::type ijob)
     }
 }
 
-static const double ErrP = 1.e-7;
-static const double Big = 1.e30;
+static const CanteraDouble ErrP = 1.e-7;
+static const CanteraDouble Big = 1.e30;
 
-void Substance::BracketSlope(double Pressure)
+void Substance::BracketSlope(CanteraDouble Pressure)
 {
     if (kbr == 0) {
         dv = (v_here < Vcrit() ? -0.05*v_here : 0.2*v_here);
@@ -757,7 +757,7 @@ void Substance::BracketSlope(double Pressure)
             dv = -0.05*v_here;
         }
     } else {
-        double dpdv = (Pmax - Pmin)/(Vmax - Vmin);
+        CanteraDouble dpdv = (Pmax - Pmin)/(Vmax - Vmin);
         v_here = Vmax;
         P_here = Pmax;
         dv = dvbf*(Pressure - P_here)/dpdv;
@@ -765,7 +765,7 @@ void Substance::BracketSlope(double Pressure)
     }
 }
 
-void Substance::set_TPp(double Temp, double Pressure)
+void Substance::set_TPp(CanteraDouble Temp, CanteraDouble Pressure)
 {
     kbr = 0;
     dvbf = 1.0;
@@ -773,11 +773,11 @@ void Substance::set_TPp(double Temp, double Pressure)
     Vmax = Big;
     Pmin = Big;
     Pmax = 0.0;
-    double dvs1 = 2.0*Vcrit();
-    double dvs2 = 0.7*Vcrit();
+    CanteraDouble dvs1 = 2.0*Vcrit();
+    CanteraDouble dvs2 = 0.7*Vcrit();
     int LoopCount = 0;
 
-    double v_save = 1.0/Rho;
+    CanteraDouble v_save = 1.0/Rho;
     T = Temp;
     v_here = vp();
 
@@ -792,7 +792,7 @@ void Substance::set_TPp(double Temp, double Pressure)
                 dv *= -1.0;
             }
             Set(PropertyPair::TV, Temp, v_here+dv);
-            double dpdv = (Pp() - P_here)/dv;
+            CanteraDouble dpdv = (Pp() - P_here)/dv;
             if (dpdv > 0.0) {
                 BracketSlope(Pressure);
             } else {
@@ -821,7 +821,7 @@ void Substance::set_TPp(double Temp, double Pressure)
                 }
             }
         }
-        double dvm = 0.2*v_here;
+        CanteraDouble dvm = 0.2*v_here;
         if (v_here < dvs1) {
             dvm *= 0.5;
         }
@@ -829,12 +829,12 @@ void Substance::set_TPp(double Temp, double Pressure)
             dvm *= 0.5;
         }
         if (kbr != 0) {
-            double vt = v_here + dv;
+            CanteraDouble vt = v_here + dv;
             if ((vt < Vmin) || (vt > Vmax)) {
                 dv = Vmin + (Pressure - Pmin)*(Vmax - Vmin)/(Pmax - Pmin) - v_here;
             }
         }
-        double dva = fabs(dv);
+        CanteraDouble dva = fabs(dv);
         if (dva > dvm) {
             dv *= dvm/dva;
         }

@@ -54,29 +54,29 @@ public:
     int T_Calls_vcs_TP;
 
     //! Current time spent in vcs_TP
-    double T_Time_vcs_TP;
+    CanteraDouble T_Time_vcs_TP;
 
     //! Current time spent in vcs_TP
-    double Time_vcs_TP;
+    CanteraDouble Time_vcs_TP;
 
     //! Total Time spent in basopt
-    double T_Time_basopt;
+    CanteraDouble T_Time_basopt;
 
     //! Current Time spent in basopt
-    double Time_basopt;
+    CanteraDouble Time_basopt;
 
     //! Time spent in initial estimator
-    double T_Time_inest;
+    CanteraDouble T_Time_inest;
 
     //! Time spent in the vcs suite of programs
-    double T_Time_vcs;
+    CanteraDouble T_Time_vcs;
 };
 
 //! Definition of the function pointer for the root finder
 /*!
  *  see vcsUtil_root1d for a definition of how to use this.
  */
-typedef double(*VCS_FUNC_PTR)(double xval, double Vtarget,
+typedef CanteraDouble(*VCS_FUNC_PTR)(CanteraDouble xval, CanteraDouble Vtarget,
                               int varID, void* fptrPassthrough,
                               int* err);
 
@@ -85,7 +85,7 @@ typedef double(*VCS_FUNC_PTR)(double xval, double Vtarget,
  * @param vec vector of doubles
  * @returns   the l2 norm of the vector
  */
-double vcs_l2norm(const vector<double>& vec);
+CanteraDouble vcs_l2norm(const vector<CanteraDouble>& vec);
 
 //! Returns a const char string representing the type of the species given by
 //! the first argument
@@ -102,12 +102,12 @@ const char* vcs_speciesType_string(int speciesStatus, int length = 100);
 /*!
  * Currently it's set to check for 10 digits of relative accuracy.
  *
- * @param d1 first double
- * @param d2 second double
+ * @param d1 first CanteraDouble
+ * @param d2 second CanteraDouble
  *
  * @returns true if the doubles are "equal" and false otherwise
  */
-bool vcs_doubleEqual(double d1, double d2);
+bool vcs_doubleEqual(CanteraDouble d1, CanteraDouble d2);
 }
 
 #endif

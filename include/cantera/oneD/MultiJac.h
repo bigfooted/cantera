@@ -27,27 +27,27 @@ public:
     MultiJac() = default;
     void reset() override;
     const string type() const override { return "banded-direct"; }
-    void setValue(size_t row, size_t col, double value) override;
+    void setValue(size_t row, size_t col, CanteraDouble value) override;
     void initialize(size_t nVars) override;
     void setBandwidth(size_t bw) override;
-    void updateTransient(double rdt, integer* mask) override;
+    void updateTransient(CanteraDouble rdt, integer* mask) override;
     void factorize() override {
         m_mat.factor();
     }
 
-    double& value(size_t i, size_t j) {
+    CanteraDouble& value(size_t i, size_t j) {
         return m_mat.value(i, j);
     }
 
-    double value(size_t i, size_t j) const {
+    CanteraDouble value(size_t i, size_t j) const {
         return m_mat.value(i, j);
     }
 
-    void solve(const double* const b, double* const x) {
+    void solve(const CanteraDouble* const b, CanteraDouble* const x) {
         m_mat.solve(b, x);
     }
 
-    void solve(const size_t stateSize, double* b, double* x) override {
+    void solve(const size_t stateSize, CanteraDouble* b, CanteraDouble* x) override {
         m_mat.solve(b, x);
     }
 
@@ -57,7 +57,7 @@ public:
 
 protected:
     BandMatrix m_mat; //!< Underlying matrix storage
-    vector<double> m_ssdiag; //!< Diagonal of the steady-state Jacobian
+    vector<CanteraDouble> m_ssdiag; //!< Diagonal of the steady-state Jacobian
 };
 
 }

@@ -11,8 +11,8 @@
 namespace Cantera
 {
 
-double polyfit(size_t n, size_t deg, const double* xp, const double* yp,
-               const double* wp, double* pp)
+CanteraDouble polyfit(size_t n, size_t deg, const CanteraDouble* xp, const CanteraDouble* yp,
+               const CanteraDouble* wp, CanteraDouble* pp)
 {
     ConstMappedVector x(xp, n);
     Eigen::VectorXd y = ConstMappedVector(yp, n);

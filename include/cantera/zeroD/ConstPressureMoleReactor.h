@@ -26,11 +26,11 @@ public:
         return "ConstPressureMoleReactor";
     };
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
-    void eval(double t, double* LHS, double* RHS) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
     vector<size_t> steadyConstraints() const override {
         throw CanteraError("ConstPressureMoleReactor::steadyConstraints",
@@ -38,13 +38,13 @@ public:
             " solver.\nSee https://github.com/Cantera/enhancements/issues/234");
     }
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     size_t componentIndex(const string& nm) const override;
     string componentName(size_t k) override;
-    double upperBound(size_t k) const override;
-    double lowerBound(size_t k) const override;
-    void resetBadValues(double* y) override;
+    CanteraDouble upperBound(size_t k) const override;
+    CanteraDouble lowerBound(size_t k) const override;
+    void resetBadValues(CanteraDouble* y) override;
 
 protected:
     const size_t m_sidx = 1;

@@ -39,57 +39,57 @@ int MixtureFugacityTP::reportSolnBranchActual() const
 }
 
 // ---- Molar Thermodynamic Properties ---------------------------
-double MixtureFugacityTP::enthalpy_mole() const
+CanteraDouble MixtureFugacityTP::enthalpy_mole() const
 {
-   double h_ideal = RT() * mean_X(m_h0_RT);
-   double h_nonideal = hresid();
+   CanteraDouble h_ideal = RT() * mean_X(m_h0_RT);
+   CanteraDouble h_nonideal = hresid();
    return h_ideal + h_nonideal;
 }
 
 
-double MixtureFugacityTP::entropy_mole() const
+CanteraDouble MixtureFugacityTP::entropy_mole() const
 {
-    double s_ideal = GasConstant * (mean_X(m_s0_R) - sum_xlogx()
+    CanteraDouble s_ideal = GasConstant * (mean_X(m_s0_R) - sum_xlogx()
         - std::log(pressure()/refPressure()));
-    double s_nonideal = sresid();
+    CanteraDouble s_nonideal = sresid();
     return s_ideal + s_nonideal;
 }
 
 // ----- Thermodynamic Values for the Species Standard States States ----
 
-void MixtureFugacityTP::getStandardChemPotentials(double* g) const
+void MixtureFugacityTP::getStandardChemPotentials(CanteraDouble* g) const
 {
     copy(m_g0_RT.begin(), m_g0_RT.end(), g);
-    double tmp = log(pressure() / refPressure());
+    CanteraDouble tmp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
         g[k] = RT() * (g[k] + tmp);
     }
 }
 
-void MixtureFugacityTP::getEnthalpy_RT(double* hrt) const
+void MixtureFugacityTP::getEnthalpy_RT(CanteraDouble* hrt) const
 {
     getEnthalpy_RT_ref(hrt);
 }
 
-void MixtureFugacityTP::getEntropy_R(double* sr) const
+void MixtureFugacityTP::getEntropy_R(CanteraDouble* sr) const
 {
     copy(m_s0_R.begin(), m_s0_R.end(), sr);
-    double tmp = log(pressure() / refPressure());
+    CanteraDouble tmp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
         sr[k] -= tmp;
     }
 }
 
-void MixtureFugacityTP::getGibbs_RT(double* grt) const
+void MixtureFugacityTP::getGibbs_RT(CanteraDouble* grt) const
 {
     copy(m_g0_RT.begin(), m_g0_RT.end(), grt);
-    double tmp = log(pressure() / refPressure());
+    CanteraDouble tmp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
         grt[k] += tmp;
     }
 }
 
-void MixtureFugacityTP::getIntEnergy_RT(double* urt) const
+void MixtureFugacityTP::getIntEnergy_RT(CanteraDouble* urt) const
 {
     copy(m_h0_RT.begin(), m_h0_RT.end(), urt);
     for (size_t i = 0; i < m_kk; i++) {
@@ -97,12 +97,12 @@ void MixtureFugacityTP::getIntEnergy_RT(double* urt) const
     }
 }
 
-void MixtureFugacityTP::getCp_R(double* cpr) const
+void MixtureFugacityTP::getCp_R(CanteraDouble* cpr) const
 {
     copy(m_cp0_R.begin(), m_cp0_R.end(), cpr);
 }
 
-void MixtureFugacityTP::getStandardVolumes(double* vol) const
+void MixtureFugacityTP::getStandardVolumes(CanteraDouble* vol) const
 {
     for (size_t i = 0; i < m_kk; i++) {
         vol[i] = RT() / pressure();
@@ -111,38 +111,38 @@ void MixtureFugacityTP::getStandardVolumes(double* vol) const
 
 // ----- Thermodynamic Values for the Species Reference States ----
 
-void MixtureFugacityTP::getEnthalpy_RT_ref(double* hrt) const
+void MixtureFugacityTP::getEnthalpy_RT_ref(CanteraDouble* hrt) const
 {
     copy(m_h0_RT.begin(), m_h0_RT.end(), hrt);
 }
 
-void MixtureFugacityTP::getGibbs_RT_ref(double* grt) const
+void MixtureFugacityTP::getGibbs_RT_ref(CanteraDouble* grt) const
 {
     copy(m_g0_RT.begin(), m_g0_RT.end(), grt);
 }
 
-void MixtureFugacityTP::getGibbs_ref(double* g) const
+void MixtureFugacityTP::getGibbs_ref(CanteraDouble* g) const
 {
-    const vector<double>& gibbsrt = gibbs_RT_ref();
+    const vector<CanteraDouble>& gibbsrt = gibbs_RT_ref();
     scale(gibbsrt.begin(), gibbsrt.end(), g, RT());
 }
 
-const vector<double>& MixtureFugacityTP::gibbs_RT_ref() const
+const vector<CanteraDouble>& MixtureFugacityTP::gibbs_RT_ref() const
 {
     return m_g0_RT;
 }
 
-void MixtureFugacityTP::getEntropy_R_ref(double* er) const
+void MixtureFugacityTP::getEntropy_R_ref(CanteraDouble* er) const
 {
     copy(m_s0_R.begin(), m_s0_R.end(), er);
 }
 
-void MixtureFugacityTP::getCp_R_ref(double* cpr) const
+void MixtureFugacityTP::getCp_R_ref(CanteraDouble* cpr) const
 {
     copy(m_cp0_R.begin(), m_cp0_R.end(), cpr);
 }
 
-void MixtureFugacityTP::getStandardVolumes_ref(double* vol) const
+void MixtureFugacityTP::getStandardVolumes_ref(CanteraDouble* vol) const
 {
     for (size_t i = 0; i < m_kk; i++) {
         vol[i]= RT() / refPressure();
@@ -166,7 +166,7 @@ bool MixtureFugacityTP::addSpecies(shared_ptr<Species> spec)
     return added;
 }
 
-void MixtureFugacityTP::setTemperature(const double temp)
+void MixtureFugacityTP::setTemperature(const CanteraDouble temp)
 {
     Phase::setTemperature(temp);
     _updateReferenceStateThermo();
@@ -175,7 +175,7 @@ void MixtureFugacityTP::setTemperature(const double temp)
     iState_ = phaseState(true);
 }
 
-void MixtureFugacityTP::setPressure(double p)
+void MixtureFugacityTP::setPressure(CanteraDouble p)
 {
     // A pretty tricky algorithm is needed here, due to problems involving
     // standard states of real fluids. For those cases you need to combine the T
@@ -183,10 +183,10 @@ void MixtureFugacityTP::setPressure(double p)
     // the forbidden zone, especially when nearing the triple point. Therefore,
     // we need to do the standard state thermo calc with the (t, pres) combo.
 
-    double t = temperature();
-    double rhoNow = density();
+    CanteraDouble t = temperature();
+    CanteraDouble rhoNow = density();
     if (forcedState_ == FLUID_UNDEFINED) {
-        double rho = densityCalc(t, p, iState_, rhoNow);
+        CanteraDouble rho = densityCalc(t, p, iState_, rhoNow);
         if (rho > 0.0) {
             setDensity(rho);
             iState_ = phaseState(true);
@@ -208,7 +208,7 @@ void MixtureFugacityTP::setPressure(double p)
     } else if (forcedState_ == FLUID_GAS) {
         // Normal density calculation
         if (iState_ < FLUID_LIQUID_0) {
-            double rho = densityCalc(t, p, iState_, rhoNow);
+            CanteraDouble rho = densityCalc(t, p, iState_, rhoNow);
             if (rho > 0.0) {
                 setDensity(rho);
                 iState_ = phaseState(true);
@@ -223,7 +223,7 @@ void MixtureFugacityTP::setPressure(double p)
         }
     } else if (forcedState_ > FLUID_LIQUID_0) {
         if (iState_ >= FLUID_LIQUID_0) {
-            double rho = densityCalc(t, p, iState_, rhoNow);
+            CanteraDouble rho = densityCalc(t, p, iState_, rhoNow);
             if (rho > 0.0) {
                 setDensity(rho);
                 iState_ = phaseState(true);
@@ -246,51 +246,51 @@ void MixtureFugacityTP::compositionChanged()
     updateMixingExpressions();
 }
 
-void MixtureFugacityTP::getActivityConcentrations(double* c) const
+void MixtureFugacityTP::getActivityConcentrations(CanteraDouble* c) const
 {
     getActivityCoefficients(c);
-    double p_RT = pressure() / RT();
+    CanteraDouble p_RT = pressure() / RT();
     for (size_t k = 0; k < m_kk; k++) {
         c[k] *= moleFraction(k)*p_RT;
     }
 }
 
-double MixtureFugacityTP::z() const
+CanteraDouble MixtureFugacityTP::z() const
 {
     return pressure() * meanMolecularWeight() / (density() * RT());
 }
 
-double MixtureFugacityTP::sresid() const
+CanteraDouble MixtureFugacityTP::sresid() const
 {
     throw NotImplementedError("MixtureFugacityTP::sresid");
 }
 
-double MixtureFugacityTP::hresid() const
+CanteraDouble MixtureFugacityTP::hresid() const
 {
     throw NotImplementedError("MixtureFugacityTP::hresid");
 }
 
-double MixtureFugacityTP::psatEst(double TKelvin) const
+CanteraDouble MixtureFugacityTP::psatEst(CanteraDouble TKelvin) const
 {
-    double pcrit = critPressure();
-    double tt = critTemperature() / TKelvin;
+    CanteraDouble pcrit = critPressure();
+    CanteraDouble tt = critTemperature() / TKelvin;
     if (tt < 1.0) {
         return pcrit;
     }
-    double lpr = -0.8734*tt*tt - 3.4522*tt + 4.2918;
+    CanteraDouble lpr = -0.8734*tt*tt - 3.4522*tt + 4.2918;
     return pcrit*exp(lpr);
 }
 
-double MixtureFugacityTP::liquidVolEst(double TKelvin, double& pres) const
+CanteraDouble MixtureFugacityTP::liquidVolEst(CanteraDouble TKelvin, CanteraDouble& pres) const
 {
     throw NotImplementedError("MixtureFugacityTP::liquidVolEst");
 }
 
-double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
-        int phase, double rhoguess)
+CanteraDouble MixtureFugacityTP::densityCalc(CanteraDouble TKelvin, CanteraDouble presPa,
+        int phase, CanteraDouble rhoguess)
 {
-    double tcrit = critTemperature();
-    double mmw = meanMolecularWeight();
+    CanteraDouble tcrit = critTemperature();
+    CanteraDouble mmw = meanMolecularWeight();
     if (rhoguess == -1.0) {
         if (phase != -1) {
             if (TKelvin > tcrit) {
@@ -299,7 +299,7 @@ double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
                 if (phase == FLUID_GAS || phase == FLUID_SUPERCRIT) {
                     rhoguess = presPa * mmw / (GasConstant * TKelvin);
                 } else if (phase >= FLUID_LIQUID_0) {
-                    double lqvol = liquidVolEst(TKelvin, presPa);
+                    CanteraDouble lqvol = liquidVolEst(TKelvin, presPa);
                     rhoguess = mmw / lqvol;
                 }
             }
@@ -310,13 +310,13 @@ double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
         }
     }
 
-    double molarVolBase = mmw / rhoguess;
-    double molarVolLast = molarVolBase;
-    double vc = mmw / critDensity();
+    CanteraDouble molarVolBase = mmw / rhoguess;
+    CanteraDouble molarVolLast = molarVolBase;
+    CanteraDouble vc = mmw / critDensity();
 
     // molar volume of the spinodal at the current temperature and mole
     // fractions. this will be updated as we go.
-    double molarVolSpinodal = vc;
+    CanteraDouble molarVolSpinodal = vc;
     bool conv = false;
 
     // We start on one side of the vc and stick with that side
@@ -333,8 +333,8 @@ double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
         // Calculate the predicted reduced pressure, pred0, based on the current
         // tau and dd. Calculate the derivative of the predicted pressure wrt
         // the molar volume. This routine also returns the pressure, presBase
-        double presBase;
-        double dpdVBase = dpdVCalc(TKelvin, molarVolBase, presBase);
+        CanteraDouble presBase;
+        CanteraDouble dpdVBase = dpdVCalc(TKelvin, molarVolBase, presBase);
 
         // If dpdV is positive, then we are in the middle of the 2 phase region
         // and beyond the spinodal stability curve. We need to adjust the
@@ -373,14 +373,14 @@ double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
         }
 
         // Dampen and crop the update
-        double dpdV = dpdVBase;
+        CanteraDouble dpdV = dpdVBase;
         if (n < 10) {
             dpdV = dpdVBase * 1.5;
         }
 
         // Formulate the update to the molar volume by Newton's method. Then,
         // crop it to a max value of 0.1 times the current volume
-        double delMV = - (presBase - presPa) / dpdV;
+        CanteraDouble delMV = - (presBase - presPa) / dpdV;
         if ((!gasSide || delMV < 0.0) && fabs(delMV) > 0.2 * molarVolBase) {
             delMV = delMV / fabs(delMV) * 0.2 * molarVolBase;
         }
@@ -412,7 +412,7 @@ double MixtureFugacityTP::densityCalc(double TKelvin, double presPa,
     }
 
     // Check for convergence, and return 0.0 if it wasn't achieved.
-    double densBase = 0.0;
+    CanteraDouble densBase = 0.0;
     if (! conv) {
         molarVolBase = 0.0;
         throw CanteraError("MixtureFugacityTP::densityCalc",
@@ -427,11 +427,11 @@ void MixtureFugacityTP::updateMixingExpressions()
 {
 }
 
-int MixtureFugacityTP::corr0(double TKelvin, double pres, double& densLiqGuess,
-                             double& densGasGuess, double& liqGRT, double& gasGRT)
+int MixtureFugacityTP::corr0(CanteraDouble TKelvin, CanteraDouble pres, CanteraDouble& densLiqGuess,
+                             CanteraDouble& densGasGuess, CanteraDouble& liqGRT, CanteraDouble& gasGRT)
 {
     int retn = 0;
-    double densLiq = densityCalc(TKelvin, pres, FLUID_LIQUID_0, densLiqGuess);
+    CanteraDouble densLiq = densityCalc(TKelvin, pres, FLUID_LIQUID_0, densLiqGuess);
     if (densLiq <= 0.0) {
         retn = -1;
     } else {
@@ -440,7 +440,7 @@ int MixtureFugacityTP::corr0(double TKelvin, double pres, double& densLiqGuess,
         liqGRT = gibbs_mole() / RT();
     }
 
-    double densGas = densityCalc(TKelvin, pres, FLUID_GAS, densGasGuess);
+    CanteraDouble densGas = densityCalc(TKelvin, pres, FLUID_GAS, densGasGuess);
     if (densGas <= 0.0) {
         if (retn == -1) {
             throw CanteraError("MixtureFugacityTP::corr0",
@@ -460,34 +460,34 @@ int MixtureFugacityTP::phaseState(bool checkState) const
 {
     int state = iState_;
     if (checkState) {
-        double t = temperature();
-        double tcrit = critTemperature();
-        double rhocrit = critDensity();
+        CanteraDouble t = temperature();
+        CanteraDouble tcrit = critTemperature();
+        CanteraDouble rhocrit = critDensity();
         if (t >= tcrit) {
             return FLUID_SUPERCRIT;
         }
-        double tmid = tcrit - 100.;
+        CanteraDouble tmid = tcrit - 100.;
         if (tmid < 0.0) {
             tmid = tcrit / 2.0;
         }
-        double pp = psatEst(tmid);
-        double mmw = meanMolecularWeight();
-        double molVolLiqTmid = liquidVolEst(tmid, pp);
-        double molVolGasTmid = GasConstant * tmid / pp;
-        double densLiqTmid = mmw / molVolLiqTmid;
-        double densGasTmid = mmw / molVolGasTmid;
-        double densMidTmid = 0.5 * (densLiqTmid + densGasTmid);
-        double rhoMid = rhocrit + (t - tcrit) * (rhocrit - densMidTmid) / (tcrit - tmid);
+        CanteraDouble pp = psatEst(tmid);
+        CanteraDouble mmw = meanMolecularWeight();
+        CanteraDouble molVolLiqTmid = liquidVolEst(tmid, pp);
+        CanteraDouble molVolGasTmid = GasConstant * tmid / pp;
+        CanteraDouble densLiqTmid = mmw / molVolLiqTmid;
+        CanteraDouble densGasTmid = mmw / molVolGasTmid;
+        CanteraDouble densMidTmid = 0.5 * (densLiqTmid + densGasTmid);
+        CanteraDouble rhoMid = rhocrit + (t - tcrit) * (rhocrit - densMidTmid) / (tcrit - tmid);
 
-        double rho = density();
+        CanteraDouble rho = density();
         int iStateGuess = FLUID_LIQUID_0;
         if (rho < rhoMid) {
             iStateGuess = FLUID_GAS;
         }
-        double molarVol = mmw / rho;
-        double presCalc;
+        CanteraDouble molarVol = mmw / rho;
+        CanteraDouble presCalc;
 
-        double dpdv = dpdVCalc(t, molarVol, presCalc);
+        CanteraDouble dpdv = dpdVCalc(t, molarVol, presCalc);
         if (dpdv < 0.0) {
             state = iStateGuess;
         } else {
@@ -497,15 +497,15 @@ int MixtureFugacityTP::phaseState(bool checkState) const
     return state;
 }
 
-double MixtureFugacityTP::satPressure(double TKelvin)
+CanteraDouble MixtureFugacityTP::satPressure(CanteraDouble TKelvin)
 {
-    double molarVolGas;
-    double molarVolLiquid;
+    CanteraDouble molarVolGas;
+    CanteraDouble molarVolLiquid;
     return calculatePsat(TKelvin, molarVolGas, molarVolLiquid);
 }
 
-double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
-        double& molarVolLiquid)
+CanteraDouble MixtureFugacityTP::calculatePsat(CanteraDouble TKelvin, CanteraDouble& molarVolGas,
+        CanteraDouble& molarVolLiquid)
 {
     // The algorithm for this routine has undergone quite a bit of work. It
     // probably needs more work. However, it seems now to be fairly robust. The
@@ -527,28 +527,28 @@ double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
 
     // we need this because this is a non-const routine that is public
     setTemperature(TKelvin);
-    double densSave = density();
-    double tempSave = temperature();
-    double pres;
-    double mw = meanMolecularWeight();
+    CanteraDouble densSave = density();
+    CanteraDouble tempSave = temperature();
+    CanteraDouble pres;
+    CanteraDouble mw = meanMolecularWeight();
     if (TKelvin < critTemperature()) {
         pres = psatEst(TKelvin);
         // trial value = Psat from correlation
-        double volLiquid = liquidVolEst(TKelvin, pres);
-        double RhoLiquidGood = mw / volLiquid;
-        double RhoGasGood = pres * mw / (GasConstant * TKelvin);
-        double delGRT = 1.0E6;
-        double liqGRT, gasGRT;
+        CanteraDouble volLiquid = liquidVolEst(TKelvin, pres);
+        CanteraDouble RhoLiquidGood = mw / volLiquid;
+        CanteraDouble RhoGasGood = pres * mw / (GasConstant * TKelvin);
+        CanteraDouble delGRT = 1.0E6;
+        CanteraDouble liqGRT, gasGRT;
 
         // First part of the calculation involves finding a pressure at which
         // the gas and the liquid state coexists.
-        double presLiquid = 0.;
-        double presGas;
-        double presBase = pres;
+        CanteraDouble presLiquid = 0.;
+        CanteraDouble presGas;
+        CanteraDouble presBase = pres;
         bool foundLiquid = false;
         bool foundGas = false;
 
-        double densLiquid = densityCalc(TKelvin, presBase, FLUID_LIQUID_0, RhoLiquidGood);
+        CanteraDouble densLiquid = densityCalc(TKelvin, presBase, FLUID_LIQUID_0, RhoLiquidGood);
         if (densLiquid > 0.0) {
             foundLiquid = true;
             presLiquid = pres;
@@ -568,7 +568,7 @@ double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
         }
 
         pres = presBase;
-        double densGas = densityCalc(TKelvin, pres, FLUID_GAS, RhoGasGood);
+        CanteraDouble densGas = densityCalc(TKelvin, pres, FLUID_GAS, RhoGasGood);
         if (densGas <= 0.0) {
             foundGas = false;
         } else {
@@ -633,9 +633,9 @@ double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
         }
 
         pres = presGas;
-        double presLast = pres;
-        double RhoGas = RhoGasGood;
-        double RhoLiquid = RhoLiquidGood;
+        CanteraDouble presLast = pres;
+        CanteraDouble RhoGas = RhoGasGood;
+        CanteraDouble RhoLiquid = RhoLiquidGood;
 
         // Now that we have found a good pressure we can proceed with the algorithm.
         for (int i = 0; i < 20; i++) {
@@ -643,8 +643,8 @@ double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
             if (stab == 0) {
                 presLast = pres;
                 delGRT = liqGRT - gasGRT;
-                double delV = mw * (1.0/RhoLiquid - 1.0/RhoGas);
-                double dp = - delGRT * GasConstant * TKelvin / delV;
+                CanteraDouble delV = mw * (1.0/RhoLiquid - 1.0/RhoGas);
+                CanteraDouble dp = - delGRT * GasConstant * TKelvin / delV;
 
                 if (fabs(dp) > 0.1 * pres) {
                     if (dp > 0.0) {
@@ -694,14 +694,14 @@ double MixtureFugacityTP::calculatePsat(double TKelvin, double& molarVolGas,
     return pres;
 }
 
-double MixtureFugacityTP::dpdVCalc(double TKelvin, double molarVol, double& presCalc) const
+CanteraDouble MixtureFugacityTP::dpdVCalc(CanteraDouble TKelvin, CanteraDouble molarVol, CanteraDouble& presCalc) const
 {
     throw NotImplementedError("MixtureFugacityTP::dpdVCalc");
 }
 
 void MixtureFugacityTP::_updateReferenceStateThermo() const
 {
-    double Tnow = temperature();
+    CanteraDouble Tnow = temperature();
 
     // If the temperature has changed since the last time these
     // properties were computed, recompute them.
@@ -713,7 +713,7 @@ void MixtureFugacityTP::_updateReferenceStateThermo() const
         for (size_t k = 0; k < m_kk; k++) {
             m_g0_RT[k] = m_h0_RT[k] - m_s0_R[k];
         }
-        double pref = refPressure();
+        CanteraDouble pref = refPressure();
         if (pref <= 0.0) {
             throw CanteraError("MixtureFugacityTP::_updateReferenceStateThermo",
                 "negative reference pressure");
@@ -721,50 +721,50 @@ void MixtureFugacityTP::_updateReferenceStateThermo() const
     }
 }
 
-double MixtureFugacityTP::critTemperature() const
+CanteraDouble MixtureFugacityTP::critTemperature() const
 {
-    double pc, tc, vc;
+    CanteraDouble pc, tc, vc;
     calcCriticalConditions(pc, tc, vc);
     return tc;
 }
 
-double MixtureFugacityTP::critPressure() const
+CanteraDouble MixtureFugacityTP::critPressure() const
 {
-    double pc, tc, vc;
+    CanteraDouble pc, tc, vc;
     calcCriticalConditions(pc, tc, vc);
     return pc;
 }
 
-double MixtureFugacityTP::critVolume() const
+CanteraDouble MixtureFugacityTP::critVolume() const
 {
-    double pc, tc, vc;
+    CanteraDouble pc, tc, vc;
     calcCriticalConditions(pc, tc, vc);
     return vc;
 }
 
-double MixtureFugacityTP::critCompressibility() const
+CanteraDouble MixtureFugacityTP::critCompressibility() const
 {
-    double pc, tc, vc;
+    CanteraDouble pc, tc, vc;
     calcCriticalConditions(pc, tc, vc);
     return pc*vc/tc/GasConstant;
 }
 
-double MixtureFugacityTP::critDensity() const
+CanteraDouble MixtureFugacityTP::critDensity() const
 {
-    double pc, tc, vc;
+    CanteraDouble pc, tc, vc;
     calcCriticalConditions(pc, tc, vc);
-    double mmw = meanMolecularWeight();
+    CanteraDouble mmw = meanMolecularWeight();
     return mmw / vc;
 }
 
-void MixtureFugacityTP::calcCriticalConditions(double& pc, double& tc, double& vc) const
+void MixtureFugacityTP::calcCriticalConditions(CanteraDouble& pc, CanteraDouble& tc, CanteraDouble& vc) const
 {
     throw NotImplementedError("MixtureFugacityTP::calcCriticalConditions");
 }
 
-int MixtureFugacityTP::solveCubic(double T, double pres, double a, double b,
-                                  double aAlpha, double Vroot[3], double an,
-                                  double bn, double cn, double dn, double tc, double vc) const
+int MixtureFugacityTP::solveCubic(CanteraDouble T, CanteraDouble pres, CanteraDouble a, CanteraDouble b,
+                                  CanteraDouble aAlpha, CanteraDouble Vroot[3], CanteraDouble an,
+                                  CanteraDouble bn, CanteraDouble cn, CanteraDouble dn, CanteraDouble tc, CanteraDouble vc) const
 {
     fill_n(Vroot, 3, 0.0);
     if (T <= 0.0) {
@@ -773,44 +773,44 @@ int MixtureFugacityTP::solveCubic(double T, double pres, double a, double b,
     }
 
     // Derive the center of the cubic, x_N
-    double xN = - bn /(3 * an);
+    CanteraDouble xN = - bn /(3 * an);
 
     // Derive the value of delta**2. This is a key quantity that determines the number of turning points
-    double delta2 = (bn * bn - 3 * an * cn) / (9 * an * an);
-    double delta = 0.0;
+    CanteraDouble delta2 = (bn * bn - 3 * an * cn) / (9 * an * an);
+    CanteraDouble delta = 0.0;
 
     // Calculate a couple of ratios
     // Cubic equation in z : z^3 - (1-B) z^2 + (A -2B -3B^2)z - (AB- B^2- B^3) = 0
-    double ratio1 = 3.0 * an * cn / (bn * bn);
-    double ratio2 = pres * b / (GasConstant * T); // B
+    CanteraDouble ratio1 = 3.0 * an * cn / (bn * bn);
+    CanteraDouble ratio2 = pres * b / (GasConstant * T); // B
     if (fabs(ratio1) < 1.0E-7) {
-        double ratio3 = aAlpha / (GasConstant * T) * pres / (GasConstant * T); // A
+        CanteraDouble ratio3 = aAlpha / (GasConstant * T) * pres / (GasConstant * T); // A
         if (fabs(ratio2) < 1.0E-5 && fabs(ratio3) < 1.0E-5) {
             // A and B terms in cubic equation for z are almost zero, then z is near to 1
-            double zz = 1.0;
+            CanteraDouble zz = 1.0;
             for (int i = 0; i < 10; i++) {
-                double znew = zz / (zz - ratio2) - ratio3 / (zz + ratio1);
-                double deltaz = znew - zz;
+                CanteraDouble znew = zz / (zz - ratio2) - ratio3 / (zz + ratio1);
+                CanteraDouble deltaz = znew - zz;
                 zz = znew;
                 if (fabs(deltaz) < 1.0E-14) {
                     break;
                 }
             }
-            double v = zz * GasConstant * T / pres;
+            CanteraDouble v = zz * GasConstant * T / pres;
             Vroot[0] = v;
             return 1;
         }
     }
 
     int nSolnValues = -1; // Represents number of solutions to the cubic equation
-    double h2 = 4. * an * an * delta2 * delta2 * delta2; // h^2
+    CanteraDouble h2 = 4. * an * an * delta2 * delta2 * delta2; // h^2
     if (delta2 > 0.0) {
         delta = sqrt(delta2);
     }
 
-    double h = 2.0 * an * delta * delta2;
-    double yN = 2.0 * bn * bn * bn / (27.0 * an * an) - bn * cn / (3.0 * an) + dn; // y_N term
-    double disc = yN * yN - h2; // discriminant
+    CanteraDouble h = 2.0 * an * delta * delta2;
+    CanteraDouble yN = 2.0 * bn * bn * bn / (27.0 * an * an) - bn * cn / (3.0 * an) + dn; // y_N term
+    CanteraDouble disc = yN * yN - h2; // discriminant
 
     //check if y = h
     if (fabs(fabs(h) - fabs(yN)) < 1.0E-10) {
@@ -833,36 +833,36 @@ int MixtureFugacityTP::solveCubic(double T, double pres, double a, double b,
         nSolnValues = 1;
     }
 
-    double tmp;
+    CanteraDouble tmp;
     // One real root -> have to determine whether gas or liquid is the root
     if (disc > 0.0) {
-        double tmpD = sqrt(disc);
-        double tmp1 = (- yN + tmpD) / (2.0 * an);
-        double sgn1 = 1.0;
+        CanteraDouble tmpD = sqrt(disc);
+        CanteraDouble tmp1 = (- yN + tmpD) / (2.0 * an);
+        CanteraDouble sgn1 = 1.0;
         if (tmp1 < 0.0) {
             sgn1 = -1.0;
             tmp1 = -tmp1;
         }
-        double tmp2 = (- yN - tmpD) / (2.0 * an);
-        double sgn2 = 1.0;
+        CanteraDouble tmp2 = (- yN - tmpD) / (2.0 * an);
+        CanteraDouble sgn2 = 1.0;
         if (tmp2 < 0.0) {
             sgn2 = -1.0;
             tmp2 = -tmp2;
         }
-        double p1 = pow(tmp1, 1./3.);
-        double p2 = pow(tmp2, 1./3.);
-        double alpha = xN + sgn1 * p1 + sgn2 * p2;
+        CanteraDouble p1 = pow(tmp1, 1./3.);
+        CanteraDouble p2 = pow(tmp2, 1./3.);
+        CanteraDouble alpha = xN + sgn1 * p1 + sgn2 * p2;
         Vroot[0] = alpha;
         Vroot[1] = 0.0;
         Vroot[2] = 0.0;
     } else if (disc < 0.0) {
         // Three real roots alpha, beta, gamma are obtained.
-        double val = acos(-yN / h);
-        double theta = val / 3.0;
-        double twoThirdPi = 2. * Pi / 3.;
-        double alpha = xN + 2. * delta * cos(theta);
-        double beta = xN + 2. * delta * cos(theta + twoThirdPi);
-        double gamma = xN + 2. * delta * cos(theta + 2.0 * twoThirdPi);
+        CanteraDouble val = acos(-yN / h);
+        CanteraDouble theta = val / 3.0;
+        CanteraDouble twoThirdPi = 2. * Pi / 3.;
+        CanteraDouble alpha = xN + 2. * delta * cos(theta);
+        CanteraDouble beta = xN + 2. * delta * cos(theta + twoThirdPi);
+        CanteraDouble gamma = xN + 2. * delta * cos(theta + 2.0 * twoThirdPi);
         Vroot[0] = beta;
         Vroot[1] = gamma;
         Vroot[2] = alpha;
@@ -912,7 +912,7 @@ int MixtureFugacityTP::solveCubic(double T, double pres, double a, double b,
     }
 
     // Find an accurate root, since there might be a heavy amount of roundoff error due to bad conditioning in this solver.
-    double res, dresdV = 0.0;
+    CanteraDouble res, dresdV = 0.0;
     for (int i = 0; i < nSolnValues; i++) {
         for (int n = 0; n < 20; n++) {
             res = an * Vroot[i] * Vroot[i] * Vroot[i] + bn * Vroot[i] * Vroot[i] + cn * Vroot[i] + dn;
@@ -920,12 +920,12 @@ int MixtureFugacityTP::solveCubic(double T, double pres, double a, double b,
                 break;
             }
             dresdV = 3.0 * an * Vroot[i] * Vroot[i] + 2.0 * bn * Vroot[i] + cn;     // derivative of the residual
-            double del = - res / dresdV;
+            CanteraDouble del = - res / dresdV;
             Vroot[i] += del;
             if (fabs(del) / (fabs(Vroot[i]) + fabs(del)) < 1.0E-14) {
                 break;
             }
-            double res2 = an * Vroot[i] * Vroot[i] * Vroot[i] + bn * Vroot[i] * Vroot[i] + cn * Vroot[i] + dn;
+            CanteraDouble res2 = an * Vroot[i] * Vroot[i] * Vroot[i] + bn * Vroot[i] * Vroot[i] + cn * Vroot[i] + dn;
             if (fabs(res2) < fabs(res)) {
                 continue;
             } else {

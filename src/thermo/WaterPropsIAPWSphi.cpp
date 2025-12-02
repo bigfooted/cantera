@@ -29,7 +29,7 @@ using std::fabs;
  * There may be a slight error here somehow.
  */
 //  @cond
-static const double ni0[9] = {
+static const CanteraDouble ni0[9] = {
     0.0,
     -8.32044648201 - 0.000000001739715,
     6.6832105268 + 0.000000000793232,
@@ -41,7 +41,7 @@ static const double ni0[9] = {
     0.24873
 };
 
-static const double gammi0[9] = {
+static const CanteraDouble gammi0[9] = {
     0.0,
     0.0,
     0.0,
@@ -228,7 +228,7 @@ static const int tiR[55] = {
     4 // 54
 };
 
-static const double ni[57] = {
+static const CanteraDouble ni[57] = {
     +0.0,
     +0.12533547935523E-1, //  1
     +0.78957634722828E1, //  2
@@ -288,61 +288,61 @@ static const double ni[57] = {
     +0.31806110878444E0 // 56
 };
 
-static const double alphai[3] = {
+static const CanteraDouble alphai[3] = {
     +20.,
     +20.,
     +20.
 };
 
-static const double betai[3] = {
+static const CanteraDouble betai[3] = {
     +150.,
     +150.,
     +250.
 };
 
-static const double gammai[3] = {
+static const CanteraDouble gammai[3] = {
     +1.21,
     +1.21,
     +1.25
 };
 
-static const double epsi[3] = {
+static const CanteraDouble epsi[3] = {
     +1.0,
     +1.0,
     +1.0
 };
 
-static const double ai[2] = {
+static const CanteraDouble ai[2] = {
     +3.5,
     +3.5
 };
 
-static const double bi[2] = {
+static const CanteraDouble bi[2] = {
     +0.85,
     +0.95
 };
 
-static const double Bi[2] = {
+static const CanteraDouble Bi[2] = {
     +0.2,
     +0.2
 };
 
-static const double Ci[2] = {
+static const CanteraDouble Ci[2] = {
     +28.0,
     +32.0
 };
 
-static const double Di[2] = {
+static const CanteraDouble Di[2] = {
     +700.,
     +800.
 };
 
-static const double Ai[2] = {
+static const CanteraDouble Ai[2] = {
     +0.32,
     +0.32
 };
 
-static const double Bbetai[2] = {
+static const CanteraDouble Bbetai[2] = {
     +0.3,
     +0.3
 };
@@ -358,7 +358,7 @@ WaterPropsIAPWSphi::WaterPropsIAPWSphi()
     }
 }
 
-void WaterPropsIAPWSphi::tdpolycalc(double tau, double delta)
+void WaterPropsIAPWSphi::tdpolycalc(CanteraDouble tau, CanteraDouble delta)
 {
     if ((tau != TAUsave) || 1) {
         TAUsave = tau;
@@ -377,11 +377,11 @@ void WaterPropsIAPWSphi::tdpolycalc(double tau, double delta)
     }
 }
 
-double WaterPropsIAPWSphi::phi0() const
+CanteraDouble WaterPropsIAPWSphi::phi0() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
-    double retn = log(delta) + ni0[1] + ni0[2]*tau + ni0[3]*log(tau);
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
+    CanteraDouble retn = log(delta) + ni0[1] + ni0[2]*tau + ni0[3]*log(tau);
 
     retn += ni0[4] * log(1.0 - exp(-gammi0[4]*tau));
     retn += ni0[5] * log(1.0 - exp(-gammi0[5]*tau));
@@ -391,15 +391,15 @@ double WaterPropsIAPWSphi::phi0() const
     return retn;
 }
 
-double WaterPropsIAPWSphi::phiR() const
+CanteraDouble WaterPropsIAPWSphi::phiR() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
 
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = (ni[1] * delta / TAUsqrt +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = (ni[1] * delta / TAUsqrt +
                       ni[2] * delta * TAUsqrt * T375 +
                       ni[3] * delta * tau +
                       ni[4] * DELTAp[2] * TAUsqrt +
@@ -414,8 +414,8 @@ double WaterPropsIAPWSphi::phiR() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
         val += (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
                 exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
     }
@@ -423,37 +423,37 @@ double WaterPropsIAPWSphi::phiR() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
-        double atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
+        CanteraDouble atmp = 0.5 / Bbetai[j];
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
         val += (ni[i] * triagtmp * delta * phi);
     }
 
     return val;
 }
 
-double WaterPropsIAPWSphi::phi(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::phi(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double nau = phi0();
-    double res = phiR();
+    CanteraDouble nau = phi0();
+    CanteraDouble res = phiR();
     return nau + res;
 }
 
-double WaterPropsIAPWSphi::phiR_d() const
+CanteraDouble WaterPropsIAPWSphi::phiR_d() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
 
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = (ni[1] / TAUsqrt +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = (ni[1] / TAUsqrt +
                       ni[2] * TAUsqrt * T375 +
                       ni[3] * tau +
                       ni[4] * 2.0 * delta * TAUsqrt +
@@ -469,9 +469,9 @@ double WaterPropsIAPWSphi::phiR_d() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
-        double tmp = (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
+        CanteraDouble tmp = (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
                            exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
         val += tmp * (diR[i]/delta - 2.0 * alphai[j] * dtmp);
     }
@@ -479,68 +479,68 @@ double WaterPropsIAPWSphi::phiR_d() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
-        double atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double triagtmpm1 = pow(triag, bi[j]-1.0);
-        double atmpM1 = atmp - 1.0;
-        double ptmp = pow(dtmp2,atmpM1);
-        double p2tmp = pow(dtmp2, ai[j]-1.0);
-        double dtriagddelta =
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
+        CanteraDouble atmp = 0.5 / Bbetai[j];
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble triagtmpm1 = pow(triag, bi[j]-1.0);
+        CanteraDouble atmpM1 = atmp - 1.0;
+        CanteraDouble ptmp = pow(dtmp2,atmpM1);
+        CanteraDouble p2tmp = pow(dtmp2, ai[j]-1.0);
+        CanteraDouble dtriagddelta =
             deltam1 *(Ai[j] * theta * 2.0 / Bbetai[j] * ptmp +
                       2.0*Bi[j]*ai[j]*p2tmp);
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
-        double dphiddelta = -2.0*Ci[j]*deltam1*phi;
-        double dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
-        double tmp = ni[i] * (triagtmp * (phi + delta*dphiddelta) +
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble dphiddelta = -2.0*Ci[j]*deltam1*phi;
+        CanteraDouble dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
+        CanteraDouble tmp = ni[i] * (triagtmp * (phi + delta*dphiddelta) +
                                    dtriagtmpddelta * delta * phi);
         val += tmp;
     }
     return val;
 }
 
-double WaterPropsIAPWSphi::phi0_d() const
+CanteraDouble WaterPropsIAPWSphi::phi0_d() const
 {
-    double delta = DELTAsave;
+    CanteraDouble delta = DELTAsave;
     return 1.0/delta;
 }
 
-double WaterPropsIAPWSphi::phi_d(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::phi_d(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double nau = phi0_d();
-    double res = phiR_d();
+    CanteraDouble nau = phi0_d();
+    CanteraDouble res = phiR_d();
     return nau + res;
 }
 
-double WaterPropsIAPWSphi::pressureM_rhoRT(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::pressureM_rhoRT(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double res = phiR_d();
+    CanteraDouble res = phiR_d();
     return 1.0 + delta * res;
 }
 
-double WaterPropsIAPWSphi::phiR_dd() const
+CanteraDouble WaterPropsIAPWSphi::phiR_dd() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
-    double atmp;
+    CanteraDouble atmp;
 
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = (ni[4] * 2.0 * TAUsqrt +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = (ni[4] * 2.0 * TAUsqrt +
                       ni[5] * 2.0 * T375 * T375 +
                       ni[6] * 6.0 * delta * T375 +
                       ni[7] * 12.0 * DELTAp[2] * tau);
     // Next, do polynomial contributions 8 to 51
     for (i = 8; i <= 51; i++) {
-        double dtmp = DELTAp[ciR[i]];
-        double tmp = ni[i] * exp(-dtmp) * TAUp[tiR[i]];
+        CanteraDouble dtmp = DELTAp[ciR[i]];
+        CanteraDouble tmp = ni[i] * exp(-dtmp) * TAUp[tiR[i]];
         if (diR[i] == 1) {
             atmp = 1.0/delta;
         } else {
@@ -554,14 +554,14 @@ double WaterPropsIAPWSphi::phiR_dd() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
-        double tmp = (ni[i] * TAUp[tiR[i]] *
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
+        CanteraDouble tmp = (ni[i] * TAUp[tiR[i]] *
                           exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
-        double deltmp = DELTAp[diR[i]];
-        double deltmpM1 = deltmp/delta;
-        double deltmpM2 = deltmpM1 / delta;
-        double d2tmp = dtmp * dtmp;
+        CanteraDouble deltmp = DELTAp[diR[i]];
+        CanteraDouble deltmpM1 = deltmp/delta;
+        CanteraDouble deltmpM2 = deltmpM1 / delta;
+        CanteraDouble d2tmp = dtmp * dtmp;
 
         val += tmp * (-2.0*alphai[j]*deltmp +
                       4.0 * alphai[j] * alphai[j] * deltmp * d2tmp -
@@ -572,34 +572,34 @@ double WaterPropsIAPWSphi::phiR_dd() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
         atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double triagtmpm1 = pow(triag, bi[j]-1.0);
-        double atmpM1 = atmp - 1.0;
-        double ptmp = pow(dtmp2,atmpM1);
-        double p2tmp = pow(dtmp2, ai[j]-1.0);
-        double dtriagddelta =
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble triagtmpm1 = pow(triag, bi[j]-1.0);
+        CanteraDouble atmpM1 = atmp - 1.0;
+        CanteraDouble ptmp = pow(dtmp2,atmpM1);
+        CanteraDouble p2tmp = pow(dtmp2, ai[j]-1.0);
+        CanteraDouble dtriagddelta =
             deltam1 *(Ai[j] * theta * 2.0 / Bbetai[j] * ptmp +
                       2.0*Bi[j]*ai[j]*p2tmp);
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
-        double dphiddelta = -2.0*Ci[j]*deltam1*phi;
-        double dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
-        double d2phiddelta2 = 2.0 * Ci[j] * phi * (2.0*Ci[j]*dtmp2 - 1.0);
-        double pptmp = ptmp / dtmp2;
-        double d2triagddelta2 = dtriagddelta / deltam1;
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble dphiddelta = -2.0*Ci[j]*deltam1*phi;
+        CanteraDouble dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
+        CanteraDouble d2phiddelta2 = 2.0 * Ci[j] * phi * (2.0*Ci[j]*dtmp2 - 1.0);
+        CanteraDouble pptmp = ptmp / dtmp2;
+        CanteraDouble d2triagddelta2 = dtriagddelta / deltam1;
         d2triagddelta2 +=
             dtmp2 *(4.0*Bi[j]*ai[j]*(ai[j]-1.0)*pow(dtmp2,ai[j]-2.0) +
                     2.0*Ai[j]*Ai[j]/(Bbetai[j]*Bbetai[j])*ptmp*ptmp +
                     Ai[j]*theta*4.0/Bbetai[j]*(atmp-1.0)*pptmp);
-        double d2triagtmpd2delta =
+        CanteraDouble d2triagtmpd2delta =
             bi[j] * (triagtmpm1 * d2triagddelta2 +
                      (bi[j]-1.0)*triagtmpm1/triag*dtriagddelta*dtriagddelta);
-        double ctmp = (triagtmp * (2.0*dphiddelta + delta*d2phiddelta2) +
+        CanteraDouble ctmp = (triagtmp * (2.0*dphiddelta + delta*d2phiddelta2) +
                             2.0*dtriagtmpddelta*(phi + delta * dphiddelta) +
                             d2triagtmpd2delta * delta * phi);
         val += ni[i] * ctmp;
@@ -607,40 +607,40 @@ double WaterPropsIAPWSphi::phiR_dd() const
     return val;
 }
 
-double WaterPropsIAPWSphi::phi0_dd() const
+CanteraDouble WaterPropsIAPWSphi::phi0_dd() const
 {
-    double delta = DELTAsave;
+    CanteraDouble delta = DELTAsave;
     return -1.0/(delta*delta);
 }
 
-double WaterPropsIAPWSphi::phi_dd(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::phi_dd(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double nau = phi0_dd();
-    double res = phiR_dd();
+    CanteraDouble nau = phi0_dd();
+    CanteraDouble res = phiR_dd();
     return nau + res;
 }
 
-double WaterPropsIAPWSphi::dimdpdrho(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::dimdpdrho(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double res1 = phiR_d();
-    double res2 = phiR_dd();
+    CanteraDouble res1 = phiR_d();
+    CanteraDouble res2 = phiR_dd();
     return 1.0 + delta * (2.0*res1 + delta*res2);
 }
 
-double WaterPropsIAPWSphi::dimdpdT(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::dimdpdT(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double res1 = phiR_d();
-    double res2 = phiR_dt();
+    CanteraDouble res1 = phiR_d();
+    CanteraDouble res2 = phiR_dt();
     return (1.0 + delta * res1) - tau * delta * (res2);
 }
 
-double WaterPropsIAPWSphi::phi0_t() const
+CanteraDouble WaterPropsIAPWSphi::phi0_t() const
 {
-    double tau = TAUsave;
-    double retn = ni0[2] + ni0[3]/tau;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble retn = ni0[2] + ni0[3]/tau;
     retn += (ni0[4] * gammi0[4] * (1.0/(1.0 - exp(-gammi0[4]*tau)) - 1.0));
     retn += (ni0[5] * gammi0[5] * (1.0/(1.0 - exp(-gammi0[5]*tau)) - 1.0));
     retn += (ni0[6] * gammi0[6] * (1.0/(1.0 - exp(-gammi0[6]*tau)) - 1.0));
@@ -649,16 +649,16 @@ double WaterPropsIAPWSphi::phi0_t() const
     return retn;
 }
 
-double WaterPropsIAPWSphi::phiR_t() const
+CanteraDouble WaterPropsIAPWSphi::phiR_t() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
-    double atmp, tmp;
+    CanteraDouble atmp, tmp;
 
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = ((-0.5) *ni[1] * delta / TAUsqrt / tau +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = ((-0.5) *ni[1] * delta / TAUsqrt / tau +
                        ni[2] * delta * 0.875 / TAUsqrt * T375 +
                        ni[3] * delta +
                        ni[4] * DELTAp[2] * 0.5 / TAUsqrt +
@@ -674,8 +674,8 @@ double WaterPropsIAPWSphi::phiR_t() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
         tmp = (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
                exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
         val += tmp *(tiR[i]/tau - 2.0 * betai[j]*ttmp);
@@ -684,34 +684,34 @@ double WaterPropsIAPWSphi::phiR_t() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
         atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
-        double dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
-        double dphidtau = - 2.0 * Di[j] * ttmp * phi;
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
+        CanteraDouble dphidtau = - 2.0 * Di[j] * ttmp * phi;
         val += ni[i] * delta * (dtriagtmpdtau * phi + triagtmp * dphidtau);
     }
     return val;
 }
 
-double WaterPropsIAPWSphi::phi_t(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::phi_t(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double nau = phi0_t();
-    double res = phiR_t();
+    CanteraDouble nau = phi0_t();
+    CanteraDouble res = phiR_t();
     return nau + res;
 }
 
-double WaterPropsIAPWSphi::phi0_tt() const
+CanteraDouble WaterPropsIAPWSphi::phi0_tt() const
 {
-    double tau = TAUsave;
-    double tmp, itmp;
-    double retn = - ni0[3]/(tau * tau);
+    CanteraDouble tau = TAUsave;
+    CanteraDouble tmp, itmp;
+    CanteraDouble retn = - ni0[3]/(tau * tau);
     for (int i = 4; i <= 8; i++) {
         tmp = exp(-gammi0[i]*tau);
         itmp = 1.0 - tmp;
@@ -720,16 +720,16 @@ double WaterPropsIAPWSphi::phi0_tt() const
     return retn;
 }
 
-double WaterPropsIAPWSphi::phiR_tt() const
+CanteraDouble WaterPropsIAPWSphi::phiR_tt() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
-    double atmp, tmp;
+    CanteraDouble atmp, tmp;
 
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = ((-0.5) * (-1.5) * ni[1] * delta / (TAUsqrt * tau * tau) +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = ((-0.5) * (-1.5) * ni[1] * delta / (TAUsqrt * tau * tau) +
                       ni[2] * delta * 0.875 * (-0.125) * T375 / (TAUsqrt * tau) +
                       ni[4] * DELTAp[2] * 0.5 * (-0.5)/ (TAUsqrt * tau) +
                       ni[5] * DELTAp[2] * 0.75 *(-0.25) * T375 * T375 / (tau * tau) +
@@ -745,8 +745,8 @@ double WaterPropsIAPWSphi::phiR_tt() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
         tmp = (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
                exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
         atmp = tiR[i]/tau - 2.0 * betai[j]*ttmp;
@@ -756,21 +756,21 @@ double WaterPropsIAPWSphi::phiR_tt() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
         atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double triagtmpM1 = triagtmp / triag;
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
-        double dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
-        double dphidtau = - 2.0 * Di[j] * ttmp * phi;
-        double d2triagtmpdtau2 =
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble triagtmpM1 = triagtmp / triag;
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
+        CanteraDouble dphidtau = - 2.0 * Di[j] * ttmp * phi;
+        CanteraDouble d2triagtmpdtau2 =
             (2 * bi[j] * triagtmpM1 +
              4 * theta * theta * bi[j] * (bi[j]-1.0) * triagtmpM1 / triag);
-        double d2phidtau2 = 2.0*Di[j]*phi *(2.0*Di[j]*ttmp*ttmp - 1.0);
+        CanteraDouble d2phidtau2 = 2.0*Di[j]*phi *(2.0*Di[j]*ttmp*ttmp - 1.0);
         tmp = (d2triagtmpdtau2 * phi +
                2 * dtriagtmpdtau * dphidtau +
                triagtmp * d2phidtau2);
@@ -780,28 +780,28 @@ double WaterPropsIAPWSphi::phiR_tt() const
     return val;
 }
 
-double WaterPropsIAPWSphi::phi_tt(double tau, double delta)
+CanteraDouble WaterPropsIAPWSphi::phi_tt(CanteraDouble tau, CanteraDouble delta)
 {
     tdpolycalc(tau, delta);
-    double nau = phi0_tt();
-    double res = phiR_tt();
+    CanteraDouble nau = phi0_tt();
+    CanteraDouble res = phiR_tt();
     return nau + res;
 }
 
-double WaterPropsIAPWSphi::phi0_dt() const
+CanteraDouble WaterPropsIAPWSphi::phi0_dt() const
 {
     return 0.0;
 }
 
-double WaterPropsIAPWSphi::phiR_dt() const
+CanteraDouble WaterPropsIAPWSphi::phiR_dt() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
     int i, j;
-    double tmp;
+    CanteraDouble tmp;
     // Write out the first seven polynomials in the expression
-    double T375 = pow(tau, 0.375);
-    double val = (ni[1] * (-0.5) / (TAUsqrt * tau) +
+    CanteraDouble T375 = pow(tau, 0.375);
+    CanteraDouble val = (ni[1] * (-0.5) / (TAUsqrt * tau) +
                       ni[2] * (0.875) * T375 / TAUsqrt +
                       ni[3] +
                       ni[4] * 2.0 * delta * (0.5) / TAUsqrt +
@@ -818,8 +818,8 @@ double WaterPropsIAPWSphi::phiR_dt() const
     // Next do contributions 52 to 54
     for (j = 0; j < 3; j++) {
         i = 52 + j;
-        double dtmp = delta - epsi[j];
-        double ttmp = tau - gammai[j];
+        CanteraDouble dtmp = delta - epsi[j];
+        CanteraDouble ttmp = tau - gammai[j];
         tmp = (ni[i] * DELTAp[diR[i]] * TAUp[tiR[i]] *
                exp(-alphai[j]*dtmp*dtmp - betai[j]*ttmp*ttmp));
         val += tmp * ((diR[i]/delta - 2.0 * alphai[j] * dtmp) *
@@ -829,30 +829,30 @@ double WaterPropsIAPWSphi::phiR_dt() const
     // Next do contributions 55 and 56
     for (j = 0; j < 2; j++) {
         i = 55 + j;
-        double deltam1 = delta - 1.0;
-        double dtmp2 = deltam1 * deltam1;
-        double atmp = 0.5 / Bbetai[j];
-        double theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
-        double triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
-        double ttmp = tau - 1.0;
-        double triagtmp = pow(triag, bi[j]);
-        double triagtmpm1 = pow(triag, bi[j]-1.0);
-        double atmpM1 = atmp - 1.0;
-        double ptmp = pow(dtmp2,atmpM1);
-        double p2tmp = pow(dtmp2, ai[j]-1.0);
-        double dtriagddelta =
+        CanteraDouble deltam1 = delta - 1.0;
+        CanteraDouble dtmp2 = deltam1 * deltam1;
+        CanteraDouble atmp = 0.5 / Bbetai[j];
+        CanteraDouble theta = (1.0 - tau) + Ai[j] * pow(dtmp2, atmp);
+        CanteraDouble triag = theta * theta + Bi[j] * pow(dtmp2, ai[j]);
+        CanteraDouble ttmp = tau - 1.0;
+        CanteraDouble triagtmp = pow(triag, bi[j]);
+        CanteraDouble triagtmpm1 = pow(triag, bi[j]-1.0);
+        CanteraDouble atmpM1 = atmp - 1.0;
+        CanteraDouble ptmp = pow(dtmp2,atmpM1);
+        CanteraDouble p2tmp = pow(dtmp2, ai[j]-1.0);
+        CanteraDouble dtriagddelta =
             deltam1 *(Ai[j] * theta * 2.0 / Bbetai[j] * ptmp +
                       2.0*Bi[j]*ai[j]*p2tmp);
-        double phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
-        double dphiddelta = -2.0*Ci[j]*deltam1*phi;
-        double dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
-        double dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
-        double dphidtau = - 2.0 * Di[j] * ttmp * phi;
-        double d2phiddeltadtau = 4.0 * Ci[j] * Di[j] * deltam1 * ttmp * phi;
-        double d2triagtmpddeltadtau =
+        CanteraDouble phi = exp(-Ci[j]*dtmp2 - Di[j]*ttmp*ttmp);
+        CanteraDouble dphiddelta = -2.0*Ci[j]*deltam1*phi;
+        CanteraDouble dtriagtmpddelta = bi[j] * triagtmpm1 * dtriagddelta;
+        CanteraDouble dtriagtmpdtau = -2.0*theta * bi[j] * triagtmp / triag;
+        CanteraDouble dphidtau = - 2.0 * Di[j] * ttmp * phi;
+        CanteraDouble d2phiddeltadtau = 4.0 * Ci[j] * Di[j] * deltam1 * ttmp * phi;
+        CanteraDouble d2triagtmpddeltadtau =
             (-Ai[j] * bi[j] * 2.0 / Bbetai[j] * triagtmpm1 * deltam1 * ptmp
              -2.0 * theta * bi[j] * (bi[j] - 1.0) * triagtmpm1 / triag * dtriagddelta);
-        double tmp = ni[i] * (triagtmp * (dphidtau + delta*d2phiddeltadtau) +
+        CanteraDouble tmp = ni[i] * (triagtmp * (dphidtau + delta*d2phiddeltadtau) +
                                   delta * dtriagtmpddelta * dphidtau +
                                   dtriagtmpdtau * (phi + delta * dphiddelta) +
                                   d2triagtmpddeltadtau * delta * phi);
@@ -861,27 +861,27 @@ double WaterPropsIAPWSphi::phiR_dt() const
     return val;
 }
 
-double WaterPropsIAPWSphi::dfind(double p_red, double tau, double deltaGuess)
+CanteraDouble WaterPropsIAPWSphi::dfind(CanteraDouble p_red, CanteraDouble tau, CanteraDouble deltaGuess)
 {
-    double dd = deltaGuess;
+    CanteraDouble dd = deltaGuess;
     bool conv = false;
-    double deldd = dd;
-    double pcheck = 1.0E-30 + 1.0E-14 * p_red;
+    CanteraDouble deldd = dd;
+    CanteraDouble pcheck = 1.0E-30 + 1.0E-14 * p_red;
     for (int n = 0; n < 200; n++) {
 
         // Calculate the internal polynomials, and then calculate the phi deriv
         // functions needed by this routine.
         tdpolycalc(tau, dd);
-        double q1 = phiR_d();
-        double q2 = phiR_dd();
+        CanteraDouble q1 = phiR_d();
+        CanteraDouble q2 = phiR_dd();
 
         // Calculate the predicted reduced pressure, pred0, based on the current
         // tau and dd.
-        double pred0 = dd + dd * dd * q1;
+        CanteraDouble pred0 = dd + dd * dd * q1;
 
         // Calculate the derivative of the predicted reduced pressure wrt the
         // reduced density, dd, This is dpddelta
-        double dpddelta = 1.0 + 2.0 * dd * q1 + dd * dd * q2;
+        CanteraDouble dpddelta = 1.0 + 2.0 * dd * q1 + dd * dd * q2;
 
         // If dpddelta is negative, then we are in the middle of the 2 phase
         // region, beyond the stability curve. We need to adjust the initial
@@ -903,7 +903,7 @@ double WaterPropsIAPWSphi::dfind(double p_red, double tau, double deltaGuess)
         }
 
         // Dampen and crop the update
-        double dpdx = dpddelta;
+        CanteraDouble dpdx = dpddelta;
         if (n < 10) {
             dpdx = dpddelta * 1.1;
         }
@@ -936,59 +936,59 @@ double WaterPropsIAPWSphi::dfind(double p_red, double tau, double deltaGuess)
     return dd;
 }
 
-double WaterPropsIAPWSphi::gibbs_RT() const
+CanteraDouble WaterPropsIAPWSphi::gibbs_RT() const
 {
-    double delta = DELTAsave;
-    double rd = phiR_d();
+    CanteraDouble delta = DELTAsave;
+    CanteraDouble rd = phiR_d();
     return 1.0 + phi0() + phiR() + delta * rd;
 }
 
-double WaterPropsIAPWSphi::enthalpy_RT() const
+CanteraDouble WaterPropsIAPWSphi::enthalpy_RT() const
 {
-    double delta = DELTAsave;
-    double tau = TAUsave;
-    double rd = phiR_d();
-    double nt = phi0_t();
-    double rt = phiR_t();
+    CanteraDouble delta = DELTAsave;
+    CanteraDouble tau = TAUsave;
+    CanteraDouble rd = phiR_d();
+    CanteraDouble nt = phi0_t();
+    CanteraDouble rt = phiR_t();
     return 1.0 + tau * (nt + rt) + delta * rd;
 }
 
-double WaterPropsIAPWSphi::entropy_R() const
+CanteraDouble WaterPropsIAPWSphi::entropy_R() const
 {
-    double tau = TAUsave;
-    double nt = phi0_t();
-    double rt = phiR_t();
-    double p0 = phi0();
-    double pR = phiR();
+    CanteraDouble tau = TAUsave;
+    CanteraDouble nt = phi0_t();
+    CanteraDouble rt = phiR_t();
+    CanteraDouble p0 = phi0();
+    CanteraDouble pR = phiR();
     return tau * (nt + rt) - p0 - pR;
 }
 
-double WaterPropsIAPWSphi::intEnergy_RT() const
+CanteraDouble WaterPropsIAPWSphi::intEnergy_RT() const
 {
-    double tau = TAUsave;
-    double nt = phi0_t();
-    double rt = phiR_t();
+    CanteraDouble tau = TAUsave;
+    CanteraDouble nt = phi0_t();
+    CanteraDouble rt = phiR_t();
     return tau * (nt + rt);
 }
 
-double WaterPropsIAPWSphi::cv_R() const
+CanteraDouble WaterPropsIAPWSphi::cv_R() const
 {
-    double tau = TAUsave;
-    double ntt = phi0_tt();
-    double rtt = phiR_tt();
+    CanteraDouble tau = TAUsave;
+    CanteraDouble ntt = phi0_tt();
+    CanteraDouble rtt = phiR_tt();
     return - tau * tau * (ntt + rtt);
 }
 
-double WaterPropsIAPWSphi::cp_R() const
+CanteraDouble WaterPropsIAPWSphi::cp_R() const
 {
-    double tau = TAUsave;
-    double delta = DELTAsave;
-    double cvR = cv_R();
-    double rd = phiR_d();
-    double rdd = phiR_dd();
-    double rdt = phiR_dt();
-    double num = (1.0 + delta * rd - delta * tau * rdt);
-    double cpR = cvR + (num * num /
+    CanteraDouble tau = TAUsave;
+    CanteraDouble delta = DELTAsave;
+    CanteraDouble cvR = cv_R();
+    CanteraDouble rd = phiR_d();
+    CanteraDouble rdd = phiR_dd();
+    CanteraDouble rdt = phiR_dt();
+    CanteraDouble num = (1.0 + delta * rd - delta * tau * rdt);
+    CanteraDouble cpR = cvR + (num * num /
                              (1.0 + 2.0 * delta * rd + delta * delta * rdd));
     return cpR;
 }

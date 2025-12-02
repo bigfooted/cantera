@@ -20,9 +20,9 @@ struct PlogData : public ReactionData
 {
     PlogData() = default;
 
-    void update(double T) override;
+    void update(CanteraDouble T) override;
 
-    void update(double T, double P) override {
+    void update(CanteraDouble T, CanteraDouble P) override {
         ReactionData::update(T);
         pressure = P;
         logP = std::log(P);
@@ -37,7 +37,7 @@ struct PlogData : public ReactionData
      * The method is used for the evaluation of numerical derivatives.
      * @param  deltaP  relative pressure perturbation
      */
-    void perturbPressure(double deltaP);
+    void perturbPressure(CanteraDouble deltaP);
 
     void restore() override;
 
@@ -46,11 +46,11 @@ struct PlogData : public ReactionData
         pressure = NAN;
     }
 
-    double pressure = NAN; //!< pressure
-    double logP = 0.0; //!< logarithm of pressure
+    CanteraDouble pressure = NAN; //!< pressure
+    CanteraDouble logP = 0.0; //!< logarithm of pressure
 
 protected:
-    double m_pressure_buf = -1.0; //!< buffered pressure
+    CanteraDouble m_pressure_buf = -1.0; //!< buffered pressure
 };
 
 
@@ -80,7 +80,7 @@ public:
     PlogRate() = default;
 
     //! Constructor from Arrhenius rate expressions at a set of pressures
-    explicit PlogRate(const std::multimap<double, ArrheniusRate>& rates);
+    explicit PlogRate(const std::multimap<CanteraDouble, ArrheniusRate>& rates);
 
     PlogRate(const AnyMap& node, const UnitStack& rate_units={});
 
@@ -138,12 +138,12 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const PlogData& shared_data) {
-        double log_k1, log_k2;
+    CanteraDouble evalFromStruct(const PlogData& shared_data) {
+        CanteraDouble log_k1, log_k2;
         if (ilow1_ == ilow2_) {
             log_k1 = rates_[ilow1_].evalLog(shared_data.logT, shared_data.recipT);
         } else {
-            double k = 1e-300; // non-zero to make log(k) finite
+            CanteraDouble k = 1e-300; // non-zero to make log(k) finite
             for (size_t i = ilow1_; i < ilow2_; i++) {
                 k += rates_[i].evalRate(shared_data.logT, shared_data.recipT);
             }
@@ -153,7 +153,7 @@ public:
         if (ihigh1_ == ihigh2_) {
             log_k2 = rates_[ihigh1_].evalLog(shared_data.logT, shared_data.recipT);
         } else {
-            double k = 1e-300; // non-zero to make log(k) finite
+            CanteraDouble k = 1e-300; // non-zero to make log(k) finite
             for (size_t i = ihigh1_; i < ihigh2_; i++) {
                 k += rates_[i].evalRate(shared_data.logT, shared_data.recipT);
             }
@@ -164,7 +164,7 @@ public:
     }
 
     //! Set up Plog object
-    void setRates(const std::multimap<double, ArrheniusRate>& rates);
+    void setRates(const std::multimap<CanteraDouble, ArrheniusRate>& rates);
 
     //! Check to make sure that the rate expression is finite over a range of
     //! temperatures at each interpolation pressure. This is potentially an
@@ -174,18 +174,18 @@ public:
 
     //! Return the pressures and Arrhenius expressions which comprise this
     //! reaction.
-    std::multimap<double, ArrheniusRate> getRates() const;
+    std::multimap<CanteraDouble, ArrheniusRate> getRates() const;
 
 protected:
     //! log(p) to (index range) in the rates_ vector
-    map<double, pair<size_t, size_t>> pressures_;
+    map<CanteraDouble, pair<size_t, size_t>> pressures_;
 
     // Rate expressions which are referenced by the indices stored in pressures_
     vector<ArrheniusRate> rates_;
 
-    double logP_ = -1000; //!< log(p) at the current state
-    double logP1_ = 1000; //!< log(p) at the lower pressure reference
-    double logP2_ = -1000; //!< log(p) at the upper pressure reference
+    CanteraDouble logP_ = -1000; //!< log(p) at the current state
+    CanteraDouble logP1_ = 1000; //!< log(p) at the lower pressure reference
+    CanteraDouble logP2_ = -1000; //!< log(p) at the upper pressure reference
 
     //! Indices to the ranges within rates_ for the lower / upper pressure, such
     //! that rates_[ilow1_] through rates_[ilow2_] (inclusive) are the rates
@@ -193,7 +193,7 @@ protected:
     //! pressure.
     size_t ilow1_, ilow2_, ihigh1_, ihigh2_;
 
-    double rDeltaP_ = -1.0; //!< reciprocal of (logP2 - logP1)
+    CanteraDouble rDeltaP_ = -1.0; //!< reciprocal of (logP2 - logP1)
 };
 
 }

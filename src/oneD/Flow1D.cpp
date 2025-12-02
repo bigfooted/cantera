@@ -76,7 +76,7 @@ Flow1D::Flow1D(shared_ptr<Solution> phase, const string& id, size_t points)
     m_refiner->setActive(c_offset_L, false);
     m_refiner->setActive(c_offset_Uo, false);
 
-    vector<double> gr;
+    vector<CanteraDouble> gr;
     for (size_t ng = 0; ng < m_points; ng++) {
         gr.push_back(1.0*ng/m_points);
     }
@@ -172,7 +172,7 @@ void Flow1D::resize(size_t ncomponents, size_t points)
     m_z.resize(m_points);
 }
 
-void Flow1D::setupGrid(size_t n, const double* z)
+void Flow1D::setupGrid(size_t n, const CanteraDouble* z)
 {
     resize(m_nv, n);
 
@@ -187,11 +187,11 @@ void Flow1D::setupGrid(size_t n, const double* z)
     }
 }
 
-void Flow1D::resetBadValues(double* xg)
+void Flow1D::resetBadValues(CanteraDouble* xg)
 {
-    double* x = xg + loc();
+    CanteraDouble* x = xg + loc();
     for (size_t j = 0; j < m_points; j++) {
-        double* Y = x + m_nv*j + c_offset_Y;
+        CanteraDouble* Y = x + m_nv*j + c_offset_Y;
         m_thermo->setMassFractions(Y);
         m_thermo->getMassFractions(Y);
     }
@@ -221,7 +221,7 @@ void Flow1D::setFluxGradientBasis(ThermoBasis fluxGradientBasis) {
     }
 }
 
-void Flow1D::_getInitialSoln(double* x)
+void Flow1D::_getInitialSoln(CanteraDouble* x)
 {
     for (size_t j = 0; j < m_points; j++) {
         T(x,j) = m_thermo->temperature();
@@ -230,19 +230,19 @@ void Flow1D::_getInitialSoln(double* x)
     }
 }
 
-void Flow1D::setGas(const double* x, size_t j)
+void Flow1D::setGas(const CanteraDouble* x, size_t j)
 {
     m_thermo->setTemperature(T(x,j));
-    const double* yy = x + m_nv*j + c_offset_Y;
+    const CanteraDouble* yy = x + m_nv*j + c_offset_Y;
     m_thermo->setMassFractions_NoNorm(yy);
     m_thermo->setPressure(m_press);
 }
 
-void Flow1D::setGasAtMidpoint(const double* x, size_t j)
+void Flow1D::setGasAtMidpoint(const CanteraDouble* x, size_t j)
 {
     m_thermo->setTemperature(0.5*(T(x,j)+T(x,j+1)));
-    const double* yy_j = x + m_nv*j + c_offset_Y;
-    const double* yy_j_plus1 = x + m_nv*(j+1) + c_offset_Y;
+    const CanteraDouble* yy_j = x + m_nv*j + c_offset_Y;
+    const CanteraDouble* yy_j_plus1 = x + m_nv*(j+1) + c_offset_Y;
     for (size_t k = 0; k < m_nsp; k++) {
         m_ybar[k] = 0.5*(yy_j[k] + yy_j_plus1[k]);
     }
@@ -250,7 +250,7 @@ void Flow1D::setGasAtMidpoint(const double* x, size_t j)
     m_thermo->setPressure(m_press);
 }
 
-void Flow1D::_finalize(const double* x)
+void Flow1D::_finalize(const CanteraDouble* x)
 {
     if (!(m_do_multicomponent ||
           m_trans->transportModel() == "mixture-averaged" ||
@@ -269,8 +269,8 @@ void Flow1D::_finalize(const double* x)
         if (e || nz == 0) {
             m_fixedtemp[j] = T(x, j);
         } else {
-            double zz = (z(j) - z(0))/(z(m_points - 1) - z(0));
-            double tt = linearInterp(zz, m_zfix, m_tfix);
+            CanteraDouble zz = (z(j) - z(0))/(z(m_points - 1) - z(0));
+            CanteraDouble tt = linearInterp(zz, m_zfix, m_tfix);
             m_fixedtemp[j] = tt;
         }
     }
@@ -302,8 +302,8 @@ void Flow1D::_finalize(const double* x)
     }
 }
 
-void Flow1D::eval(size_t jGlobal, double* xGlobal, double* rsdGlobal,
-                  integer* diagGlobal, double rdt)
+void Flow1D::eval(size_t jGlobal, CanteraDouble* xGlobal, CanteraDouble* rsdGlobal,
+                  integer* diagGlobal, CanteraDouble rdt)
 {
     // If evaluating a Jacobian, and the global point is outside the domain of
     // influence for this domain, then skip evaluating the residual
@@ -312,8 +312,8 @@ void Flow1D::eval(size_t jGlobal, double* xGlobal, double* rsdGlobal,
     }
 
     // start of local part of global arrays
-    double* x = xGlobal + loc();
-    double* rsd = rsdGlobal + loc();
+    CanteraDouble* x = xGlobal + loc();
+    CanteraDouble* rsd = rsdGlobal + loc();
     integer* diag = diagGlobal + loc();
 
     size_t jmin, jmax;
@@ -341,7 +341,7 @@ void Flow1D::eval(size_t jGlobal, double* xGlobal, double* rsdGlobal,
     evalSpecies(x, rsd, diag, rdt, jmin, jmax);
 }
 
-void Flow1D::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
+void Flow1D::updateProperties(size_t jg, CanteraDouble* x, size_t jmin, size_t jmax)
 {
     // properties are computed for grid points from j0 to j1
     size_t j0 = std::max<size_t>(jmin, 1) - 1;
@@ -354,9 +354,9 @@ void Flow1D::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
         updateTransport(x, j0, j1);
     }
     if (jg == npos) {
-        double* Yleft = x + index(c_offset_Y, jmin);
+        CanteraDouble* Yleft = x + index(c_offset_Y, jmin);
         m_kExcessLeft = distance(Yleft, max_element(Yleft, Yleft + m_nsp));
-        double* Yright = x + index(c_offset_Y, jmax);
+        CanteraDouble* Yright = x + index(c_offset_Y, jmax);
         m_kExcessRight = distance(Yright, max_element(Yright, Yright + m_nsp));
     }
 
@@ -365,13 +365,13 @@ void Flow1D::updateProperties(size_t jg, double* x, size_t jmin, size_t jmax)
     updateDiffFluxes(x, j0, j1);
 }
 
-void Flow1D::updateTransport(double* x, size_t j0, size_t j1)
+void Flow1D::updateTransport(CanteraDouble* x, size_t j0, size_t j1)
 {
      if (m_do_multicomponent) {
         for (size_t j = j0; j < j1; j++) {
             setGasAtMidpoint(x,j);
-            double wtm = m_thermo->meanMolecularWeight();
-            double rho = m_thermo->density();
+            CanteraDouble wtm = m_thermo->meanMolecularWeight();
+            CanteraDouble rho = m_thermo->density();
             m_visc[j] = (m_dovisc ? m_trans->viscosity() : 0.0);
             m_trans->getMultiDiffCoeffs(m_nsp, &m_multidiff[mindex(0,0,j)]);
 
@@ -396,10 +396,10 @@ void Flow1D::updateTransport(double* x, size_t j0, size_t j1)
                 m_trans->getMixDiffCoeffsMass(&m_diff[j*m_nsp]);
             }
 
-            double rho = m_thermo->density();
+            CanteraDouble rho = m_thermo->density();
 
             if (m_fluxGradientBasis == ThermoBasis::molar) {
-                double wtm = m_thermo->meanMolecularWeight();
+                CanteraDouble wtm = m_thermo->meanMolecularWeight();
                 for (size_t k=0; k < m_nsp; k++) {
                     m_diff[k+j*m_nsp] *= m_wt[k] * rho / wtm;
                 }
@@ -416,13 +416,13 @@ void Flow1D::updateTransport(double* x, size_t j0, size_t j1)
     }
 }
 
-void Flow1D::updateDiffFluxes(const double* x, size_t j0, size_t j1)
+void Flow1D::updateDiffFluxes(const CanteraDouble* x, size_t j0, size_t j1)
 {
     if (m_do_multicomponent) {
         for (size_t j = j0; j < j1; j++) {
-            double dz = z(j+1) - z(j);
+            CanteraDouble dz = z(j+1) - z(j);
             for (size_t k = 0; k < m_nsp; k++) {
-                double sum = 0.0;
+                CanteraDouble sum = 0.0;
                 for (size_t m = 0; m < m_nsp; m++) {
                     sum += m_wt[m] * m_multidiff[mindex(k,m,j)] * (X(x,m,j+1)-X(x,m,j));
                 }
@@ -431,8 +431,8 @@ void Flow1D::updateDiffFluxes(const double* x, size_t j0, size_t j1)
         }
     } else {
         for (size_t j = j0; j < j1; j++) {
-            double sum = 0.0;
-            double dz = z(j+1) - z(j);
+            CanteraDouble sum = 0.0;
+            CanteraDouble dz = z(j+1) - z(j);
             if (m_fluxGradientBasis == ThermoBasis::molar) {
                 for (size_t k = 0; k < m_nsp; k++) {
                     m_flux(k,j) = m_diff[k+m_nsp*j] * (X(x,k,j) - X(x,k,j+1))/dz;
@@ -453,7 +453,7 @@ void Flow1D::updateDiffFluxes(const double* x, size_t j0, size_t j1)
 
     if (m_do_soret) {
         for (size_t m = j0; m < j1; m++) {
-            double gradlogT = 2.0 * (T(x,m+1) - T(x,m)) /
+            CanteraDouble gradlogT = 2.0 * (T(x,m+1) - T(x,m)) /
                               ((T(x,m+1) + T(x,m)) * (z(m+1) - z(m)));
             for (size_t k = 0; k < m_nsp; k++) {
                 m_flux(k,m) -= m_dthermal(k,m)*gradlogT;
@@ -462,46 +462,46 @@ void Flow1D::updateDiffFluxes(const double* x, size_t j0, size_t j1)
     }
 }
 
-void Flow1D::computeRadiation(double* x, size_t jmin, size_t jmax)
+void Flow1D::computeRadiation(CanteraDouble* x, size_t jmin, size_t jmax)
 {
     // Variable definitions for the Planck absorption coefficient and the
     // radiation calculation:
-    double k_P_ref = 1.0*OneAtm;
+    CanteraDouble k_P_ref = 1.0*OneAtm;
 
     // Polynomial coefficients:
-    const double c_H2O[6] = {-0.23093, -1.12390, 9.41530, -2.99880,
+    const CanteraDouble c_H2O[6] = {-0.23093, -1.12390, 9.41530, -2.99880,
                                     0.51382, -1.86840e-5};
-    const double c_CO2[6] = {18.741, -121.310, 273.500, -194.050,
+    const CanteraDouble c_CO2[6] = {18.741, -121.310, 273.500, -194.050,
                                     56.310, -5.8169};
 
     // Calculation of the two boundary values
-    double boundary_Rad_left = m_epsilon_left * StefanBoltz * pow(T(x, 0), 4);
-    double boundary_Rad_right = m_epsilon_right * StefanBoltz * pow(T(x, m_points - 1), 4);
+    CanteraDouble boundary_Rad_left = m_epsilon_left * StefanBoltz * pow(T(x, 0), 4);
+    CanteraDouble boundary_Rad_right = m_epsilon_right * StefanBoltz * pow(T(x, m_points - 1), 4);
 
     for (size_t j = jmin; j < jmax; j++) {
         // calculation of the mean Planck absorption coefficient
-        double k_P = 0;
+        CanteraDouble k_P = 0;
         // Absorption coefficient for H2O
         if (m_kRadiating[1] != npos) {
-            double k_P_H2O = 0;
+            CanteraDouble k_P_H2O = 0;
             for (size_t n = 0; n <= 5; n++) {
-                k_P_H2O += c_H2O[n] * pow(1000 / T(x, j), (double) n);
+                k_P_H2O += c_H2O[n] * pow(1000 / T(x, j), (CanteraDouble) n);
             }
             k_P_H2O /= k_P_ref;
             k_P += m_press * X(x, m_kRadiating[1], j) * k_P_H2O;
         }
         // Absorption coefficient for CO2
         if (m_kRadiating[0] != npos) {
-            double k_P_CO2 = 0;
+            CanteraDouble k_P_CO2 = 0;
             for (size_t n = 0; n <= 5; n++) {
-                k_P_CO2 += c_CO2[n] * pow(1000 / T(x, j), (double) n);
+                k_P_CO2 += c_CO2[n] * pow(1000 / T(x, j), (CanteraDouble) n);
             }
             k_P_CO2 /= k_P_ref;
             k_P += m_press * X(x, m_kRadiating[0], j) * k_P_CO2;
         }
 
         // Calculation of the radiative heat loss term
-        double radiative_heat_loss = 2 * k_P *(2 * StefanBoltz * pow(T(x, j), 4)
+        CanteraDouble radiative_heat_loss = 2 * k_P *(2 * StefanBoltz * pow(T(x, j), 4)
                                      - boundary_Rad_left - boundary_Rad_right);
 
         // set the radiative heat loss vector
@@ -509,8 +509,8 @@ void Flow1D::computeRadiation(double* x, size_t jmin, size_t jmax)
     }
 }
 
-void Flow1D::evalContinuity(double* x, double* rsd, int* diag,
-                            double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalContinuity(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                            CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     // The left boundary has the same form for all cases.
     if (jmin == 0) { // left boundary
@@ -566,8 +566,8 @@ void Flow1D::evalContinuity(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalMomentum(double* x, double* rsd, int* diag,
-                          double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalMomentum(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                          CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     if (!m_usesLambda) { //disable this equation
         for (size_t j = jmin; j <= jmax; j++) {
@@ -602,8 +602,8 @@ void Flow1D::evalMomentum(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalLambda(double* x, double* rsd, int* diag,
-                        double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalLambda(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                        CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     if (!m_usesLambda) { // disable this equation
         for (size_t j = jmin; j <= jmax; j++) {
@@ -645,8 +645,8 @@ void Flow1D::evalLambda(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalEnergy(double* x, double* rsd, int* diag,
-                        double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalEnergy(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                        CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     if (jmin == 0) { // left boundary
         rsd[index(c_offset_T, jmin)] = T(x, jmin);
@@ -662,9 +662,9 @@ void Flow1D::evalEnergy(double* x, double* rsd, int* diag,
     for (size_t j = j0; j <= j1; j++) {
         if (m_do_energy[j]) {
             grad_hk(x, j);
-            double sum = 0.0;
+            CanteraDouble sum = 0.0;
             for (size_t k = 0; k < m_nsp; k++) {
-                double flxk = 0.5*(m_flux(k, j-1) + m_flux(k, j));
+                CanteraDouble flxk = 0.5*(m_flux(k, j-1) + m_flux(k, j));
                 sum += m_wdot(k, j)*m_hk(k, j);
                 sum += flxk * m_dhk_dz(k, j) / m_wt[k];
             }
@@ -687,8 +687,8 @@ void Flow1D::evalEnergy(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalUo(double* x, double* rsd, int* diag,
-                    double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalUo(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                    CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     if (!m_twoPointControl) { // disable this equation
         for (size_t j = jmin; j <= jmax; j++) {
@@ -727,11 +727,11 @@ void Flow1D::evalUo(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalSpecies(double* x, double* rsd, int* diag,
-                         double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalSpecies(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                         CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     if (jmin == 0) { // left boundary
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t k = 0; k < m_nsp; k++) {
             sum += Y(x,k,jmin);
             rsd[index(c_offset_Y+k, jmin)] = -(m_flux(k, jmin) +
@@ -742,7 +742,7 @@ void Flow1D::evalSpecies(double* x, double* rsd, int* diag,
     }
 
     if (jmax == m_points - 1) { // right boundary
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         for (size_t k = 0; k < m_nsp; k++) {
             sum += Y(x,k,jmax);
             rsd[index(k+c_offset_Y, jmax)] = m_flux(k, jmax-1) +
@@ -757,8 +757,8 @@ void Flow1D::evalSpecies(double* x, double* rsd, int* diag,
     size_t j1 = std::min(jmax, m_points-2);
     for (size_t j = j0; j <= j1; j++) {
         for (size_t k = 0; k < m_nsp; k++) {
-            double convec = rho_u(x, j)*dYdz(x, k, j);
-            double diffus = 2*(m_flux(k, j) - m_flux(k, j-1)) / (z(j+1) - z(j-1));
+            CanteraDouble convec = rho_u(x, j)*dYdz(x, k, j);
+            CanteraDouble diffus = 2*(m_flux(k, j) - m_flux(k, j-1)) / (z(j+1) - z(j-1));
             rsd[index(c_offset_Y + k, j)] = (m_wt[k]*m_wdot(k, j)
                                               - convec - diffus) / m_rho[j]
                                             - rdt*(Y(x, k, j) - Y_prev(k, j));
@@ -767,8 +767,8 @@ void Flow1D::evalSpecies(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::evalElectricField(double* x, double* rsd, int* diag,
-                               double rdt, size_t jmin, size_t jmax)
+void Flow1D::evalElectricField(CanteraDouble* x, CanteraDouble* rsd, int* diag,
+                               CanteraDouble rdt, size_t jmin, size_t jmax)
 {
     for (size_t j = jmin; j <= jmax; j++) {
         // The same value is used for left/right/interior points
@@ -776,7 +776,7 @@ void Flow1D::evalElectricField(double* x, double* rsd, int* diag,
     }
 }
 
-void Flow1D::show(const double* x)
+void Flow1D::show(const CanteraDouble* x)
 {
     writelog("    Pressure:  {:10.4g} Pa\n", m_press);
 
@@ -929,12 +929,12 @@ void Flow1D::updateState(size_t loc)
         throw CanteraError("Flow1D::updateState",
             "Domain does not have associated Solution object.");
     }
-    const double* soln = m_state->data() + m_iloc + m_nv * loc;
+    const CanteraDouble* soln = m_state->data() + m_iloc + m_nv * loc;
     m_solution->thermo()->setMassFractions_NoNorm(soln + c_offset_Y);
     m_solution->thermo()->setState_TP(*(soln + c_offset_T), m_press);
 }
 
-void Flow1D::getValues(const string& component, vector<double>& values) const
+void Flow1D::getValues(const string& component, vector<CanteraDouble>& values) const
 {
     if (!m_state) {
         throw CanteraError("Flow1D::getValues",
@@ -949,13 +949,13 @@ void Flow1D::getValues(const string& component, vector<double>& values) const
             "Flow1D::getValues", "Component '{}' is not used by '{}'.",
             component, domainType());
     }
-    const double* soln = m_state->data() + m_iloc;
+    const CanteraDouble* soln = m_state->data() + m_iloc;
     for (size_t j = 0; j < nPoints(); j++) {
         values[j] = soln[index(i,j)];
     }
 }
 
-void Flow1D::setValues(const string& component, const vector<double>& values)
+void Flow1D::setValues(const string& component, const vector<CanteraDouble>& values)
 {
     if (!m_state) {
         throw CanteraError("Flow1D::setValues",
@@ -970,13 +970,13 @@ void Flow1D::setValues(const string& component, const vector<double>& values)
             "Flow1D::setValues", "Component '{}' is not used by '{}'.",
             component, domainType());
     }
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
     for (size_t j = 0; j < nPoints(); j++) {
         soln[index(i,j)] = values[j];
     }
 }
 
-void Flow1D::getResiduals(const string& component, vector<double>& values) const
+void Flow1D::getResiduals(const string& component, vector<CanteraDouble>& values) const
 {
     if (!m_state) {
         throw CanteraError("Flow1D::getResiduals",
@@ -991,14 +991,14 @@ void Flow1D::getResiduals(const string& component, vector<double>& values) const
             "Flow1D::getResiduals", "Component '{}' is not used by '{}'.",
             component, domainType());
     }
-    const double* soln = m_container->_workVector().data() + m_iloc;
+    const CanteraDouble* soln = m_container->_workVector().data() + m_iloc;
     for (size_t j = 0; j < nPoints(); j++) {
         values[j] = soln[index(i,j)];
     }
 }
 
 void Flow1D::setProfile(const string& component,
-                        const vector<double>& pos, const vector<double>& values)
+                        const vector<CanteraDouble>& pos, const vector<CanteraDouble>& values)
 {
     if (!m_state) {
         throw CanteraError("Flow1D::setProfile",
@@ -1020,17 +1020,17 @@ void Flow1D::setProfile(const string& component,
             "Flow1D::setProfile", "Component '{}' is not used by '{}'.",
             component, domainType());
     }
-    double* soln = m_state->data() + m_iloc;
-    double z0 = zmin();
-    double zDelta = zmax() - z0;
+    CanteraDouble* soln = m_state->data() + m_iloc;
+    CanteraDouble z0 = zmin();
+    CanteraDouble zDelta = zmax() - z0;
     for (size_t j = 0; j < nPoints(); j++) {
-        double frac = (z(j) - z0)/zDelta;
-        double v = linearInterp(frac, pos, values);
+        CanteraDouble frac = (z(j) - z0)/zDelta;
+        CanteraDouble v = linearInterp(frac, pos, values);
         soln[index(i,j)] = v;
     }
 }
 
-void Flow1D::setFlatProfile(const string& component, double value)
+void Flow1D::setFlatProfile(const string& component, CanteraDouble value)
 {
     if (!m_state) {
         throw CanteraError("Flow1D::setFlatProfile",
@@ -1042,7 +1042,7 @@ void Flow1D::setFlatProfile(const string& component, double value)
             "Flow1D::setFlatProfile", "Component '{}' is not used by '{}'.",
             component, domainType());
     }
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
     for (size_t j = 0; j < nPoints(); j++) {
         soln[index(i,j)] = value;
     }
@@ -1054,14 +1054,14 @@ shared_ptr<SolutionArray> Flow1D::toArray(bool normalize)
         throw CanteraError("Flow1D::toArray",
             "Domain needs to be installed in a container before calling toArray.");
     }
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
     auto arr = SolutionArray::create(
         m_solution, static_cast<int>(nPoints()), getMeta());
     arr->addExtra("grid", false); // leading entry
     AnyValue value;
     value = m_z;
     arr->setComponent("grid", value);
-    vector<double> data(nPoints());
+    vector<CanteraDouble> data(nPoints());
     for (size_t i = 0; i < nComponents(); i++) {
         if (componentActive(i)) {
             auto name = componentName(i);
@@ -1099,14 +1099,14 @@ void Flow1D::fromArray(const shared_ptr<SolutionArray>& arr)
     }
     resize(nComponents(), arr->size());
     m_container->resize();
-    double* soln = m_state->data() + m_iloc;
+    CanteraDouble* soln = m_state->data() + m_iloc;
 
     Domain1D::setMeta(arr->meta());
     arr->setLoc(0);
     auto phase = arr->thermo();
     m_press = phase->pressure();
 
-    const auto grid = arr->getComponent("grid").as<vector<double>>();
+    const auto grid = arr->getComponent("grid").as<vector<CanteraDouble>>();
     setupGrid(nPoints(), &grid[0]);
     setMeta(arr->meta()); // can affect which components are active
 
@@ -1116,13 +1116,13 @@ void Flow1D::fromArray(const shared_ptr<SolutionArray>& arr)
         }
         string name = componentName(i);
         if (arr->hasComponent(name)) {
-            const vector<double> data = arr->getComponent(name).as<vector<double>>();
+            const vector<CanteraDouble> data = arr->getComponent(name).as<vector<CanteraDouble>>();
             for (size_t j = 0; j < nPoints(); j++) {
                 soln[index(i,j)] = data[j];
             }
         } else if (name == "Lambda" && arr->hasComponent("lambda")) {
             // edge case: 'lambda' is renamed to 'Lambda' in Cantera 3.2
-            const auto data = arr->getComponent("lambda").as<vector<double>>();
+            const auto data = arr->getComponent("lambda").as<vector<CanteraDouble>>();
             for (size_t j = 0; j < nPoints(); j++) {
                 soln[index(i,j)] = data[j];
             }
@@ -1170,10 +1170,10 @@ void Flow1D::setMeta(const AnyMap& state)
 
     if (state.hasKey("refine-criteria")) {
         const AnyMap& criteria = state["refine-criteria"].as<AnyMap>();
-        double ratio = criteria.getDouble("ratio", m_refiner->maxRatio());
-        double slope = criteria.getDouble("slope", m_refiner->maxDelta());
-        double curve = criteria.getDouble("curve", m_refiner->maxSlope());
-        double prune = criteria.getDouble("prune", m_refiner->prune());
+        CanteraDouble ratio = criteria.getDouble("ratio", m_refiner->maxRatio());
+        CanteraDouble slope = criteria.getDouble("slope", m_refiner->maxDelta());
+        CanteraDouble curve = criteria.getDouble("curve", m_refiner->maxSlope());
+        CanteraDouble prune = criteria.getDouble("prune", m_refiner->prune());
         m_refiner->setCriteria(ratio, slope, curve, prune);
 
         if (criteria.hasKey("grid-min")) {
@@ -1247,7 +1247,7 @@ bool Flow1D::doElectricField() const
         "Not used by '{}' objects.", domainType());
 }
 
-void Flow1D::setBoundaryEmissivities(double e_left, double e_right)
+void Flow1D::setBoundaryEmissivities(CanteraDouble e_left, CanteraDouble e_right)
 {
     if (e_left < 0 || e_left > 1) {
         throw CanteraError("Flow1D::setBoundaryEmissivities",
@@ -1285,7 +1285,7 @@ void Flow1D::fixTemperature(size_t j)
     }
 }
 
-void Flow1D::grad_hk(const double* x, size_t j)
+void Flow1D::grad_hk(const CanteraDouble* x, size_t j)
 {
     size_t jloc = (u(x, j) > 0.0 ? j : j + 1);
     for(size_t k = 0; k < m_nsp; k++) {
@@ -1294,7 +1294,7 @@ void Flow1D::grad_hk(const double* x, size_t j)
 }
 
 // Two-point control functions
-double Flow1D::leftControlPointTemperature() const
+CanteraDouble Flow1D::leftControlPointTemperature() const
 {
     if (m_twoPointControl) {
         if (m_zLeft != Undef) {
@@ -1309,7 +1309,7 @@ double Flow1D::leftControlPointTemperature() const
     }
 }
 
-double Flow1D::leftControlPointCoordinate() const
+CanteraDouble Flow1D::leftControlPointCoordinate() const
 {
     if (m_twoPointControl) {
         if (m_zLeft != Undef) {
@@ -1324,7 +1324,7 @@ double Flow1D::leftControlPointCoordinate() const
     }
 }
 
-void Flow1D::setLeftControlPointTemperature(double temperature)
+void Flow1D::setLeftControlPointTemperature(CanteraDouble temperature)
 {
     if (m_twoPointControl) {
         if (m_zLeft != Undef) {
@@ -1339,7 +1339,7 @@ void Flow1D::setLeftControlPointTemperature(double temperature)
     }
 }
 
-void Flow1D::setLeftControlPointCoordinate(double z_left)
+void Flow1D::setLeftControlPointCoordinate(CanteraDouble z_left)
 {
     if (m_twoPointControl) {
             m_zLeft = z_left;
@@ -1349,7 +1349,7 @@ void Flow1D::setLeftControlPointCoordinate(double z_left)
     }
 }
 
-double Flow1D::rightControlPointTemperature() const
+CanteraDouble Flow1D::rightControlPointTemperature() const
 {
     if (m_twoPointControl) {
         if (m_zRight != Undef) {
@@ -1364,7 +1364,7 @@ double Flow1D::rightControlPointTemperature() const
     }
 }
 
-double Flow1D::rightControlPointCoordinate() const
+CanteraDouble Flow1D::rightControlPointCoordinate() const
 {
     if (m_twoPointControl) {
         if (m_zRight != Undef) {
@@ -1379,7 +1379,7 @@ double Flow1D::rightControlPointCoordinate() const
     }
 }
 
-void Flow1D::setRightControlPointTemperature(double temperature)
+void Flow1D::setRightControlPointTemperature(CanteraDouble temperature)
 {
     if (m_twoPointControl) {
         if (m_zRight != Undef) {
@@ -1394,7 +1394,7 @@ void Flow1D::setRightControlPointTemperature(double temperature)
     }
 }
 
-void Flow1D::setRightControlPointCoordinate(double z_right)
+void Flow1D::setRightControlPointCoordinate(CanteraDouble z_right)
 {
     if (m_twoPointControl) {
             m_zRight = z_right;

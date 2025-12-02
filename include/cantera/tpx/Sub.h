@@ -28,7 +28,7 @@ namespace propertyFlag
 enum type { H, S, U, V, P, T };
 }
 
-const double Undef = 999.1234;
+const CanteraDouble Undef = 999.1234;
 
 /**
  * Base class from which all pure substances are derived
@@ -40,29 +40,29 @@ public:
 
     virtual ~Substance() = default;
 
-    void setStdState(double h0 = 0.0, double s0 = 0.0,
-                     double t0 = 298.15, double p0 = 1.01325e5);
+    void setStdState(CanteraDouble h0 = 0.0, CanteraDouble s0 = 0.0,
+                     CanteraDouble t0 = 298.15, CanteraDouble p0 = 1.01325e5);
 
     //! @name Information about a substance
     //! @{
 
     //! Molecular weight [kg/kmol]
-    virtual double MolWt()=0;
+    virtual CanteraDouble MolWt()=0;
 
     //! Critical temperature [K]
-    virtual double Tcrit()=0;
+    virtual CanteraDouble Tcrit()=0;
 
     //! Critical pressure [Pa]
-    virtual double Pcrit()=0;
+    virtual CanteraDouble Pcrit()=0;
 
     //! Critical specific volume [m^3/kg]
-    virtual double Vcrit()=0;
+    virtual CanteraDouble Vcrit()=0;
 
     //! Minimum temperature for which the equation of state is valid
-    virtual double Tmin()=0;
+    virtual CanteraDouble Tmin()=0;
 
     //! Maximum temperature for which the equation of state is valid
-    virtual double Tmax()=0;
+    virtual CanteraDouble Tmax()=0;
 
     //! Name of the substance
     const char* name() {
@@ -82,68 +82,68 @@ public:
     //! Pressure [Pa]. If two phases are present, return the saturation
     //! pressure; otherwise return the pressure computed directly from the
     //! underlying eos.
-    double P();
+    CanteraDouble P();
 
     //! Temperature [K]
-    double Temp() {
+    CanteraDouble Temp() {
         return T;
     }
 
     //! Specific volume [m^3/kg]
-    double v() {
+    CanteraDouble v() {
         return prop(propertyFlag::V);
     }
 
     //! Internal energy [J/kg]
-    double u() {
+    CanteraDouble u() {
         return prop(propertyFlag::U);
     }
 
     //! Enthalpy [J/kg]
-    double h() {
+    CanteraDouble h() {
         return prop(propertyFlag::H);
     }
 
     //! Entropy [J/kg/K]
-    double s() {
+    CanteraDouble s() {
         return prop(propertyFlag::S);
     }
 
     //! Helmholtz function [J/kg]
-    double f() {
+    CanteraDouble f() {
         return u() - T*s();
     }
 
     //! Gibbs function [J/kg]
-    double g() {
+    CanteraDouble g() {
         return h() - T*s();
     }
 
     //! Specific heat at constant volume [J/kg/K]
-    virtual double cv();
+    virtual CanteraDouble cv();
 
     //! Specific heat at constant pressure [J/kg/K]
-    virtual double cp();
+    virtual CanteraDouble cp();
 
-    virtual double thermalExpansionCoeff();
+    virtual CanteraDouble thermalExpansionCoeff();
 
-    virtual double isothermalCompressibility();
+    virtual CanteraDouble isothermalCompressibility();
 
     //! @}
     //! @name Saturation Properties
     //! @{
 
-    double Ps();
+    CanteraDouble Ps();
 
     //! The derivative of the saturation pressure with respect to temperature.
-    virtual double dPsdT();
+    virtual CanteraDouble dPsdT();
 
     //! Saturation temperature at pressure *p*.
-    double Tsat(double p);
+    CanteraDouble Tsat(CanteraDouble p);
 
     //! Vapor mass fraction. If T >= Tcrit, 0 is returned for v < Vcrit, and 1
     //! is returned if v > Vcrit.
-    double x();
+    CanteraDouble x();
 
     //! Returns 1 if the current state is a liquid/vapor mixture, 0 otherwise.
     //! By default, saturated vapor and saturated liquid are included; setting
@@ -151,81 +151,81 @@ public:
     int TwoPhase(bool strict=false);
     //! @}
 
-    virtual double Pp()=0;
+    virtual CanteraDouble Pp()=0;
 
     //! Enthalpy of a single-phase state
-    double hp() {
+    CanteraDouble hp() {
         return up() + Pp()/Rho;
     }
 
     //! Gibbs function of a single-phase state
-    double gp() {
+    CanteraDouble gp() {
         return hp() - T*sp();
     }
 
-    double prop(propertyFlag::type ijob);
+    CanteraDouble prop(propertyFlag::type ijob);
 
     //! set T and P
-    void set_TPp(double t0, double p0);
+    void set_TPp(CanteraDouble t0, CanteraDouble p0);
 
     //! Function to set or change the state for a property pair *XY* where
     //! *x0* is the value of first property and *y0* is the value of the
     //! second property.
-    void Set(PropertyPair::type XY, double x0, double y0);
+    void Set(PropertyPair::type XY, CanteraDouble x0, CanteraDouble y0);
 
 protected:
-    double T = Undef;
-    double Rho = Undef;
-    double Tslast = Undef;
-    double Rhf = Undef;
-    double Rhv = Undef;
-    double Pst = Undef;
-    double m_energy_offset = 0.0;
-    double m_entropy_offset = 0.0;
+    CanteraDouble T = Undef;
+    CanteraDouble Rho = Undef;
+    CanteraDouble Tslast = Undef;
+    CanteraDouble Rhf = Undef;
+    CanteraDouble Rhv = Undef;
+    CanteraDouble Pst = Undef;
+    CanteraDouble m_energy_offset = 0.0;
+    CanteraDouble m_entropy_offset = 0.0;
     std::string m_name;
     std::string m_formula;
 
-    virtual double ldens()=0;
+    virtual CanteraDouble ldens()=0;
 
     //! Saturation pressure, Pa
-    virtual double Psat()=0;
+    virtual CanteraDouble Psat()=0;
 
     //! Internal energy of a single-phase state
-    virtual double up()=0;
+    virtual CanteraDouble up()=0;
 
     //! Entropy of a single-phase state
-    virtual double sp()=0;
+    virtual CanteraDouble sp()=0;
 
     virtual int ideal() {
         return 0;
     }
 
-    double vp() {
+    CanteraDouble vp() {
         return 1.0/Rho;
     }
 
     //! Uses the lever rule to set state in the dome. Returns 1 if in dome,
     //! 0 if not, in which case state not set.
-    int Lever(int itp, double sat, double val, propertyFlag::type ifunc);
+    int Lever(int itp, CanteraDouble sat, CanteraDouble val, propertyFlag::type ifunc);
 
     //! Update saturated liquid and vapor densities and saturation pressure
     void update_sat();
 
 private:
-    void set_Rho(double r0);
-    void set_T(double t0);
-    void set_v(double v0);
-    void BracketSlope(double p);
-    double vprop(propertyFlag::type ijob);
+    void set_Rho(CanteraDouble r0);
+    void set_T(CanteraDouble t0);
+    void set_v(CanteraDouble v0);
+    void BracketSlope(CanteraDouble p);
+    CanteraDouble vprop(propertyFlag::type ijob);
     void set_xy(propertyFlag::type if1, propertyFlag::type if2,
-                double X, double Y,
-                double atx, double aty, double rtx, double rty);
+                CanteraDouble X, CanteraDouble Y,
+                CanteraDouble atx, CanteraDouble aty, CanteraDouble rtx, CanteraDouble rty);
 
     int kbr = 0;
-    double Vmin, Vmax;
-    double Pmin, Pmax;
-    double dvbf, dv;
-    double v_here, P_here;
+    CanteraDouble Vmin, Vmax;
+    CanteraDouble Pmin, Pmax;
+    CanteraDouble dvbf, dv;
+    CanteraDouble v_here, P_here;
 };
 
 }

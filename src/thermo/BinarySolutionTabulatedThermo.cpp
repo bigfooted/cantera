@@ -38,8 +38,8 @@ void BinarySolutionTabulatedThermo::_updateThermo() const
     bool x_changed = !cached.validate(stateMFNumber());
 
     if (x_changed) {
-        double x_tab = moleFraction(m_kk_tab);
-        double x_other = moleFraction(1 - m_kk_tab);
+        CanteraDouble x_tab = moleFraction(m_kk_tab);
+        CanteraDouble x_other = moleFraction(1 - m_kk_tab);
         m_h0_tab = interpolate(x_tab, m_enthalpy_tab);
         m_s0_tab = interpolate(x_tab, m_entropy_tab);
         if (x_tab == 0) {
@@ -53,11 +53,11 @@ void BinarySolutionTabulatedThermo::_updateThermo() const
         }
     }
 
-    double tnow = temperature();
+    CanteraDouble tnow = temperature();
     if (x_changed || m_tlast != tnow) {
         // Update the thermodynamic functions of the reference state.
         m_spthermo.update(tnow, m_cp0_R.data(), m_h0_RT.data(), m_s0_R.data());
-        double rrt = 1.0 / RT();
+        CanteraDouble rrt = 1.0 / RT();
         m_h0_RT[m_kk_tab] += m_h0_tab * rrt;
         m_s0_R[m_kk_tab] += m_s0_tab / GasConstant;
         for (size_t k = 0; k < m_kk; k++) {
@@ -93,11 +93,11 @@ void BinarySolutionTabulatedThermo::initThermo()
                 m_input["tabulated-species"].asString(), name());
         }
         const AnyMap& table = m_input["tabulated-thermo"].as<AnyMap>();
-        vector<double> x = table["mole-fractions"].asVector<double>();
+        vector<CanteraDouble> x = table["mole-fractions"].asVector<CanteraDouble>();
         size_t N = x.size();
-        vector<double> h = table.convertVector("enthalpy", "J/kmol", N);
-        vector<double> s = table.convertVector("entropy", "J/kmol/K", N);
-        vector<double> vmol(N);
+        vector<CanteraDouble> h = table.convertVector("enthalpy", "J/kmol", N);
+        vector<CanteraDouble> s = table.convertVector("entropy", "J/kmol/K", N);
+        vector<CanteraDouble> vmol(N);
         // Check for molar-volume key in tabulatedThermo table,
         // otherwise calculate molar volume from pure species molar volumes
         if (table.hasKey("molar-volume")) {
@@ -110,7 +110,7 @@ void BinarySolutionTabulatedThermo::initThermo()
         }
 
         // Sort the x, h, s, vmol data in the order of increasing x
-        vector<pair<double,double>> x_h(N), x_s(N), x_vmol(N);
+        vector<pair<CanteraDouble,CanteraDouble>> x_h(N), x_s(N), x_vmol(N);
         for(size_t i = 0; i < N; i++) {
             x_h[i] = {x[i], h[i]};
             x_s[i] = {x[i], s[i]};
@@ -156,10 +156,10 @@ void BinarySolutionTabulatedThermo::getParameters(AnyMap& phaseNode) const
     phaseNode["tabulated-thermo"] = std::move(tabThermo);
 }
 
-double BinarySolutionTabulatedThermo::interpolate(const double x,
-                                                  const vector<double>& inputData) const
+CanteraDouble BinarySolutionTabulatedThermo::interpolate(const CanteraDouble x,
+                                                  const vector<CanteraDouble>& inputData) const
 {
-    double c;
+    CanteraDouble c;
     // Check if x is out of bound
     if (x > m_molefrac_tab.back()) {
         c = inputData.back();
@@ -176,8 +176,8 @@ double BinarySolutionTabulatedThermo::interpolate(const double x,
     return c;
 }
 
-void BinarySolutionTabulatedThermo::diff(const vector<double>& inputData,
-                                         vector<double>& derivedData) const
+void BinarySolutionTabulatedThermo::diff(const vector<CanteraDouble>& inputData,
+                                         vector<CanteraDouble>& derivedData) const
 {
     if (inputData.size() > 1) {
         derivedData[0] = (inputData[1] - inputData[0]) /
@@ -196,20 +196,20 @@ void BinarySolutionTabulatedThermo::diff(const vector<double>& inputData,
     }
 }
 
-void BinarySolutionTabulatedThermo::getPartialMolarVolumes(double* vbar) const
+void BinarySolutionTabulatedThermo::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     std::copy(m_speciesMolarVolume.begin(), m_speciesMolarVolume.end(), vbar);
 }
 
 void BinarySolutionTabulatedThermo::calcDensity()
 {
-    double Xtab = moleFraction(m_kk_tab);
-    double Vm = interpolate(Xtab, m_molar_volume_tab);
-    double dVdX_tab = interpolate(Xtab, m_derived_molar_volume_tab);
+    CanteraDouble Xtab = moleFraction(m_kk_tab);
+    CanteraDouble Vm = interpolate(Xtab, m_molar_volume_tab);
+    CanteraDouble dVdX_tab = interpolate(Xtab, m_derived_molar_volume_tab);
     m_speciesMolarVolume[m_kk_tab] = Vm + (1 - Xtab) * dVdX_tab;
     m_speciesMolarVolume[1-m_kk_tab] = Vm - Xtab * dVdX_tab;
 
-    double dens = meanMolecularWeight() / Vm;
+    CanteraDouble dens = meanMolecularWeight() / Vm;
 
     // Set the density in the parent State object directly, by calling the
     // Phase::assignDensity() function.

@@ -74,12 +74,12 @@ public:
     //! classes don't need to supply entries for these functions.
     //! @{
 
-    double enthalpy_mole() const override;
-    double intEnergy_mole() const override;
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Activities, Standard State, and Activity Concentrations
@@ -98,11 +98,11 @@ public:
      *
      * @param a   Output vector of activities. Length: 1.
      */
-    void getActivities(double* a) const override {
+    void getActivities(CanteraDouble* a) const override {
         a[0] = 1.0;
     }
 
-    void getActivityCoefficients(double* ac) const override {
+    void getActivityCoefficients(CanteraDouble* ac) const override {
         ac[0] = 1.0;
     }
 
@@ -123,7 +123,7 @@ public:
      * @param mu   On return, Contains the chemical potential of the single
      *             species and the phase. Units are J / kmol . Length = 1
      */
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
 
     //! Get the species partial molar enthalpies. Units: J/kmol.
     /*!
@@ -132,7 +132,7 @@ public:
      * @param hbar    Output vector of species partial molar enthalpies.
      *                Length: 1. units are J/kmol.
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     //! Get the species partial molar internal energies. Units: J/kmol.
     /*!
@@ -141,7 +141,7 @@ public:
      * @param ubar On return, Contains the internal energy of the single species
      *             and the phase. Units are J / kmol . Length = 1
      */
-    void getPartialMolarIntEnergies(double* ubar) const override;
+    void getPartialMolarIntEnergies(CanteraDouble* ubar) const override;
 
     //! Get the species partial molar entropy. Units: J/kmol K.
     /*!
@@ -150,7 +150,7 @@ public:
      * @param sbar On return, Contains the entropy of the single species and the
      *             phase. Units are J / kmol / K . Length = 1
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
     //! Get the species partial molar Heat Capacities. Units: J/ kmol /K.
     /*!
@@ -159,7 +159,7 @@ public:
      * @param cpbar On return, Contains the heat capacity of the single species
      *              and the phase. Units are J / kmol / K . Length = 1
      */
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
     //! Get the species partial molar volumes. Units: m^3/kmol.
     /*!
@@ -168,7 +168,7 @@ public:
      * @param vbar On return, Contains the molar volume of the single species
      *             and the phase. Units are m^3 / kmol. Length = 1
      */
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     //! @}
     //! @name  Properties of the Standard State of the Species in the Solution
@@ -190,7 +190,7 @@ public:
      * @param vbar On output this contains the standard volume of the species
      *             and phase (m^3/kmol). Vector of length 1
      */
-    void getStandardVolumes(double* vbar) const override;
+    void getStandardVolumes(CanteraDouble* vbar) const override;
 
     //! @}
     //! @name Thermodynamic Values for the Species Reference State
@@ -200,11 +200,11 @@ public:
     //! involve a specification of the equation of state.
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getCp_R_ref(double* cprt) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
 
     //! @}
     //! @name Setting the State
@@ -213,10 +213,10 @@ public:
     //! @{
 
     //! Mass fractions are fixed, with Y[0] = 1.0.
-    void setMassFractions(const double* const y) override {};
+    void setMassFractions(const CanteraDouble* const y) override {};
 
     //! Mole fractions are fixed, with x[0] = 1.0.
-    void setMoleFractions(const double* const x) override {};
+    void setMoleFractions(const CanteraDouble* const x) override {};
 
     //! @}
 
@@ -224,18 +224,18 @@ public:
 
 protected:
     //! The current pressure of the solution (Pa). It gets initialized to 1 atm.
-    double m_press = OneAtm;
+    CanteraDouble m_press = OneAtm;
 
     // Reference pressure (Pa). Must be the same for all species. Defaults to
     // 1 atm.
-    double m_p0 = OneAtm;
+    CanteraDouble m_p0 = OneAtm;
 
     //! Dimensionless enthalpy at the (mtlast, m_p0)
-    mutable double m_h0_RT;
+    mutable CanteraDouble m_h0_RT;
     //! Dimensionless heat capacity at the (mtlast, m_p0)
-    mutable double m_cp0_R;
+    mutable CanteraDouble m_cp0_R;
     //! Dimensionless entropy at the (mtlast, m_p0)
-    mutable double m_s0_R;
+    mutable CanteraDouble m_s0_R;
 
     //! This internal routine calculates new species Cp0, H0, and S0 whenever the
     //! temperature has changed.

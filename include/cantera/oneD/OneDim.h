@@ -54,7 +54,7 @@ public:
     //! @f$ n @f$ in domain @f$ d @f$. @f$ N @f$ is the total number of state variables
     //! across all domains and @f$ J_d @f$ is the number of grid points in domain
     //! @f$ d @f$.
-    double weightedNorm(const double* step) const override;
+    CanteraDouble weightedNorm(const CanteraDouble* step) const override;
 
     //! Number of domains.
     size_t nDomains() const {
@@ -125,8 +125,8 @@ public:
     string componentName(size_t i) const override;
     pair<string, string> componentTableHeader() const override;
     string componentTableLabel(size_t i) const override;
-    double upperBound(size_t i) const override;
-    double lowerBound(size_t i) const override;
+    CanteraDouble upperBound(size_t i) const override;
+    CanteraDouble lowerBound(size_t i) const override;
 
     /**
      * Initialize all domains. On the first call, this methods calls the init
@@ -140,7 +140,7 @@ public:
         return m_pts;
     }
 
-    void initTimeInteg(double dt, double* x) override;
+    void initTimeInteg(CanteraDouble dt, CanteraDouble* x) override;
     void setSteadyMode() override;
 
     /**
@@ -154,13 +154,13 @@ public:
      *                  the default value is used.
      * @param count   Set to zero to omit this call from the statistics
      */
-    void eval(size_t j, double* x, double* r, double rdt=-1.0, int count=1);
+    void eval(size_t j, CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt=-1.0, int count=1);
 
-    void eval(double* x, double* r, double rdt=-1.0, int count=1) override {
+    void eval(CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt=-1.0, int count=1) override {
         return eval(npos, x, r, rdt, count);
     }
 
-    void evalJacobian(double* x0) override;
+    void evalJacobian(CanteraDouble* x0) override;
 
     //! Return a pointer to the domain global point *i* belongs to.
     /*!
@@ -170,7 +170,7 @@ public:
     Domain1D* pointDomain(size_t i);
 
     void resize() override;
-    void resetBadValues(double* x) override;
+    void resetBadValues(CanteraDouble* x) override;
 
     //! Write statistics about the number of iterations and Jacobians at each
     //! grid level
@@ -205,14 +205,14 @@ public:
     }
 
     //! Return CPU time spent evaluating Jacobians in each call to solve()
-    const vector<double>& jacobianTimeStats() {
+    const vector<CanteraDouble>& jacobianTimeStats() {
         saveStats();
         return m_jacElapsed;
     }
 
     //! Return CPU time spent on non-Jacobian function evaluations in each call
     //! to solve()
-    const vector<double>& evalTimeStats() {
+    const vector<CanteraDouble>& evalTimeStats() {
         saveStats();
         return m_funcElapsed;
     }
@@ -237,7 +237,7 @@ public:
     }
 
     //! Access internal work array.
-    const vector<double>& _workVector() const {
+    const vector<CanteraDouble>& _workVector() const {
         return m_xnew;
     }
 
@@ -274,11 +274,11 @@ private:
     //! Solver stats are collected after successfully solving on a particular grid.
     //! @{
     int m_nevals = 0; //!< Number of calls to eval()
-    double m_evaltime = 0; //!< Total time [s] spent in eval()
+    CanteraDouble m_evaltime = 0; //!< Total time [s] spent in eval()
 
     vector<size_t> m_gridpts; //!< Number of grid points in this grid
     vector<int> m_jacEvals; //!< Number of Jacobian evaluations on this grid
-    vector<double> m_jacElapsed; //!< Time [s] spent evaluating Jacobians on this grid
+    vector<CanteraDouble> m_jacElapsed; //!< Time [s] spent evaluating Jacobians on this grid
 
     //! Number of residual function evaluations on this grid (not counting evaluations
     //! used to construct Jacobians).
@@ -286,7 +286,7 @@ private:
 
     //! Time [s] spent on residual function evaluations on this grid (not counting
     //! evaluations used to construct Jacobians).
-    vector<double> m_funcElapsed;
+    vector<CanteraDouble> m_funcElapsed;
 
     //! Number of time steps taken in each call to solve() (for example, for each
     //! successive grid refinement)

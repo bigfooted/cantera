@@ -20,7 +20,7 @@ namespace Cantera
 //!     shared_ptr<Func1> d1 = newFunc1("sin", {1.0});
 //! ```
 //! @since New in %Cantera 3.0
-class Func1Factory : public Factory<Func1, const vector<double>&>
+class Func1Factory : public Factory<Func1, const vector<CanteraDouble>&>
 {
 public:
     /**
@@ -81,13 +81,13 @@ private:
 //! Factory class to create Func1 compound objects - version B
 //!
 //! This class is mainly used via the newFunc1(const string&, const shared_ptr<Func1>,
-//! double) function, for example:
+//! CanteraDouble) function, for example:
 //!
 //! ```cpp
 //!     shared_ptr<Func1> d1 = newFunc1("plus-constant", f, 1.);
 //! ```
 //! @since New in %Cantera 3.0
-class Math1FactoryB : public Factory<Func1, const shared_ptr<Func1>, double>
+class Math1FactoryB : public Factory<Func1, const shared_ptr<Func1>, CanteraDouble>
 {
 public:
     /**
@@ -116,14 +116,14 @@ private:
 //! @param coeff  Coefficient; definition depends on functor type.
 //! @ingroup func1basic
 //! @since New in %Cantera 3.0
-shared_ptr<Func1> newFunc1(const string& func1Type, double coeff=1.);
+shared_ptr<Func1> newFunc1(const string& func1Type, CanteraDouble coeff=1.);
 
 //! Create a new advanced functor object (see @ref func1advanced).
 //! @param func1Type  String identifying functor type.
 //! @param arr  Parameter vector; definition depends on functor type.
 //! @ingroup func1advanced
 //! @since New in %Cantera 3.0
-shared_ptr<Func1> newFunc1(const string& func1Type, const vector<double>& arr);
+shared_ptr<Func1> newFunc1(const string& func1Type, const vector<CanteraDouble>& arr);
 
 //! Create a new compound functor object (see @ref func1compound).
 //! @param func1Type  String identifying functor type.
@@ -141,7 +141,7 @@ shared_ptr<Func1> newFunc1(const string& func1Type,
 //! @ingroup func1modified
 //! @since New in %Cantera 3.0
 shared_ptr<Func1> newFunc1(const string& func1Type,
-                           const shared_ptr<Func1> f, double coeff);
+                           const shared_ptr<Func1> f, CanteraDouble coeff);
 
 //! Check definition of functor object.
 //! @param func1Type  String identifying functor type.

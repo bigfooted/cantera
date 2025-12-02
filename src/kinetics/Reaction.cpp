@@ -293,7 +293,7 @@ void Reaction::setParameters(const AnyMap& node, const Kinetics& kin)
     setEquation(node["equation"].asString(), &kin);
     // Non-stoichiometric reaction orders
     if (node.hasKey("orders")) {
-        for (const auto& [name, order] : node["orders"].asMap<double>()) {
+        for (const auto& [name, order] : node["orders"].asMap<CanteraDouble>()) {
             orders[name] = order;
             if (kin.kineticsSpeciesIndex(name, false) == npos) {
                 setValid(false);
@@ -461,7 +461,7 @@ void Reaction::setEquation(const string& equation, const Kinetics* kin)
             m_third_body->explicit_3rd = true;
         } else if (input.hasKey("efficiencies")) {
             // third body is implicitly defined by efficiency
-            auto effs = input["efficiencies"].asMap<double>();
+            auto effs = input["efficiencies"].asMap<CanteraDouble>();
             if (effs.size() != 1 || !reactants.count(effs.begin()->first)) {
                 throw InputFileError("Reaction::setEquation", input,
                     "Detected ambiguous third body colliders in reaction '{}'\n"
@@ -650,8 +650,8 @@ void Reaction::checkBalance(const Kinetics& kin) const
     string msg;
     bool ok = true;
     for (const auto& [elem, balance] : balr) {
-        double scale = std::max(std::abs(balr[elem]), std::abs(balp[elem]));
-        double elemdiff = fabs(balp[elem] - balr[elem]);
+        CanteraDouble scale = std::max(std::abs(balr[elem]), std::abs(balp[elem]));
+        CanteraDouble elemdiff = fabs(balp[elem] - balr[elem]);
         if (elemdiff > 1e-4 * scale) {
             ok = false;
             msg += fmt::format("  {}           {}           {}\n",
@@ -670,8 +670,8 @@ void Reaction::checkBalance(const Kinetics& kin) const
     }
 
     // Check that the number of surface sites is balanced
-    double reac_sites = 0.0;
-    double prod_sites = 0.0;
+    CanteraDouble reac_sites = 0.0;
+    CanteraDouble prod_sites = 0.0;
     auto& surf = dynamic_cast<const SurfPhase&>(kin.thermo(0));
     for (const auto& [name, stoich] : reactants) {
         size_t k = surf.speciesIndex(name, false);
@@ -740,7 +740,7 @@ bool Reaction::checkSpecies(const Kinetics& kin) const
 bool Reaction::usesElectrochemistry(const Kinetics& kin) const
 {
     // Check electrochemistry
-    vector<double> e_counter(kin.nPhases(), 0.0);
+    vector<CanteraDouble> e_counter(kin.nPhases(), 0.0);
 
     // Find the number of electrons in the products for each phase
     for (const auto& [name, stoich] : products) {
@@ -759,7 +759,7 @@ bool Reaction::usesElectrochemistry(const Kinetics& kin) const
     }
 
     // If the electrons change phases then the reaction is electrochemical
-    for (double delta_e : e_counter) {
+    for (CanteraDouble delta_e : e_counter) {
         if (std::abs(delta_e) > 1e-4) {
             return true;
         }
@@ -810,7 +810,7 @@ ThirdBody::ThirdBody(const AnyMap& node)
 void ThirdBody::setParameters(const AnyMap& node)
 {
     if (node.hasKey("default-efficiency")) {
-        double value = node["default-efficiency"].asDouble();
+        CanteraDouble value = node["default-efficiency"].asDouble();
         if (m_name != "M" && value != 0.) {
             throw InputFileError("ThirdBody::setParameters", node["default-efficiency"],
                 "Invalid default efficiency for explicit collider {};\n"
@@ -819,7 +819,7 @@ void ThirdBody::setParameters(const AnyMap& node)
         default_efficiency = value;
     }
     if (node.hasKey("efficiencies")) {
-        efficiencies = node["efficiencies"].asMap<double>();
+        efficiencies = node["efficiencies"].asMap<CanteraDouble>();
     }
     if (m_name != "M"
         && (efficiencies.size() != 1 || efficiencies.begin()->first != m_name))
@@ -842,7 +842,7 @@ void ThirdBody::getParameters(AnyMap& node) const
     }
 }
 
-double ThirdBody::efficiency(const string& k) const
+CanteraDouble ThirdBody::efficiency(const string& k) const
 {
     return getValue(efficiencies, k, default_efficiency);
 }
@@ -902,7 +902,7 @@ void parseReactionEquation(Reaction& R, const string& equation,
             tokens[i] == "<=>" || tokens[i] == "=" || tokens[i] == "=>") {
             string species = tokens[i-1];
 
-            double stoich = 1.0;
+            CanteraDouble stoich = 1.0;
             bool mass_action = true;
             if (last_used != npos && tokens[last_used] == "(+"
                     && ba::ends_with(species, ")")) {

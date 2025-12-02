@@ -15,29 +15,29 @@ namespace Cantera
 {
 const int DeltaDegree = 6;
 
-double MMCollisionInt::delta[8] = {0.0, 0.25, 0.50, 0.75, 1.0,
+CanteraDouble MMCollisionInt::delta[8] = {0.0, 0.25, 0.50, 0.75, 1.0,
                                    1.5, 2.0, 2.5
                                   };
 
-double MMCollisionInt::quadInterp(double x0, double* x, double* y)
+CanteraDouble MMCollisionInt::quadInterp(CanteraDouble x0, CanteraDouble* x, CanteraDouble* y)
 {
-    double dx21 = x[1] - x[0];
-    double dx32 = x[2] - x[1];
-    double dx31 = dx21 + dx32;
-    double dy32 = y[2] - y[1];
-    double dy21 = y[1] - y[0];
-    double a = (dx21*dy32 - dy21*dx32)/(dx21*dx31*dx32);
+    CanteraDouble dx21 = x[1] - x[0];
+    CanteraDouble dx32 = x[2] - x[1];
+    CanteraDouble dx31 = dx21 + dx32;
+    CanteraDouble dy32 = y[2] - y[1];
+    CanteraDouble dy21 = y[1] - y[0];
+    CanteraDouble a = (dx21*dy32 - dy21*dx32)/(dx21*dx31*dx32);
     return a*(x0 - x[0])*(x0 - x[1]) + (dy21/dx21)*(x0 - x[1]) + y[1];
 }
 
-double MMCollisionInt::tstar22[37] = {
+CanteraDouble MMCollisionInt::tstar22[37] = {
     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
     1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 3.5, 4.0,
     5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 14.0, 16.0,
     18.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 75.0, 100.0
 };
 
-double MMCollisionInt::omega22_table[37*8] = {
+CanteraDouble MMCollisionInt::omega22_table[37*8] = {
     4.1005, 4.266,  4.833,  5.742,  6.729,  8.624,  10.34,  11.89,
     3.2626, 3.305,  3.516,  3.914,  4.433,  5.57,   6.637,  7.618,
     2.8399, 2.836,  2.936,  3.168,  3.511,  4.329,  5.126,  5.874,
@@ -78,14 +78,14 @@ double MMCollisionInt::omega22_table[37*8] = {
 };
 
 // changed upper limit to 500 from 1.0e10  dgg 5/21/04
-double MMCollisionInt::tstar[39] = {
+CanteraDouble MMCollisionInt::tstar[39] = {
     0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
     1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 3.5, 4.0,
     5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 14.0, 16.0,
     18.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 75.0, 100.0, 500.0
 };
 
-double MMCollisionInt::astar_table[39*8] = {
+CanteraDouble MMCollisionInt::astar_table[39*8] = {
     1.0065, 1.0840, 1.0840, 1.0840, 1.0840, 1.0840, 1.0840, 1.0840,
     1.0231, 1.0660, 1.0380, 1.0400, 1.0430, 1.0500, 1.0520, 1.0510,
     1.0424, 1.0450, 1.0480, 1.0520, 1.0560, 1.0650, 1.0660, 1.0640,
@@ -128,7 +128,7 @@ double MMCollisionInt::astar_table[39*8] = {
     1.14187
 };
 
-double MMCollisionInt::bstar_table[39*8] = {
+CanteraDouble MMCollisionInt::bstar_table[39*8] = {
     1.1852, 1.2963, 1.2963, 1.2963, 1.2963, 1.2963,1.2963, 1.2963,
     1.1960,  1.216,  1.237,  1.269,  1.285,  1.290,  1.297,  1.294,
     1.2451,  1.257,  1.340,  1.389,  1.366,  1.327,  1.314,  1.278,
@@ -171,7 +171,7 @@ double MMCollisionInt::bstar_table[39*8] = {
     1.10185
 };
 
-double MMCollisionInt::cstar_table[39*8] = {
+CanteraDouble MMCollisionInt::cstar_table[39*8] = {
     0.8889,  0.77778, 0.77778,0.77778,0.77778,0.77778,0.77778,0.77778,
     0.88575, 0.8988, 0.8378, 0.8029, 0.7876, 0.7805, 0.7799, 0.7801,
     0.87268, 0.8692,0.8647,0.8479,0.8237,0.7975,0.7881,0.7784,
@@ -213,7 +213,7 @@ double MMCollisionInt::cstar_table[39*8] = {
     0.94444, 0.94444,0.94444,0.94444,0.94444,0.94444,0.94444,0.94444
 };
 
-void MMCollisionInt::init(double tstar_min, double tstar_max)
+void MMCollisionInt::init(CanteraDouble tstar_min, CanteraDouble tstar_max)
 {
     m_nmin = -1;
     m_nmax = -1;
@@ -234,7 +234,7 @@ void MMCollisionInt::init(double tstar_min, double tstar_max)
 
     for (int i = 0; i < 37; i++) {
         m_logTemp[i] = log(tstar[i+1]);
-        vector<double> c(DeltaDegree+1);
+        vector<CanteraDouble> c(DeltaDegree+1);
 
         fitDelta(0, i, DeltaDegree, c.data());
         m_o22poly.push_back(c);
@@ -250,10 +250,10 @@ void MMCollisionInt::init(double tstar_min, double tstar_max)
     }
 }
 
-double MMCollisionInt::fitDelta(int table, int ntstar, int degree, double* c)
+CanteraDouble MMCollisionInt::fitDelta(int table, int ntstar, int degree, CanteraDouble* c)
 {
-    vector<double> w(8);
-    double* begin = 0;
+    vector<CanteraDouble> w(8);
+    CanteraDouble* begin = 0;
     switch (table) {
     case 0:
         begin = omega22_table + 8*ntstar;
@@ -274,7 +274,7 @@ double MMCollisionInt::fitDelta(int table, int ntstar, int degree, double* c)
     return polyfit(8, degree, delta, begin, w.data(), c);
 }
 
-double MMCollisionInt::omega22(double ts, double deltastar)
+CanteraDouble MMCollisionInt::omega22(CanteraDouble ts, CanteraDouble deltastar)
 {
     int i;
     for (i = 0; i < 37; i++) {
@@ -288,7 +288,7 @@ double MMCollisionInt::omega22(double ts, double deltastar)
         i2 = 36;
         i1 = i2 - 3;
     }
-    vector<double> values(3);
+    vector<CanteraDouble> values(3);
     for (i = i1; i < i2; i++) {
         if (deltastar == 0.0) {
             values[i-i1] = omega22_table[8*i];
@@ -299,7 +299,7 @@ double MMCollisionInt::omega22(double ts, double deltastar)
     return quadInterp(log(ts), &m_logTemp[i1], values.data());
 }
 
-double MMCollisionInt::astar(double ts, double deltastar)
+CanteraDouble MMCollisionInt::astar(CanteraDouble ts, CanteraDouble deltastar)
 {
     int i;
     for (i = 0; i < 37; i++) if (ts < tstar22[i]) {
@@ -311,7 +311,7 @@ double MMCollisionInt::astar(double ts, double deltastar)
         i2 = 36;
         i1 = i2 - 3;
     }
-    vector<double> values(3);
+    vector<CanteraDouble> values(3);
     for (i = i1; i < i2; i++) {
         if (deltastar == 0.0) {
             values[i-i1] = astar_table[8*(i + 1)];
@@ -322,7 +322,7 @@ double MMCollisionInt::astar(double ts, double deltastar)
     return quadInterp(log(ts), &m_logTemp[i1], values.data());
 }
 
-double MMCollisionInt::bstar(double ts, double deltastar)
+CanteraDouble MMCollisionInt::bstar(CanteraDouble ts, CanteraDouble deltastar)
 {
     int i;
     for (i = 0; i < 37; i++) if (ts < tstar22[i]) {
@@ -334,7 +334,7 @@ double MMCollisionInt::bstar(double ts, double deltastar)
         i2 = 36;
         i1 = i2 - 3;
     }
-    vector<double> values(3);
+    vector<CanteraDouble> values(3);
     for (i = i1; i < i2; i++) {
         if (deltastar == 0.0) {
             values[i-i1] = bstar_table[8*(i + 1)];
@@ -345,7 +345,7 @@ double MMCollisionInt::bstar(double ts, double deltastar)
     return quadInterp(log(ts), &m_logTemp[i1], values.data());
 }
 
-double MMCollisionInt::cstar(double ts, double deltastar)
+CanteraDouble MMCollisionInt::cstar(CanteraDouble ts, CanteraDouble deltastar)
 {
     int i;
     for (i = 0; i < 37; i++) if (ts < tstar22[i]) {
@@ -357,7 +357,7 @@ double MMCollisionInt::cstar(double ts, double deltastar)
         i2 = 36;
         i1 = i2 - 3;
     }
-    vector<double> values(3);
+    vector<CanteraDouble> values(3);
     for (i = i1; i < i2; i++) {
         if (deltastar == 0.0) {
             values[i-i1] = cstar_table[8*(i + 1)];
@@ -368,12 +368,12 @@ double MMCollisionInt::cstar(double ts, double deltastar)
     return quadInterp(log(ts), &m_logTemp[i1], values.data());
 }
 
-void MMCollisionInt::fit_omega22(int degree, double deltastar, double* o22)
+void MMCollisionInt::fit_omega22(int degree, CanteraDouble deltastar, CanteraDouble* o22)
 {
     int n = m_nmax - m_nmin + 1;
-    vector<double> values(n);
-    vector<double> w(n);
-    double* logT = &m_logTemp[m_nmin];
+    vector<CanteraDouble> values(n);
+    vector<CanteraDouble> w(n);
+    CanteraDouble* logT = &m_logTemp[m_nmin];
     for (int i = 0; i < n; i++) {
         if (deltastar == 0.0) {
             values[i] = omega22_table[8*(i + m_nmin)];
@@ -385,12 +385,12 @@ void MMCollisionInt::fit_omega22(int degree, double deltastar, double* o22)
     polyfit(n, degree, logT, values.data(), w.data(), o22);
 }
 
-void MMCollisionInt::fit(int degree, double deltastar, double* a, double* b, double* c)
+void MMCollisionInt::fit(int degree, CanteraDouble deltastar, CanteraDouble* a, CanteraDouble* b, CanteraDouble* c)
 {
     int n = m_nmax - m_nmin + 1;
-    vector<double> values(n);
-    vector<double> w(n);
-    double* logT = &m_logTemp[m_nmin];
+    vector<CanteraDouble> values(n);
+    vector<CanteraDouble> w(n);
+    CanteraDouble* logT = &m_logTemp[m_nmin];
     for (int i = 0; i < n; i++) {
         if (deltastar == 0.0) {
             values[i] = astar_table[8*(i + m_nmin + 1)];

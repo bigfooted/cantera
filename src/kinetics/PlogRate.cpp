@@ -9,7 +9,7 @@
 namespace Cantera
 {
 
-void PlogData::update(double T)
+void PlogData::update(CanteraDouble T)
 {
     throw CanteraError("PlogData::update",
         "Missing state information: 'PlogData' requires pressure.");
@@ -17,8 +17,8 @@ void PlogData::update(double T)
 
 bool PlogData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double T = phase.temperature();
-    double P = phase.pressure();
+    CanteraDouble T = phase.temperature();
+    CanteraDouble P = phase.pressure();
     if (P != pressure || T != temperature) {
         update(T, P);
         return true;
@@ -26,7 +26,7 @@ bool PlogData::update(const ThermoPhase& phase, const Kinetics& kin)
     return false;
 }
 
-void PlogData::perturbPressure(double deltaP)
+void PlogData::perturbPressure(CanteraDouble deltaP)
 {
     if (m_pressure_buf > 0.) {
         throw CanteraError("PlogData::perturbPressure",
@@ -49,7 +49,7 @@ void PlogData::restore()
 
 // Methods of class PlogRate
 
-PlogRate::PlogRate(const std::multimap<double, ArrheniusRate>& rates)
+PlogRate::PlogRate(const std::multimap<CanteraDouble, ArrheniusRate>& rates)
 {
     setRates(rates);
 }
@@ -62,7 +62,7 @@ PlogRate::PlogRate(const AnyMap& node, const UnitStack& rate_units)
 void PlogRate::setParameters(const AnyMap& node, const UnitStack& rate_units)
 {
     ReactionRate::setParameters(node, rate_units);
-    std::multimap<double, ArrheniusRate> multi_rates;
+    std::multimap<CanteraDouble, ArrheniusRate> multi_rates;
     if (node.hasKey("rate-constants")) {
         auto& rates = node["rate-constants"].asVector<AnyMap>();
         for (const auto& rate : rates) {
@@ -89,7 +89,7 @@ void PlogRate::getParameters(AnyMap& rateNode, const Units& rate_units) const
     rateNode["rate-constants"] = std::move(rateList);
 }
 
-void PlogRate::setRates(const std::multimap<double, ArrheniusRate>& rates)
+void PlogRate::setRates(const std::multimap<CanteraDouble, ArrheniusRate>& rates)
 {
     size_t j = 0;
     rates_.clear();
@@ -98,7 +98,7 @@ void PlogRate::setRates(const std::multimap<double, ArrheniusRate>& rates)
     rates_.reserve(rates.size());
     // Insert intermediate pressures
     for (const auto& [pressure, rate] : rates) {
-        double logp = std::log(pressure);
+        CanteraDouble logp = std::log(pressure);
         if (pressures_.empty() || pressures_.rbegin()->first != logp) {
             // starting a new group
             pressures_[logp] = {j, j+1};
@@ -130,14 +130,14 @@ void PlogRate::validate(const string& equation, const Kinetics& kin)
     }
 
     fmt::memory_buffer err_reactions;
-    double T[] = {300.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0};
+    CanteraDouble T[] = {300.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0};
     PlogData data;
 
     for (auto iter = ++pressures_.begin(); iter->first < 1000; iter++) {
         data.update(T[0], exp(iter->first)); // iter->first contains log(p)
         updateFromStruct(data);
         for (size_t i=0; i < 6; i++) {
-            double k = 0;
+            CanteraDouble k = 0;
             for (size_t p = ilow1_; p < ilow2_; p++) {
                 k += rates_.at(p).evalRate(log(T[i]), 1.0 / T[i]);
             }
@@ -157,9 +157,9 @@ void PlogRate::validate(const string& equation, const Kinetics& kin)
     }
 }
 
-std::multimap<double, ArrheniusRate> PlogRate::getRates() const
+std::multimap<CanteraDouble, ArrheniusRate> PlogRate::getRates() const
 {
-    std::multimap<double, ArrheniusRate> rateMap;
+    std::multimap<CanteraDouble, ArrheniusRate> rateMap;
     // initial preincrement to skip rate for P --> 0
     for (auto iter = ++pressures_.begin();
             iter->first < 1000; // skip rates for (P --> infinity)

@@ -48,7 +48,7 @@ Path::Path(SpeciesNode* begin, SpeciesNode* end)
     end->addPath(this);
 }
 
-void Path::addReaction(size_t rxnNumber, double value, const string& label)
+void Path::addReaction(size_t rxnNumber, CanteraDouble value, const string& label)
 {
     m_rxn[rxnNumber] += value;
     m_total += value;
@@ -57,12 +57,12 @@ void Path::addReaction(size_t rxnNumber, double value, const string& label)
     }
 }
 
-void Path::writeLabel(ostream& s, double threshold)
+void Path::writeLabel(ostream& s, CanteraDouble threshold)
 {
     if (m_label.size() == 0) {
         return;
     }
-    double v;
+    CanteraDouble v;
     for (const auto& [species, value] : m_label) {
         v = value / m_total;
         if (m_label.size() == 1) {
@@ -106,7 +106,7 @@ ReactionPathDiagram::~ReactionPathDiagram()
 
 vector<int> ReactionPathDiagram::reactions()
 {
-    double flmax = 0.0;
+    CanteraDouble flmax = 0.0;
     for (size_t i = 0; i < nPaths(); i++) {
         Path* p = path(i);
         flmax = std::max(p->flow(), flmax);
@@ -114,7 +114,7 @@ vector<int> ReactionPathDiagram::reactions()
     m_rxns.clear();
     for (size_t i = 0; i < nPaths(); i++) {
         for (const auto& [iRxn, flux] : path(i)->reactionMap()) {
-            double flxratio = flux / flmax;
+            CanteraDouble flxratio = flux / flmax;
             if (flxratio > threshold) {
                 m_rxns.insert(iRxn);
             }
@@ -142,14 +142,14 @@ void ReactionPathDiagram::add(shared_ptr<ReactionPathDiagram> d)
     add(*d.get());
 }
 
-void ReactionPathDiagram::findMajorPaths(double athreshold, size_t lda, double* a)
+void ReactionPathDiagram::findMajorPaths(CanteraDouble athreshold, size_t lda, CanteraDouble* a)
 {
-    double netmax = 0.0;
+    CanteraDouble netmax = 0.0;
     for (size_t n = 0; n < nNodes(); n++) {
         for (size_t m = n+1; m < nNodes(); m++) {
             size_t k1 = m_speciesNumber[n];
             size_t k2 = m_speciesNumber[m];
-            double fl = fabs(netFlow(k1,k2));
+            CanteraDouble fl = fabs(netFlow(k1,k2));
             netmax = std::max(fl, netmax);
         }
     }
@@ -157,7 +157,7 @@ void ReactionPathDiagram::findMajorPaths(double athreshold, size_t lda, double* 
         for (size_t m = n+1; m < nNodes(); m++) {
             size_t k1 = m_speciesNumber[n];
             size_t k2 = m_speciesNumber[m];
-            double fl = fabs(netFlow(k1,k2));
+            CanteraDouble fl = fabs(netFlow(k1,k2));
             if (fl > athreshold*netmax) {
                 a[lda*k1 + k2] = 1;
             }
@@ -228,8 +228,8 @@ void ReactionPathDiagram::writeData(ostream& s)
         size_t k1 = m_speciesNumber[i1];
         for (size_t i2 = i1+1; i2 < nNodes(); i2++) {
             size_t k2 = m_speciesNumber[i2];
-            double f1 = flow(k1, k2);
-            double f2 = flow(k2, k1);
+            CanteraDouble f1 = flow(k1, k2);
+            CanteraDouble f2 = flow(k2, k1);
             s << m_nodes[k1]->name << " " << m_nodes[k2]->name
               << " " << f1 << " " << -f2 << endl;
         }
@@ -238,7 +238,7 @@ void ReactionPathDiagram::writeData(ostream& s)
 
 void ReactionPathDiagram::exportToDot(ostream& s)
 {
-    double flmax = 0.0;
+    CanteraDouble flmax = 0.0;
     s.precision(3);
 
     // a directed graph
@@ -269,7 +269,7 @@ void ReactionPathDiagram::exportToDot(ostream& s)
                 node(k1)->visible = false;
                 for (size_t i2 = i1+1; i2 < nNodes(); i2++) {
                     size_t k2 = m_speciesNumber[i2];
-                    double flx = netFlow(k1, k2);
+                    CanteraDouble flx = netFlow(k1, k2);
                     if (flx < 0.0) {
                         flx = -flx;
                     }
@@ -286,12 +286,12 @@ void ReactionPathDiagram::exportToDot(ostream& s)
             size_t k1 = m_speciesNumber[i1];
             for (size_t i2 = i1+1; i2 < nNodes(); i2++) {
                 size_t k2 = m_speciesNumber[i2];
-                double flx = netFlow(k1, k2);
+                CanteraDouble flx = netFlow(k1, k2);
                 if (m_local != npos && k1 != m_local && k2 != m_local) {
                     flx = 0.0;
                 }
                 if (flx != 0.0) {
-                    double flxratio;
+                    CanteraDouble flxratio;
                     size_t kbegin, kend;
                     // set beginning and end of the path based on the sign of
                     // the net flow
@@ -316,7 +316,7 @@ void ReactionPathDiagram::exportToDot(ostream& s)
                         s <<  "[fontname=\""+m_font+"\", penwidth=";
 
                         if (arrow_width < 0) {
-                            double lwidth = 1.0 - 4.0
+                            CanteraDouble lwidth = 1.0 - 4.0
                                      * log10(flxratio/threshold)/log10(threshold) + 1.0;
                             s << lwidth;
                             s << ", arrowsize="
@@ -326,8 +326,8 @@ void ReactionPathDiagram::exportToDot(ostream& s)
                             s << ", arrowsize=" << flxratio + 1;
                         }
 
-                        double hue = 0.7;
-                        double bright = 0.9;
+                        CanteraDouble hue = 0.7;
+                        CanteraDouble bright = 0.9;
                         s << ", color=" << "\"" << hue << ", "
                           << flxratio + 0.5
                           << ", " << bright << "\"" << endl;
@@ -364,7 +364,7 @@ void ReactionPathDiagram::exportToDot(ostream& s)
 
         for (size_t i = 0; i < nPaths(); i++) {
             Path* p = path(i);
-            double flxratio = p->flow()/flmax;
+            CanteraDouble flxratio = p->flow()/flmax;
             if (m_local != npos) {
                 if (p->begin()->number != m_local
                         && p->end()->number != m_local) {
@@ -378,7 +378,7 @@ void ReactionPathDiagram::exportToDot(ostream& s)
                   << " -> s" << p->end()->number;
 
                 if (arrow_width < 0) {
-                    double lwidth = 1.0 - 4.0 * log10(flxratio/threshold)/log10(threshold)
+                    CanteraDouble lwidth = 1.0 - 4.0 * log10(flxratio/threshold)/log10(threshold)
                              + 1.0;
                     s <<  "[fontname=\""+m_font+"\", penwidth="
                       << lwidth;
@@ -389,8 +389,8 @@ void ReactionPathDiagram::exportToDot(ostream& s)
                       <<  arrow_width;
                     s << ", arrowsize=" << flxratio + 1;
                 }
-                double hue = 0.7;
-                double bright = 0.9;
+                CanteraDouble hue = 0.7;
+                CanteraDouble bright = 0.9;
                 s << ", color=" << "\"" << hue << ", " << flxratio + 0.5
                   << ", " << bright << "\"" << endl;
 
@@ -419,7 +419,7 @@ void ReactionPathDiagram::exportToDot(ostream& s)
 }
 
 
-void ReactionPathDiagram::addNode(size_t k, const string& nm, double x)
+void ReactionPathDiagram::addNode(size_t k, const string& nm, CanteraDouble x)
 {
     if (!m_nodes[k]) {
         m_nodes[k] = new SpeciesNode;
@@ -431,7 +431,7 @@ void ReactionPathDiagram::addNode(size_t k, const string& nm, double x)
 }
 
 void ReactionPathDiagram::linkNodes(size_t k1, size_t k2, size_t rxn,
-                                    double value, string legend)
+                                    CanteraDouble value, string legend)
 {
     Path* ff = m_paths[k1][k2];
     if (!ff) {
@@ -738,7 +738,7 @@ int ReactionPathBuilder::build(Kinetics& s, const string& element,
                                ostream& output, ReactionPathDiagram& r, bool quiet)
 {
     map<size_t, int> warn;
-    double threshold = 0.0;
+    CanteraDouble threshold = 0.0;
     size_t m = m_enamemap[element]-1;
     r.element = element;
     if (m == npos) {
@@ -761,8 +761,8 @@ int ReactionPathBuilder::build(Kinetics& s, const string& element,
     }
 
     for (size_t i = 0; i < m_nr; i++) {
-        double ropf = m_ropf[i];
-        double ropr = m_ropr[i];
+        CanteraDouble ropf = m_ropf[i];
+        CanteraDouble ropr = m_ropr[i];
 
         // loop over reactions involving element m
         if (m_elatoms(m, i) > 0) {
@@ -798,7 +798,7 @@ int ReactionPathBuilder::build(Kinetics& s, const string& element,
                         // the type of reaction to determine which reactant
                         // species was the source of a given m-atom in the
                         // product
-                        double f;
+                        CanteraDouble f;
                         if ((m_atoms(kkp,m) < m_elatoms(m, i)) &&
                                 (m_atoms(kkr,m) < m_elatoms(m, i))) {
                             map<size_t, map<size_t, Group>>& g = m_transfer[i];
@@ -829,8 +829,8 @@ int ReactionPathBuilder::build(Kinetics& s, const string& element,
                             f = m_atoms(kkp,m) * m_atoms(kkr,m) / m_elatoms(m, i);
                         }
 
-                        double fwd = ropf*f;
-                        double rev = ropr*f;
+                        CanteraDouble fwd = ropf*f;
+                        CanteraDouble rev = ropr*f;
                         bool force_incl = ((status[kkr] == 1) || (status[kkp] == 1));
 
                         bool fwd_incl = ((fwd > threshold) ||

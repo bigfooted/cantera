@@ -71,7 +71,7 @@ public:
      *  See the class description for the polynomial representation of the
      *  thermo functions in terms of @f$ A, \dots, G @f$.
      */
-    ShomatePoly(double tlow, double thigh, double pref, const double* coeffs) :
+    ShomatePoly(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs) :
         SpeciesThermoInterpType(tlow, thigh, pref),
         m_coeff(7)
     {
@@ -83,7 +83,7 @@ public:
 
     //! Set array of 7 polynomial coefficients. Input values are assumed to be
     //! on a kJ/mol basis.
-    void setParameters(const vector<double>& coeffs) {
+    void setParameters(const vector<CanteraDouble>& coeffs) {
         if (coeffs.size() != 7) {
             throw CanteraError("ShomatePoly::setParameters", "Array must "
                 "contain 7 coefficients, but {} were given.", coeffs.size());
@@ -100,8 +100,8 @@ public:
 
     size_t temperaturePolySize() const override { return 6; }
 
-    void updateTemperaturePoly(double T, double* T_poly) const override {
-        double tt = 1.e-3*T;
+    void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const override {
+        CanteraDouble tt = 1.e-3*T;
         T_poly[0] = tt;
         T_poly[1] = tt * tt;
         T_poly[2] = T_poly[1] * tt;
@@ -122,30 +122,30 @@ public:
      *   - `t[4] = log(t)`
      *   - `t[5] = 1.0/t;
      */
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override {
-        double A = m_coeff[0];
-        double Bt = m_coeff[1]*tt[0];
-        double Ct2 = m_coeff[2]*tt[1];
-        double Dt3 = m_coeff[3]*tt[2];
-        double Etm2 = m_coeff[4]*tt[3];
-        double Ftm1 = m_coeff[5]*tt[5];
-        double G = m_coeff[6];
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override {
+        CanteraDouble A = m_coeff[0];
+        CanteraDouble Bt = m_coeff[1]*tt[0];
+        CanteraDouble Ct2 = m_coeff[2]*tt[1];
+        CanteraDouble Dt3 = m_coeff[3]*tt[2];
+        CanteraDouble Etm2 = m_coeff[4]*tt[3];
+        CanteraDouble Ftm1 = m_coeff[5]*tt[5];
+        CanteraDouble G = m_coeff[6];
 
         *cp_R = A + Bt + Ct2 + Dt3 + Etm2;
         *h_RT = A + 0.5*Bt + 1.0/3.0*Ct2 + 0.25*Dt3 - Etm2 + Ftm1;
         *s_R = A*tt[4] + Bt + 0.5*Ct2 + 1.0/3.0*Dt3 - 0.5*Etm2 + G;
     }
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override {
-        double tPoly[6];
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override {
+        CanteraDouble tPoly[6];
         updateTemperaturePoly(temp, tPoly);
         updateProperties(tPoly, cp_R, h_RT, s_R);
     }
 
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override {
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override {
         n = 0;
         type = SHOMATE;
         tlow = m_lowT;
@@ -159,22 +159,22 @@ public:
     void getParameters(AnyMap& thermo) const override {
         // ShomatePoly is only used as an embedded model within ShomatePoly2, so
         // all that needs to be added here are the polynomial coefficients
-        vector<double> dimensioned_coeffs(m_coeff.size());
+        vector<CanteraDouble> dimensioned_coeffs(m_coeff.size());
         for (size_t i = 0; i < m_coeff.size(); i++) {
             dimensioned_coeffs[i] = m_coeff[i] * GasConstant / 1000;
         }
-        thermo["data"].asVector<vector<double>>().push_back(dimensioned_coeffs);
+        thermo["data"].asVector<vector<CanteraDouble>>().push_back(dimensioned_coeffs);
     }
 
-    double reportHf298(double* const h298=nullptr) const override {
-        double cp_R, h_RT, s_R;
+    CanteraDouble reportHf298(CanteraDouble* const h298=nullptr) const override {
+        CanteraDouble cp_R, h_RT, s_R;
         updatePropertiesTemp(298.15, &cp_R, &h_RT, &s_R);
         return h_RT * GasConstant * 298.15;
     }
 
-    void modifyOneHf298(const size_t k, const double Hf298New) override {
-        double hnow = reportHf298();
-        double delH = Hf298New - hnow;
+    void modifyOneHf298(const size_t k, const CanteraDouble Hf298New) override {
+        CanteraDouble hnow = reportHf298();
+        CanteraDouble delH = Hf298New - hnow;
         m_coeff[5] += delH / (1e3 * GasConstant);
     }
 
@@ -184,8 +184,8 @@ public:
 
 protected:
     //! Array of coefficients
-    vector<double> m_coeff;
-    double m_coeff5_orig;
+    vector<CanteraDouble> m_coeff;
+    CanteraDouble m_coeff5_orig;
 };
 
 //! The Shomate polynomial parameterization for two temperature ranges for one
@@ -242,7 +242,7 @@ public:
      * @param coeffs  Vector of coefficients used to set the parameters for the
      *                standard state. [Tmid, 7 low-T coeffs, 7 high-T coeffs]
      */
-    ShomatePoly2(double tlow, double thigh, double pref, const double* coeffs) :
+    ShomatePoly2(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs) :
         SpeciesThermoInterpType(tlow, thigh, pref),
         m_midT(coeffs[0]),
         msp_low(tlow, coeffs[0], pref, coeffs+1),
@@ -250,17 +250,17 @@ public:
     {
     }
 
-    void setMinTemp(double Tmin) override {
+    void setMinTemp(CanteraDouble Tmin) override {
         SpeciesThermoInterpType::setMinTemp(Tmin);
         msp_low.setMinTemp(Tmin);
     }
 
-    void setMaxTemp(double Tmax) override {
+    void setMaxTemp(CanteraDouble Tmax) override {
         SpeciesThermoInterpType::setMaxTemp(Tmax);
         msp_high.setMaxTemp(Tmax);
     }
 
-    void setRefPressure(double Pref) override {
+    void setRefPressure(CanteraDouble Pref) override {
         SpeciesThermoInterpType::setRefPressure(Pref);
         msp_low.setRefPressure(Pref);
         msp_high.setRefPressure(Pref);
@@ -272,7 +272,7 @@ public:
      * @param low   Vector of 7 coefficients for the low temperature polynomial
      * @param high  Vector of 7 coefficients for the high temperature polynomial
      */
-    void setParameters(double Tmid, const vector<double>& low, const vector<double>& high) {
+    void setParameters(CanteraDouble Tmid, const vector<CanteraDouble>& low, const vector<CanteraDouble>& high) {
         m_midT = Tmid;
         msp_low.setMaxTemp(Tmid);
         msp_high.setMinTemp(Tmid);
@@ -286,14 +286,14 @@ public:
 
     size_t temperaturePolySize() const override{ return 7; }
 
-    void updateTemperaturePoly(double T, double* T_poly) const override {
+    void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const override {
         msp_low.updateTemperaturePoly(T, T_poly);
     }
 
     //! @copydoc ShomatePoly::updateProperties
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override {
-        double T = 1000 * tt[0];
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override {
+        CanteraDouble T = 1000 * tt[0];
         if (T <= m_midT) {
             msp_low.updateProperties(tt, cp_R, h_RT, s_R);
         } else {
@@ -301,8 +301,8 @@ public:
         }
     }
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override {
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override {
         if (temp <= m_midT) {
             msp_low.updatePropertiesTemp(temp, cp_R, h_RT, s_R);
         } else {
@@ -312,8 +312,8 @@ public:
 
     size_t nCoeffs() const override { return 15; }
 
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override {
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override {
         msp_low.reportParameters(n, type, tlow, coeffs[0], pref, coeffs + 1);
         msp_high.reportParameters(n, type, coeffs[0], thigh, pref, coeffs + 8);
         type = SHOMATE2;
@@ -322,15 +322,15 @@ public:
     void getParameters(AnyMap& thermo) const override {
         SpeciesThermoInterpType::getParameters(thermo);
         thermo["model"] = "Shomate";
-        vector<double> Tranges {m_lowT, m_midT, m_highT};
+        vector<CanteraDouble> Tranges {m_lowT, m_midT, m_highT};
         thermo["temperature-ranges"].setQuantity(Tranges, "K");
-        thermo["data"] = vector<vector<double>>();
+        thermo["data"] = vector<vector<CanteraDouble>>();
         msp_low.getParameters(thermo);
         msp_high.getParameters(thermo);
     }
 
-    double reportHf298(double* const h298=nullptr) const override {
-        double h;
+    CanteraDouble reportHf298(CanteraDouble* const h298=nullptr) const override {
+        CanteraDouble h;
         if (298.15 <= m_midT) {
             h = msp_low.reportHf298(h298);
         } else {
@@ -342,11 +342,11 @@ public:
         return h;
     }
 
-    void modifyOneHf298(const size_t k, const double Hf298New) override {
-        double h298now = reportHf298(0);
-        double delH = Hf298New - h298now;
-        double h = msp_low.reportHf298(0);
-        double hnew = h + delH;
+    void modifyOneHf298(const size_t k, const CanteraDouble Hf298New) override {
+        CanteraDouble h298now = reportHf298(0);
+        CanteraDouble delH = Hf298New - h298now;
+        CanteraDouble h = msp_low.reportHf298(0);
+        CanteraDouble hnew = h + delH;
         msp_low.modifyOneHf298(k, hnew);
         h = msp_high.reportHf298(0);
         hnew = h + delH;
@@ -360,7 +360,7 @@ public:
 
 protected:
     //! Midrange temperature (kelvin)
-    double m_midT;
+    CanteraDouble m_midT;
     //! Shomate polynomial for the low temperature region.
     ShomatePoly msp_low;
     //! Shomate polynomial for the high temperature region.

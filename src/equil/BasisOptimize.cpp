@@ -13,12 +13,12 @@
 namespace Cantera
 {
 int BasisOptimize_print_lvl = 0;
-static const double USEDBEFORE = -1;
+static const CanteraDouble USEDBEFORE = -1;
 
 size_t BasisOptimize(int* usedZeroedSpecies, bool doFormRxn, MultiPhase* mphase,
                      vector<size_t>& orderVectorSpecies,
                      vector<size_t>& orderVectorElements,
-                     vector<double>& formRxnMatrix)
+                     vector<CanteraDouble>& formRxnMatrix)
 {
     // Get the total number of elements defined in the multiphase object
     size_t ne = mphase->nElements();
@@ -60,7 +60,7 @@ size_t BasisOptimize(int* usedZeroedSpecies, bool doFormRxn, MultiPhase* mphase,
                          mphase->speciesName(kk), k);
                 for (size_t j = 0; j < ne; j++) {
                     size_t jj = orderVectorElements[j];
-                    double num = mphase->nAtoms(kk,jj);
+                    CanteraDouble num = mphase->nAtoms(kk,jj);
                     writelogf("%6.1g  ", num);
                 }
                 writelog("\n");
@@ -79,20 +79,20 @@ size_t BasisOptimize(int* usedZeroedSpecies, bool doFormRxn, MultiPhase* mphase,
     *usedZeroedSpecies = false;
 
     // Create an array of mole numbers
-    vector<double> molNum(nspecies,0.0);
+    vector<CanteraDouble> molNum(nspecies,0.0);
     mphase->getMoles(molNum.data());
 
     // Other workspace
     DenseMatrix sm(ne, ne);
-    vector<double> ss(ne, 0.0);
-    vector<double> sa(ne, 0.0);
+    vector<CanteraDouble> ss(ne, 0.0);
+    vector<CanteraDouble> sa(ne, 0.0);
     if (formRxnMatrix.size() < nspecies*ne) {
         formRxnMatrix.resize(nspecies*ne, 0.0);
     }
 
     // For debugging purposes keep an unmodified copy of the array.
-    vector<double> molNumBase = molNum;
-    double molSave = 0.0;
+    vector<CanteraDouble> molNumBase = molNum;
+    CanteraDouble molSave = 0.0;
     size_t jr = 0;
 
     // Top of a loop of some sort based on the index JR. JR is the current
@@ -289,7 +289,7 @@ size_t BasisOptimize(int* usedZeroedSpecies, bool doFormRxn, MultiPhase* mphase,
 } // basopt()
 
 
-void ElemRearrange(size_t nComponents, const vector<double>& elementAbundances,
+void ElemRearrange(size_t nComponents, const vector<CanteraDouble>& elementAbundances,
                    MultiPhase* mphase,
                    vector<size_t>& orderVectorSpecies,
                    vector<size_t>& orderVectorElements)
@@ -326,7 +326,7 @@ void ElemRearrange(size_t nComponents, const vector<double>& elementAbundances,
     // If the elementAbundances aren't input, just create a fake one based on
     // summing the column of the stoich matrix. This will force elements with
     // zero species to the end of the element ordering.
-    vector<double> eAbund(nelements,0.0);
+    vector<CanteraDouble> eAbund(nelements,0.0);
     if (elementAbundances.size() != nelements) {
         for (size_t j = 0; j < nelements; j++) {
             eAbund[j] = 0.0;
@@ -339,9 +339,9 @@ void ElemRearrange(size_t nComponents, const vector<double>& elementAbundances,
              eAbund.begin());
     }
 
-    vector<double> sa(nelements,0.0);
-    vector<double> ss(nelements,0.0);
-    vector<double> sm(nelements*nelements,0.0);
+    vector<CanteraDouble> sa(nelements,0.0);
+    vector<CanteraDouble> ss(nelements,0.0);
+    vector<CanteraDouble> sm(nelements*nelements,0.0);
 
     // Top of a loop of some sort based on the index JR. JR is the current
     // number independent elements found.
@@ -425,7 +425,7 @@ void ElemRearrange(size_t nComponents, const vector<double>& elementAbundances,
             // It will be used in the denominator in future row calcs.
             sa[jr] = 0.0;
             for (size_t ml = 0; ml < nComponents; ++ml) {
-                double tmp = sm[ml + jr*nComponents];
+                CanteraDouble tmp = sm[ml + jr*nComponents];
                 sa[jr] += tmp * tmp;
             }
             // IF NORM OF NEW ROW  .LT. 1E-6 REJECT

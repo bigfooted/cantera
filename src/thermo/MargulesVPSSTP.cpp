@@ -22,7 +22,7 @@ MargulesVPSSTP::MargulesVPSSTP(const string& inputFile, const string& id_)
 
 // -- Activities, Standard States, Activity Concentrations -----------
 
-void MargulesVPSSTP::getLnActivityCoefficients(double* lnac) const
+void MargulesVPSSTP::getLnActivityCoefficients(CanteraDouble* lnac) const
 {
     // Update the activity coefficients
     s_update_lnActCoeff();
@@ -35,7 +35,7 @@ void MargulesVPSSTP::getLnActivityCoefficients(double* lnac) const
 
 // ------------ Partial Molar Properties of the Solution ------------
 
-void MargulesVPSSTP::getChemPotentials(double* mu) const
+void MargulesVPSSTP::getChemPotentials(CanteraDouble* mu) const
 {
     // First get the standard chemical potentials in molar form. This requires
     // updates of standard state as a function of T and P
@@ -44,17 +44,17 @@ void MargulesVPSSTP::getChemPotentials(double* mu) const
     // Update the activity coefficients
     s_update_lnActCoeff();
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(moleFractions_[k], SmallNumber);
+        CanteraDouble xx = std::max(moleFractions_[k], SmallNumber);
         mu[k] += RT() * (log(xx) + lnActCoeff_Scaled_[k]);
     }
 }
 
-double MargulesVPSSTP::cv_mole() const
+CanteraDouble MargulesVPSSTP::cv_mole() const
 {
     return cp_mole() - GasConstant;
 }
 
-void MargulesVPSSTP::getPartialMolarEnthalpies(double* hbar) const
+void MargulesVPSSTP::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     // Get the nondimensional standard state enthalpies
     getEnthalpy_RT(hbar);
@@ -73,11 +73,11 @@ void MargulesVPSSTP::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void MargulesVPSSTP::getPartialMolarCp(double* cpbar) const
+void MargulesVPSSTP::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     // Get the nondimensional standard state entropies
     getCp_R(cpbar);
-    double T = temperature();
+    CanteraDouble T = temperature();
 
     // Update the activity coefficients, This also update the internally stored
     // molalities.
@@ -93,11 +93,11 @@ void MargulesVPSSTP::getPartialMolarCp(double* cpbar) const
     }
 }
 
-void MargulesVPSSTP::getPartialMolarEntropies(double* sbar) const
+void MargulesVPSSTP::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     // Get the nondimensional standard state entropies
     getEntropy_R(sbar);
-    double T = temperature();
+    CanteraDouble T = temperature();
 
     // Update the activity coefficients, This also update the internally stored
     // molalities.
@@ -105,7 +105,7 @@ void MargulesVPSSTP::getPartialMolarEntropies(double* sbar) const
     s_update_dlnActCoeff_dT();
 
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(moleFractions_[k], SmallNumber);
+        CanteraDouble xx = std::max(moleFractions_[k], SmallNumber);
         sbar[k] += - lnActCoeff_Scaled_[k] -log(xx) - T * dlnActCoeffdT_Scaled_[k];
     }
 
@@ -115,9 +115,9 @@ void MargulesVPSSTP::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void MargulesVPSSTP::getPartialMolarVolumes(double* vbar) const
+void MargulesVPSSTP::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
 
     // Get the standard state values in m^3 kmol-1
     getStandardVolumes(vbar);
@@ -125,12 +125,12 @@ void MargulesVPSSTP::getPartialMolarVolumes(double* vbar) const
     for (size_t i = 0; i < numBinaryInteractions_; i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double g0 = (m_VHE_b_ij[i] - T * m_VSE_b_ij[i]);
-        double g1 = (m_VHE_c_ij[i] - T * m_VSE_c_ij[i]);
-        const double temp1 = g0 + g1 * XB;
-        const double all = -1.0*XA*XB*temp1 - XA*XB*XB*g1;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble g0 = (m_VHE_b_ij[i] - T * m_VSE_b_ij[i]);
+        CanteraDouble g1 = (m_VHE_c_ij[i] - T * m_VSE_c_ij[i]);
+        const CanteraDouble temp1 = g0 + g1 * XB;
+        const CanteraDouble all = -1.0*XA*XB*temp1 - XA*XB*XB*g1;
 
         for (size_t iK = 0; iK < m_kk; iK++) {
             vbar[iK] += all;
@@ -146,7 +146,7 @@ void MargulesVPSSTP::initThermo()
     if (m_input.hasKey("interactions")) {
         for (auto& item : m_input["interactions"].asVector<AnyMap>()) {
             auto& species = item["species"].asVector<string>(2);
-            vector<double> h(2), s(2), vh(2), vs(2);
+            vector<CanteraDouble> h(2), s(2), vh(2), vs(2);
             if (item.hasKey("excess-enthalpy")) {
                 h = item.convertVector("excess-enthalpy", "J/kmol", 2);
             }
@@ -201,8 +201,8 @@ void MargulesVPSSTP::initLengths()
 }
 
 void MargulesVPSSTP::addBinaryInteraction(const string& speciesA,
-    const string& speciesB, double h0, double h1, double s0, double s1,
-    double vh0, double vh1, double vs0, double vs1)
+    const string& speciesB, CanteraDouble h0, CanteraDouble h1, CanteraDouble s0, CanteraDouble s1,
+    CanteraDouble vh0, CanteraDouble vh1, CanteraDouble vs0, CanteraDouble vs1)
 {
     size_t kA = speciesIndex(speciesA, false);
     size_t kB = speciesIndex(speciesB, false);
@@ -228,18 +228,18 @@ void MargulesVPSSTP::addBinaryInteraction(const string& speciesA,
 
 void MargulesVPSSTP::s_update_lnActCoeff() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     lnActCoeff_Scaled_.assign(m_kk, 0.0);
     for (size_t i = 0; i < numBinaryInteractions_; i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
-        double g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        const double XAXB = XA * XB;
-        const double g0g1XB = (g0 + g1 * XB);
-        const double all = -1.0 * XAXB * g0g1XB - XAXB * XB * g1;
+        CanteraDouble g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
+        CanteraDouble g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        const CanteraDouble XAXB = XA * XB;
+        const CanteraDouble g0g1XB = (g0 + g1 * XB);
+        const CanteraDouble all = -1.0 * XAXB * g0g1XB - XAXB * XB * g1;
         for (size_t iK = 0; iK < m_kk; iK++) {
             lnActCoeff_Scaled_[iK] += all;
         }
@@ -250,22 +250,22 @@ void MargulesVPSSTP::s_update_lnActCoeff() const
 
 void MargulesVPSSTP::s_update_dlnActCoeff_dT() const
 {
-    double invT = 1.0 / temperature();
-    double invRTT = 1.0 / GasConstant*invT*invT;
+    CanteraDouble invT = 1.0 / temperature();
+    CanteraDouble invRTT = 1.0 / GasConstant*invT*invT;
     dlnActCoeffdT_Scaled_.assign(m_kk, 0.0);
     d2lnActCoeffdT2_Scaled_.assign(m_kk, 0.0);
     for (size_t i = 0; i < numBinaryInteractions_; i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double g0 = -m_HE_b_ij[i] * invRTT;
-        double g1 = -m_HE_c_ij[i] * invRTT;
-        const double XAXB = XA * XB;
-        const double g0g1XB = (g0 + g1 * XB);
-        const double all = -1.0 * XAXB * g0g1XB - XAXB * XB * g1;
-        const double mult = 2.0 * invT;
-        const double dT2all = mult * all;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble g0 = -m_HE_b_ij[i] * invRTT;
+        CanteraDouble g1 = -m_HE_c_ij[i] * invRTT;
+        const CanteraDouble XAXB = XA * XB;
+        const CanteraDouble g0g1XB = (g0 + g1 * XB);
+        const CanteraDouble all = -1.0 * XAXB * g0g1XB - XAXB * XB * g1;
+        const CanteraDouble mult = 2.0 * invT;
+        const CanteraDouble dT2all = mult * all;
         for (size_t iK = 0; iK < m_kk; iK++) {
             dlnActCoeffdT_Scaled_[iK] += all;
             d2lnActCoeffdT2_Scaled_[iK] -= dT2all;
@@ -277,7 +277,7 @@ void MargulesVPSSTP::s_update_dlnActCoeff_dT() const
     }
 }
 
-void MargulesVPSSTP::getdlnActCoeffdT(double* dlnActCoeffdT) const
+void MargulesVPSSTP::getdlnActCoeffdT(CanteraDouble* dlnActCoeffdT) const
 {
     s_update_dlnActCoeff_dT();
     for (size_t k = 0; k < m_kk; k++) {
@@ -285,7 +285,7 @@ void MargulesVPSSTP::getdlnActCoeffdT(double* dlnActCoeffdT) const
     }
 }
 
-void MargulesVPSSTP::getd2lnActCoeffdT2(double* d2lnActCoeffdT2) const
+void MargulesVPSSTP::getd2lnActCoeffdT2(CanteraDouble* d2lnActCoeffdT2) const
 {
     s_update_dlnActCoeff_dT();
     for (size_t k = 0; k < m_kk; k++) {
@@ -293,10 +293,10 @@ void MargulesVPSSTP::getd2lnActCoeffdT2(double* d2lnActCoeffdT2) const
     }
 }
 
-void MargulesVPSSTP::getdlnActCoeffds(const double dTds, const double* const dXds,
-                                       double* dlnActCoeffds) const
+void MargulesVPSSTP::getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+                                       CanteraDouble* dlnActCoeffds) const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     s_update_dlnActCoeff_dT();
     for (size_t iK = 0; iK < m_kk; iK++) {
         dlnActCoeffds[iK] = 0.0;
@@ -305,15 +305,15 @@ void MargulesVPSSTP::getdlnActCoeffds(const double dTds, const double* const dXd
     for (size_t i = 0; i < numBinaryInteractions_; i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
-        double dXA = dXds[iA];
-        double dXB = dXds[iB];
-        double g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
-        double g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
-        const double g02g1XB = g0 + 2*g1*XB;
-        const double g2XAdXB = 2*g1*XA*dXB;
-        const double all = (-XB * dXA - XA *dXB) * g02g1XB - XB *g2XAdXB;
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
+        CanteraDouble dXA = dXds[iA];
+        CanteraDouble dXB = dXds[iB];
+        CanteraDouble g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
+        CanteraDouble g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
+        const CanteraDouble g02g1XB = g0 + 2*g1*XB;
+        const CanteraDouble g2XAdXB = 2*g1*XA*dXB;
+        const CanteraDouble all = (-XB * dXA - XA *dXB) * g02g1XB - XB *g2XAdXB;
         for (size_t iK = 0; iK < m_kk; iK++) {
             dlnActCoeffds[iK] += all + dlnActCoeffdT_Scaled_[iK]*dTds;
         }
@@ -324,11 +324,11 @@ void MargulesVPSSTP::getdlnActCoeffds(const double dTds, const double* const dXd
 
 void MargulesVPSSTP::s_update_dlnActCoeff_dlnN_diag() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeffdlnN_diag_.assign(m_kk, 0.0);
 
     for (size_t iK = 0; iK < m_kk; iK++) {
-        double XK = moleFractions_[iK];
+        CanteraDouble XK = moleFractions_[iK];
 
         for (size_t i = 0; i < numBinaryInteractions_; i++) {
             size_t iA = m_pSpecies_A_ij[i];
@@ -342,11 +342,11 @@ void MargulesVPSSTP::s_update_dlnActCoeff_dlnN_diag() const
                 delBK = 1;
             }
 
-            double XA = moleFractions_[iA];
-            double XB = moleFractions_[iB];
+            CanteraDouble XA = moleFractions_[iA];
+            CanteraDouble XB = moleFractions_[iB];
 
-            double g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
-            double g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
+            CanteraDouble g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
+            CanteraDouble g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
 
             dlnActCoeffdlnN_diag_[iK] += 2*(delBK-XB)*(g0*(delAK-XA)+g1*(2*(delAK-XA)*XB+XA*(delBK-XB)));
         }
@@ -356,20 +356,20 @@ void MargulesVPSSTP::s_update_dlnActCoeff_dlnN_diag() const
 
 void MargulesVPSSTP::s_update_dlnActCoeff_dlnN() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeffdlnN_.zero();
 
     // Loop over the activity coefficient gamma_k
     for (size_t iK = 0; iK < m_kk; iK++) {
         for (size_t iM = 0; iM < m_kk; iM++) {
-            double XM = moleFractions_[iM];
+            CanteraDouble XM = moleFractions_[iM];
             for (size_t i = 0; i < numBinaryInteractions_; i++) {
                 size_t iA = m_pSpecies_A_ij[i];
                 size_t iB = m_pSpecies_B_ij[i];
-                double delAK = 0.0;
-                double delBK = 0.0;
-                double delAM = 0.0;
-                double delBM = 0.0;
+                CanteraDouble delAK = 0.0;
+                CanteraDouble delBK = 0.0;
+                CanteraDouble delAM = 0.0;
+                CanteraDouble delBM = 0.0;
                 if (iA==iK) {
                     delAK = 1.0;
                 } else if (iB==iK) {
@@ -381,10 +381,10 @@ void MargulesVPSSTP::s_update_dlnActCoeff_dlnN() const
                     delBM = 1.0;
                 }
 
-                double XA = moleFractions_[iA];
-                double XB = moleFractions_[iB];
-                double g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
-                double g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
+                CanteraDouble XA = moleFractions_[iA];
+                CanteraDouble XB = moleFractions_[iB];
+                CanteraDouble g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
+                CanteraDouble g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
                 dlnActCoeffdlnN_(iK,iM) += g0*((delAM-XA)*(delBK-XB)+(delAK-XA)*(delBM-XB));
                 dlnActCoeffdlnN_(iK,iM) += 2*g1*((delAM-XA)*(delBK-XB)*XB+(delAK-XA)*(delBM-XB)*XB+(delBM-XB)*(delBK-XB)*XA);
             }
@@ -395,25 +395,25 @@ void MargulesVPSSTP::s_update_dlnActCoeff_dlnN() const
 
 void MargulesVPSSTP::s_update_dlnActCoeff_dlnX_diag() const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     dlnActCoeffdlnX_diag_.assign(m_kk, 0.0);
 
     for (size_t i = 0; i < numBinaryInteractions_; i++) {
         size_t iA = m_pSpecies_A_ij[i];
         size_t iB = m_pSpecies_B_ij[i];
 
-        double XA = moleFractions_[iA];
-        double XB = moleFractions_[iB];
+        CanteraDouble XA = moleFractions_[iA];
+        CanteraDouble XB = moleFractions_[iB];
 
-        double g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
-        double g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
+        CanteraDouble g0 = (m_HE_b_ij[i] - T * m_SE_b_ij[i]) / RT();
+        CanteraDouble g1 = (m_HE_c_ij[i] - T * m_SE_c_ij[i]) / RT();
 
         dlnActCoeffdlnX_diag_[iA] += XA*XB*(2*g1*-2*g0-6*g1*XB);
         dlnActCoeffdlnX_diag_[iB] += XA*XB*(2*g1*-2*g0-6*g1*XB);
     }
 }
 
-void MargulesVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const
+void MargulesVPSSTP::getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const
 {
     s_update_dlnActCoeff_dlnN_diag();
     for (size_t k = 0; k < m_kk; k++) {
@@ -421,7 +421,7 @@ void MargulesVPSSTP::getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const
     }
 }
 
-void MargulesVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const
+void MargulesVPSSTP::getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const
 {
     s_update_dlnActCoeff_dlnX_diag();
     for (size_t k = 0; k < m_kk; k++) {
@@ -429,10 +429,10 @@ void MargulesVPSSTP::getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const
     }
 }
 
-void MargulesVPSSTP::getdlnActCoeffdlnN(const size_t ld, double* dlnActCoeffdlnN)
+void MargulesVPSSTP::getdlnActCoeffdlnN(const size_t ld, CanteraDouble* dlnActCoeffdlnN)
 {
     s_update_dlnActCoeff_dlnN();
-    double* data =  & dlnActCoeffdlnN_(0,0);
+    CanteraDouble* data =  & dlnActCoeffdlnN_(0,0);
     for (size_t k = 0; k < m_kk; k++) {
         for (size_t m = 0; m < m_kk; m++) {
             dlnActCoeffdlnN[ld * k + m] = data[m_kk * k + m];

@@ -16,7 +16,7 @@
 namespace Cantera
 {
 
-Domain1D::Domain1D(size_t nv, size_t points, double time)
+Domain1D::Domain1D(size_t nv, size_t points, CanteraDouble time)
 {
     resize(nv, points);
 }
@@ -90,7 +90,7 @@ bool Domain1D::hasComponent(const string& name, bool checkAlias) const
                        "Component '{}' not found", name);
 }
 
-void Domain1D::setTransientTolerances(double rtol, double atol, size_t n)
+void Domain1D::setTransientTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n)
 {
     if (n == npos) {
         for (n = 0; n < m_nv; n++) {
@@ -103,7 +103,7 @@ void Domain1D::setTransientTolerances(double rtol, double atol, size_t n)
     }
 }
 
-void Domain1D::setSteadyTolerances(double rtol, double atol, size_t n)
+void Domain1D::setSteadyTolerances(CanteraDouble rtol, CanteraDouble atol, size_t n)
 {
     if (n == npos) {
         for (n = 0; n < m_nv; n++) {
@@ -126,10 +126,10 @@ void Domain1D::needJacUpdate()
 
 AnyMap Domain1D::getMeta() const
 {
-    auto wrap_tols = [this](const vector<double>& tols) {
+    auto wrap_tols = [this](const vector<CanteraDouble>& tols) {
         // If all tolerances are the same, just store the scalar value.
         // Otherwise, store them by component name
-        set<double> unique_tols(tols.begin(), tols.end());
+        set<CanteraDouble> unique_tols(tols.begin(), tols.end());
         if (unique_tols.size() == 1) {
             return AnyValue(tols[0]);
         } else {
@@ -154,7 +154,7 @@ AnyMap Domain1D::getMeta() const
 
 void Domain1D::setMeta(const AnyMap& meta)
 {
-    auto set_tols = [&](const AnyValue& tols, const string& which, vector<double>& out)
+    auto set_tols = [&](const AnyValue& tols, const string& which, vector<CanteraDouble>& out)
     {
         if (!tols.hasKey(which)) {
             return;
@@ -204,12 +204,12 @@ void Domain1D::locate()
     }
 }
 
-void Domain1D::setupGrid(const vector<double>& grid)
+void Domain1D::setupGrid(const vector<CanteraDouble>& grid)
 {
     setupGrid(grid.size(), grid.data());
 }
 
-void Domain1D::setupGrid(size_t n, const double* z)
+void Domain1D::setupGrid(size_t n, const CanteraDouble* z)
 {
     if (n > 1) {
         resize(m_nv, n);
@@ -219,17 +219,17 @@ void Domain1D::setupGrid(size_t n, const double* z)
     }
 }
 
-void Domain1D::setupUniformGrid(size_t points, double length, double start)
+void Domain1D::setupUniformGrid(size_t points, CanteraDouble length, CanteraDouble start)
 {
-    vector<double> grid(points);
-    double dz = length / static_cast<double>(points - 1);
+    vector<CanteraDouble> grid(points);
+    CanteraDouble dz = length / static_cast<CanteraDouble>(points - 1);
     for (size_t iz = 0; iz < points; iz++) {
         grid[iz] = start + iz * dz;
     }
     setupGrid(grid);
 }
 
-void Domain1D::show(const double* x)
+void Domain1D::show(const CanteraDouble* x)
 {
     size_t nn = m_nv/5;
     for (size_t i = 0; i < nn; i++) {
@@ -263,17 +263,17 @@ void Domain1D::show(const double* x)
     writelog("\n");
 }
 
-void Domain1D::setRefineCriteria(double ratio, double slope, double curve, double prune)
+void Domain1D::setRefineCriteria(CanteraDouble ratio, CanteraDouble slope, CanteraDouble curve, CanteraDouble prune)
 {
     m_refiner->setCriteria(ratio, slope, curve, prune);
 }
 
-vector<double> Domain1D::getRefineCriteria()
+vector<CanteraDouble> Domain1D::getRefineCriteria()
 {
     return m_refiner->getCriteria();
 }
 
-void Domain1D::_getInitialSoln(double* x)
+void Domain1D::_getInitialSoln(CanteraDouble* x)
 {
     for (size_t j = 0; j < m_points; j++) {
         for (size_t n = 0; n < m_nv; n++) {
@@ -282,7 +282,7 @@ void Domain1D::_getInitialSoln(double* x)
     }
 }
 
-double Domain1D::initialValue(size_t n, size_t j)
+CanteraDouble Domain1D::initialValue(size_t n, size_t j)
 {
     throw NotImplementedError("Domain1D::initialValue");
 }

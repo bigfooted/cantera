@@ -23,12 +23,12 @@
 #include <iostream>
 
 namespace {
-double X_o_cutoff_default = 0.20;
-double gamma_o_min_default = 0.00001;
-double gamma_k_min_default = 10.0;
-double slopefCut_default = 0.6;
-double slopegCut_default = 0.0;
-double cCut_default = .05;
+CanteraDouble X_o_cutoff_default = 0.20;
+CanteraDouble gamma_o_min_default = 0.00001;
+CanteraDouble gamma_k_min_default = 10.0;
+CanteraDouble slopefCut_default = 0.6;
+CanteraDouble slopegCut_default = 0.0;
+CanteraDouble cCut_default = .05;
 }
 
 namespace Cantera
@@ -45,7 +45,7 @@ IdealMolalSoln::IdealMolalSoln(const string& inputFile, const string& id_) :
     initThermoFile(inputFile, id_);
 }
 
-double IdealMolalSoln::intEnergy_mole() const
+CanteraDouble IdealMolalSoln::intEnergy_mole() const
 {
     getPartialMolarIntEnergies(m_workS.data());
     return mean_X(m_workS);
@@ -53,12 +53,12 @@ double IdealMolalSoln::intEnergy_mole() const
 
 // ------- Mechanical Equation of State Properties ------------------------
 
-double IdealMolalSoln::isothermalCompressibility() const
+CanteraDouble IdealMolalSoln::isothermalCompressibility() const
 {
     return 0.0;
 }
 
-double IdealMolalSoln::thermalExpansionCoeff() const
+CanteraDouble IdealMolalSoln::thermalExpansionCoeff() const
 {
     return 0.0;
 }
@@ -71,14 +71,14 @@ Units IdealMolalSoln::standardConcentrationUnits() const
         return Units(1.0); // dimensionless
     } else {
         // kmol/m^3 for bulk phases
-        return Units(1.0, 0, -static_cast<double>(nDim()), 0, 0, 0, 1);
+        return Units(1.0, 0, -static_cast<CanteraDouble>(nDim()), 0, 0, 0, 1);
     }
 }
 
-void IdealMolalSoln::getActivityConcentrations(double* c) const
+void IdealMolalSoln::getActivityConcentrations(CanteraDouble* c) const
 {
     if (m_formGC != 1) {
-        double c_solvent = standardConcentration();
+        CanteraDouble c_solvent = standardConcentration();
         getActivities(c);
         for (size_t k = 0; k < m_kk; k++) {
             c[k] *= c_solvent;
@@ -86,13 +86,13 @@ void IdealMolalSoln::getActivityConcentrations(double* c) const
     } else {
         getActivities(c);
         for (size_t k = 0; k < m_kk; k++) {
-            double c0 = standardConcentration(k);
+            CanteraDouble c0 = standardConcentration(k);
             c[k] *= c0;
         }
     }
 }
 
-double IdealMolalSoln::standardConcentration(size_t k) const
+CanteraDouble IdealMolalSoln::standardConcentration(size_t k) const
 {
     switch (m_formGC) {
     case 0:
@@ -108,7 +108,7 @@ double IdealMolalSoln::standardConcentration(size_t k) const
     }
 }
 
-void IdealMolalSoln::getActivities(double* ac) const
+void IdealMolalSoln::getActivities(CanteraDouble* ac) const
 {
     _updateStandardStateThermo();
 
@@ -119,7 +119,7 @@ void IdealMolalSoln::getActivities(double* ac) const
         for (size_t k = 0; k < m_kk; k++) {
             ac[k] = m_molalities[k];
         }
-        double xmolSolvent = moleFraction(0);
+        CanteraDouble xmolSolvent = moleFraction(0);
         // Limit the activity coefficient to be finite as the solvent mole
         // fraction goes to zero.
         xmolSolvent = std::max(m_xmolSolventMIN, xmolSolvent);
@@ -132,18 +132,18 @@ void IdealMolalSoln::getActivities(double* ac) const
         for (size_t k = 1; k < m_kk; k++) {
             ac[k] = m_molalities[k] * exp(IMS_lnActCoeffMolal_[k]);
         }
-        double xmolSolvent = moleFraction(0);
+        CanteraDouble xmolSolvent = moleFraction(0);
         ac[0] = exp(IMS_lnActCoeffMolal_[0]) * xmolSolvent;
     }
 }
 
-void IdealMolalSoln::getMolalityActivityCoefficients(double* acMolality) const
+void IdealMolalSoln::getMolalityActivityCoefficients(CanteraDouble* acMolality) const
 {
     if (IMS_typeCutoff_ == 0) {
         for (size_t k = 0; k < m_kk; k++) {
             acMolality[k] = 1.0;
         }
-        double xmolSolvent = moleFraction(0);
+        CanteraDouble xmolSolvent = moleFraction(0);
         // Limit the activity coefficient to be finite as the solvent mole
         // fraction goes to zero.
         xmolSolvent = std::max(m_xmolSolventMIN, xmolSolvent);
@@ -159,7 +159,7 @@ void IdealMolalSoln::getMolalityActivityCoefficients(double* acMolality) const
 
 // ------ Partial Molar Properties of the Solution -----------------
 
-void IdealMolalSoln::getChemPotentials(double* mu) const
+void IdealMolalSoln::getChemPotentials(CanteraDouble* mu) const
 {
     // First get the standard chemical potentials. This requires updates of
     // standard state as a function of T and P These are defined at unit
@@ -171,17 +171,17 @@ void IdealMolalSoln::getChemPotentials(double* mu) const
     calcMolalities();
 
     // get the solvent mole fraction
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
 
     if (IMS_typeCutoff_ == 0 || xmolSolvent > 3.* IMS_X_o_cutoff_/2.0) {
         for (size_t k = 1; k < m_kk; k++) {
-            double xx = std::max(m_molalities[k], SmallNumber);
+            CanteraDouble xx = std::max(m_molalities[k], SmallNumber);
             mu[k] += RT() * log(xx);
         }
 
         // Do the solvent
         //  -> see my notes
-        double xx = std::max(xmolSolvent, SmallNumber);
+        CanteraDouble xx = std::max(xmolSolvent, SmallNumber);
         mu[0] += (RT() * (xmolSolvent - 1.0) / xx);
     } else {
         // Update the activity coefficients. This also updates the internal
@@ -189,15 +189,15 @@ void IdealMolalSoln::getChemPotentials(double* mu) const
         s_updateIMS_lnMolalityActCoeff();
 
         for (size_t k = 1; k < m_kk; k++) {
-            double xx = std::max(m_molalities[k], SmallNumber);
+            CanteraDouble xx = std::max(m_molalities[k], SmallNumber);
             mu[k] += RT() * (log(xx) + IMS_lnActCoeffMolal_[k]);
         }
-        double xx = std::max(xmolSolvent, SmallNumber);
+        CanteraDouble xx = std::max(xmolSolvent, SmallNumber);
         mu[0] += RT() * (log(xx) + IMS_lnActCoeffMolal_[0]);
     }
 }
 
-void IdealMolalSoln::getPartialMolarEnthalpies(double* hbar) const
+void IdealMolalSoln::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     getEnthalpy_RT(hbar);
     for (size_t k = 0; k < m_kk; k++) {
@@ -205,7 +205,7 @@ void IdealMolalSoln::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void IdealMolalSoln::getPartialMolarIntEnergies(double* ubar) const
+void IdealMolalSoln::getPartialMolarIntEnergies(CanteraDouble* ubar) const
 {
     getIntEnergy_RT(ubar);
     for (size_t k = 0; k < m_kk; k++) {
@@ -213,16 +213,16 @@ void IdealMolalSoln::getPartialMolarIntEnergies(double* ubar) const
     }
 }
 
-void IdealMolalSoln::getPartialMolarEntropies(double* sbar) const
+void IdealMolalSoln::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     getEntropy_R(sbar);
     calcMolalities();
     if (IMS_typeCutoff_ == 0) {
         for (size_t k = 1; k < m_kk; k++) {
-            double mm = std::max(SmallNumber, m_molalities[k]);
+            CanteraDouble mm = std::max(SmallNumber, m_molalities[k]);
             sbar[k] -= GasConstant * log(mm);
         }
-        double xmolSolvent = moleFraction(0);
+        CanteraDouble xmolSolvent = moleFraction(0);
         sbar[0] -= (GasConstant * (xmolSolvent - 1.0) / xmolSolvent);
     } else {
         // Update the activity coefficients, This also update the internally
@@ -231,23 +231,23 @@ void IdealMolalSoln::getPartialMolarEntropies(double* sbar) const
 
         // First we will add in the obvious dependence on the T term out front
         // of the log activity term
-        double mm;
+        CanteraDouble mm;
         for (size_t k = 1; k < m_kk; k++) {
             mm = std::max(SmallNumber, m_molalities[k]);
             sbar[k] -= GasConstant * (log(mm) + IMS_lnActCoeffMolal_[k]);
         }
-        double xmolSolvent = moleFraction(0);
+        CanteraDouble xmolSolvent = moleFraction(0);
         mm = std::max(SmallNumber, xmolSolvent);
         sbar[0] -= GasConstant *(log(mm) + IMS_lnActCoeffMolal_[0]);
     }
 }
 
-void IdealMolalSoln::getPartialMolarVolumes(double* vbar) const
+void IdealMolalSoln::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     getStandardVolumes(vbar);
 }
 
-void IdealMolalSoln::getPartialMolarCp(double* cpbar) const
+void IdealMolalSoln::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     // Get the nondimensional Gibbs standard state of the species at the T and P
     // of the solution.
@@ -376,8 +376,8 @@ void IdealMolalSoln::s_updateIMS_lnMolalityActCoeff() const
     // with respect to the contents of the State objects' data.
     calcMolalities();
 
-    double xmolSolvent = moleFraction(0);
-    double xx = std::max(m_xmolSolventMIN, xmolSolvent);
+    CanteraDouble xmolSolvent = moleFraction(0);
+    CanteraDouble xx = std::max(m_xmolSolventMIN, xmolSolvent);
 
     if (IMS_typeCutoff_ == 0) {
         for (size_t k = 1; k < m_kk; k++) {
@@ -393,7 +393,7 @@ void IdealMolalSoln::s_updateIMS_lnMolalityActCoeff() const
             IMS_lnActCoeffMolal_[0] = - log(xx) + (xx - 1.0)/xx;
             return;
         } else if (xmolSolvent < IMS_X_o_cutoff_/2.0) {
-            double tmp = log(xx * IMS_gamma_k_min_);
+            CanteraDouble tmp = log(xx * IMS_gamma_k_min_);
             for (size_t k = 1; k < m_kk; k++) {
                 IMS_lnActCoeffMolal_[k]= tmp;
             }
@@ -401,34 +401,34 @@ void IdealMolalSoln::s_updateIMS_lnMolalityActCoeff() const
             return;
         } else {
             // If we are in the middle region, calculate the connecting polynomials
-            double xminus = xmolSolvent - IMS_X_o_cutoff_/2.0;
-            double xminus2 = xminus * xminus;
-            double xminus3 = xminus2 * xminus;
-            double x_o_cut2 = IMS_X_o_cutoff_ * IMS_X_o_cutoff_;
-            double x_o_cut3 = x_o_cut2 * IMS_X_o_cutoff_;
+            CanteraDouble xminus = xmolSolvent - IMS_X_o_cutoff_/2.0;
+            CanteraDouble xminus2 = xminus * xminus;
+            CanteraDouble xminus3 = xminus2 * xminus;
+            CanteraDouble x_o_cut2 = IMS_X_o_cutoff_ * IMS_X_o_cutoff_;
+            CanteraDouble x_o_cut3 = x_o_cut2 * IMS_X_o_cutoff_;
 
-            double h2 = 3.5 * xminus2 / IMS_X_o_cutoff_ - 2.0 * xminus3 / x_o_cut2;
-            double h2_prime = 7.0 * xminus / IMS_X_o_cutoff_ - 6.0 * xminus2 / x_o_cut2;
+            CanteraDouble h2 = 3.5 * xminus2 / IMS_X_o_cutoff_ - 2.0 * xminus3 / x_o_cut2;
+            CanteraDouble h2_prime = 7.0 * xminus / IMS_X_o_cutoff_ - 6.0 * xminus2 / x_o_cut2;
 
-            double h1 = (1.0 - 3.0 * xminus2 / x_o_cut2 + 2.0 * xminus3/ x_o_cut3);
-            double h1_prime = (- 6.0 * xminus / x_o_cut2 + 6.0 * xminus2/ x_o_cut3);
+            CanteraDouble h1 = (1.0 - 3.0 * xminus2 / x_o_cut2 + 2.0 * xminus3/ x_o_cut3);
+            CanteraDouble h1_prime = (- 6.0 * xminus / x_o_cut2 + 6.0 * xminus2/ x_o_cut3);
 
-            double h1_g = h1 / IMS_gamma_o_min_;
-            double h1_g_prime = h1_prime / IMS_gamma_o_min_;
+            CanteraDouble h1_g = h1 / IMS_gamma_o_min_;
+            CanteraDouble h1_g_prime = h1_prime / IMS_gamma_o_min_;
 
-            double alpha = 1.0 / (exp(1.0) * IMS_gamma_k_min_);
-            double h1_f = h1 * alpha;
-            double h1_f_prime = h1_prime * alpha;
+            CanteraDouble alpha = 1.0 / (exp(1.0) * IMS_gamma_k_min_);
+            CanteraDouble h1_f = h1 * alpha;
+            CanteraDouble h1_f_prime = h1_prime * alpha;
 
-            double f = h2 + h1_f;
-            double f_prime = h2_prime + h1_f_prime;
+            CanteraDouble f = h2 + h1_f;
+            CanteraDouble f_prime = h2_prime + h1_f_prime;
 
-            double g = h2 + h1_g;
-            double g_prime = h2_prime + h1_g_prime;
+            CanteraDouble g = h2 + h1_g;
+            CanteraDouble g_prime = h2_prime + h1_g_prime;
 
-            double tmp = (xmolSolvent/ g * g_prime + (1.0-xmolSolvent) / f * f_prime);
-            double lngammak = -1.0 - log(f) + tmp * xmolSolvent;
-            double lngammao =-log(g) - tmp * (1.0-xmolSolvent);
+            CanteraDouble tmp = (xmolSolvent/ g * g_prime + (1.0-xmolSolvent) / f * f_prime);
+            CanteraDouble lngammak = -1.0 - log(f) + tmp * xmolSolvent;
+            CanteraDouble lngammao =-log(g) - tmp * (1.0-xmolSolvent);
 
             tmp = log(xmolSolvent) + lngammak;
             for (size_t k = 1; k < m_kk; k++) {
@@ -445,22 +445,22 @@ void IdealMolalSoln::s_updateIMS_lnMolalityActCoeff() const
             IMS_lnActCoeffMolal_[0] = - log(xx) + (xx - 1.0)/xx;
             return;
         } else {
-            double xoverc = xmolSolvent/IMS_cCut_;
-            double eterm = std::exp(-xoverc);
+            CanteraDouble xoverc = xmolSolvent/IMS_cCut_;
+            CanteraDouble eterm = std::exp(-xoverc);
 
-            double fptmp = IMS_bfCut_ - IMS_afCut_ / IMS_cCut_ - IMS_bfCut_*xoverc
+            CanteraDouble fptmp = IMS_bfCut_ - IMS_afCut_ / IMS_cCut_ - IMS_bfCut_*xoverc
                            + 2.0*IMS_dfCut_*xmolSolvent - IMS_dfCut_*xmolSolvent*xoverc;
-            double f_prime = 1.0 + eterm*fptmp;
-            double f = xmolSolvent + IMS_efCut_ + eterm * (IMS_afCut_ + xmolSolvent * (IMS_bfCut_ + IMS_dfCut_*xmolSolvent));
+            CanteraDouble f_prime = 1.0 + eterm*fptmp;
+            CanteraDouble f = xmolSolvent + IMS_efCut_ + eterm * (IMS_afCut_ + xmolSolvent * (IMS_bfCut_ + IMS_dfCut_*xmolSolvent));
 
-            double gptmp = IMS_bgCut_ - IMS_agCut_ / IMS_cCut_ - IMS_bgCut_*xoverc
+            CanteraDouble gptmp = IMS_bgCut_ - IMS_agCut_ / IMS_cCut_ - IMS_bgCut_*xoverc
                            + 2.0*IMS_dgCut_*xmolSolvent - IMS_dgCut_*xmolSolvent*xoverc;
-            double g_prime = 1.0 + eterm*gptmp;
-            double g = xmolSolvent + IMS_egCut_ + eterm * (IMS_agCut_ + xmolSolvent * (IMS_bgCut_ + IMS_dgCut_*xmolSolvent));
+            CanteraDouble g_prime = 1.0 + eterm*gptmp;
+            CanteraDouble g = xmolSolvent + IMS_egCut_ + eterm * (IMS_agCut_ + xmolSolvent * (IMS_bgCut_ + IMS_dgCut_*xmolSolvent));
 
-            double tmp = (xmolSolvent / g * g_prime + (1.0 - xmolSolvent) / f * f_prime);
-            double lngammak = -1.0 - log(f) + tmp * xmolSolvent;
-            double lngammao =-log(g) - tmp * (1.0-xmolSolvent);
+            CanteraDouble tmp = (xmolSolvent / g * g_prime + (1.0 - xmolSolvent) / f * f_prime);
+            CanteraDouble lngammak = -1.0 - log(f) + tmp * xmolSolvent;
+            CanteraDouble lngammao =-log(g) - tmp * (1.0-xmolSolvent);
 
             tmp = log(xx) + lngammak;
             for (size_t k = 1; k < m_kk; k++) {
@@ -477,14 +477,14 @@ void IdealMolalSoln::calcIMSCutoffParams_()
     IMS_efCut_ = 0.0;
     bool converged = false;
     for (int its = 0; its < 100 && !converged; its++) {
-        double oldV = IMS_efCut_;
+        CanteraDouble oldV = IMS_efCut_;
         IMS_afCut_ = 1.0 / (std::exp(1.0) * IMS_gamma_k_min_) - IMS_efCut_;
         IMS_bfCut_ = IMS_afCut_ / IMS_cCut_ + IMS_slopefCut_ - 1.0;
         IMS_dfCut_ = ((- IMS_afCut_/IMS_cCut_ + IMS_bfCut_ - IMS_bfCut_*IMS_X_o_cutoff_/IMS_cCut_)
                       /
                       (IMS_X_o_cutoff_*IMS_X_o_cutoff_/IMS_cCut_ - 2.0 * IMS_X_o_cutoff_));
-        double tmp = IMS_afCut_ + IMS_X_o_cutoff_*(IMS_bfCut_ + IMS_dfCut_ * IMS_X_o_cutoff_);
-        double eterm = std::exp(-IMS_X_o_cutoff_/IMS_cCut_);
+        CanteraDouble tmp = IMS_afCut_ + IMS_X_o_cutoff_*(IMS_bfCut_ + IMS_dfCut_ * IMS_X_o_cutoff_);
+        CanteraDouble eterm = std::exp(-IMS_X_o_cutoff_/IMS_cCut_);
         IMS_efCut_ = - eterm * (tmp);
         if (fabs(IMS_efCut_ - oldV) < 1.0E-14) {
             converged = true;
@@ -495,19 +495,19 @@ void IdealMolalSoln::calcIMSCutoffParams_()
                            "failed to converge on the f polynomial");
     }
     converged = false;
-    double f_0 = IMS_afCut_ + IMS_efCut_;
-    double f_prime_0 = 1.0 - IMS_afCut_ / IMS_cCut_ + IMS_bfCut_;
+    CanteraDouble f_0 = IMS_afCut_ + IMS_efCut_;
+    CanteraDouble f_prime_0 = 1.0 - IMS_afCut_ / IMS_cCut_ + IMS_bfCut_;
     IMS_egCut_ = 0.0;
     for (int its = 0; its < 100 && !converged; its++) {
-        double oldV = IMS_egCut_;
-        double lng_0 = -log(IMS_gamma_o_min_) - f_prime_0 / f_0;
+        CanteraDouble oldV = IMS_egCut_;
+        CanteraDouble lng_0 = -log(IMS_gamma_o_min_) - f_prime_0 / f_0;
         IMS_agCut_ = exp(lng_0) - IMS_egCut_;
         IMS_bgCut_ = IMS_agCut_ / IMS_cCut_ + IMS_slopegCut_ - 1.0;
         IMS_dgCut_ = ((- IMS_agCut_/IMS_cCut_ + IMS_bgCut_ - IMS_bgCut_*IMS_X_o_cutoff_/IMS_cCut_)
                       /
                       (IMS_X_o_cutoff_*IMS_X_o_cutoff_/IMS_cCut_ - 2.0 * IMS_X_o_cutoff_));
-        double tmp = IMS_agCut_ + IMS_X_o_cutoff_*(IMS_bgCut_ + IMS_dgCut_ *IMS_X_o_cutoff_);
-        double eterm = std::exp(-IMS_X_o_cutoff_/IMS_cCut_);
+        CanteraDouble tmp = IMS_agCut_ + IMS_X_o_cutoff_*(IMS_bgCut_ + IMS_dgCut_ *IMS_X_o_cutoff_);
+        CanteraDouble eterm = std::exp(-IMS_X_o_cutoff_/IMS_cCut_);
         IMS_egCut_ = - eterm * (tmp);
         if (fabs(IMS_egCut_ - oldV) < 1.0E-14) {
             converged = true;

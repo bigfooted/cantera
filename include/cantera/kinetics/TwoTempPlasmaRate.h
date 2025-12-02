@@ -22,20 +22,20 @@ struct TwoTempPlasmaData : public ReactionData
     TwoTempPlasmaData() = default;
 
     bool update(const ThermoPhase& phase, const Kinetics& kin) override;
-    void update(double T) override;
-    void update(double T, double Te) override;
+    void update(CanteraDouble T) override;
+    void update(CanteraDouble T, CanteraDouble Te) override;
     using ReactionData::update;
 
-    virtual void updateTe(double Te);
+    virtual void updateTe(CanteraDouble Te);
 
     void invalidateCache() override {
         ReactionData::invalidateCache();
         electronTemp = NAN;
     }
 
-    double electronTemp = 1.0; //!< electron temperature
-    double logTe = 0.0; //!< logarithm of electron temperature
-    double recipTe = 1.0; //!< inverse of electron temperature
+    CanteraDouble electronTemp = 1.0; //!< electron temperature
+    CanteraDouble logTe = 0.0; //!< logarithm of electron temperature
+    CanteraDouble recipTe = 1.0; //!< inverse of electron temperature
 };
 
 
@@ -70,7 +70,7 @@ public:
      *  @param Ea  Activation energy in energy units [J/kmol]
      *  @param EE  Activation electron energy in energy units [J/kmol]
      */
-    TwoTempPlasmaRate(double A, double b, double Ea=0.0, double EE=0.0);
+    TwoTempPlasmaRate(CanteraDouble A, CanteraDouble b, CanteraDouble Ea=0.0, CanteraDouble EE=0.0);
 
     TwoTempPlasmaRate(const AnyMap& node, const UnitStack& rate_units={});
 
@@ -88,7 +88,7 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const TwoTempPlasmaData& shared_data) const {
+    CanteraDouble evalFromStruct(const TwoTempPlasmaData& shared_data) const {
         // m_E4_R is the electron activation (in temperature units)
         return m_A * std::exp(m_b * shared_data.logTe -
                               m_Ea_R * shared_data.recipT +
@@ -103,10 +103,10 @@ public:
      *  A corresponding warning is raised.
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double ddTScaledFromStruct(const TwoTempPlasmaData& shared_data) const;
+    CanteraDouble ddTScaledFromStruct(const TwoTempPlasmaData& shared_data) const;
 
     //! Return the electron activation energy *Ea* [J/kmol]
-    double activationElectronEnergy() const {
+    CanteraDouble activationElectronEnergy() const {
         return m_E4_R * GasConstant;
     }
 };

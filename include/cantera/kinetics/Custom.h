@@ -55,7 +55,7 @@ public:
     /*!
      *  @param shared_data  data shared by all reactions of a given type
      */
-    double evalFromStruct(const ArrheniusData& shared_data) const;
+    CanteraDouble evalFromStruct(const ArrheniusData& shared_data) const;
 
     //! Set custom rate
     /**

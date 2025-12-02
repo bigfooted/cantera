@@ -35,7 +35,7 @@ public:
     //! @param rdt  Reciprocal of the time step. if omitted, then the internally stored
     //!     value (accessible using the rdt() method) is used.
     //! @param count   Set to zero to omit this call from the statistics
-    virtual void eval(double* x, double* r, double rdt=-1.0, int count=1) = 0;
+    virtual void eval(CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt=-1.0, int count=1) = 0;
 
     //! Evaluates the Jacobian at x0 using finite differences.
     //!
@@ -44,7 +44,7 @@ public:
     //! finite differences to determine the corresponding column of the Jacobian.
     //!
     //! @param x0  State vector at which to evaluate the Jacobian
-    virtual void evalJacobian(double* x0) = 0;
+    virtual void evalJacobian(CanteraDouble* x0) = 0;
 
     //! Compute the weighted norm of `step`.
     //!
@@ -55,10 +55,10 @@ public:
     //! tolerances. This makes the norm dimensionless and scaled appropriately, avoiding
     //! issues where some components dominate due to differences in their scales. See
     //! OneDim::weightedNorm() for a representative implementation.
-    virtual double weightedNorm(const double* step) const = 0;
+    virtual CanteraDouble weightedNorm(const CanteraDouble* step) const = 0;
 
     //! Set the initial guess. Should be called before solve().
-    void setInitialGuess(const double* x);
+    void setInitialGuess(const CanteraDouble* x);
 
     //! Solve the steady-state problem, taking internal timesteps as necessary until
     //! the Newton solver can converge for the steady problem.
@@ -66,11 +66,11 @@ public:
     void solve(int loglevel=0);
 
     //! Get the converged steady-state solution after calling solve().
-    void getState(double* x) const;
+    void getState(CanteraDouble* x) const;
 
     //! Steady-state max norm (infinity norm) of the residual evaluated using solution
     //! x. On return, array r contains the steady-state residual values.
-    double ssnorm(double* x, double* r);
+    CanteraDouble ssnorm(CanteraDouble* x, CanteraDouble* r);
 
     //! Total solution vector length;
     size_t size() const {
@@ -104,10 +104,10 @@ public:
     virtual string componentTableLabel(size_t i) const { return componentName(i); }
 
     //! Get the upper bound for global component *i* in the state vector
-    virtual double upperBound(size_t i) const = 0;
+    virtual CanteraDouble upperBound(size_t i) const = 0;
 
     //! Get the lower bound for global component *i* in the state vector
-    virtual double lowerBound(size_t i) const = 0;
+    virtual CanteraDouble lowerBound(size_t i) const = 0;
 
     //! Return a reference to the Newton iterator.
     MultiNewton& newton();
@@ -121,7 +121,7 @@ public:
     shared_ptr<SystemJacobian> linearSolver() const { return m_jac; }
 
     //! Reciprocal of the time step.
-    double rdt() const {
+    CanteraDouble rdt() const {
         return m_rdt;
     }
 
@@ -136,7 +136,7 @@ public:
     }
 
     //! Prepare for time stepping beginning with solution *x* and timestep *dt*.
-    virtual void initTimeInteg(double dt, double* x);
+    virtual void initTimeInteg(CanteraDouble dt, CanteraDouble* x);
 
     //! Prepare to solve the steady-state problem. After invoking this method,
     //! subsequent calls to solve() will solve the steady-state problem. Sets the
@@ -158,10 +158,10 @@ public:
     //! @param r  solution vector after time stepping
     //! @param loglevel  controls amount of printed diagnostics
     //! @returns size of last timestep taken
-    double timeStep(int nsteps, double dt, double* x, double* r, int loglevel);
+    CanteraDouble timeStep(int nsteps, CanteraDouble dt, CanteraDouble* x, CanteraDouble* r, int loglevel);
 
     //! Reset values such as negative species concentrations
-    virtual void resetBadValues(double* x) {}
+    virtual void resetBadValues(CanteraDouble* x) {}
 
     //! @name Options
     //! @{
@@ -173,7 +173,7 @@ public:
     //! @param tsteps  A sequence of time step counts to take after subsequent failures
     //!     of the steady-state solver. The last value in `tsteps` will be used again
     //!     after further unsuccessful solution attempts.
-    void setTimeStep(double stepsize, size_t n, const int* tsteps);
+    void setTimeStep(CanteraDouble stepsize, size_t n, const int* tsteps);
 
     //! Set the number of time steps to try when the steady Newton solver is
     //! unsuccessful.
@@ -182,17 +182,17 @@ public:
     //!     of the steady-state solver. The last value in `tsteps` will be used again
     //!     after further unsuccessful solution attempts.
     //! @since New in %Cantera 3.2
-    void setTimeStep(double stepSize, const vector<int>& tSteps) {
+    void setTimeStep(CanteraDouble stepSize, const vector<int>& tSteps) {
         setTimeStep(stepSize, tSteps.size(), tSteps.data());
     }
 
     //! Set the minimum time step allowed during time stepping
-    void setMinTimeStep(double tmin) {
+    void setMinTimeStep(CanteraDouble tmin) {
         m_tmin = tmin;
     }
 
     //! Set the maximum time step allowed during time stepping
-    void setMaxTimeStep(double tmax) {
+    void setMaxTimeStep(CanteraDouble tmax) {
         m_tmax = tmax;
     }
 
@@ -200,7 +200,7 @@ public:
     //! The default value is 0.5.
     //!
     //! @param tfactor  factor time step is multiplied by if time stepping fails
-    void setTimeStepFactor(double tfactor) {
+    void setTimeStepFactor(CanteraDouble tfactor) {
         m_tfactor = tfactor;
     }
 
@@ -244,7 +244,7 @@ public:
     //!     Default `1.0e-10`.
     //! @param threshold  Threshold below which to exclude elements from the Jacobian
     //!     Default `0.0`.
-    void setJacobianPerturbation(double relative, double absolute, double threshold) {
+    void setJacobianPerturbation(CanteraDouble relative, CanteraDouble absolute, CanteraDouble threshold) {
         m_jacobianRelPerturb = relative;
         m_jacobianAbsPerturb = absolute;
         m_jacobianThreshold = threshold;
@@ -264,30 +264,30 @@ protected:
     //! Evaluate the steady-state Jacobian, accessible via linearSolver()
     //! @param[in] x  Current state vector, length size()
     //! @param[out] rsd  Storage for the residual, length size()
-    void evalSSJacobian(double* x, double* rsd);
+    void evalSSJacobian(CanteraDouble* x, CanteraDouble* rsd);
 
     //! Array of number of steps to take after each unsuccessful steady-state solve
     //! before re-attempting the steady-state solution. For subsequent time stepping
     //! calls, the final value is reused. See setTimeStep().
     vector<int> m_steps = { 10 };
 
-    double m_tstep = 1.0e-5; //!< Initial timestep
-    double m_tmin = 1e-16; //!< Minimum timestep size
-    double m_tmax = 1e+08; //!< Maximum timestep size
+    CanteraDouble m_tstep = 1.0e-5; //!< Initial timestep
+    CanteraDouble m_tmin = 1e-16; //!< Minimum timestep size
+    CanteraDouble m_tmax = 1e+08; //!< Maximum timestep size
 
     //! Factor time step is multiplied by if time stepping fails ( < 1 )
-    double m_tfactor = 0.5;
+    CanteraDouble m_tfactor = 0.5;
 
-    shared_ptr<vector<double>> m_state; //!< Solution vector
+    shared_ptr<vector<CanteraDouble>> m_state; //!< Solution vector
 
     //! Work array used to hold the residual or the new solution
-    vector<double> m_xnew;
+    vector<CanteraDouble> m_xnew;
 
     //! State vector after the last successful set of time steps
-    vector<double> m_xlast_ts;
+    vector<CanteraDouble> m_xlast_ts;
 
     unique_ptr<MultiNewton> m_newt; //!< Newton iterator
-    double m_rdt = 0.0; //!< Reciprocal of time step
+    CanteraDouble m_rdt = 0.0; //!< Reciprocal of time step
 
     shared_ptr<SystemJacobian> m_jac; //!< Jacobian evaluator
     bool m_jac_ok = false; //!< If `true`, Jacobian is current
@@ -296,7 +296,7 @@ protected:
     size_t m_size = 0; //!< %Solution vector size
 
     //! Work arrays used during Jacobian evaluation
-    vector<double> m_work1, m_work2;
+    vector<CanteraDouble> m_work1, m_work2;
 
     vector<int> m_mask; //!< Transient mask. See transientMask()
     int m_ss_jac_age = 20; //!< Maximum age of the Jacobian in steady-state mode.
@@ -320,11 +320,11 @@ protected:
     int m_nsteps_max = 500; //!< Maximum number of timesteps allowed per call to solve()
 
     //! Threshold for ignoring small elements in Jacobian
-    double m_jacobianThreshold = 0.0;
+    CanteraDouble m_jacobianThreshold = 0.0;
     //! Relative perturbation of each component in finite difference Jacobian
-    double m_jacobianRelPerturb = 1e-5;
+    CanteraDouble m_jacobianRelPerturb = 1e-5;
     //! Absolute perturbation of each component in finite difference Jacobian
-    double m_jacobianAbsPerturb = 1e-10;
+    CanteraDouble m_jacobianAbsPerturb = 1e-10;
 };
 
 }

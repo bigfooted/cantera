@@ -41,7 +41,7 @@ BandMatrix::~BandMatrix()
     // Needs to be defined here so m_ipiv can be deleted
 }
 
-BandMatrix::BandMatrix(size_t n, size_t kl, size_t ku, double v)   :
+BandMatrix::BandMatrix(size_t n, size_t kl, size_t ku, CanteraDouble v)   :
     m_n(n),
     m_kl(kl),
     m_ku(ku),
@@ -104,7 +104,7 @@ BandMatrix& BandMatrix::operator=(const BandMatrix& y)
     return *this;
 }
 
-void BandMatrix::resize(size_t n, size_t kl, size_t ku, double v)
+void BandMatrix::resize(size_t n, size_t kl, size_t ku, CanteraDouble v)
 {
     m_n = n;
     m_kl = kl;
@@ -123,7 +123,7 @@ void BandMatrix::resize(size_t n, size_t kl, size_t ku, double v)
     m_factored = false;
 }
 
-void BandMatrix::bfill(double v)
+void BandMatrix::bfill(CanteraDouble v)
 {
     std::fill(data.begin(), data.end(), v);
     m_factored = false;
@@ -135,17 +135,17 @@ void BandMatrix::zero()
     m_factored = false;
 }
 
-double& BandMatrix::operator()(size_t i, size_t j)
+CanteraDouble& BandMatrix::operator()(size_t i, size_t j)
 {
     return value(i,j);
 }
 
-double BandMatrix::operator()(size_t i, size_t j) const
+CanteraDouble BandMatrix::operator()(size_t i, size_t j) const
 {
     return value(i,j);
 }
 
-double& BandMatrix::value(size_t i, size_t j)
+CanteraDouble& BandMatrix::value(size_t i, size_t j)
 {
     m_factored = false;
     if (i + m_ku < j || i > j + m_kl) {
@@ -154,7 +154,7 @@ double& BandMatrix::value(size_t i, size_t j)
     return data[index(i,j)];
 }
 
-double BandMatrix::value(size_t i, size_t j) const
+CanteraDouble BandMatrix::value(size_t i, size_t j) const
 {
     if (i + m_ku < j || i > j + m_kl) {
         return 0.0;
@@ -167,7 +167,7 @@ size_t BandMatrix::index(size_t i, size_t j) const
     return (2*m_kl + m_ku)*j + m_kl + m_ku + i;
 }
 
-double BandMatrix::_value(size_t i, size_t j) const
+CanteraDouble BandMatrix::_value(size_t i, size_t j) const
 {
     return data[index(i,j)];
 }
@@ -197,10 +197,10 @@ size_t BandMatrix::ldim() const
     return 2*m_kl + m_ku + 1;
 }
 
-void BandMatrix::mult(const double* b, double* prod) const
+void BandMatrix::mult(const CanteraDouble* b, CanteraDouble* prod) const
 {
     for (size_t m = 0; m < m_n; m++) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         size_t start = (m >= m_kl) ? m - m_kl : 0;
         size_t stop = std::min(m + m_ku + 1, m_n);
         for (size_t j = start; j < stop; j++) {
@@ -210,10 +210,10 @@ void BandMatrix::mult(const double* b, double* prod) const
     }
 }
 
-void BandMatrix::leftMult(const double* const b, double* const prod) const
+void BandMatrix::leftMult(const CanteraDouble* const b, CanteraDouble* const prod) const
 {
     for (size_t n = 0; n < m_n; n++) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         size_t start = (n >= m_ku) ? n - m_ku : 0;
         size_t stop = std::min(n + m_kl + 1, m_n);
         for (size_t i = start; i < stop; i++) {
@@ -249,13 +249,13 @@ void BandMatrix::factor()
     m_factored = true;
 }
 
-void BandMatrix::solve(const double* const b, double* const x)
+void BandMatrix::solve(const CanteraDouble* const b, CanteraDouble* const x)
 {
     copy(b, b + m_n, x);
     solve(x);
 }
 
-void BandMatrix::solve(double* b, size_t nrhs, size_t ldb)
+void BandMatrix::solve(CanteraDouble* b, size_t nrhs, size_t ldb)
 {
     if (!m_factored) {
         factor();
@@ -275,7 +275,7 @@ void BandMatrix::solve(double* b, size_t nrhs, size_t ldb)
     long int nu = static_cast<long int>(nSuperDiagonals());
     long int nl = static_cast<long int>(nSubDiagonals());
     long int smu = nu + nl;
-    double** a = m_lu_col_ptrs.data();
+    CanteraDouble** a = m_lu_col_ptrs.data();
     #if SUNDIALS_VERSION_MAJOR >= 6
         SUNDlsMat_bandGBTRS(a, static_cast<long int>(nColumns()), smu, nl,
                             m_ipiv->data.data(), b);
@@ -299,7 +299,7 @@ ostream& operator<<(ostream& s, const BandMatrix& m)
     return s;
 }
 
-double BandMatrix::rcond(double a1norm)
+CanteraDouble BandMatrix::rcond(CanteraDouble a1norm)
 {
     iwork_.resize(m_n);
     work_.resize(3 * m_n);
@@ -311,7 +311,7 @@ double BandMatrix::rcond(double a1norm)
 #if CT_USE_LAPACK
     size_t ldab = (2 *m_kl + m_ku + 1);
     int rinfo = 0;
-    double rcond = ct_dgbcon('1', m_n, m_kl, m_ku, ludata.data(),
+    CanteraDouble rcond = ct_dgbcon('1', m_n, m_kl, m_ku, ludata.data(),
         ldab, m_ipiv->data.data(), a1norm, work_.data(), iwork_.data(), rinfo);
     if (rinfo != 0) {
         throw CanteraError("BandMatrix::rcond", "DGBCON returned INFO = {}", rinfo);
@@ -327,11 +327,11 @@ int BandMatrix::factorAlgorithm() const
     return 0;
 }
 
-double BandMatrix::oneNorm() const
+CanteraDouble BandMatrix::oneNorm() const
 {
-    double value = 0.0;
+    CanteraDouble value = 0.0;
     for (size_t j = 0; j < m_n; j++) {
-        double sum = 0.0;
+        CanteraDouble sum = 0.0;
         size_t start = (j >= m_ku) ? j - m_ku : 0;
         size_t stop = std::min(j + m_kl + 1, m_n);
         for (size_t i = start; i < stop; i++) {
@@ -342,12 +342,12 @@ double BandMatrix::oneNorm() const
     return value;
 }
 
-size_t BandMatrix::checkRows(double& valueSmall) const
+size_t BandMatrix::checkRows(CanteraDouble& valueSmall) const
 {
     valueSmall = 1.0E300;
     size_t iSmall = npos;
     for (size_t i = 0; i < m_n; i++) {
-        double valueS = 0.0;
+        CanteraDouble valueS = 0.0;
         size_t start = (i > m_kl) ? i - m_kl : 0;
         size_t stop = std::min(i + m_ku + 1, m_n);
         for (size_t j = start; j < stop; j++) {
@@ -364,12 +364,12 @@ size_t BandMatrix::checkRows(double& valueSmall) const
     return iSmall;
 }
 
-size_t BandMatrix::checkColumns(double& valueSmall) const
+size_t BandMatrix::checkColumns(CanteraDouble& valueSmall) const
 {
     valueSmall = 1.0E300;
     size_t jSmall = npos;
     for (size_t j = 0; j < m_n; j++) {
-        double valueS = 0.0;
+        CanteraDouble valueS = 0.0;
         size_t start = (j > m_ku) ? j - m_ku : 0;
         size_t stop = std::min(j + m_kl + 1, m_n);
         for (size_t i = start; i < stop; i++) {
@@ -386,12 +386,12 @@ size_t BandMatrix::checkColumns(double& valueSmall) const
     return jSmall;
 }
 
-double* BandMatrix::ptrColumn(size_t j)
+CanteraDouble* BandMatrix::ptrColumn(size_t j)
 {
     return m_colPtrs[j];
 }
 
-double* const* BandMatrix::colPts()
+CanteraDouble* const* BandMatrix::colPts()
 {
     return &m_colPtrs[0];
 }

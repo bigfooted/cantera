@@ -110,8 +110,8 @@ public:
     //! @name Molar Thermodynamic properties
     //! @{
 
-    double enthalpy_mole() const override;
-    double entropy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
     //! @}
     //! @name  Properties of the Standard State of the Species in the Solution
@@ -134,7 +134,7 @@ public:
      * @param mu   Output vector of standard state chemical potentials.
      *             length = m_kk. units are J / kmol.
      */
-    void getStandardChemPotentials(double* mu) const override;
+    void getStandardChemPotentials(CanteraDouble* mu) const override;
 
     //! Get the nondimensional Enthalpy functions for the species at their
     //! standard states at the current *T* and *P* of the solution.
@@ -146,7 +146,7 @@ public:
     * @param hrt     Output vector of standard state enthalpies.
     *                length = m_kk. units are unitless.
     */
-    void getEnthalpy_RT(double* hrt) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
 
     //! Get the array of nondimensional Enthalpy functions for the standard
     //! state species at the current *T* and *P* of the solution.
@@ -158,7 +158,7 @@ public:
      * @param sr     Output vector of nondimensional standard state entropies.
      *               length = m_kk.
      */
-    void getEntropy_R(double* sr) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
 
     //! Get the nondimensional Gibbs functions for the species at their standard
     //! states of solution at the current T and P of the solution.
@@ -170,7 +170,7 @@ public:
      * @param grt    Output vector of nondimensional standard state Gibbs free
      *               energies. length = m_kk.
      */
-    void getGibbs_RT(double* grt) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
 
     //! Returns the vector of nondimensional internal Energies of the standard
     //! state at the current temperature and pressure of the solution for each
@@ -187,7 +187,7 @@ public:
      * @param urt    Output vector of nondimensional standard state internal
      *               energies. length = m_kk.
      */
-    void getIntEnergy_RT(double* urt) const override;
+    void getIntEnergy_RT(CanteraDouble* urt) const override;
 
     //! Get the nondimensional Heat Capacities at constant pressure for the
     //! standard state of the species at the current T and P.
@@ -200,7 +200,7 @@ public:
      *               Capacities at constant pressure for the standard state of
      *               the species. Length: m_kk.
      */
-    void getCp_R(double* cpr) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
 
     //! Get the molar volumes of each species in their standard states at the
     //! current *T* and *P* of the solution.
@@ -214,7 +214,7 @@ public:
      * @param vol Output vector of species volumes. length = m_kk.
      *            units =  m^3 / kmol
      */
-    void getStandardVolumes(double* vol) const override;
+    void getStandardVolumes(CanteraDouble* vol) const override;
     //! @}
 
     //! Set the temperature of the phase
@@ -224,7 +224,7 @@ public:
      *
      * @param temp  Temperature (kelvin)
      */
-    void setTemperature(const double temp) override;
+    void setTemperature(const CanteraDouble temp) override;
 
     //! Set the internally stored pressure (Pa) at constant temperature and
     //! composition
@@ -234,7 +234,7 @@ public:
      *
      *  @param p input Pressure (Pa)
      */
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
 protected:
     void compositionChanged() override;
@@ -266,8 +266,8 @@ public:
     //! routine _updateRefStateThermo().
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
 
 protected:
     //! Returns the vector of nondimensional Gibbs free energies of the
@@ -278,13 +278,13 @@ protected:
      *          of the reference state of the species
      *          length = m_kk, units = dimensionless.
      */
-    const vector<double>& gibbs_RT_ref() const;
+    const vector<CanteraDouble>& gibbs_RT_ref() const;
 
 public:
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getCp_R_ref(double* cprt) const override;
-    void getStandardVolumes_ref(double* vol) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
+    void getStandardVolumes_ref(CanteraDouble* vol) const override;
 
     //! @}
     //! @name Initialization Methods - For Internal use
@@ -309,7 +309,7 @@ protected:
      *
      *  returns the value of z
      */
-    double z() const;
+    CanteraDouble z() const;
 
     //! Calculate the deviation terms for the total entropy of the mixture from
     //! the ideal gas mixture
@@ -318,7 +318,7 @@ protected:
      *
      * @returns the change in entropy in units of J kmol-1 K-1.
      */
-    virtual double sresid() const;
+    virtual CanteraDouble sresid() const;
 
     //! Calculate the deviation terms for the total enthalpy of the mixture from
     //! the ideal gas mixture
@@ -327,7 +327,7 @@ protected:
      *
      * @returns the change in entropy in units of J kmol-1.
      */
-    virtual double hresid() const;
+    virtual CanteraDouble hresid() const;
 
     //! Estimate for the saturation pressure
     /*!
@@ -337,7 +337,7 @@ protected:
      * @param TKelvin  temperature in kelvin
      * @return the estimated saturation pressure at the given temperature
      */
-    virtual double psatEst(double TKelvin) const;
+    virtual CanteraDouble psatEst(CanteraDouble TKelvin) const;
 
 public:
     //! Estimate for the molar volume of the liquid
@@ -354,7 +354,7 @@ public:
      * @returns the estimate of the liquid volume. If the liquid can't be
      *          found, this routine returns -1.
      */
-    virtual double liquidVolEst(double TKelvin, double& pres) const;
+    virtual CanteraDouble liquidVolEst(CanteraDouble TKelvin, CanteraDouble& pres) const;
 
     //! Calculates the density given the temperature and the pressure and a
     //! guess at the density.
@@ -378,8 +378,8 @@ public:
      *            have found an acceptable density at a different phase, we
      *            return a -2.
      */
-    virtual double densityCalc(double TKelvin, double pressure, int phaseRequested,
-                               double rhoguess);
+    virtual CanteraDouble densityCalc(CanteraDouble TKelvin, CanteraDouble pressure, int phaseRequested,
+                               CanteraDouble rhoguess);
 
 protected:
     //! Utility routine in the calculation of the saturation pressure
@@ -391,8 +391,8 @@ protected:
      * @param[out] liqGRT    deltaG/RT of liquid
      * @param[out] gasGRT    deltaG/RT of gas
      */
-    int corr0(double TKelvin, double pres, double& densLiq,
-              double& densGas, double& liqGRT, double& gasGRT);
+    int corr0(CanteraDouble TKelvin, CanteraDouble pres, CanteraDouble& densLiq,
+              CanteraDouble& densGas, CanteraDouble& liqGRT, CanteraDouble& gasGRT);
 
 public:
     //! Returns the Phase State flag for the current state of the object
@@ -415,7 +415,7 @@ public:
      * @param molarVolLiquid  (return) Molar volume of the liquid
      * @returns the saturation pressure at the given temperature
      */
-    double calculatePsat(double TKelvin, double& molarVolGas, double& molarVolLiquid);
+    CanteraDouble calculatePsat(CanteraDouble TKelvin, CanteraDouble& molarVolGas, CanteraDouble& molarVolLiquid);
 
 public:
     //! Calculate the saturation pressure at the current mixture content for the
@@ -424,8 +424,8 @@ public:
      * @param TKelvin   Temperature (Kelvin)
      * @return          The saturation pressure at the given temperature
      */
-    double satPressure(double TKelvin) override;
-    void getActivityConcentrations(double* c) const override;
+    CanteraDouble satPressure(CanteraDouble TKelvin) override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
 protected:
     //! Calculate the pressure and the pressure derivative given the temperature
@@ -438,7 +438,7 @@ protected:
      * @param   presCalc  Returns the pressure.
      * @returns the derivative of the pressure wrt the molar volume
      */
-    virtual double dpdVCalc(double TKelvin, double molarVol, double& presCalc) const;
+    virtual CanteraDouble dpdVCalc(CanteraDouble TKelvin, CanteraDouble molarVol, CanteraDouble& presCalc) const;
 
     virtual void updateMixingExpressions();
 
@@ -446,12 +446,12 @@ protected:
     //! @name Critical State Properties.
     //! @{
 
-    double critTemperature() const override;
-    double critPressure() const override;
-    double critVolume() const override;
-    double critCompressibility() const override;
-    double critDensity() const override;
-    virtual void calcCriticalConditions(double& pc, double& tc, double& vc) const;
+    CanteraDouble critTemperature() const override;
+    CanteraDouble critPressure() const override;
+    CanteraDouble critVolume() const override;
+    CanteraDouble critCompressibility() const override;
+    CanteraDouble critDensity() const override;
+    virtual void calcCriticalConditions(CanteraDouble& pc, CanteraDouble& tc, CanteraDouble& vc) const;
 
     //! Solve the cubic equation of state
     /*!
@@ -476,9 +476,9 @@ protected:
      * @param   vc        Critical volume
      * @returns the number of solutions found
      */
-    int solveCubic(double T, double pres, double a, double b,
-                   double aAlpha, double Vroot[3], double an,
-                   double bn, double cn, double dn, double tc, double vc) const;
+    int solveCubic(CanteraDouble T, CanteraDouble pres, CanteraDouble a, CanteraDouble b,
+                   CanteraDouble aAlpha, CanteraDouble Vroot[3], CanteraDouble an,
+                   CanteraDouble bn, CanteraDouble cn, CanteraDouble dn, CanteraDouble tc, CanteraDouble vc) const;
 
     //! @}
 
@@ -486,7 +486,7 @@ protected:
     /*!
      * This vector is kept up-to-date when some the setState functions are called.
      */
-    vector<double> moleFractions_;
+    vector<CanteraDouble> moleFractions_;
 
     //! Current state of the fluid
     /*!
@@ -501,16 +501,16 @@ protected:
     int forcedState_ = FLUID_UNDEFINED;
 
     //! Temporary storage for dimensionless reference state enthalpies
-    mutable vector<double> m_h0_RT;
+    mutable vector<CanteraDouble> m_h0_RT;
 
     //! Temporary storage for dimensionless reference state heat capacities
-    mutable vector<double> m_cp0_R;
+    mutable vector<CanteraDouble> m_cp0_R;
 
     //! Temporary storage for dimensionless reference state Gibbs energies
-    mutable vector<double> m_g0_RT;
+    mutable vector<CanteraDouble> m_g0_RT;
 
     //! Temporary storage for dimensionless reference state entropies
-    mutable vector<double> m_s0_R;
+    mutable vector<CanteraDouble> m_s0_R;
 };
 }
 

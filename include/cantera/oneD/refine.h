@@ -51,13 +51,13 @@ public:
      *      should be smaller than both `slope` and `curve`. Set `prune <= 0`
      *      to disable pruning.
      */
-    void setCriteria(double ratio = 10.0,
-                     double slope = 0.8,
-                     double curve = 0.8,
-                     double prune = -0.1);
+    void setCriteria(CanteraDouble ratio = 10.0,
+                     CanteraDouble slope = 0.8,
+                     CanteraDouble curve = 0.8,
+                     CanteraDouble prune = -0.1);
 
     //! Get the grid refinement criteria. @see Refiner::setCriteria
-    vector<double> getCriteria()
+    vector<CanteraDouble> getCriteria()
     {
         return {m_ratio, m_slope, m_curve, m_prune};
     }
@@ -83,13 +83,13 @@ public:
     }
 
     //! Set the minimum allowable spacing between adjacent grid points [m].
-    void setGridMin(double gridmin) {
+    void setGridMin(CanteraDouble gridmin) {
         m_gridmin = gridmin;
     }
 
     //! Returns the the minimum allowable spacing between adjacent
     //! grid points [m].
-    double gridMin() const {
+    CanteraDouble gridMin() const {
         return m_gridmin;
     }
 
@@ -103,7 +103,7 @@ public:
      *
      * @returns The number of new grid points needed (size of #m_insertPts)
      */
-    int analyze(size_t n, const double* z, const double* x);
+    int analyze(size_t n, const CanteraDouble* z, const CanteraDouble* x);
 
     //! Returns the number of new grid points that were needed.
     int nNewPoints() {
@@ -147,25 +147,25 @@ public:
      * @param n %Solution component index
      * @param j Grid point index
      */
-    double value(const double* x, size_t n, size_t j);
+    CanteraDouble value(const CanteraDouble* x, size_t n, size_t j);
 
     //! Returns the maximum allowable ratio of grid spacing between adjacent intervals
-    double maxRatio() {
+    CanteraDouble maxRatio() {
         return m_ratio;
     }
 
     //! Returns the maximum allowable difference in value between adjacent points
-    double maxDelta() {
+    CanteraDouble maxDelta() {
         return m_slope;
     }
 
     //! Returns the maximum allowable difference in the derivative between adjacent points
-    double maxSlope() {
+    CanteraDouble maxSlope() {
         return m_curve;
     }
 
     //! Returns the threshold for removing unnecessary grid points
-    double prune() {
+    CanteraDouble prune() {
         return m_prune;
     }
 
@@ -191,22 +191,22 @@ protected:
 
     //! @name Refinement criteria
     //! @{
-    double m_ratio = 10.0; //!< grid spacing refinement criteria
-    double m_slope = 0.8; //!< function change refinement criteria
-    double m_curve = 0.8; //!< function slope refinement criteria
-    double m_prune = -0.001; //!< pruning refinement criteria
+    CanteraDouble m_ratio = 10.0; //!< grid spacing refinement criteria
+    CanteraDouble m_slope = 0.8; //!< function change refinement criteria
+    CanteraDouble m_curve = 0.8; //!< function slope refinement criteria
+    CanteraDouble m_prune = -0.001; //!< pruning refinement criteria
     //! @}
 
     //! Threshold for ignoring small changes around a constant during refinement.
-    double m_min_range = 0.01;
+    CanteraDouble m_min_range = 0.01;
 
     Domain1D* m_domain; //!< Pointer to the domain to be refined.
     size_t m_nv; //!< Number of components in the domain
     size_t m_npmax = 1000; //!< Maximum number of grid points
 
     //! Absolute tolerance threshold for solution components in the domain
-    double m_thresh = std::sqrt(std::numeric_limits<double>::epsilon());
-    double m_gridmin = 1e-10; //!< minimum grid spacing [m]
+    CanteraDouble m_thresh = std::sqrt(std::numeric_limits<CanteraDouble>::epsilon());
+    CanteraDouble m_gridmin = 1e-10; //!< minimum grid spacing [m]
 };
 
 }

@@ -41,7 +41,7 @@ public:
      * @param[out] ydot rate of change of solution vector, length neq()
      * @param[in] p sensitivity parameter vector, length nparams()
      */
-    virtual void eval(double t, double* y, double* ydot, double* p) {
+    virtual void eval(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* p) {
         throw NotImplementedError("FuncEval::eval");
     }
 
@@ -53,14 +53,14 @@ public:
      * @param[in] p sensitivity parameter vector, length nparams()
      * @param[out] residual the DAE residuals, length nparams()
      */
-    virtual void evalDae(double t, double* y, double* ydot, double* p,
-                         double* residual) {
+    virtual void evalDae(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* p,
+                         CanteraDouble* residual) {
         throw NotImplementedError("FuncEval::evalDae");
     }
 
     //! Given a vector of length neq(), mark which variables should be
     //! considered algebraic constraints
-    virtual void getConstraints(double* constraints) {
+    virtual void getConstraints(CanteraDouble* constraints) {
         throw NotImplementedError("FuncEval::getConstraints");
     }
 
@@ -73,7 +73,7 @@ public:
      *  @returns 0 for a successful evaluation; 1 after a potentially-
      *      recoverable error; -1 after an unrecoverable error.
      */
-    int evalNoThrow(double t, double* y, double* ydot);
+    int evalNoThrow(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot);
 
     //! Evaluate the right-hand side using return code to indicate status.
     /*!
@@ -84,7 +84,7 @@ public:
      *  @returns 0 for a successful evaluation; 1 after a potentially-
      *      recoverable error; -1 after an unrecoverable error.
      */
-    int evalDaeNoThrow(double t, double* y, double* ydot, double* residual);
+    int evalDaeNoThrow(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* residual);
 
     /**
      * Evaluate the setup processes for the Jacobian preconditioner.
@@ -94,7 +94,7 @@ public:
      * @warning This function is an experimental part of the %Cantera API and may be
      * changed or removed without notice.
      */
-    virtual void preconditionerSetup(double t, double* y, double gamma) {
+    virtual void preconditionerSetup(CanteraDouble t, CanteraDouble* y, CanteraDouble gamma) {
         throw NotImplementedError("FuncEval::preconditionerSetup");
     }
 
@@ -105,12 +105,12 @@ public:
      * @warning This function is an experimental part of the %Cantera API and may be
      * changed or removed without notice.
      */
-    virtual void preconditionerSolve(double* rhs, double* output) {
+    virtual void preconditionerSolve(CanteraDouble* rhs, CanteraDouble* output) {
         throw NotImplementedError("FuncEval::preconditionerSolve");
     }
 
     //! Update the preconditioner based on already computed jacobian values
-    virtual void updatePreconditioner(double gamma) {
+    virtual void updatePreconditioner(CanteraDouble gamma) {
         throw NotImplementedError("FuncEval::updatePreconditioner");
     }
 
@@ -124,7 +124,7 @@ public:
      * @warning This function is an experimental part of the %Cantera API and may be
      * changed or removed without notice.
      */
-    int preconditioner_setup_nothrow(double t, double* y, double gamma);
+    int preconditioner_setup_nothrow(CanteraDouble t, CanteraDouble* y, CanteraDouble gamma);
 
     /**
      * Preconditioner solve that doesn't throw an error but returns a
@@ -135,7 +135,7 @@ public:
      * @warning This function is an experimental part of the %Cantera API and may be
      * changed or removed without notice.
      */
-    int preconditioner_solve_nothrow(double* rhs, double* output);
+    int preconditioner_solve_nothrow(CanteraDouble* rhs, CanteraDouble* output);
 
     //! Number of event/root functions exposed to the integrator.
     //! 0 indicates root finding is disabled.
@@ -152,22 +152,22 @@ public:
      * @param[out] gout Array of length nRootFunctions() to be filled with the
      *      values of the root functions
      */
-    virtual void evalRootFunctions(double t, const double* y, double* gout) { }
+    virtual void evalRootFunctions(CanteraDouble t, const CanteraDouble* y, CanteraDouble* gout) { }
 
     //! Wrapper for evalRootFunctions that converts exceptions to return codes.
     //! @returns 0 for a successful evaluation, 1 after a potentially-
     //!     recoverable error, or -1 after an unrecoverable error.
-    int evalRootFunctionsNoThrow(double t, const double* y, double* gout);
+    int evalRootFunctionsNoThrow(CanteraDouble t, const CanteraDouble* y, CanteraDouble* gout);
 
     //! Fill in the vector *y* with the current state of the system.
     //! Used for getting the initial state for ODE systems.
-    virtual void getState(double* y) {
+    virtual void getState(CanteraDouble* y) {
         throw NotImplementedError("FuncEval::getState");
     }
 
     //! Fill in the vectors *y* and *ydot* with the current state of the system.
     //! Used for getting the initial state for DAE systems.
-    virtual void getStateDae(double* y, double* ydot) {
+    virtual void getStateDae(CanteraDouble* y, CanteraDouble* ydot) {
         throw NotImplementedError("FuncEval::getStateDae");
     }
 
@@ -200,10 +200,10 @@ public:
     //! Values for the problem parameters for which sensitivities are computed
     //! This is the array which is perturbed and passed back as the fourth
     //! argument to eval().
-    vector<double> m_sens_params;
+    vector<CanteraDouble> m_sens_params;
 
     //! Scaling factors for each sensitivity parameter
-    vector<double> m_paramScales;
+    vector<CanteraDouble> m_paramScales;
 
 protected:
     // If true, errors are accumulated in m_errors. Otherwise, they are printed

@@ -162,7 +162,7 @@ long int getPrecision(const Cantera::AnyValue& precisionSource)
     return precision;
 }
 
-string formatDouble(double x, long int precision)
+string formatDouble(CanteraDouble x, long int precision)
 {
     // This function ensures that trailing zeros resulting from round-off error
     // are removed. Values are only rounded if at least three digits are removed,
@@ -300,7 +300,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const AnyMap& rhs)
             string valueStr;
             bool foundType = true;
             bool needsQuotes = false;
-            if (value.is<double>()) {
+            if (value.is<CanteraDouble>()) {
                 valueStr = formatDouble(value.asDouble(), getPrecision(value));
             } else if (value.is<string>()) {
                 valueStr = value.asString();
@@ -367,9 +367,9 @@ void emitString(YAML::Emitter& out, const string& str0) {
 
 //! Write a vector in YAML "flow" style, wrapping lines to avoid exceeding the
 //! preferred maximum line length (set by `max_line_length`). Specialized for
-//! `vector<double>` to be able to use the custom `formatDouble` function with
+//! `vector<CanteraDouble>` to be able to use the custom `formatDouble` function with
 //! a given precision.
-void emitFlowVector(YAML::Emitter& out, const vector<double>& v, long int precision)
+void emitFlowVector(YAML::Emitter& out, const vector<CanteraDouble>& v, long int precision)
 {
     out << YAML::Flow;
     out << YAML::BeginSeq;
@@ -437,7 +437,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const AnyValue& rhs)
     if (rhs.isScalar()) {
         if (rhs.is<string>()) {
             emitString(out, rhs.asString());
-        } else if (rhs.is<double>()) {
+        } else if (rhs.is<CanteraDouble>()) {
             out << formatDouble(rhs.asDouble(), getPrecision(rhs));
         } else if (rhs.is<long int>()) {
             out << rhs.asInt();
@@ -452,8 +452,8 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const AnyValue& rhs)
         out << rhs.as<AnyMap>();
     } else if (rhs.is<vector<AnyMap>>()) {
         out << rhs.asVector<AnyMap>();
-    } else if (rhs.is<vector<double>>()) {
-        emitFlowVector(out, rhs.asVector<double>(), getPrecision(rhs));
+    } else if (rhs.is<vector<CanteraDouble>>()) {
+        emitFlowVector(out, rhs.asVector<CanteraDouble>(), getPrecision(rhs));
     } else if (rhs.is<vector<string>>()) {
         emitFlowVector(out, rhs.asVector<string>());
     } else if (rhs.is<vector<long int>>()) {
@@ -462,8 +462,8 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const AnyValue& rhs)
         emitFlowVector(out, rhs.asVector<bool>());
     } else if (rhs.is<vector<Cantera::AnyValue>>()) {
         out << rhs.asVector<Cantera::AnyValue>();
-    } else if (rhs.is<vector<vector<double>>>()) {
-        const auto& v = rhs.asVector<vector<double>>();
+    } else if (rhs.is<vector<vector<CanteraDouble>>>()) {
+        const auto& v = rhs.asVector<vector<CanteraDouble>>();
         long int precision = getPrecision(rhs);
         out << YAML::BeginSeq;
         for (const auto& u : v) {
@@ -522,8 +522,8 @@ struct convert<Cantera::AnyValue> {
                 } catch (YAML::BadConversion&) {
                     // This exception is raised if the value doesn't fit in a
                     // long int, in which case we would rather store it
-                    // (possibly inexactly) as a double.
-                    target = node.as<double>();
+                    // (possibly inexactly) as a CanteraDouble.
+                    target = node.as<CanteraDouble>();
                 }
             } else if (isFloat(nodestr)) {
                 target = fpValue(nodestr);
@@ -539,7 +539,7 @@ struct convert<Cantera::AnyValue> {
             if (types == Type::Integer) {
                 target = node.as<vector<long int>>();
             } else if (types == (Type::Integer | Type::Double) || types == Type::Double) {
-                vector<double> values;
+                vector<CanteraDouble> values;
                 for (const auto& elem : node) {
                     values.push_back(fpValue(elem.as<string>()));
                 }
@@ -559,7 +559,7 @@ struct convert<Cantera::AnyValue> {
                 if (subtypes == Type::Integer) {
                     target = node.as<vector<vector<long int>>>();
                 } else if (subtypes == (Type::Integer | Type::Double) || subtypes == Type::Double) {
-                    vector<vector<double>> values;
+                    vector<vector<CanteraDouble>> values;
                     for (const auto& row : node) {
                         values.emplace_back();
                         for (const auto& value : row) {
@@ -692,12 +692,12 @@ bool AnyValue::empty() const {
 }
 
 bool AnyValue::isScalar() const {
-    return is<double>() || is<long int>() || is<string>() || is<bool>();
+    return is<CanteraDouble>() || is<long int>() || is<string>() || is<bool>();
 }
 
 size_t AnyValue::vectorSize() const {
-    if (isVector<double>()) {
-        return as<vector<double>>().size();
+    if (isVector<CanteraDouble>()) {
+        return as<vector<CanteraDouble>>().size();
     }
     if (isVector<long int>()) {
         return as<vector<long int>>().size();
@@ -712,9 +712,9 @@ size_t AnyValue::vectorSize() const {
 }
 
 pair<size_t, size_t> AnyValue::matrixShape() const {
-    if (isVector<vector<double>>()) {
-        auto& mat = as<vector<vector<double>>>();
-        if (isMatrix<double>()) {
+    if (isVector<vector<CanteraDouble>>()) {
+        auto& mat = as<vector<vector<CanteraDouble>>>();
+        if (isMatrix<CanteraDouble>()) {
             if (mat.size()) {
                 return {mat.size(), mat[0].size()};
             }
@@ -809,17 +809,17 @@ bool operator!=(const string& lhs, const AnyValue& rhs)
 
 // Specialization for "Quantity"
 
-void AnyValue::setQuantity(double value, const string& units, bool is_act_energy) {
+void AnyValue::setQuantity(CanteraDouble value, const string& units, bool is_act_energy) {
     m_value = Quantity{AnyValue(value), Units(units), is_act_energy, {}};
     m_equals = eq_comparer<Quantity>;
 }
 
-void AnyValue::setQuantity(double value, const Units& units) {
+void AnyValue::setQuantity(CanteraDouble value, const Units& units) {
     m_value = Quantity{AnyValue(value), units, false, {}};
     m_equals = eq_comparer<Quantity>;
 }
 
-void AnyValue::setQuantity(const vector<double>& values, const string& units) {
+void AnyValue::setQuantity(const vector<CanteraDouble>& values, const string& units) {
     AnyValue v;
     v = values;
     m_value = Quantity{v, Units(units), false, {}};
@@ -833,14 +833,14 @@ void AnyValue::setQuantity(const AnyValue& value, const unitConverter& converter
 }
 
 template<>
-bool AnyValue::is<vector<double>>() const
+bool AnyValue::is<vector<CanteraDouble>>() const
 {
-    if (m_value.type() == typeid(vector<double>)) {
+    if (m_value.type() == typeid(vector<CanteraDouble>)) {
         return true;
     } else if (m_value.type() == typeid(vector<AnyValue>)) {
         for (const auto& item : as<vector<AnyValue>>()) {
-            if (!(item.is<double>()
-                || (item.is<Quantity>() && item.as<Quantity>().value.is<double>())))
+            if (!(item.is<CanteraDouble>()
+                || (item.is<Quantity>() && item.as<Quantity>().value.is<CanteraDouble>())))
             {
                 return false;
             }
@@ -851,31 +851,31 @@ bool AnyValue::is<vector<double>>() const
     }
 }
 
-// Specializations for "double"
+// Specializations for "CanteraDouble"
 
-AnyValue::AnyValue(double value)
+AnyValue::AnyValue(CanteraDouble value)
     : m_value{value}
-    , m_equals(eq_comparer<double>)
+    , m_equals(eq_comparer<CanteraDouble>)
 {}
 
-AnyValue &AnyValue::operator=(double value) {
+AnyValue &AnyValue::operator=(CanteraDouble value) {
     m_value = value;
-    m_equals = eq_comparer<double>;
+    m_equals = eq_comparer<CanteraDouble>;
     return *this;
 }
 
-double& AnyValue::asDouble() {
-    return as<double>();
+CanteraDouble& AnyValue::asDouble() {
+    return as<CanteraDouble>();
 }
 
-const double& AnyValue::asDouble() const {
-    return as<double>();
+const CanteraDouble& AnyValue::asDouble() const {
+    return as<CanteraDouble>();
 }
 
-bool AnyValue::operator==(const double& other) const
+bool AnyValue::operator==(const CanteraDouble& other) const
 {
-    if (m_value.type() == typeid(double)) {
-        return std::any_cast<double>(m_value) == other;
+    if (m_value.type() == typeid(CanteraDouble)) {
+        return std::any_cast<CanteraDouble>(m_value) == other;
     } else if (m_value.type() == typeid(long int)) {
         return std::any_cast<long int>(m_value) == other;
     } else {
@@ -883,17 +883,17 @@ bool AnyValue::operator==(const double& other) const
     }
 }
 
-bool AnyValue::operator!=(const double& other) const
+bool AnyValue::operator!=(const CanteraDouble& other) const
 {
     return !(*this == other);
 }
 
-bool operator==(const double& lhs, const AnyValue& rhs)
+bool operator==(const CanteraDouble& lhs, const AnyValue& rhs)
 {
     return rhs == lhs;
 }
 
-bool operator!=(const double& lhs, const AnyValue& rhs)
+bool operator!=(const CanteraDouble& lhs, const AnyValue& rhs)
 {
     return rhs != lhs;
 }
@@ -955,8 +955,8 @@ bool AnyValue::operator==(const long int& other) const
 {
     if (m_value.type() == typeid(long int)) {
         return std::any_cast<long int>(m_value) == other;
-    } else if (m_value.type() == typeid(double)) {
-        return std::any_cast<double>(m_value) == other;
+    } else if (m_value.type() == typeid(CanteraDouble)) {
+        return std::any_cast<CanteraDouble>(m_value) == other;
     } else {
         return false;
     }
@@ -1236,16 +1236,16 @@ void AnyValue::applyUnits(shared_ptr<UnitSystem>& units)
             // Replace the value last since Q is a reference to m_value and won't be
             // valid after this
             m_value = Q.value.m_value;
-        } else if (Q.value.is<double>()) {
+        } else if (Q.value.is<CanteraDouble>()) {
             if (Q.isActivationEnergy) {
-                *this = Q.value.as<double>() / units->convertActivationEnergyTo(1.0, Q.units);
+                *this = Q.value.as<CanteraDouble>() / units->convertActivationEnergyTo(1.0, Q.units);
             } else {
-                *this = Q.value.as<double>() / units->convertTo(1.0, Q.units);
+                *this = Q.value.as<CanteraDouble>() / units->convertTo(1.0, Q.units);
             }
-        } else if (Q.value.is<vector<double>>()) {
-            double factor = 1.0 / units->convertTo(1.0, Q.units);
-            auto& old = Q.value.asVector<double>();
-            vector<double> converted(old.size());
+        } else if (Q.value.is<vector<CanteraDouble>>()) {
+            CanteraDouble factor = 1.0 / units->convertTo(1.0, Q.units);
+            auto& old = Q.value.asVector<CanteraDouble>();
+            vector<CanteraDouble> converted(old.size());
             scale(old.begin(), old.end(), converted.begin(), factor);
             *this = std::move(converted);
         } else {
@@ -1268,8 +1268,8 @@ const vector<AnyValue>& AnyValue::asVector<AnyValue>(size_t nMin, size_t nMax) c
 {
     if (!is<vector<AnyValue>>()) {
         vector<AnyValue> v;
-        if (is<vector<double>>()) {
-            for (const auto& el : asVector<double>()) {
+        if (is<vector<CanteraDouble>>()) {
+            for (const auto& el : asVector<CanteraDouble>()) {
                 v.push_back(AnyValue(el));
             }
             const_cast<AnyValue*>(this)->m_value = v;
@@ -1303,71 +1303,71 @@ vector<AnyValue>& AnyValue::asVector<AnyValue>(size_t nMin, size_t nMax)
 }
 
 template<>
-const vector<double>& AnyValue::asVector<double>(size_t nMin, size_t nMax) const
+const vector<CanteraDouble>& AnyValue::asVector<CanteraDouble>(size_t nMin, size_t nMax) const
 {
     if (is<vector<long int>>()) {
-        vector<double> v;
+        vector<CanteraDouble> v;
         for (const auto& el : asVector<long int>()) {
             v.push_back(el);
         }
         const_cast<AnyValue*>(this)->m_value = v;
     }
-    const auto& vv = as<vector<double>>();
-    m_equals = eq_comparer<vector<double>>;
+    const auto& vv = as<vector<CanteraDouble>>();
+    m_equals = eq_comparer<vector<CanteraDouble>>;
     checkSize(vv, nMin, nMax);
     return vv;
 }
 
 template<>
-vector<double>& AnyValue::asVector<double>(size_t nMin, size_t nMax)
+vector<CanteraDouble>& AnyValue::asVector<CanteraDouble>(size_t nMin, size_t nMax)
 {
     if (is<vector<long int>>()) {
-        vector<double> v;
+        vector<CanteraDouble> v;
         for (const auto& el : asVector<long int>()) {
             v.push_back(el);
         }
         m_value = v;
     }
-    auto& vv = as<vector<double>>();
-    m_equals = eq_comparer<vector<double>>;
+    auto& vv = as<vector<CanteraDouble>>();
+    m_equals = eq_comparer<vector<CanteraDouble>>;
     checkSize(vv, nMin, nMax);
     return vv;
 }
 
 template<>
-const vector<vector<double>>& AnyValue::asVector<vector<double>>(size_t nMin, size_t nMax) const
+const vector<vector<CanteraDouble>>& AnyValue::asVector<vector<CanteraDouble>>(size_t nMin, size_t nMax) const
 {
     if (is<vector<vector<long int>>>()) {
-        vector<vector<double>> v;
+        vector<vector<CanteraDouble>> v;
         for (const auto& outer : asVector<vector<long int>>()) {
-            v.push_back(vector<double>());
+            v.push_back(vector<CanteraDouble>());
             for (const auto& inner : outer) {
                 v.back().push_back(inner);
             }
         }
         const_cast<AnyValue*>(this)->m_value = v;
     }
-    const auto& vv = as<vector<vector<double>>>();
-    m_equals = eq_comparer<vector<vector<double>>>;
+    const auto& vv = as<vector<vector<CanteraDouble>>>();
+    m_equals = eq_comparer<vector<vector<CanteraDouble>>>;
     checkSize(vv, nMin, nMax);
     return vv;
 }
 
 template<>
-vector<vector<double>>& AnyValue::asVector<vector<double>>(size_t nMin, size_t nMax)
+vector<vector<CanteraDouble>>& AnyValue::asVector<vector<CanteraDouble>>(size_t nMin, size_t nMax)
 {
     if (is<vector<vector<long int>>>()) {
-        vector<vector<double>> v;
+        vector<vector<CanteraDouble>> v;
         for (const auto& outer : asVector<vector<long int>>()) {
-            v.push_back(vector<double>());
+            v.push_back(vector<CanteraDouble>());
             for (const auto& inner : outer) {
                 v.back().push_back(inner);
             }
         }
         m_value = v;
     }
-    auto& vv = as<vector<vector<double>>>();
-    m_equals = eq_comparer<vector<vector<double>>>;
+    auto& vv = as<vector<vector<CanteraDouble>>>();
+    m_equals = eq_comparer<vector<vector<CanteraDouble>>>;
     checkSize(vv, nMin, nMax);
     return vv;
 }
@@ -1577,7 +1577,7 @@ bool AnyMap::getBool(const string& key, bool default_) const
     return (hasKey(key)) ? m_data.at(key).asBool() : default_;
 }
 
-double AnyMap::getDouble(const string& key, double default_) const
+CanteraDouble AnyMap::getDouble(const string& key, CanteraDouble default_) const
 {
     return (hasKey(key)) ? m_data.at(key).asDouble() : default_;
 }
@@ -1592,18 +1592,18 @@ const string& AnyMap::getString(const string& key, const string& default_) const
     return (hasKey(key)) ? m_data.at(key).asString() : default_;
 }
 
-double AnyMap::convert(const string& key, const string& dest) const
+CanteraDouble AnyMap::convert(const string& key, const string& dest) const
 {
     return units().convert(at(key), dest);
 }
 
-double AnyMap::convert(const string& key, const Units& dest) const
+CanteraDouble AnyMap::convert(const string& key, const Units& dest) const
 {
     return units().convert(at(key), dest);
 }
 
-double AnyMap::convert(const string& key, const string& dest,
-                       double default_) const
+CanteraDouble AnyMap::convert(const string& key, const string& dest,
+                       CanteraDouble default_) const
 {
     if (hasKey(key)) {
         return units().convert(at(key), dest);
@@ -1612,7 +1612,7 @@ double AnyMap::convert(const string& key, const string& dest,
     }
 }
 
-vector<double> AnyMap::convertVector(const string& key, const string& dest,
+vector<CanteraDouble> AnyMap::convertVector(const string& key, const string& dest,
                                      size_t nMin, size_t nMax) const
 {
     return units().convert(at(key).asVector<AnyValue>(nMin, nMax), dest);

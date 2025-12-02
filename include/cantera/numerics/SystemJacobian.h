@@ -54,7 +54,7 @@ public:
     //! @param row row in the jacobian matrix
     //! @param col column in the jacobian matrix
     //! @param value value of the element at row and col
-    virtual void setValue(size_t row, size_t col, double value) {
+    virtual void setValue(size_t row, size_t col, CanteraDouble value) {
         throw NotImplementedError("SystemJacobian::setValue");
     }
 
@@ -62,7 +62,7 @@ public:
     //! preconditioning uses a strictly positive composition when preconditioning which
     //! is handled by this function
     //! @param state a vector containing the state to be updated
-    virtual void stateAdjustment(vector<double>& state) {
+    virtual void stateAdjustment(vector<CanteraDouble>& state) {
         throw NotImplementedError("SystemJacobian::stateAdjustment");
     }
 
@@ -86,7 +86,7 @@ public:
     //! @f$ \alpha @f$.
     //! @param rdt  Reciprocal of the time step [1/s]
     //! @param mask  Mask for transient terms: 1 if transient, 0 if algebraic.
-    virtual void updateTransient(double rdt, int* mask) {
+    virtual void updateTransient(CanteraDouble rdt, int* mask) {
         throw NotImplementedError("SystemJacobian::updateTransient");
     }
 
@@ -99,7 +99,7 @@ public:
     //! @param[in] stateSize length of the rhs and output vectors
     //! @param[in] rhs_vector right hand side vector used in linear system
     //! @param[out] output output vector for solution
-    virtual void solve(const size_t stateSize, double* rhs_vector, double* output) {
+    virtual void solve(const size_t stateSize, CanteraDouble* rhs_vector, CanteraDouble* output) {
         throw NotImplementedError("SystemJacobian::solve");
     };
 
@@ -126,18 +126,18 @@ public:
 
     //! Set gamma used in preconditioning
     //! @param gamma used in M = I - gamma*J
-    virtual void setGamma(double gamma) {
+    virtual void setGamma(CanteraDouble gamma) {
         m_gamma = gamma;
     };
 
     //! Get gamma used in preconditioning
-    virtual double gamma() {
+    virtual CanteraDouble gamma() {
         return m_gamma;
     };
 
     //! Set the absolute tolerance in the solver outside of the network initialization
     //! @param atol the specified tolerance
-    virtual void setAbsoluteTolerance(double atol) {
+    virtual void setAbsoluteTolerance(CanteraDouble atol) {
         m_atol = atol;
     }
 
@@ -148,12 +148,12 @@ public:
     }
 
     //! Elapsed CPU time spent computing the Jacobian elements.
-    double elapsedTime() const {
+    CanteraDouble elapsedTime() const {
         return m_elapsed;
     }
 
     //! Increase the elapsed time by the specified time.
-    void updateElapsed(double evalTime) {
+    void updateElapsed(CanteraDouble evalTime) {
         m_elapsed += evalTime;
     }
 
@@ -201,15 +201,15 @@ protected:
     size_t m_dim;
 
     //! gamma value used in M = I - gamma*J
-    double m_gamma = 1.0;
+    CanteraDouble m_gamma = 1.0;
 
     //! bool saying whether or not the system is initialized
     bool m_init = false;
 
     //! Absolute tolerance of the ODE solver
-    double m_atol = 0;
+    CanteraDouble m_atol = 0;
 
-    double m_elapsed = 0.0; //!< Elapsed CPU time taken to compute the Jacobian
+    CanteraDouble m_elapsed = 0.0; //!< Elapsed CPU time taken to compute the Jacobian
     int m_nevals = 0; //!< Number of Jacobian evaluations.
 
     int m_age = 100000; //!< Age of the Jacobian (times incrementAge() has been called)

@@ -23,9 +23,9 @@ struct FalloffData : public ReactionData
 
     bool update(const ThermoPhase& phase, const Kinetics& kin) override;
 
-    void update(double T) override;
+    void update(CanteraDouble T) override;
 
-    void update(double T, double M) override;
+    void update(CanteraDouble T, CanteraDouble M) override;
 
     using ReactionData::update;
 
@@ -34,7 +34,7 @@ struct FalloffData : public ReactionData
      * The method is used for the evaluation of numerical derivatives.
      * @param deltaM  relative third-body perturbation
      */
-    void perturbThirdBodies(double deltaM);
+    void perturbThirdBodies(CanteraDouble deltaM);
 
     void restore() override;
 
@@ -50,15 +50,15 @@ struct FalloffData : public ReactionData
     }
 
     bool ready = false; //!< boolean indicating whether vectors are accessible
-    double molar_density = NAN; //!< used to determine if updates are needed
-    vector<double> conc_3b; //!< vector of effective third-body concentrations
+    CanteraDouble molar_density = NAN; //!< used to determine if updates are needed
+    vector<CanteraDouble> conc_3b; //!< vector of effective third-body concentrations
 
 protected:
     //! integer that is incremented when composition changes
     int m_state_mf_number = -1;
     //! boolean indicating whether 3-rd body values are perturbed
     bool m_perturbed = false;
-    vector<double> m_conc_3b_buf; //!< buffered third-body concentrations
+    vector<CanteraDouble> m_conc_3b_buf; //!< buffered third-body concentrations
 };
 
 
@@ -92,7 +92,7 @@ public:
      * @param c Vector of coefficients of the parameterization. The number and
      *     meaning of these coefficients is subclass-dependent.
      */
-    virtual void setFalloffCoeffs(const vector<double>& c);
+    virtual void setFalloffCoeffs(const vector<CanteraDouble>& c);
 
     /**
      * Retrieve coefficients of the falloff parameterization.
@@ -100,7 +100,7 @@ public:
      * @param c Vector of coefficients of the parameterization. The number and
      *     meaning of these coefficients is subclass-dependent.
      */
-    virtual void getFalloffCoeffs(vector<double>& c) const;
+    virtual void getFalloffCoeffs(vector<CanteraDouble>& c) const;
 
     /**
      * Update the temperature-dependent portions of the falloff function, if
@@ -109,7 +109,7 @@ public:
      * @param T Temperature [K].
      * @param work storage space for intermediate results.
      */
-    virtual void updateTemp(double T, double* work) const {}
+    virtual void updateTemp(CanteraDouble T, CanteraDouble* work) const {}
 
     /**
      * The falloff function.
@@ -120,18 +120,18 @@ public:
      *             to updateTemp.
      * @returns the value of the falloff function @f$ F @f$ defined above
      */
-    virtual double F(double pr, const double* work) const {
+    virtual CanteraDouble F(CanteraDouble pr, const CanteraDouble* work) const {
         return 1.0;
     }
 
     //! Evaluate falloff function at current conditions
-    double evalF(double T, double conc3b) {
+    CanteraDouble evalF(CanteraDouble T, CanteraDouble conc3b) {
         updateTemp(T, m_work.data());
-        double logT = std::log(T);
-        double recipT = 1. / T;
+        CanteraDouble logT = std::log(T);
+        CanteraDouble recipT = 1. / T;
         m_rc_low = m_lowRate.evalRate(logT, recipT);
         m_rc_high = m_highRate.evalRate(logT, recipT);
-        double pr = conc3b * m_rc_low / (m_rc_high + SmallNumber);
+        CanteraDouble pr = conc3b * m_rc_low / (m_rc_high + SmallNumber);
         return F(pr, m_work.data());
     }
 
@@ -154,17 +154,17 @@ public:
 
     //! Evaluate reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double evalFromStruct(const FalloffData& shared_data) {
+    CanteraDouble evalFromStruct(const FalloffData& shared_data) {
         updateTemp(shared_data.temperature, m_work.data());
         m_rc_low = m_lowRate.evalRate(shared_data.logT, shared_data.recipT);
         m_rc_high = m_highRate.evalRate(shared_data.logT, shared_data.recipT);
-        double thirdBodyConcentration;
+        CanteraDouble thirdBodyConcentration;
         if (shared_data.ready) {
             thirdBodyConcentration = shared_data.conc_3b[m_rate_index];
         } else {
             thirdBodyConcentration = shared_data.conc_3b[0];
         }
-        double pr = thirdBodyConcentration * m_rc_low / (m_rc_high + SmallNumber);
+        CanteraDouble pr = thirdBodyConcentration * m_rc_low / (m_rc_high + SmallNumber);
 
         // Apply falloff function
         if (m_chemicallyActivated) {
@@ -236,9 +236,9 @@ protected:
     //! Flag indicating whether negative A values are permitted
     bool m_negativeA_ok = false;
 
-    double m_rc_low = NAN; //!< Evaluated reaction rate in the low-pressure limit
-    double m_rc_high = NAN; //!< Evaluated reaction rate in the high-pressure limit
-    vector<double> m_work; //!< Work vector
+    CanteraDouble m_rc_low = NAN; //!< Evaluated reaction rate in the low-pressure limit
+    CanteraDouble m_rc_high = NAN; //!< Evaluated reaction rate in the high-pressure limit
+    vector<CanteraDouble> m_work; //!< Work vector
 };
 
 
@@ -256,7 +256,7 @@ public:
     LindemannRate(const AnyMap& node, const UnitStack& rate_units={});
 
     LindemannRate(const ArrheniusRate& low, const ArrheniusRate& high,
-                  const vector<double>& c);
+                  const vector<CanteraDouble>& c);
 
     unique_ptr<MultiRateBase> newMultiRate() const override{
         return make_unique<MultiRate<LindemannRate, FalloffData>>();
@@ -320,7 +320,7 @@ public:
 
     TroeRate(const AnyMap& node, const UnitStack& rate_units={});
     TroeRate(const ArrheniusRate& low, const ArrheniusRate& high,
-             const vector<double>& c);
+             const vector<CanteraDouble>& c);
 
     unique_ptr<MultiRateBase> newMultiRate() const override {
         return make_unique<MultiRate<TroeRate, FalloffData>>();
@@ -331,9 +331,9 @@ public:
      * @param c Vector of three or four doubles: The doubles are the parameters,
      *          a, T_3, T_1, and (optionally) T_2 of the Troe parameterization
      */
-    void setFalloffCoeffs(const vector<double>& c) override;
+    void setFalloffCoeffs(const vector<CanteraDouble>& c) override;
 
-    void getFalloffCoeffs(vector<double>& c) const override;
+    void getFalloffCoeffs(vector<CanteraDouble>& c) const override;
 
     //! Update the temperature parameters in the representation
     /*!
@@ -341,9 +341,9 @@ public:
      *   @param work      Vector of working space, length 1, representing the
      *                    temperature-dependent part of the parameterization.
      */
-    void updateTemp(double T, double* work) const override;
+    void updateTemp(CanteraDouble T, CanteraDouble* work) const override;
 
-    double F(double pr, const double* work) const override;
+    CanteraDouble F(CanteraDouble pr, const CanteraDouble* work) const override;
 
     const string subType() const override {
         return "Troe";
@@ -359,16 +359,16 @@ public:
 
 protected:
     //! parameter a in the 4-parameter Troe falloff function. Dimensionless
-    double m_a;
+    CanteraDouble m_a;
 
     //! parameter 1/T_3 in the 4-parameter Troe falloff function. [K^-1]
-    double m_rt3;
+    CanteraDouble m_rt3;
 
     //! parameter 1/T_1 in the 4-parameter Troe falloff function. [K^-1]
-    double m_rt1;
+    CanteraDouble m_rt1;
 
     //! parameter T_2 in the 4-parameter Troe falloff function. [K]
-    double m_t2;
+    CanteraDouble m_t2;
 };
 
 //! The SRI falloff function
@@ -414,7 +414,7 @@ public:
 
     SriRate(const AnyMap& node, const UnitStack& rate_units={});
 
-    SriRate(const ArrheniusRate& low, const ArrheniusRate& high, const vector<double>& c)
+    SriRate(const ArrheniusRate& low, const ArrheniusRate& high, const vector<CanteraDouble>& c)
         : SriRate()
     {
         m_lowRate = low;
@@ -432,9 +432,9 @@ public:
      *          a, b, c, d (optional; default 1.0), and e (optional; default
      *          0.0) of the SRI parameterization
      */
-    void setFalloffCoeffs(const vector<double>& c) override;
+    void setFalloffCoeffs(const vector<CanteraDouble>& c) override;
 
-    void getFalloffCoeffs(vector<double>& c) const override;
+    void getFalloffCoeffs(vector<CanteraDouble>& c) const override;
 
     //! Update the temperature parameters in the representation
     /*!
@@ -442,9 +442,9 @@ public:
      *   @param work      Vector of working space, length 2, representing the
      *                    temperature-dependent part of the parameterization.
      */
-    void updateTemp(double T, double* work) const override;
+    void updateTemp(CanteraDouble T, CanteraDouble* work) const override;
 
-    double F(double pr, const double* work) const override;
+    CanteraDouble F(CanteraDouble pr, const CanteraDouble* work) const override;
 
     const string subType() const override {
         return "SRI";
@@ -459,19 +459,19 @@ public:
 
 protected:
     //! parameter a in the 5-parameter SRI falloff function. Dimensionless.
-    double m_a;
+    CanteraDouble m_a;
 
     //! parameter b in the 5-parameter SRI falloff function. [K]
-    double m_b;
+    CanteraDouble m_b;
 
     //! parameter c in the 5-parameter SRI falloff function. [K]
-    double m_c;
+    CanteraDouble m_c;
 
     //! parameter d in the 5-parameter SRI falloff function. Dimensionless.
-    double m_d;
+    CanteraDouble m_d;
 
     //! parameter d in the 5-parameter SRI falloff function. Dimensionless.
-    double m_e;
+    CanteraDouble m_e;
 };
 
 //! The 1- or 2-parameter Tsang falloff parameterization.
@@ -508,7 +508,7 @@ public:
 
     TsangRate(const AnyMap& node, const UnitStack& rate_units={});
 
-    TsangRate(const ArrheniusRate& low, const ArrheniusRate& high, const vector<double>& c)
+    TsangRate(const ArrheniusRate& low, const ArrheniusRate& high, const vector<CanteraDouble>& c)
         : TsangRate()
     {
         m_lowRate = low;
@@ -525,9 +525,9 @@ public:
      * @param c Vector of one or two doubles: The doubles are the parameters,
      *          a and (optionally) b of the Tsang F_cent parameterization
      */
-    void setFalloffCoeffs(const vector<double>& c) override;
+    void setFalloffCoeffs(const vector<CanteraDouble>& c) override;
 
-    void getFalloffCoeffs(vector<double>& c) const override;
+    void getFalloffCoeffs(vector<CanteraDouble>& c) const override;
 
     //! Update the temperature parameters in the representation
     /*!
@@ -535,9 +535,9 @@ public:
      *   @param work      Vector of working space, length 1, representing the
      *                    temperature-dependent part of the parameterization.
      */
-    void updateTemp(double T, double* work) const override;
+    void updateTemp(CanteraDouble T, CanteraDouble* work) const override;
 
-    double F(double pr, const double* work) const override;
+    CanteraDouble F(CanteraDouble pr, const CanteraDouble* work) const override;
 
     const string subType() const override {
         return "Tsang";
@@ -553,10 +553,10 @@ public:
 
 protected:
     //! parameter a in the Tsang F_cent formulation. Dimensionless
-    double m_a;
+    CanteraDouble m_a;
 
     //! parameter b in the Tsang F_cent formulation. [K^-1]
-    double m_b;
+    CanteraDouble m_b;
 };
 
 typedef FalloffRate Falloff;

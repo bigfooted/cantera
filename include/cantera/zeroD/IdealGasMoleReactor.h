@@ -28,29 +28,29 @@ public:
 
     size_t componentIndex(const string& nm) const override;
     string componentName(size_t k) override;
-    double upperBound(size_t k) const override;
-    double lowerBound(size_t k) const override;
+    CanteraDouble upperBound(size_t k) const override;
+    CanteraDouble lowerBound(size_t k) const override;
     vector<size_t> steadyConstraints() const override;
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
-    void eval(double t, double* LHS, double* RHS) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     //! Calculate an approximate Jacobian to accelerate preconditioned solvers
 
     //! Neglects derivatives with respect to mole fractions that would generate a
     //! fully-dense Jacobian. Currently, also neglects terms related to interactions
     //! between reactors, for example via inlets and outlets.
-    Eigen::SparseMatrix<double> jacobian() override;
+    Eigen::SparseMatrix<CanteraDouble> jacobian() override;
 
     bool preconditionerSupported() const override {return true;};
 
 protected:
-    vector<double> m_uk; //!< Species molar internal energies
+    vector<CanteraDouble> m_uk; //!< Species molar internal energies
 };
 
 }

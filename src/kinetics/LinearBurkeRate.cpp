@@ -19,8 +19,8 @@ LinearBurkeData::LinearBurkeData()
 bool LinearBurkeData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
     int X = phase.stateMFNumber();
-    double T = phase.temperature();
-    double P = phase.pressure();
+    CanteraDouble T = phase.temperature();
+    CanteraDouble P = phase.pressure();
     if (moleFractions.empty()) {
         moleFractions.resize(kin.nTotalSpecies());
     }
@@ -35,7 +35,7 @@ bool LinearBurkeData::update(const ThermoPhase& phase, const Kinetics& kin)
     return false;
 }
 
-void LinearBurkeData::perturbPressure(double deltaP)
+void LinearBurkeData::perturbPressure(CanteraDouble deltaP)
 {
     if (m_pressure_buf > 0.) {
         throw CanteraError("LinearBurkeData::perturbPressure",
@@ -206,8 +206,8 @@ void LinearBurkeRate::setContext(const Reaction& rxn, const Kinetics& kin)
     }
 }
 
-double LinearBurkeRate::evalPlogRate(const LinearBurkeData& shared_data,
-    DataTypes& dataObj, RateTypes& rateObj, double logPeff)
+CanteraDouble LinearBurkeRate::evalPlogRate(const LinearBurkeData& shared_data,
+    DataTypes& dataObj, RateTypes& rateObj, CanteraDouble logPeff)
 {
     PlogData& data = std::get<PlogData>(dataObj);
     PlogRate& rate = std::get<PlogRate>(rateObj);
@@ -219,8 +219,8 @@ double LinearBurkeRate::evalPlogRate(const LinearBurkeData& shared_data,
     return rate.evalFromStruct(data);
 }
 
-double LinearBurkeRate::evalTroeRate(const LinearBurkeData& shared_data,
-    DataTypes& dataObj, RateTypes& rateObj, double logPeff)
+CanteraDouble LinearBurkeRate::evalTroeRate(const LinearBurkeData& shared_data,
+    DataTypes& dataObj, RateTypes& rateObj, CanteraDouble logPeff)
 {
     FalloffData& data = get<FalloffData>(dataObj);
     TroeRate& rate = get<TroeRate>(rateObj);
@@ -231,8 +231,8 @@ double LinearBurkeRate::evalTroeRate(const LinearBurkeData& shared_data,
     return rate.evalFromStruct(data);
 }
 
-double LinearBurkeRate::evalChebyshevRate(const LinearBurkeData& shared_data,
-    DataTypes& dataObj, RateTypes& rateObj, double logPeff)
+CanteraDouble LinearBurkeRate::evalChebyshevRate(const LinearBurkeData& shared_data,
+    DataTypes& dataObj, RateTypes& rateObj, CanteraDouble logPeff)
 {
     ChebyshevData& data = get<ChebyshevData>(dataObj);
     ChebyshevRate& rate = get<ChebyshevRate>(rateObj);
@@ -243,16 +243,16 @@ double LinearBurkeRate::evalChebyshevRate(const LinearBurkeData& shared_data,
     return rate.evalFromStruct(data);
 }
 
-double LinearBurkeRate::evalFromStruct(const LinearBurkeData& shared_data)
+CanteraDouble LinearBurkeRate::evalFromStruct(const LinearBurkeData& shared_data)
 {
-    double sigmaX_M = 0.0;
+    CanteraDouble sigmaX_M = 0.0;
     // Test each species listed at the top of the YAML file
     for (size_t i = 0; i < shared_data.moleFractions.size(); i++) {
         // Total sum will be essentially 1, but perhaps not exactly due to Cantera's
         // rounding conventions
         sigmaX_M += shared_data.moleFractions[i];
     }
-    double eps_mix = 0.0; // mole-fraction-weighted overall eps value of the mixtures
+    CanteraDouble eps_mix = 0.0; // mole-fraction-weighted overall eps value of the mixtures
     for (size_t j = 0; j < m_colliderIndices.size(); j++) {
         size_t i = m_colliderIndices[j];
         eps_mix += shared_data.moleFractions[i]
@@ -265,12 +265,12 @@ double LinearBurkeRate::evalFromStruct(const LinearBurkeData& shared_data)
         throw InputFileError("LinearBurkeRate::evalFromStruct", m_input,
             "eps_mix == 0 for some reason");
     }
-    double k_LMR_ = 0.0;
-    double logPeff;
+    CanteraDouble k_LMR_ = 0.0;
+    CanteraDouble logPeff;
     for (size_t j = 0; j < m_colliderIndices.size(); j++) {
         size_t i = m_colliderIndices[j];
-        double eps1 = m_epsObjs1[j].evalRate(shared_data.logT, shared_data.recipT);
-        double eps2 = m_epsObjs2[j].evalRate(shared_data.logT, shared_data.recipT);
+        CanteraDouble eps1 = m_epsObjs1[j].evalRate(shared_data.logT, shared_data.recipT);
+        CanteraDouble eps2 = m_epsObjs2[j].evalRate(shared_data.logT, shared_data.recipT);
         // eps2 equals either eps_M or eps_i, depending on the scenario
         // effective pressure as a function of eps
         logPeff = shared_data.logP + log(eps_mix) - log(eps2);

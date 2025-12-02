@@ -66,7 +66,7 @@ public:
         return true;
     }
 
-    void setInitialVolume(double vol) override {
+    void setInitialVolume(CanteraDouble vol) override {
         m_vol = vol;
     }
 
@@ -98,7 +98,7 @@ public:
     /*!
      *  @param[out] y state vector representing the initial state of the reactor
      */
-    virtual void getState(double* y);
+    virtual void getState(CanteraDouble* y);
 
     //! Get the current state and derivative vector of the reactor for a DAE solver
     /*!
@@ -106,11 +106,11 @@ public:
      *  @param[out] ydot  state vector representing the initial derivatives of the
      *                    reactor
      */
-    virtual void getStateDae(double* y, double* ydot) {
+    virtual void getStateDae(CanteraDouble* y, CanteraDouble* ydot) {
         throw NotImplementedError("Reactor::getStateDae(y, ydot)");
     }
 
-    void initialize(double t0=0.0) override;
+    void initialize(CanteraDouble t0=0.0) override;
 
     //! Evaluate the reactor governing equations. Called by ReactorNet::eval.
     //! @param[in] t time.
@@ -118,7 +118,7 @@ public:
     //! coefficients for governing equations, length m_nv, default values 1
     //! @param[out] RHS pointer to start of vector of right-hand side
     //! coefficients for governing equations, length m_nv, default values 0
-    virtual void eval(double t, double* LHS, double* RHS);
+    virtual void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS);
 
     /**
      * Evaluate the reactor governing equations. Called by ReactorNet::eval.
@@ -127,13 +127,13 @@ public:
      * @param[in] ydot rate of change of solution vector, length neq()
      * @param[out] residual residuals vector, length neq()
      */
-    virtual void evalDae(double t, double* y, double* ydot, double* residual) {
+    virtual void evalDae(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* residual) {
         throw NotImplementedError("Reactor::evalDae");
     }
 
     //! Given a vector of length neq(), mark which variables should be
     //! considered algebraic constraints
-    virtual void getConstraints(double* constraints) {
+    virtual void getConstraints(CanteraDouble* constraints) {
         throw NotImplementedError("Reactor::getConstraints");
     }
 
@@ -146,7 +146,7 @@ public:
     virtual vector<size_t> steadyConstraints() const;
 
     //! Set the state of the reactor to correspond to the state vector *y*.
-    virtual void updateState(double* y);
+    virtual void updateState(CanteraDouble* y);
 
     //! Number of sensitivity parameters associated with this reactor.
     //! (including walls)
@@ -169,19 +169,19 @@ public:
     virtual string componentName(size_t k);
 
     //! Get the upper bound on the k-th component of the local state vector.
-    virtual double upperBound(size_t k) const;
+    virtual CanteraDouble upperBound(size_t k) const;
 
     //! Get the lower bound on the k-th component of the local state vector.
-    virtual double lowerBound(size_t k) const;
+    virtual CanteraDouble lowerBound(size_t k) const;
 
     //! Reset physically or mathematically problematic values, such as negative species
     //! concentrations.
     //! @param[inout] y  current state vector, to be updated; length neq()
-    virtual void resetBadValues(double* y);
+    virtual void resetBadValues(CanteraDouble* y);
 
     //! Set absolute step size limits during advance
     //! @param limits array of step size limits with length neq
-    void setAdvanceLimits(const double* limits);
+    void setAdvanceLimits(const CanteraDouble* limits);
 
     //! Check whether Reactor object uses advance limits
     //! @returns           True if at least one limit is set, False otherwise
@@ -192,12 +192,12 @@ public:
     //! Retrieve absolute step size limits during advance
     //! @param[out] limits array of step size limits with length neq
     //! @returns           True if at least one limit is set, False otherwise
-    bool getAdvanceLimits(double* limits) const;
+    bool getAdvanceLimits(CanteraDouble* limits) const;
 
     //! Set individual step size limit for component name *nm*
     //! @param nm component name
     //! @param limit value for step size limit
-    void setAdvanceLimit(const string& nm, const double limit);
+    void setAdvanceLimit(const string& nm, const CanteraDouble limit);
 
     //! Calculate the Jacobian of a specific Reactor specialization.
     //! @warning Depending on the particular implementation, this may return an
@@ -207,7 +207,7 @@ public:
     //!
     //! @warning  This method is an experimental part of the %Cantera
     //! API and may be changed or removed without notice.
-    virtual Eigen::SparseMatrix<double> jacobian() {
+    virtual Eigen::SparseMatrix<CanteraDouble> jacobian() {
         throw NotImplementedError("Reactor::jacobian");
     }
 
@@ -218,17 +218,17 @@ public:
     //!
     //! @warning  This method is an experimental part of the %Cantera
     //! API and may be changed or removed without notice.
-    Eigen::SparseMatrix<double> finiteDifferenceJacobian();
+    Eigen::SparseMatrix<CanteraDouble> finiteDifferenceJacobian();
 
     //! Use this to set the kinetics objects derivative settings
     virtual void setDerivativeSettings(AnyMap& settings);
 
     //! Set reaction rate multipliers based on the sensitivity variables in
     //! *params*.
-    virtual void applySensitivity(double* params);
+    virtual void applySensitivity(CanteraDouble* params);
 
     //! Reset the reaction rate multipliers
-    virtual void resetSensitivity(double* params);
+    virtual void resetSensitivity(CanteraDouble* params);
 
     //! Return a false if preconditioning is not supported or true otherwise.
     //!
@@ -249,7 +249,7 @@ protected:
     //! Evaluate terms related to Walls. Calculates #m_vdot and #m_Qdot based on
     //! wall movement and heat transfer.
     //! @param t     the current time
-    virtual void evalWalls(double t);
+    virtual void evalWalls(CanteraDouble t);
 
     //! Evaluate terms related to surface reactions.
     //! @param[out] LHS   Multiplicative factor on the left hand side of ODE for surface
@@ -257,12 +257,12 @@ protected:
     //! @param[out] RHS   Right hand side of ODE for surface species coverages
     //! @param[out] sdot  array of production rates of bulk phase species on surfaces
     //!                   [kmol/s]
-    virtual void evalSurfaces(double* LHS, double* RHS, double* sdot);
+    virtual void evalSurfaces(CanteraDouble* LHS, CanteraDouble* RHS, CanteraDouble* sdot);
 
-    virtual void evalSurfaces(double* RHS, double* sdot);
+    virtual void evalSurfaces(CanteraDouble* RHS, CanteraDouble* sdot);
 
     //! Update the state of SurfPhase objects attached to this reactor
-    virtual void updateSurfaceState(double* y);
+    virtual void updateSurfaceState(CanteraDouble* y);
 
     //! Update the state information needed by connected reactors, flow devices,
     //! and reactor walls. Called from updateState().
@@ -273,31 +273,31 @@ protected:
     virtual void updateConnected(bool updatePressure);
 
     //! Get initial conditions for SurfPhase objects attached to this reactor
-    virtual void getSurfaceInitialConditions(double* y);
+    virtual void getSurfaceInitialConditions(CanteraDouble* y);
 
     //! Pointer to the homogeneous Kinetics object that handles the reactions
     Kinetics* m_kin = nullptr;
 
-    double m_vdot = 0.0; //!< net rate of volume change from moving walls [m^3/s]
+    CanteraDouble m_vdot = 0.0; //!< net rate of volume change from moving walls [m^3/s]
 
-    double m_Qdot = 0.0; //!< net heat transfer into the reactor, through walls [W]
+    CanteraDouble m_Qdot = 0.0; //!< net heat transfer into the reactor, through walls [W]
 
-    vector<double> m_work;
+    vector<CanteraDouble> m_work;
 
     //! Production rates of gas phase species on surfaces [kmol/s]
-    vector<double> m_sdot;
+    vector<CanteraDouble> m_sdot;
 
-    vector<double> m_wdot; //!< Species net molar production rates
-    vector<double> m_uk; //!< Species molar internal energies
+    vector<CanteraDouble> m_wdot; //!< Species net molar production rates
+    vector<CanteraDouble> m_uk; //!< Species molar internal energies
     bool m_chem = false;
     bool m_energy = true;
     size_t m_nv = 0;
     size_t m_nv_surf; //!!< Number of variables associated with reactor surfaces
 
-    vector<double> m_advancelimits; //!< Advance step limit
+    vector<CanteraDouble> m_advancelimits; //!< Advance step limit
 
     //! Vector of triplets representing the jacobian
-    vector<Eigen::Triplet<double>> m_jac_trips;
+    vector<Eigen::Triplet<CanteraDouble>> m_jac_trips;
 };
 }
 

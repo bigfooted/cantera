@@ -27,7 +27,7 @@ void MultiJac::setBandwidth(size_t bw)
     m_mat.resize(m_dim, bw, bw);
 }
 
-void MultiJac::setValue(size_t row, size_t col, double value)
+void MultiJac::setValue(size_t row, size_t col, CanteraDouble value)
 {
     m_mat(row, col) = value;
     if (row == col) {
@@ -35,7 +35,7 @@ void MultiJac::setValue(size_t row, size_t col, double value)
     }
 }
 
-void MultiJac::updateTransient(double rdt, integer* mask)
+void MultiJac::updateTransient(CanteraDouble rdt, integer* mask)
 {
     for (size_t n = 0; n < m_dim; n++) {
         m_mat.value(n,n) = m_ssdiag[n] - mask[n]*rdt;

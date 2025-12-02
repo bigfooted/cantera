@@ -35,7 +35,7 @@ struct ReactionData
      * This method allows for testing of a reaction rate expression outside of
      * Kinetics reaction rate evaluators.
      */
-    virtual void update(double T) {
+    virtual void update(CanteraDouble T) {
         temperature = T;
         logT = std::log(T);
         recipT = 1./T;
@@ -47,7 +47,7 @@ struct ReactionData
      * This method allows for testing of a reaction rate expression outside of
      * Kinetics reaction rate evaluators.
      */
-    virtual void update(double T, double extra) {
+    virtual void update(CanteraDouble T, CanteraDouble extra) {
         throw NotImplementedError("ReactionData::update",
             "ReactionData type does not use extra scalar argument.");
     }
@@ -61,7 +61,7 @@ struct ReactionData
      * @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    virtual void update(double T, const vector<double>& extra) {
+    virtual void update(CanteraDouble T, const vector<CanteraDouble>& extra) {
         throw NotImplementedError("ReactionData::update",
             "ReactionData type does not use extra vector argument.");
     }
@@ -79,7 +79,7 @@ struct ReactionData
      * The method is used for the evaluation of numerical derivatives.
      * @param  deltaT  relative temperature perturbation
      */
-    void perturbTemperature(double deltaT) {
+    void perturbTemperature(CanteraDouble deltaT) {
         if (m_temperature_buf > 0.) {
             throw CanteraError("ReactionData::perturbTemperature",
                 "Cannot apply another perturbation as state is already perturbed.");
@@ -109,12 +109,12 @@ struct ReactionData
         temperature = NAN;
     }
 
-    double temperature = 1.0; //!< temperature
-    double logT = 0.0; //!< logarithm of temperature
-    double recipT = 1.0; //!< inverse of temperature
+    CanteraDouble temperature = 1.0; //!< temperature
+    CanteraDouble logT = 0.0; //!< logarithm of temperature
+    CanteraDouble recipT = 1.0; //!< inverse of temperature
 
 protected:
-    double m_temperature_buf = -1.0; //!< buffered temperature
+    CanteraDouble m_temperature_buf = -1.0; //!< buffered temperature
 };
 
 }

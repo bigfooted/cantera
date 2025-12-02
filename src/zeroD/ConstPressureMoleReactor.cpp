@@ -15,7 +15,7 @@
 namespace Cantera
 {
 
-void ConstPressureMoleReactor::getState(double* y)
+void ConstPressureMoleReactor::getState(CanteraDouble* y)
 {
     if (m_thermo == 0) {
         throw CanteraError("ConstPressureMoleReactor::getState",
@@ -32,13 +32,13 @@ void ConstPressureMoleReactor::getState(double* y)
     getSurfaceInitialConditions(y+m_nsp+m_sidx);
 }
 
-void ConstPressureMoleReactor::initialize(double t0)
+void ConstPressureMoleReactor::initialize(CanteraDouble t0)
 {
     MoleReactor::initialize(t0);
     m_nv -= 1; // const pressure system loses 1 more variable from MoleReactor
 }
 
-void ConstPressureMoleReactor::updateState(double* y)
+void ConstPressureMoleReactor::updateState(CanteraDouble* y)
 {
     // the components of y are: [0] the enthalpy, [1...K+1) are the
     // moles of each species, and [K+1...] are the moles of surface
@@ -55,15 +55,15 @@ void ConstPressureMoleReactor::updateState(double* y)
     updateSurfaceState(y + m_nsp + m_sidx);
 }
 
-void ConstPressureMoleReactor::eval(double time, double* LHS, double* RHS)
+void ConstPressureMoleReactor::eval(CanteraDouble time, CanteraDouble* LHS, CanteraDouble* RHS)
 {
-    double* dndt = RHS + m_sidx; // kmol per s
+    CanteraDouble* dndt = RHS + m_sidx; // kmol per s
 
     evalWalls(time);
 
     m_thermo->restoreState(m_state);
 
-    const vector<double>& imw = m_thermo->inverseMolecularWeights();
+    const vector<CanteraDouble>& imw = m_thermo->inverseMolecularWeights();
 
     if (m_chem) {
         m_kin->getNetProductionRates(&m_wdot[0]); // "omega dot"
@@ -73,7 +73,7 @@ void ConstPressureMoleReactor::eval(double time, double* LHS, double* RHS)
     evalSurfaces(LHS + m_nsp + m_sidx, RHS + m_nsp + m_sidx, m_sdot.data());
 
     // external heat transfer
-    double dHdt = m_Qdot;
+    CanteraDouble dHdt = m_Qdot;
 
     for (size_t n = 0; n < m_nsp; n++) {
         // production in gas phase and from surfaces
@@ -142,12 +142,12 @@ string ConstPressureMoleReactor::componentName(size_t k) {
     throw IndexError("ConstPressureMoleReactor::componentName", "component", k, m_nv);
 }
 
-double ConstPressureMoleReactor::upperBound(size_t k) const {
+CanteraDouble ConstPressureMoleReactor::upperBound(size_t k) const {
     // Component is either enthalpy or moles of a bulk or surface species
     return BigNumber;
 }
 
-double ConstPressureMoleReactor::lowerBound(size_t k) const {
+CanteraDouble ConstPressureMoleReactor::lowerBound(size_t k) const {
     if (k == 0) {
         return -BigNumber; // enthalpy
     } else if (k >= 1 && k < m_nv) {
@@ -157,7 +157,7 @@ double ConstPressureMoleReactor::lowerBound(size_t k) const {
     }
 }
 
-void ConstPressureMoleReactor::resetBadValues(double* y) {
+void ConstPressureMoleReactor::resetBadValues(CanteraDouble* y) {
     for (size_t k = m_sidx; k < m_nv; k++) {
         y[k] = std::max(y[k], 0.0);
     }

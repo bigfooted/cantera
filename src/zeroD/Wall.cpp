@@ -23,24 +23,24 @@ WallBase::WallBase(shared_ptr<ReactorBase> r0, shared_ptr<ReactorBase> r1,
     m_right->addWall(*this, 1);
 }
 
-void WallBase::setArea(double a) {
+void WallBase::setArea(CanteraDouble a) {
     m_area = a;
 }
 
-double Wall::velocity() const {
+CanteraDouble Wall::velocity() const {
     if (m_vf) {
         return m_vf->eval(m_time);
     }
     return 0.;
 }
 
-double Wall::expansionRate()
+CanteraDouble Wall::expansionRate()
 {
     if (!ready()) {
         throw CanteraError("Wall::expansionRate",
                            "Wall is not ready; some parameters have not been set.");
     }
-    double rate = m_k * m_area * (m_left->pressure() - m_right->pressure());
+    CanteraDouble rate = m_k * m_area * (m_left->pressure() - m_right->pressure());
 
     if (m_vf) {
         rate += m_area * m_vf->eval(m_time);
@@ -48,24 +48,24 @@ double Wall::expansionRate()
     return rate;
 }
 
-double Wall::heatFlux() const {
+CanteraDouble Wall::heatFlux() const {
     if (m_qf) {
         return m_qf->eval(m_time);
     }
     return 0.;
 }
 
-double Wall::heatRate()
+CanteraDouble Wall::heatRate()
 {
     if (!ready()) {
         throw CanteraError("Wall::heatRate",
                            "Wall is not ready; some parameters have not been set.");
     }
-    double q1 = (m_area * m_rrth) *
+    CanteraDouble q1 = (m_area * m_rrth) *
                 (m_left->temperature() - m_right->temperature());
     if (m_emiss > 0.0) {
-        double tl = m_left->temperature();
-        double tr = m_right->temperature();
+        CanteraDouble tl = m_left->temperature();
+        CanteraDouble tr = m_right->temperature();
         q1 += m_emiss * m_area * StefanBoltz * (tl*tl*tl*tl - tr*tr*tr*tr);
     }
 

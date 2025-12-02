@@ -51,16 +51,16 @@ public:
     //! @name Molar Thermodynamic Properties
     //! @{
 
-    double enthalpy_mole() const override;
-    double entropy_mole() const override;
-    double cp_mole() const override;
-    double cv_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
 
     //! @}
     //! @name Mechanical Properties
     //! @{
 
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
 protected:
     void calcDensity() override;
@@ -68,7 +68,7 @@ protected:
 
 public:
     Units standardConcentrationUnits() const override;
-    void getActivityConcentrations(double* c) const override;
+    void getActivityConcentrations(CanteraDouble* c) const override;
 
     //! Returns the standard concentration @f$ C^0_k @f$, which is used to
     //! normalize the generalized concentration.
@@ -82,20 +82,20 @@ public:
      * @return
      *   Returns the standard Concentration in units of m3 kmol-1.
      */
-    double standardConcentration(size_t k=0) const override;
+    CanteraDouble standardConcentration(size_t k=0) const override;
 
-    void getActivityCoefficients(double* ac) const override;
+    void getActivityCoefficients(CanteraDouble* ac) const override;
 
 
     //! @name  Partial Molar Properties of the Solution
     //! @{
 
-    void getChemPotentials(double* mu) const override;
-    void getPartialMolarEnthalpies(double* hbar) const override;
-    void getPartialMolarEntropies(double* sbar) const override;
-    void getPartialMolarIntEnergies(double* ubar) const override;
-    void getPartialMolarCp(double* cpbar) const override;
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
+    void getPartialMolarIntEnergies(CanteraDouble* ubar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
     //! @}
 
 public:
@@ -110,7 +110,7 @@ public:
     bool addSpecies(shared_ptr<Species> spec) override;
     void initThermo() override;
     void getParameters(AnyMap& phaseNode) const override;
-    void setToEquilState(const double* lambda_RT) override;
+    void setToEquilState(const CanteraDouble* lambda_RT) override;
 
     //! @}
 
@@ -124,7 +124,7 @@ protected:
     int m_formGC = 0;
 
     //! Temporary storage - length = m_kk.
-    vector<double> m_pp;
+    vector<CanteraDouble> m_pp;
 };
 }
 

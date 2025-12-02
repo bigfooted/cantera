@@ -61,14 +61,14 @@ string OneDim::componentTableLabel(size_t i) const
     return fmt::format("{:8s} {:3d} {:<12s}", dom, pt, comp);
 }
 
-double OneDim::upperBound(size_t i) const
+CanteraDouble OneDim::upperBound(size_t i) const
 {
     const auto& [n, j, k] = m_componentInfo[i];
     Domain1D& dom = domain(n);
     return dom.upperBound(k);
 }
 
-double OneDim::lowerBound(size_t i) const
+CanteraDouble OneDim::lowerBound(size_t i) const
 {
     const auto& [n, j, k] = m_componentInfo[i];
     Domain1D& dom = domain(n);
@@ -98,26 +98,26 @@ void OneDim::addDomain(shared_ptr<Domain1D> d)
     resize();
 }
 
-double OneDim::weightedNorm(const double* step) const
+CanteraDouble OneDim::weightedNorm(const CanteraDouble* step) const
 {
-    double sum = 0.0;
-    const double* x = m_state->data();
+    CanteraDouble sum = 0.0;
+    const CanteraDouble* x = m_state->data();
     size_t nd = nDomains();
     for (size_t n = 0; n < nd; n++) {
         Domain1D& dom = domain(n);
-        double d_sum = 0.0;
+        CanteraDouble d_sum = 0.0;
         size_t nv = dom.nComponents();
         size_t np = dom.nPoints();
         size_t dstart = start(n);
 
         for (size_t i = 0; i < nv; i++) {
-            double esum = 0.0;
+            CanteraDouble esum = 0.0;
             for (size_t j = 0; j < np; j++) {
                 esum += fabs(x[dstart + nv*j + i]);
             }
-            double ewt = dom.rtol(i)*esum/np + dom.atol(i);
+            CanteraDouble ewt = dom.rtol(i)*esum/np + dom.atol(i);
             for (size_t j = 0; j < np; j++) {
-                double f = step[dstart + nv*j + i]/ewt;
+                CanteraDouble f = step[dstart + nv*j + i]/ewt;
                 d_sum += f*f;
             }
         }
@@ -239,7 +239,7 @@ Domain1D* OneDim::pointDomain(size_t i)
     return 0;
 }
 
-void OneDim::eval(size_t j, double* x, double* r, double rdt, int count)
+void OneDim::eval(size_t j, CanteraDouble* x, CanteraDouble* r, CanteraDouble rdt, int count)
 {
     clock_t t0 = clock();
     if (m_interrupt) {
@@ -266,12 +266,12 @@ void OneDim::eval(size_t j, double* x, double* r, double rdt, int count)
     // increment counter and time
     if (count) {
         clock_t t1 = clock();
-        m_evaltime += double(t1 - t0)/CLOCKS_PER_SEC;
+        m_evaltime += CanteraDouble(t1 - t0)/CLOCKS_PER_SEC;
         m_nevals++;
     }
 }
 
-void OneDim::evalJacobian(double* x0)
+void OneDim::evalJacobian(CanteraDouble* x0)
 {
     m_jac->reset();
     clock_t t0 = clock();
@@ -283,13 +283,13 @@ void OneDim::evalJacobian(double* x0)
         size_t nv = nVars(j);
         for (size_t n = 0; n < nv; n++) {
             // perturb x(n); preserve sign(x(n))
-            double xsave = x0[ipt];
-            double dx = fabs(xsave) * m_jacobianRelPerturb + m_jacobianAbsPerturb;
+            CanteraDouble xsave = x0[ipt];
+            CanteraDouble dx = fabs(xsave) * m_jacobianRelPerturb + m_jacobianAbsPerturb;
             if (xsave < 0) {
                 dx = -dx;
             }
             x0[ipt] = xsave + dx;
-            double rdx = 1.0 / (x0[ipt] - xsave);
+            CanteraDouble rdx = 1.0 / (x0[ipt] - xsave);
 
             // calculate perturbed residual
             eval(j, x0, m_work2.data(), 0.0, 0);
@@ -300,7 +300,7 @@ void OneDim::evalJacobian(double* x0)
                     size_t mv = nVars(i);
                     size_t iloc = loc(i);
                     for (size_t m = 0; m < mv; m++) {
-                        double delta = m_work2[m+iloc] - m_work1[m+iloc];
+                        CanteraDouble delta = m_work2[m+iloc] - m_work1[m+iloc];
                         if (std::abs(delta) > m_jacobianThreshold || m+iloc == ipt) {
                             m_jac->setValue(m + iloc, ipt, delta * rdx);
                         }
@@ -312,12 +312,12 @@ void OneDim::evalJacobian(double* x0)
         }
     }
 
-    m_jac->updateElapsed(double(clock() - t0) / CLOCKS_PER_SEC);
+    m_jac->updateElapsed(CanteraDouble(clock() - t0) / CLOCKS_PER_SEC);
     m_jac->incrementEvals();
     m_jac->setAge(0);
 }
 
-void OneDim::initTimeInteg(double dt, double* x)
+void OneDim::initTimeInteg(CanteraDouble dt, CanteraDouble* x)
 {
     SteadyStateSystem::initTimeInteg(dt, x);
     // iterate over all domains, preparing each one to begin time stepping
@@ -354,7 +354,7 @@ void OneDim::init()
     m_init = true;
 }
 
-void OneDim::resetBadValues(double* x)
+void OneDim::resetBadValues(CanteraDouble* x)
 {
     for (auto dom : m_dom) {
         dom->resetBadValues(x);

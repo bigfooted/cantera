@@ -73,25 +73,25 @@ public:
      *                           If not supplied, uses the default value in CVODES (7).
      */
     ImplicitSurfChem(vector<InterfaceKinetics*> k,
-                     double rtol=1.e-7, double atol=1.e-14,
-                     double maxStepSize=0, size_t maxSteps=20000,
+                     CanteraDouble rtol=1.e-7, CanteraDouble atol=1.e-14,
+                     CanteraDouble maxStepSize=0, size_t maxSteps=20000,
                      size_t maxErrTestFails=7);
 
     /**
      *  Must be called before calling method 'advance'
      */
-    void initialize(double t0=0.0);
+    void initialize(CanteraDouble t0=0.0);
 
     /**
      *  Set the maximum integration step-size.  Note, setting this value to zero
      *  disables this option
      */
-    void setMaxStepSize(double maxstep=0.0);
+    void setMaxStepSize(CanteraDouble maxstep=0.0);
 
     /**
      *  Set the relative and absolute integration tolerances.
      */
-    void setTolerances(double rtol=1.e-7, double atol=1.e-14);
+    void setTolerances(CanteraDouble rtol=1.e-7, CanteraDouble atol=1.e-14);
 
     /**
      *  Set the maximum number of CVODES integration steps.
@@ -111,7 +111,7 @@ public:
      *  @param t0  Initial Time -> this is an input
      *  @param t1  Final Time -> This is an input
      */
-    void integrate(double t0, double t1);
+    void integrate(CanteraDouble t0, CanteraDouble t1);
 
     //! Integrate from t0 to t1 without reinitializing the integrator.
     /*!
@@ -121,7 +121,7 @@ public:
      *  @param t0  Initial Time -> this is an input
      *  @param t1  Final Time -> This is an input
      */
-    void integrate0(double t0, double t1);
+    void integrate0(CanteraDouble t0, CanteraDouble t1);
 
     //! Solve for the pseudo steady-state of the surface problem
     /*!
@@ -143,7 +143,7 @@ public:
      *             system is solved directly.
      */
     void solvePseudoSteadyStateProblem(int ifuncOverride = -1,
-                                       double timeScaleOverride = 1.0);
+                                       CanteraDouble timeScaleOverride = 1.0);
 
     // overloaded methods of class FuncEval
 
@@ -160,7 +160,7 @@ public:
      *                derivative of the surface coverages.
      *  @param p   Unused parameter pass-through parameter vector
      */
-    void eval(double t, double* y, double* ydot, double* p) override;
+    void eval(CanteraDouble t, CanteraDouble* y, CanteraDouble* ydot, CanteraDouble* p) override;
 
     //! Get the current state of the solution vector
     /*!
@@ -168,7 +168,7 @@ public:
      *            On output, this contains the initial value
      *           of the solution.
      */
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
     /**
      * Get the specifications for the problem from the values
@@ -181,7 +181,7 @@ public:
      *                  vectors are contiguous within the object, in the same
      *                  order as the unknown vector.
      */
-    void getConcSpecies(double* const vecConcSpecies) const;
+    void getConcSpecies(CanteraDouble* const vecConcSpecies) const;
 
     //! Sets the concentrations within phases that are unknowns in
     //! the surface problem
@@ -193,7 +193,7 @@ public:
      *                  vectors are contiguous within the object, in the same
      *                  order as the unknown vector.
      */
-    void setConcSpecies(const double* const vecConcSpecies);
+    void setConcSpecies(const CanteraDouble* const vecConcSpecies);
 
     //! Sets the state variable in all thermodynamic phases (surface and
     //! surrounding bulk phases) to the input temperature and pressure
@@ -201,7 +201,7 @@ public:
      *  @param TKelvin input temperature (kelvin)
      *  @param PresPa   input pressure in pascal.
      */
-    void setCommonState_TP(double TKelvin, double PresPa);
+    void setCommonState_TP(CanteraDouble TKelvin, CanteraDouble PresPa);
 
     //! Returns a reference to the vector of pointers to the
     //! InterfaceKinetics objects
@@ -228,7 +228,7 @@ protected:
      * @param y Current value of the solution vector. The length is equal to
      *     the sum of the number of surface sites in all the surface phases.
      */
-    void updateState(double* y);
+    void updateState(CanteraDouble* y);
 
     //! vector of pointers to surface phases.
     vector<SurfPhase*> m_surf;
@@ -256,19 +256,19 @@ protected:
     vector<vector<int>> pLocVec;
     //! Pointer to the CVODE integrator
     unique_ptr<Integrator> m_integ;
-    double m_atol, m_rtol; // tolerances
-    double m_maxstep; //!< max step size
+    CanteraDouble m_atol, m_rtol; // tolerances
+    CanteraDouble m_maxstep; //!< max step size
     size_t m_nmax; //!< maximum number of steps allowed
     size_t m_maxErrTestFails; //!< maximum number of error test failures allowed
-    vector<double> m_work;
+    vector<CanteraDouble> m_work;
 
     /**
      * Temporary vector - length num species in the Kinetics object. This is
      * the sum of the number of species in each phase included in the kinetics
      * object.
      */
-    vector<double> m_concSpecies;
-    vector<double> m_concSpeciesSave;
+    vector<CanteraDouble> m_concSpecies;
+    vector<CanteraDouble> m_concSpeciesSave;
 
     /**
      * Index into the species vector of the kinetics manager,

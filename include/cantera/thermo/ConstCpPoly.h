@@ -55,7 +55,7 @@ public:
      *                     the standard state for species n. Contains 4 parameters
      *                     in the order of setParameters() arguments.
      */
-    ConstCpPoly(double tlow, double thigh, double pref, const double* coeffs);
+    ConstCpPoly(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs);
 
     /**
      * Set ConstCpPoly parameters.
@@ -64,7 +64,7 @@ public:
      * @param s0  @f$ \hat{s}^\circ(T^\circ) @f$ [J/kmol/K]
      * @param cp0  @f$ \hat{c}_p^\circ(T^\circ) @f$ [J/kmol/K]
      */
-    void setParameters(double t0, double h0, double s0, double cp0);
+    void setParameters(CanteraDouble t0, CanteraDouble h0, CanteraDouble s0, CanteraDouble cp0);
 
     int reportType() const override {
         return CONSTANT_CP;
@@ -77,36 +77,36 @@ public:
      *  - m_t[0] = tt;
      *
      */
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override;
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override;
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override;
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override;
 
     size_t nCoeffs() const override { return 4; }
 
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override;
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override;
 
     void getParameters(AnyMap& thermo) const override;
 
-    double reportHf298(double* const h298=nullptr) const override;
-    void modifyOneHf298(const size_t k, const double Hf298New) override;
+    CanteraDouble reportHf298(CanteraDouble* const h298=nullptr) const override;
+    void modifyOneHf298(const size_t k, const CanteraDouble Hf298New) override;
     void resetHf298() override;
 
 protected:
     //! Base temperature
-    double m_t0 = 298.15;
+    CanteraDouble m_t0 = 298.15;
     //! Dimensionless value of the heat capacity
-    double m_cp0_R = 0.0;
+    CanteraDouble m_cp0_R = 0.0;
     //! dimensionless value of the enthalpy at t0
-    double m_h0_R = 0.0;
+    CanteraDouble m_h0_R = 0.0;
     //! Dimensionless value of the entropy at t0
-    double m_s0_R = 0.0;
+    CanteraDouble m_s0_R = 0.0;
     //! log of the t0 value
-    double m_logt0 = log(298.15);
+    CanteraDouble m_logt0 = log(298.15);
     //! Original value of h0_R, restored by calling resetHf298()
-    double m_h0_R_orig = 0.0;
+    CanteraDouble m_h0_R_orig = 0.0;
 };
 
 }

@@ -439,7 +439,7 @@ public:
      * Returns the reference pressure in Pa. This function is a wrapper
      * that calls the species thermo refPressure function.
      */
-    virtual double refPressure() const {
+    virtual CanteraDouble refPressure() const {
         return m_spthermo.refPressure();
     }
 
@@ -454,7 +454,7 @@ public:
      * @param k index of the species. Default is -1, which will return the max
      *          of the min value over all species.
      */
-    virtual double minTemp(size_t k = npos) const {
+    virtual CanteraDouble minTemp(size_t k = npos) const {
         return m_spthermo.minTemp(k);
     }
 
@@ -469,7 +469,7 @@ public:
      *   @returns    the current value of the Heat of Formation at 298K
      *       and 1 bar
      */
-    double Hf298SS(const size_t k) const {
+    CanteraDouble Hf298SS(const size_t k) const {
         return m_spthermo.reportOneHf298(k);
     }
 
@@ -484,7 +484,7 @@ public:
      *   @param  Hf298New    Specify the new value of the Heat of Formation at
      *       298K and 1 bar
      */
-    virtual void modifyOneHf298SS(const size_t k, const double Hf298New) {
+    virtual void modifyOneHf298SS(const size_t k, const CanteraDouble Hf298New) {
         m_spthermo.modifyOneHf298(k, Hf298New);
         invalidateCache();
     }
@@ -507,7 +507,7 @@ public:
      * @param k index of the species. Default is -1, which will return the min
      *          of the max value over all species.
      */
-    virtual double maxTemp(size_t k = npos) const {
+    virtual CanteraDouble maxTemp(size_t k = npos) const {
         return m_spthermo.maxTemp(k);
     }
 
@@ -535,13 +535,13 @@ public:
      * @f]
      * @see getPartialMolarEnthalpies()
      */
-    virtual double enthalpy_mole() const {
+    virtual CanteraDouble enthalpy_mole() const {
         getPartialMolarEnthalpies(m_workS.data());
         return mean_X(m_workS);
     }
 
     //! Molar internal energy. Units: J/kmol.
-    virtual double intEnergy_mole() const {
+    virtual CanteraDouble intEnergy_mole() const {
         return enthalpy_mole() - pressure()* molarVolume();
     }
 
@@ -553,7 +553,7 @@ public:
      * @f]
      * @see getPartialMolarEnthalpies()
      */
-    virtual double entropy_mole() const {
+    virtual CanteraDouble entropy_mole() const {
         getPartialMolarEntropies(m_workS.data());
         return mean_X(m_workS);
     }
@@ -566,7 +566,7 @@ public:
      * @f]
      * @see getChemPotentials()
      */
-    virtual double gibbs_mole() const {
+    virtual CanteraDouble gibbs_mole() const {
         getChemPotentials(m_workS.data());
         return mean_X(m_workS);
     }
@@ -578,13 +578,13 @@ public:
      * @f]
      * @see getPartialMolarCp()
      */
-    virtual double cp_mole() const {
+    virtual CanteraDouble cp_mole() const {
         getPartialMolarCp(m_workS.data());
         return mean_X(m_workS);
     }
 
     //! Molar heat capacity at constant volume and composition [J/kmol/K].
-    virtual double cv_mole() const {
+    virtual CanteraDouble cv_mole() const {
         throw NotImplementedError("ThermoPhase::cv_mole",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -604,7 +604,7 @@ public:
      * \kappa_T = \frac{1}{\rho}\left(\frac{\partial \rho}{\partial P}\right)_T
      * @f]
      */
-    virtual double isothermalCompressibility() const {
+    virtual CanteraDouble isothermalCompressibility() const {
         throw NotImplementedError("ThermoPhase::isothermalCompressibility",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -616,7 +616,7 @@ public:
      * \beta = \frac{1}{v}\left(\frac{\partial v}{\partial T}\right)_P
      * @f]
      */
-    virtual double thermalExpansionCoeff() const {
+    virtual CanteraDouble thermalExpansionCoeff() const {
         throw NotImplementedError("ThermoPhase::thermalExpansionCoeff",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -628,7 +628,7 @@ public:
      * c = \sqrt{\left(\frac{\partial P}{\partial\rho}\right)_s}
      * @f]
      */
-    virtual double soundSpeed() const {
+    virtual CanteraDouble soundSpeed() const {
         throw NotImplementedError("ThermoPhase::soundSpeed",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -650,7 +650,7 @@ public:
      *
      * @param v Input value of the electric potential in Volts
      */
-    void setElectricPotential(double v) {
+    void setElectricPotential(CanteraDouble v) {
         m_phi = v;
         invalidateCache();
     }
@@ -659,7 +659,7 @@ public:
     /*!
      *  Units are Volts (which are Joules/coulomb)
      */
-    double electricPotential() const {
+    CanteraDouble electricPotential() const {
         return m_phi;
     }
 
@@ -735,7 +735,7 @@ public:
      *           upon the implementation of the reaction rate expressions within
      *           the phase.
      */
-    virtual void getActivityConcentrations(double* c) const {
+    virtual void getActivityConcentrations(CanteraDouble* c) const {
         throw NotImplementedError("ThermoPhase::getActivityConcentrations",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -757,7 +757,7 @@ public:
      *   Returns the standard concentration. The units are by definition
      *   dependent on the ThermoPhase and kinetics manager representation.
      */
-    virtual double standardConcentration(size_t k=0) const {
+    virtual CanteraDouble standardConcentration(size_t k=0) const {
         throw NotImplementedError("ThermoPhase::standardConcentration",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -766,7 +766,7 @@ public:
     /*!
      * @param k    index of the species (defaults to zero)
      */
-    virtual double logStandardConc(size_t k=0) const;
+    virtual CanteraDouble logStandardConc(size_t k=0) const;
 
     //! Get the array of non-dimensional activities at the current solution
     //! temperature, pressure, and solution concentration.
@@ -780,14 +780,14 @@ public:
      *
      * @param a   Output vector of activities. Length: m_kk.
      */
-    virtual void getActivities(double* a) const;
+    virtual void getActivities(CanteraDouble* a) const;
 
     //! Get the array of non-dimensional molar-based activity coefficients at
     //! the current solution temperature, pressure, and solution concentration.
     /*!
      * @param ac Output vector of activity coefficients. Length: m_kk.
      */
-    virtual void getActivityCoefficients(double* ac) const {
+    virtual void getActivityCoefficients(CanteraDouble* ac) const {
         if (m_kk == 1) {
             ac[0] = 1.0;
         } else {
@@ -801,7 +801,7 @@ public:
     /*!
      * @param lnac Output vector of ln activity coefficients. Length: m_kk.
      */
-    virtual void getLnActivityCoefficients(double* lnac) const;
+    virtual void getLnActivityCoefficients(CanteraDouble* lnac) const;
 
     //! @}
     //! @name  Partial Molar Properties of the Solution
@@ -816,7 +816,7 @@ public:
      * @param mu  Output vector of species chemical
      *            potentials. Length: m_kk. Units: J/kmol
      */
-    virtual void getChemPotentials(double* mu) const {
+    virtual void getChemPotentials(CanteraDouble* mu) const {
         throw NotImplementedError("ThermoPhase::getChemPotentials",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -835,7 +835,7 @@ public:
      * @param mu  Output vector of species electrochemical
      *            potentials. Length: m_kk. Units: J/kmol
      */
-    void getElectrochemPotentials(double* mu) const;
+    void getElectrochemPotentials(CanteraDouble* mu) const;
 
     //! Returns an array of partial molar enthalpies for the species
     //! in the mixture. Units (J/kmol)
@@ -843,7 +843,7 @@ public:
      * @param hbar    Output vector of species partial molar enthalpies.
      *                Length: m_kk. units are J/kmol.
      */
-    virtual void getPartialMolarEnthalpies(double* hbar) const {
+    virtual void getPartialMolarEnthalpies(CanteraDouble* hbar) const {
         throw NotImplementedError("ThermoPhase::getPartialMolarEnthalpies",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -854,7 +854,7 @@ public:
      * @param sbar    Output vector of species partial molar entropies.
      *                Length = m_kk. units are J/kmol/K.
      */
-    virtual void getPartialMolarEntropies(double* sbar) const {
+    virtual void getPartialMolarEntropies(CanteraDouble* sbar) const {
         throw NotImplementedError("ThermoPhase::getPartialMolarEntropies",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -865,7 +865,7 @@ public:
      * @param ubar    Output vector of species partial molar internal energies.
      *                Length = m_kk. units are J/kmol.
      */
-    virtual void getPartialMolarIntEnergies(double* ubar) const {
+    virtual void getPartialMolarIntEnergies(CanteraDouble* ubar) const {
         throw NotImplementedError("ThermoPhase::getPartialMolarIntEnergies",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -877,7 +877,7 @@ public:
      *                capacities at constant pressure.
      *                Length = m_kk. units are J/kmol/K.
      */
-    virtual void getPartialMolarCp(double* cpbar) const {
+    virtual void getPartialMolarCp(CanteraDouble* cpbar) const {
         throw NotImplementedError("ThermoPhase::getPartialMolarCp",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -888,7 +888,7 @@ public:
      *  @param vbar   Output vector of species partial molar volumes.
      *                Length = m_kk. units are m^3/kmol.
      */
-    virtual void getPartialMolarVolumes(double* vbar) const {
+    virtual void getPartialMolarVolumes(CanteraDouble* vbar) const {
         throw NotImplementedError("ThermoPhase::getPartialMolarVolumes",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -907,7 +907,7 @@ public:
      * @param mu      Output vector of chemical potentials.
      *                Length: m_kk.
      */
-    virtual void getStandardChemPotentials(double* mu) const {
+    virtual void getStandardChemPotentials(CanteraDouble* mu) const {
         throw NotImplementedError("ThermoPhase::getStandardChemPotentials",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -918,7 +918,7 @@ public:
      * @param hrt      Output vector of nondimensional standard state enthalpies.
      *                 Length: m_kk.
      */
-    virtual void getEnthalpy_RT(double* hrt) const {
+    virtual void getEnthalpy_RT(CanteraDouble* hrt) const {
         throw NotImplementedError("ThermoPhase::getEnthalpy_RT",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -929,7 +929,7 @@ public:
      * @param sr   Output vector of nondimensional standard state entropies.
      *             Length: m_kk.
      */
-    virtual void getEntropy_R(double* sr) const {
+    virtual void getEntropy_R(CanteraDouble* sr) const {
         throw NotImplementedError("ThermoPhase::getEntropy_R",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -940,7 +940,7 @@ public:
      * @param grt  Output vector of nondimensional standard state Gibbs free
      *             energies. Length: m_kk.
      */
-    virtual void getGibbs_RT(double* grt) const {
+    virtual void getGibbs_RT(CanteraDouble* grt) const {
         throw NotImplementedError("ThermoPhase::getGibbs_RT",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -951,7 +951,7 @@ public:
      * @param urt  output vector of nondimensional standard state internal energies
      *             of the species. Length: m_kk.
      */
-    virtual void getIntEnergy_RT(double* urt) const {
+    virtual void getIntEnergy_RT(CanteraDouble* urt) const {
         throw NotImplementedError("ThermoPhase::getIntEnergy_RT",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -963,7 +963,7 @@ public:
      * @param cpr   Output vector of nondimensional standard state heat
      *              capacities. Length: m_kk.
      */
-    virtual void getCp_R(double* cpr) const {
+    virtual void getCp_R(CanteraDouble* cpr) const {
         throw NotImplementedError("ThermoPhase::getCp_R",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -976,7 +976,7 @@ public:
      * @param vol     Output vector containing the standard state volumes.
      *                Length: m_kk.
      */
-    virtual void getStandardVolumes(double* vol) const {
+    virtual void getStandardVolumes(CanteraDouble* vol) const {
         throw NotImplementedError("ThermoPhase::getStandardVolumes",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -992,7 +992,7 @@ public:
      * @param hrt     Output vector containing the nondimensional reference
      *                state enthalpies. Length: m_kk.
      */
-    virtual void getEnthalpy_RT_ref(double* hrt) const {
+    virtual void getEnthalpy_RT_ref(CanteraDouble* hrt) const {
         throw NotImplementedError("ThermoPhase::getEnthalpy_RT_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1004,7 +1004,7 @@ public:
      * @param grt     Output vector containing the nondimensional reference state
      *                Gibbs Free energies.  Length: m_kk.
      */
-    virtual void getGibbs_RT_ref(double* grt) const {
+    virtual void getGibbs_RT_ref(CanteraDouble* grt) const {
         throw NotImplementedError("ThermoPhase::getGibbs_RT_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1016,7 +1016,7 @@ public:
      * @param g       Output vector containing the reference state
      *                Gibbs Free energies. Length: m_kk. Units: J/kmol.
      */
-    virtual void getGibbs_ref(double* g) const {
+    virtual void getGibbs_ref(CanteraDouble* g) const {
         throw NotImplementedError("ThermoPhase::getGibbs_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1028,7 +1028,7 @@ public:
      * @param er      Output vector containing the nondimensional reference
      *                state entropies. Length: m_kk.
      */
-    virtual void getEntropy_R_ref(double* er) const {
+    virtual void getEntropy_R_ref(CanteraDouble* er) const {
         throw NotImplementedError("ThermoPhase::getEntropy_R_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1040,7 +1040,7 @@ public:
      * @param urt    Output vector of nondimensional reference state internal
      *               energies of the species. Length: m_kk
      */
-    virtual void getIntEnergy_RT_ref(double* urt) const {
+    virtual void getIntEnergy_RT_ref(CanteraDouble* urt) const {
         throw NotImplementedError("ThermoPhase::getIntEnergy_RT_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1053,7 +1053,7 @@ public:
      *               heat capacities at constant pressure for the species.
      *               Length: m_kk
      */
-    virtual void getCp_R_ref(double* cprt) const {
+    virtual void getCp_R_ref(CanteraDouble* cprt) const {
         throw NotImplementedError("ThermoPhase::getCp_R_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1066,7 +1066,7 @@ public:
      * @param vol     Output vector containing the standard state volumes.
      *                Length: m_kk.
      */
-    virtual void getStandardVolumes_ref(double* vol) const {
+    virtual void getStandardVolumes_ref(CanteraDouble* vol) const {
         throw NotImplementedError("ThermoPhase::getStandardVolumes_ref",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1078,32 +1078,32 @@ public:
     //! @{
 
     //! Specific enthalpy. Units: J/kg.
-    double enthalpy_mass() const {
+    CanteraDouble enthalpy_mass() const {
         return enthalpy_mole()/meanMolecularWeight();
     }
 
     //! Specific internal energy. Units: J/kg.
-    double intEnergy_mass() const {
+    CanteraDouble intEnergy_mass() const {
         return intEnergy_mole()/meanMolecularWeight();
     }
 
     //! Specific entropy. Units: J/kg/K.
-    double entropy_mass() const {
+    CanteraDouble entropy_mass() const {
         return entropy_mole()/meanMolecularWeight();
     }
 
     //! Specific Gibbs function. Units: J/kg.
-    double gibbs_mass() const {
+    CanteraDouble gibbs_mass() const {
         return gibbs_mole()/meanMolecularWeight();
     }
 
     //! Specific heat at constant pressure and composition [J/kg/K].
-    double cp_mass() const {
+    CanteraDouble cp_mass() const {
         return cp_mole()/meanMolecularWeight();
     }
 
     //! Specific heat at constant volume and composition [J/kg/K].
-    double cv_mass() const {
+    CanteraDouble cv_mass() const {
         return cv_mole()/meanMolecularWeight();
     }
     //! @}
@@ -1112,7 +1112,7 @@ public:
     /*!
      *  The units are Joules kmol-1
      */
-    double RT() const {
+    CanteraDouble RT() const {
         return temperature() * GasConstant;
     }
 
@@ -1132,7 +1132,7 @@ public:
      * @param x    Vector of mole fractions.
      *             Length is equal to m_kk.
      */
-    virtual void setState_TPX(double t, double p, const double* x);
+    virtual void setState_TPX(CanteraDouble t, CanteraDouble p, const CanteraDouble* x);
 
     //! Set the temperature (K), pressure (Pa), and mole fractions.
     /*!
@@ -1144,7 +1144,7 @@ public:
      * @param x    Composition map of mole fractions. Species not in
      *             the composition map are assumed to have zero mole fraction
      */
-    virtual void setState_TPX(double t, double p, const Composition& x);
+    virtual void setState_TPX(CanteraDouble t, CanteraDouble p, const Composition& x);
 
     //! Set the temperature (K), pressure (Pa), and mole fractions.
     /*!
@@ -1157,7 +1157,7 @@ public:
      *             Species not in the composition map are assumed to have zero
      *             mole fraction
      */
-    virtual void setState_TPX(double t, double p, const string& x);
+    virtual void setState_TPX(CanteraDouble t, CanteraDouble p, const string& x);
 
     //! Set the internally stored temperature (K), pressure (Pa), and mass
     //! fractions of the phase.
@@ -1170,7 +1170,7 @@ public:
      * @param y    Vector of mass fractions.
      *             Length is equal to m_kk.
      */
-    virtual void setState_TPY(double t, double p, const double* y);
+    virtual void setState_TPY(CanteraDouble t, CanteraDouble p, const CanteraDouble* y);
 
     //! Set the internally stored temperature (K), pressure (Pa), and mass
     //! fractions of the phase
@@ -1183,7 +1183,7 @@ public:
      * @param y    Composition map of mass fractions. Species not in
      *             the composition map are assumed to have zero mass fraction
      */
-    virtual void setState_TPY(double t, double p, const Composition& y);
+    virtual void setState_TPY(CanteraDouble t, CanteraDouble p, const Composition& y);
 
     //! Set the internally stored temperature (K), pressure (Pa), and mass
     //! fractions of the phase
@@ -1197,7 +1197,7 @@ public:
      *             Species not in the composition map are assumed to have zero
      *             mass fraction
      */
-    virtual void setState_TPY(double t, double p, const string& y);
+    virtual void setState_TPY(CanteraDouble t, CanteraDouble p, const string& y);
 
     //! Set the temperature (K) and pressure (Pa)
     /*!
@@ -1206,7 +1206,7 @@ public:
      * @param t    Temperature (K)
      * @param p    Pressure (Pa)
      */
-    virtual void setState_TP(double t, double p);
+    virtual void setState_TP(CanteraDouble t, CanteraDouble p);
 
     //! Set the internally stored specific enthalpy (J/kg) and pressure (Pa) of
     //! the phase.
@@ -1217,7 +1217,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_HP(double h, double p, double tol=1e-9);
+    virtual void setState_HP(CanteraDouble h, CanteraDouble p, CanteraDouble tol=1e-9);
 
     //! Set the specific internal energy (J/kg) and specific volume (m^3/kg).
     /*!
@@ -1231,7 +1231,7 @@ public:
      *             Important for some applications where numerical Jacobians
      *             are being calculated.
      */
-    virtual void setState_UV(double u, double v, double tol=1e-9);
+    virtual void setState_UV(CanteraDouble u, CanteraDouble v, CanteraDouble tol=1e-9);
 
     //! Set the specific entropy (J/kg/K) and pressure (Pa).
     /*!
@@ -1244,7 +1244,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_SP(double s, double p, double tol=1e-9);
+    virtual void setState_SP(CanteraDouble s, CanteraDouble p, CanteraDouble tol=1e-9);
 
     //! Set the specific entropy (J/kg/K) and specific volume (m^3/kg).
     /*!
@@ -1257,7 +1257,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_SV(double s, double v, double tol=1e-9);
+    virtual void setState_SV(CanteraDouble s, CanteraDouble v, CanteraDouble tol=1e-9);
 
     //! Set the specific entropy (J/kg/K) and temperature (K).
     /*!
@@ -1271,7 +1271,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_ST(double s, double t, double tol=1e-9) {
+    virtual void setState_ST(CanteraDouble s, CanteraDouble t, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_ST",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1288,7 +1288,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_TV(double t, double v, double tol=1e-9) {
+    virtual void setState_TV(CanteraDouble t, CanteraDouble v, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_TV",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1305,7 +1305,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_PV(double p, double v, double tol=1e-9) {
+    virtual void setState_PV(CanteraDouble p, CanteraDouble v, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_PV",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1322,7 +1322,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_UP(double u, double p, double tol=1e-9) {
+    virtual void setState_UP(CanteraDouble u, CanteraDouble p, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_UP",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1339,7 +1339,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_VH(double v, double h, double tol=1e-9) {
+    virtual void setState_VH(CanteraDouble v, CanteraDouble h, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_VH",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1356,7 +1356,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_TH(double t, double h, double tol=1e-9) {
+    virtual void setState_TH(CanteraDouble t, CanteraDouble h, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_TH",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1373,7 +1373,7 @@ public:
      *              Important for some applications where numerical Jacobians
      *              are being calculated.
      */
-    virtual void setState_SH(double s, double h, double tol=1e-9) {
+    virtual void setState_SH(CanteraDouble s, CanteraDouble h, CanteraDouble tol=1e-9) {
         throw NotImplementedError("ThermoPhase::setState_SH",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1392,7 +1392,7 @@ public:
      * @param p   Pressure (Pa)
      * @since New in %Cantera 3.0.
      */
-    virtual void setState_DP(double rho, double p) {
+    virtual void setState_DP(CanteraDouble rho, CanteraDouble p) {
         throw NotImplementedError("ThermoPhase::setState_DP",
                                   "Not implemented for phase type '{}'", type());
     }
@@ -1441,13 +1441,13 @@ public:
      *                   Fuel and oxidizer composition are interpreted
      *                   as mole or mass fractions (default: molar)
      */
-    void setMixtureFraction(double mixFrac, const double* fuelComp,
-                            const double* oxComp, ThermoBasis basis=ThermoBasis::molar);
+    void setMixtureFraction(CanteraDouble mixFrac, const CanteraDouble* fuelComp,
+                            const CanteraDouble* oxComp, ThermoBasis basis=ThermoBasis::molar);
     //! @copydoc ThermoPhase::setMixtureFraction
-    void setMixtureFraction(double mixFrac, const string& fuelComp,
+    void setMixtureFraction(CanteraDouble mixFrac, const string& fuelComp,
             const string& oxComp, ThermoBasis basis=ThermoBasis::molar);
     //! @copydoc ThermoPhase::setMixtureFraction
-    void setMixtureFraction(double mixFrac, const Composition& fuelComp,
+    void setMixtureFraction(CanteraDouble mixFrac, const Composition& fuelComp,
             const Composition& oxComp, ThermoBasis basis=ThermoBasis::molar);
     //! @}
     //! @name Compute Mixture Fraction
@@ -1484,15 +1484,15 @@ public:
      *                   based on a single element (default: "Bilger")
      * @returns          mixture fraction (kg fuel / kg mixture)
      */
-    double mixtureFraction(const double* fuelComp, const double* oxComp,
+    CanteraDouble mixtureFraction(const CanteraDouble* fuelComp, const CanteraDouble* oxComp,
                            ThermoBasis basis=ThermoBasis::molar,
                            const string& element="Bilger") const;
     //! @copydoc ThermoPhase::mixtureFraction
-    double mixtureFraction(const string& fuelComp, const string& oxComp,
+    CanteraDouble mixtureFraction(const string& fuelComp, const string& oxComp,
                            ThermoBasis basis=ThermoBasis::molar,
                            const string& element="Bilger") const;
     //! @copydoc ThermoPhase::mixtureFraction
-    double mixtureFraction(const Composition& fuelComp, const Composition& oxComp,
+    CanteraDouble mixtureFraction(const Composition& fuelComp, const Composition& oxComp,
                            ThermoBasis basis=ThermoBasis::molar,
                            const string& element="Bilger") const;
     //! @}
@@ -1513,13 +1513,13 @@ public:
      *                   Fuel and oxidizer composition are interpreted
      *                   as mole or mass fractions (default: molar)
      */
-    void setEquivalenceRatio(double phi, const double* fuelComp, const double* oxComp,
+    void setEquivalenceRatio(CanteraDouble phi, const CanteraDouble* fuelComp, const CanteraDouble* oxComp,
                              ThermoBasis basis=ThermoBasis::molar);
     //! @copydoc ThermoPhase::setEquivalenceRatio
-    void setEquivalenceRatio(double phi, const string& fuelComp,
+    void setEquivalenceRatio(CanteraDouble phi, const string& fuelComp,
             const string& oxComp, ThermoBasis basis=ThermoBasis::molar);
     //! @copydoc ThermoPhase::setEquivalenceRatio
-    void setEquivalenceRatio(double phi, const Composition& fuelComp,
+    void setEquivalenceRatio(CanteraDouble phi, const Composition& fuelComp,
             const Composition& oxComp, ThermoBasis basis=ThermoBasis::molar);
     //! @}
 
@@ -1550,13 +1550,13 @@ public:
      * @see mixtureFraction for the definition of the Bilger mixture fraction
      * @see equivalenceRatio() for the computation of @f$ \phi @f$ without arguments
      */
-    double equivalenceRatio(const double* fuelComp, const double* oxComp,
+    CanteraDouble equivalenceRatio(const CanteraDouble* fuelComp, const CanteraDouble* oxComp,
                             ThermoBasis basis=ThermoBasis::molar) const;
     //! @copydoc ThermoPhase::equivalenceRatio
-    double equivalenceRatio(const string& fuelComp, const string& oxComp,
+    CanteraDouble equivalenceRatio(const string& fuelComp, const string& oxComp,
                             ThermoBasis basis=ThermoBasis::molar) const;
     //! @copydoc ThermoPhase::equivalenceRatio
-    double equivalenceRatio(const Composition& fuelComp,
+    CanteraDouble equivalenceRatio(const Composition& fuelComp,
             const Composition& oxComp, ThermoBasis basis=ThermoBasis::molar) const;
     //! @}
 
@@ -1581,7 +1581,7 @@ public:
      * @see equivalenceRatio   compute the equivalence ratio from specific
      *                         fuel and oxidizer compositions
      */
-    double equivalenceRatio() const;
+    CanteraDouble equivalenceRatio() const;
 
     //! @name Compute Stoichiometric Air to Fuel Ratio
     //! @{
@@ -1605,13 +1605,13 @@ public:
      *                   as mole or mass fractions (default: molar)
      * @returns          Stoichiometric Air to Fuel Ratio (kg oxidizer / kg fuel)
      */
-    double stoichAirFuelRatio(const double* fuelComp, const double* oxComp,
+    CanteraDouble stoichAirFuelRatio(const CanteraDouble* fuelComp, const CanteraDouble* oxComp,
                               ThermoBasis basis=ThermoBasis::molar) const;
     //! @copydoc ThermoPhase::stoichAirFuelRatio
-    double stoichAirFuelRatio(const string& fuelComp, const string& oxComp,
+    CanteraDouble stoichAirFuelRatio(const string& fuelComp, const string& oxComp,
                               ThermoBasis basis=ThermoBasis::molar) const;
     //! @copydoc ThermoPhase::stoichAirFuelRatio
-    double stoichAirFuelRatio(const Composition& fuelComp,
+    CanteraDouble stoichAirFuelRatio(const Composition& fuelComp,
             const Composition& oxComp, ThermoBasis basis=ThermoBasis::molar) const;
     //! @}
 
@@ -1634,7 +1634,7 @@ private:
      *              are being calculated.
      * @param doUV  True if solving for UV, false for HP.
      */
-    void setState_HPorUV(double h, double p, double tol=1e-9, bool doUV = false);
+    void setState_HPorUV(CanteraDouble h, CanteraDouble p, CanteraDouble tol=1e-9, bool doUV = false);
 
     //! Carry out work in SP and SV calculations.
     /*!
@@ -1645,11 +1645,11 @@ private:
      *              are being calculated.
      * @param doSV  True if solving for SV, false for SP.
      */
-    void setState_SPorSV(double s, double p, double tol=1e-9, bool doSV = false);
+    void setState_SPorSV(CanteraDouble s, CanteraDouble p, CanteraDouble tol=1e-9, bool doSV = false);
 
     //! Helper function used by setState_HPorUV and setState_SPorSV.
     //! Sets the temperature and (if set_p is true) the pressure.
-    void setState_conditional_TP(double t, double p, bool set_p);
+    void setState_conditional_TP(CanteraDouble t, CanteraDouble p, bool set_p);
 
     //! Helper function for computing the amount of oxygen required for complete
     //! oxidation.
@@ -1657,7 +1657,7 @@ private:
      * @param y       array of (possibly non-normalized) mass fractions (length m_kk)
      * @returns       amount of required oxygen in kmol O / kg mixture
      */
-    double o2Required(const double* y) const;
+    CanteraDouble o2Required(const CanteraDouble* y) const;
 
     //! Helper function for computing the amount of oxygen
     //! available in the current mixture.
@@ -1665,7 +1665,7 @@ private:
      * @param y       array of (possibly non-normalized) mass fractions (length m_kk)
      * @returns       amount of O in kmol O / kg mixture
      */
-    double o2Present(const double* y) const;
+    CanteraDouble o2Present(const CanteraDouble* y) const;
 
 public:
     //! @name Chemical Equilibrium
@@ -1705,7 +1705,7 @@ public:
      * @ingroup equilGroup
      */
     void equilibrate(const string& XY, const string& solver="auto",
-                     double rtol=1e-9, int max_steps=50000, int max_iter=100,
+                     CanteraDouble rtol=1e-9, int max_steps=50000, int max_iter=100,
                      int estimate_equil=0, int log_level=0);
 
     //!This method is used by the ChemEquil equilibrium solver.
@@ -1720,7 +1720,7 @@ public:
      * @param mu_RT Input vector of dimensionless chemical potentials
      *                  The length is equal to nSpecies().
      */
-    virtual void setToEquilState(const double* mu_RT) {
+    virtual void setToEquilState(const CanteraDouble* mu_RT) {
         throw NotImplementedError("ThermoPhase::setToEquilState");
     }
 
@@ -1739,27 +1739,27 @@ public:
     //! @{
 
     //! Critical temperature (K).
-    virtual double critTemperature() const {
+    virtual CanteraDouble critTemperature() const {
         throw NotImplementedError("ThermoPhase::critTemperature");
     }
 
     //! Critical pressure (Pa).
-    virtual double critPressure() const {
+    virtual CanteraDouble critPressure() const {
         throw NotImplementedError("ThermoPhase::critPressure");
     }
 
     //! Critical volume (m3/kmol).
-    virtual double critVolume() const {
+    virtual CanteraDouble critVolume() const {
         throw NotImplementedError("ThermoPhase::critVolume");
     }
 
     //! Critical compressibility (unitless).
-    virtual double critCompressibility() const {
+    virtual CanteraDouble critCompressibility() const {
         throw NotImplementedError("ThermoPhase::critCompressibility");
     }
 
     //! Critical density (kg/m3).
-    virtual double critDensity() const {
+    virtual CanteraDouble critDensity() const {
         throw NotImplementedError("ThermoPhase::critDensity");
     }
 
@@ -1774,7 +1774,7 @@ public:
     /*!
      * @param p Pressure (Pa)
      */
-    virtual double satTemperature(double p) const {
+    virtual CanteraDouble satTemperature(CanteraDouble p) const {
         throw NotImplementedError("ThermoPhase::satTemperature");
     }
 
@@ -1782,12 +1782,12 @@ public:
     /*!
      * @param t Temperature (Kelvin)
      */
-    virtual double satPressure(double t) {
+    virtual CanteraDouble satPressure(CanteraDouble t) {
         throw NotImplementedError("ThermoPhase::satPressure");
     }
 
     //! Return the fraction of vapor at the current conditions
-    virtual double vaporFraction() const {
+    virtual CanteraDouble vaporFraction() const {
         throw NotImplementedError("ThermoPhase::vaporFraction");
     }
 
@@ -1796,7 +1796,7 @@ public:
      * @param t  Temperature (kelvin)
      * @param x  Fraction of vapor
      */
-    virtual void setState_Tsat(double t, double x) {
+    virtual void setState_Tsat(CanteraDouble t, CanteraDouble x) {
         throw NotImplementedError("ThermoPhase::setState_Tsat");
     }
 
@@ -1805,7 +1805,7 @@ public:
      * @param p  Pressure (Pa)
      * @param x  Fraction of vapor
      */
-    virtual void setState_Psat(double p, double x) {
+    virtual void setState_Psat(CanteraDouble p, CanteraDouble x) {
         throw NotImplementedError("ThermoPhase::setState_Psat");
     }
 
@@ -1825,7 +1825,7 @@ public:
      * @param P    Pressure (Pa)
      * @param Q    vapor fraction
      */
-    void setState_TPQ(double T, double P, double Q);
+    void setState_TPQ(CanteraDouble T, CanteraDouble P, CanteraDouble Q);
 
     //! @}
     //! @name Initialization Methods - For Internal Use (ThermoPhase)
@@ -1927,8 +1927,8 @@ public:
      *                       m_kk units are 1/units(s). if s is a physical
      *                       coordinate then the units are 1/m.
      */
-    virtual void getdlnActCoeffds(const double dTds, const double* const dXds,
-                                  double* dlnActCoeffds) const {
+    virtual void getdlnActCoeffds(const CanteraDouble dTds, const CanteraDouble* const dXds,
+                                  CanteraDouble* dlnActCoeffds) const {
         throw NotImplementedError("ThermoPhase::getdlnActCoeffds");
     }
 
@@ -1947,7 +1947,7 @@ public:
      * @param dlnActCoeffdlnX_diag    Output vector of derivatives of the log
      *     Activity Coefficients wrt the mole fractions. length = m_kk
      */
-    virtual void getdlnActCoeffdlnX_diag(double* dlnActCoeffdlnX_diag) const {
+    virtual void getdlnActCoeffdlnX_diag(CanteraDouble* dlnActCoeffdlnX_diag) const {
         throw NotImplementedError("ThermoPhase::getdlnActCoeffdlnX_diag");
     }
 
@@ -1967,7 +1967,7 @@ public:
      * @param dlnActCoeffdlnN_diag    Output vector of derivatives of the
      *                                log Activity Coefficients. length = m_kk
      */
-    virtual void getdlnActCoeffdlnN_diag(double* dlnActCoeffdlnN_diag) const {
+    virtual void getdlnActCoeffdlnN_diag(CanteraDouble* dlnActCoeffdlnN_diag) const {
         throw NotImplementedError("ThermoPhase::getdlnActCoeffdlnN_diag");
     }
 
@@ -1996,10 +1996,10 @@ public:
      * @param dlnActCoeffdlnN    Output vector of derivatives of the
      *                           log Activity Coefficients. length = m_kk * m_kk
      */
-    virtual void getdlnActCoeffdlnN(const size_t ld, double* const dlnActCoeffdlnN);
+    virtual void getdlnActCoeffdlnN(const size_t ld, CanteraDouble* const dlnActCoeffdlnN);
 
     virtual void getdlnActCoeffdlnN_numderiv(const size_t ld,
-                                             double* const dlnActCoeffdlnN);
+                                             CanteraDouble* const dlnActCoeffdlnN);
 
     //! @}
     //! @name Printing
@@ -2012,7 +2012,7 @@ public:
      * @param threshold   Show information about species with mole fractions
      *                    greater than *threshold*.
      */
-    virtual string report(bool show_thermo=true, double threshold=-1e-14) const;
+    virtual string report(bool show_thermo=true, CanteraDouble threshold=-1e-14) const;
 
     //! @}
 
@@ -2048,7 +2048,7 @@ protected:
     AnyMap m_input;
 
     //! Stored value of the electric potential for this phase. Units are Volts.
-    double m_phi = 0.0;
+    CanteraDouble m_phi = 0.0;
 
     //! Boolean indicating whether a charge neutrality condition is a necessity
     /*!
@@ -2064,7 +2064,7 @@ protected:
     int m_ssConvention = cSS_CONVENTION_TEMPERATURE;
 
     //! last value of the temperature processed by reference state
-    mutable double m_tlast = 0.0;
+    mutable CanteraDouble m_tlast = 0.0;
 
     //! reference to Solution
     std::weak_ptr<Solution> m_soln;

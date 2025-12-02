@@ -23,13 +23,13 @@ FalloffData::FalloffData()
     m_conc_3b_buf.resize(1, NAN);
 }
 
-void FalloffData::update(double T)
+void FalloffData::update(CanteraDouble T)
 {
     throw CanteraError("FalloffData::update",
         "Missing state information: 'FalloffData' requires third-body concentration.");
 }
 
-void FalloffData::update(double T, double M)
+void FalloffData::update(CanteraDouble T, CanteraDouble M)
 {
     ReactionData::update(T);
     conc_3b[0] = M;
@@ -37,9 +37,9 @@ void FalloffData::update(double T, double M)
 
 bool FalloffData::update(const ThermoPhase& phase, const Kinetics& kin)
 {
-    double rho_m = phase.molarDensity();
+    CanteraDouble rho_m = phase.molarDensity();
     int mf = phase.stateMFNumber();
-    double T = phase.temperature();
+    CanteraDouble T = phase.temperature();
     bool changed = false;
     if (T != temperature) {
         ReactionData::update(T);
@@ -54,7 +54,7 @@ bool FalloffData::update(const ThermoPhase& phase, const Kinetics& kin)
     return changed;
 }
 
-void FalloffData::perturbThirdBodies(double deltaM)
+void FalloffData::perturbThirdBodies(CanteraDouble deltaM)
 {
     if (m_perturbed) {
         throw CanteraError("FalloffData::perturbThirdBodies",
@@ -110,7 +110,7 @@ void FalloffRate::setHighRate(const ArrheniusRate& high)
     m_highRate = std::move(_high);
 }
 
-void FalloffRate::setFalloffCoeffs(const vector<double>& c)
+void FalloffRate::setFalloffCoeffs(const vector<CanteraDouble>& c)
 {
     if (c.size() != 0) {
         throw InputFileError("FalloffRate::setFalloffCoeffs", m_input,
@@ -120,7 +120,7 @@ void FalloffRate::setFalloffCoeffs(const vector<double>& c)
     m_valid = true;
 }
 
-void FalloffRate::getFalloffCoeffs(vector<double>& c) const
+void FalloffRate::getFalloffCoeffs(vector<CanteraDouble>& c) const
 {
     c.clear();
 }
@@ -207,7 +207,7 @@ LindemannRate::LindemannRate(const AnyMap& node, const UnitStack& rate_units)
 }
 
 LindemannRate::LindemannRate(const ArrheniusRate& low, const ArrheniusRate& high,
-                             const vector<double>& c)
+                             const vector<CanteraDouble>& c)
     : LindemannRate()
 {
     m_lowRate = low;
@@ -222,7 +222,7 @@ TroeRate::TroeRate(const AnyMap& node, const UnitStack& rate_units)
 }
 
 TroeRate::TroeRate(const ArrheniusRate& low, const ArrheniusRate& high,
-                   const vector<double>& c)
+                   const vector<CanteraDouble>& c)
     : TroeRate()
 {
     m_lowRate = low;
@@ -230,7 +230,7 @@ TroeRate::TroeRate(const ArrheniusRate& low, const ArrheniusRate& high,
     setFalloffCoeffs(c);
 }
 
-void TroeRate::setFalloffCoeffs(const vector<double>& c)
+void TroeRate::setFalloffCoeffs(const vector<CanteraDouble>& c)
 {
     if (c.size() != 3 && c.size() != 4) {
         throw InputFileError("TroeRate::setFalloffCoeffs", m_input,
@@ -239,13 +239,13 @@ void TroeRate::setFalloffCoeffs(const vector<double>& c)
     }
     m_a = c[0];
     if (std::abs(c[1]) < SmallNumber) {
-        m_rt3 = std::numeric_limits<double>::infinity();
+        m_rt3 = std::numeric_limits<CanteraDouble>::infinity();
     } else {
         m_rt3 = 1.0 / c[1];
     }
 
     if (std::abs(c[2]) < SmallNumber) {
-        m_rt1 = std::numeric_limits<double>::infinity();
+        m_rt1 = std::numeric_limits<CanteraDouble>::infinity();
     } else {
         m_rt1 = 1.0 / c[2];
     }
@@ -267,7 +267,7 @@ void TroeRate::setFalloffCoeffs(const vector<double>& c)
     m_valid = true;
 }
 
-void TroeRate::getFalloffCoeffs(vector<double>& c) const
+void TroeRate::getFalloffCoeffs(vector<CanteraDouble>& c) const
 {
     if (std::abs(m_t2) < SmallNumber) {
         c.resize(3);
@@ -280,22 +280,22 @@ void TroeRate::getFalloffCoeffs(vector<double>& c) const
     c[2] = 1.0 / m_rt1;
 }
 
-void TroeRate::updateTemp(double T, double* work) const
+void TroeRate::updateTemp(CanteraDouble T, CanteraDouble* work) const
 {
-    double Fcent = (1.0 - m_a) * exp(-T*m_rt3) + m_a * exp(-T*m_rt1);
+    CanteraDouble Fcent = (1.0 - m_a) * exp(-T*m_rt3) + m_a * exp(-T*m_rt1);
     if (m_t2) {
         Fcent += exp(- m_t2 / T);
     }
     *work = log10(std::max(Fcent, SmallNumber));
 }
 
-double TroeRate::F(double pr, const double* work) const
+CanteraDouble TroeRate::F(CanteraDouble pr, const CanteraDouble* work) const
 {
-    double lpr = log10(std::max(pr,SmallNumber));
-    double cc = -0.4 - 0.67 * (*work);
-    double nn = 0.75 - 1.27 * (*work);
-    double f1 = (lpr + cc)/ (nn - 0.14 * (lpr + cc));
-    double lgf = (*work) / (1.0 + f1 * f1);
+    CanteraDouble lpr = log10(std::max(pr,SmallNumber));
+    CanteraDouble cc = -0.4 - 0.67 * (*work);
+    CanteraDouble nn = 0.75 - 1.27 * (*work);
+    CanteraDouble f1 = (lpr + cc)/ (nn - 0.14 * (lpr + cc));
+    CanteraDouble lgf = (*work) / (1.0 + f1 * f1);
     return pow(10.0, lgf);
 }
 
@@ -310,7 +310,7 @@ void TroeRate::setParameters(const AnyMap& node, const UnitStack& rate_units)
     if (f.empty()) {
         return;
     }
-    vector<double> params{
+    vector<CanteraDouble> params{
         f["A"].asDouble(),
         f["T3"].asDouble(),
         f["T1"].asDouble()
@@ -344,7 +344,7 @@ SriRate::SriRate(const AnyMap& node, const UnitStack& rate_units)
     setParameters(node, rate_units);
 }
 
-void SriRate::setFalloffCoeffs(const vector<double>& c)
+void SriRate::setFalloffCoeffs(const vector<CanteraDouble>& c)
 {
     if (c.size() != 3 && c.size() != 5) {
         throw InputFileError("SriRate::setFalloffCoeffs", m_input,
@@ -374,7 +374,7 @@ void SriRate::setFalloffCoeffs(const vector<double>& c)
     m_valid = true;
 }
 
-void SriRate::getFalloffCoeffs(vector<double>& c) const
+void SriRate::getFalloffCoeffs(vector<CanteraDouble>& c) const
 {
     if (m_e < SmallNumber && std::abs(m_e - 1.) < SmallNumber) {
         c.resize(3);
@@ -388,7 +388,7 @@ void SriRate::getFalloffCoeffs(vector<double>& c) const
     c[2] = m_c;
 }
 
-void SriRate::updateTemp(double T, double* work) const
+void SriRate::updateTemp(CanteraDouble T, CanteraDouble* work) const
 {
     *work = m_a * exp(- m_b / T);
     if (m_c != 0.0) {
@@ -397,10 +397,10 @@ void SriRate::updateTemp(double T, double* work) const
     work[1] = m_d * pow(T,m_e);
 }
 
-double SriRate::F(double pr, const double* work) const
+CanteraDouble SriRate::F(CanteraDouble pr, const CanteraDouble* work) const
 {
-    double lpr = log10(std::max(pr,SmallNumber));
-    double xx = 1.0/(1.0 + lpr*lpr);
+    CanteraDouble lpr = log10(std::max(pr,SmallNumber));
+    CanteraDouble xx = 1.0/(1.0 + lpr*lpr);
     return pow(*work, xx) * work[1];
 }
 
@@ -415,7 +415,7 @@ void SriRate::setParameters(const AnyMap& node, const UnitStack& rate_units)
     if (f.empty()) {
         return;
     }
-    vector<double> params{
+    vector<CanteraDouble> params{
         f["A"].asDouble(),
         f["B"].asDouble(),
         f["C"].asDouble()
@@ -453,7 +453,7 @@ TsangRate::TsangRate(const AnyMap& node, const UnitStack& rate_units)
     setParameters(node, rate_units);
 }
 
-void TsangRate::setFalloffCoeffs(const vector<double>& c)
+void TsangRate::setFalloffCoeffs(const vector<CanteraDouble>& c)
 {
     if (c.size() != 1 && c.size() != 2) {
         throw InputFileError("TsangRate::init", m_input,
@@ -471,7 +471,7 @@ void TsangRate::setFalloffCoeffs(const vector<double>& c)
     m_valid = true;
 }
 
-void TsangRate::getFalloffCoeffs(vector<double>& c) const
+void TsangRate::getFalloffCoeffs(vector<CanteraDouble>& c) const
 {
     if (std::abs(m_b) < SmallNumber) {
         c.resize(1);
@@ -482,19 +482,19 @@ void TsangRate::getFalloffCoeffs(vector<double>& c) const
     c[0] = m_a;
 }
 
-void TsangRate::updateTemp(double T, double* work) const
+void TsangRate::updateTemp(CanteraDouble T, CanteraDouble* work) const
 {
-    double Fcent = m_a + (m_b * T);
+    CanteraDouble Fcent = m_a + (m_b * T);
     *work = log10(std::max(Fcent, SmallNumber));
 }
 
-double TsangRate::F(double pr, const double* work) const
+CanteraDouble TsangRate::F(CanteraDouble pr, const CanteraDouble* work) const
 {   //identical to TroeRate::F
-    double lpr = log10(std::max(pr,SmallNumber));
-    double cc = -0.4 - 0.67 * (*work);
-    double nn = 0.75 - 1.27 * (*work);
-    double f1 = (lpr + cc)/ (nn - 0.14 * (lpr + cc));
-    double lgf = (*work) / (1.0 + f1 * f1);
+    CanteraDouble lpr = log10(std::max(pr,SmallNumber));
+    CanteraDouble cc = -0.4 - 0.67 * (*work);
+    CanteraDouble nn = 0.75 - 1.27 * (*work);
+    CanteraDouble f1 = (lpr + cc)/ (nn - 0.14 * (lpr + cc));
+    CanteraDouble lgf = (*work) / (1.0 + f1 * f1);
     return pow(10.0, lgf);
 }
 
@@ -509,7 +509,7 @@ void TsangRate::setParameters(const AnyMap& node, const UnitStack& rate_units)
     if (f.empty()) {
         return;
     }
-    vector<double> params{
+    vector<CanteraDouble> params{
         f["A"].asDouble(),
         f["B"].asDouble()
     };

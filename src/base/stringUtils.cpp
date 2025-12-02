@@ -30,7 +30,7 @@ namespace ba = boost::algorithm;
 namespace Cantera
 {
 
-string vec2str(const vector<double>& v, const string& fmt, const string& sep)
+string vec2str(const vector<CanteraDouble>& v, const string& fmt, const string& sep)
 {
     char buf[64];
     std::stringstream o;
@@ -78,7 +78,7 @@ Composition parseCompString(const string& ss, const vector<string>& names)
                 "unknown species '" + name + "'");
         }
 
-        double value;
+        CanteraDouble value;
         try {
             value = fpValueCheck(ss.substr(valstart, stop-valstart));
         } catch (CanteraError&) {
@@ -118,16 +118,16 @@ Composition parseCompString(const string& ss, const vector<string>& names)
     return x;
 }
 
-double fpValue(const string& val)
+CanteraDouble fpValue(const string& val)
 {
-    double rval;
+    CanteraDouble rval;
     std::stringstream ss(val);
     ss.imbue(std::locale("C"));
     ss >> rval;
     return rval;
 }
 
-double fpValueCheck(const string& val)
+CanteraDouble fpValueCheck(const string& val)
 {
     string str = ba::trim_copy(val);
     if (str.empty()) {

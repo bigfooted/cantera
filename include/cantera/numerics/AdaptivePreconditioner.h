@@ -28,8 +28,8 @@ public:
     void initialize(size_t networkSize) override;
     const string type() const override { return "Adaptive"; }
     void factorize() override;
-    void solve(const size_t stateSize, double* rhs_vector, double* output) override;
-    void stateAdjustment(vector<double>& state) override;
+    void solve(const size_t stateSize, CanteraDouble* rhs_vector, CanteraDouble* output) override;
+    void stateAdjustment(vector<CanteraDouble>& state) override;
 
     int info() const override {
         return static_cast<int>(m_solver.info());
@@ -39,24 +39,24 @@ public:
     void prunePreconditioner();
 
     //! Get the threshold value for setting elements
-    double threshold() { return m_threshold; }
+    CanteraDouble threshold() { return m_threshold; }
 
     //! Get ILUT fill factor
-    double ilutFillFactor() { return m_fill_factor; }
+    CanteraDouble ilutFillFactor() { return m_fill_factor; }
 
     //! Get ILUT drop tolerance
-    double ilutDropTol() { return m_drop_tol; }
+    CanteraDouble ilutDropTol() { return m_drop_tol; }
 
     //! Set the threshold value to compare elements against
-    //! @param threshold double value used in setting by threshold
-    void setThreshold(double threshold) {
+    //! @param threshold CanteraDouble value used in setting by threshold
+    void setThreshold(CanteraDouble threshold) {
         m_threshold = threshold;
         m_prune_precon = (threshold <= 0) ? false : true;
     }
 
     //! Set drop tolerance for ILUT
-    //! @param droptol double value used in setting solver drop tolerance
-    void setIlutDropTol(double droptol) {
+    //! @param droptol CanteraDouble value used in setting solver drop tolerance
+    void setIlutDropTol(CanteraDouble droptol) {
         m_drop_tol = droptol;
         m_solver.setDroptol(droptol);
         }
@@ -70,20 +70,20 @@ public:
 
 protected:
     //! ILUT fill factor
-    double m_fill_factor = 0;
+    CanteraDouble m_fill_factor = 0;
 
     //! ILUT drop tolerance
-    double m_drop_tol = 0;
+    CanteraDouble m_drop_tol = 0;
 
     //! Solver used in solving the linear system
-    Eigen::IncompleteLUT<double> m_solver;
+    Eigen::IncompleteLUT<CanteraDouble> m_solver;
 
     //! Minimum value a non-diagonal element must be to be included in
     //! the preconditioner
-    double m_threshold = 0.0;
+    CanteraDouble m_threshold = 0.0;
 
     //! Bool set whether to prune the matrix or not
-    double m_prune_precon = true;
+    CanteraDouble m_prune_precon = true;
 };
 
 }

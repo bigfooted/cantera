@@ -24,8 +24,8 @@
 namespace Cantera
 {
 
-SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, double tlow,
-    double thigh, double pref, const double* coeffs)
+SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, CanteraDouble tlow,
+    CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs)
 {
     switch (type) {
     case NASA1:
@@ -50,7 +50,7 @@ SpeciesThermoInterpType* newSpeciesThermoInterpType(int type, double tlow,
 }
 
 SpeciesThermoInterpType* newSpeciesThermoInterpType(const string& stype,
-    double tlow, double thigh, double pref, const double* coeffs)
+    CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs)
 {
     int itype = -1;
     string type = toLowerCopy(stype);
@@ -80,7 +80,7 @@ SpeciesThermoInterpType* newSpeciesThermoInterpType(const string& stype,
 void setupSpeciesThermo(SpeciesThermoInterpType& thermo,
                         const AnyMap& node)
 {
-    double Pref = node.convert("reference-pressure", "Pa", OneAtm);
+    CanteraDouble Pref = node.convert("reference-pressure", "Pa", OneAtm);
     thermo.setRefPressure(Pref);
     thermo.input() = node;
 }
@@ -88,8 +88,8 @@ void setupSpeciesThermo(SpeciesThermoInterpType& thermo,
 void setupNasaPoly(NasaPoly2& thermo, const AnyMap& node)
 {
     setupSpeciesThermo(thermo, node);
-    vector<double> Tranges = node.convertVector("temperature-ranges", "K", 2, 3);
-    const auto& data = node["data"].asVector<vector<double>>(Tranges.size()-1);
+    vector<CanteraDouble> Tranges = node.convertVector("temperature-ranges", "K", 2, 3);
+    const auto& data = node["data"].asVector<vector<CanteraDouble>>(Tranges.size()-1);
     for (const auto& poly : data) {
         if (poly.size() != 7) {
             throw CanteraError("setupNasaPoly", "Wrong number of coefficients "
@@ -108,8 +108,8 @@ void setupNasaPoly(NasaPoly2& thermo, const AnyMap& node)
 void setupShomatePoly(ShomatePoly2& thermo, const AnyMap& node)
 {
     setupSpeciesThermo(thermo, node);
-    vector<double> Tranges = node.convertVector("temperature-ranges", "K", 2, 3);
-    const auto& data = node["data"].asVector<vector<double>>(Tranges.size()-1);
+    vector<CanteraDouble> Tranges = node.convertVector("temperature-ranges", "K", 2, 3);
+    const auto& data = node["data"].asVector<vector<CanteraDouble>>(Tranges.size()-1);
     for (const auto& poly : data) {
         if (poly.size() != 7) {
             throw CanteraError("setupShomatePoly", "Wrong number of coefficients "
@@ -134,19 +134,19 @@ void setupConstCp(ConstCpPoly& thermo, const AnyMap& node)
     if (node.hasKey("T-max")) {
         thermo.setMaxTemp(node.convert("T-max", "K"));
     }
-    double T0 = node.convert("T0", "K", 298.15);
-    double h0 = node.convert("h0", "J/kmol", 0.0);
-    double s0 = node.convert("s0", "J/kmol/K", 0.0);
-    double cp0 = node.convert("cp0", "J/kmol/K", 0.0);
+    CanteraDouble T0 = node.convert("T0", "K", 298.15);
+    CanteraDouble h0 = node.convert("h0", "J/kmol", 0.0);
+    CanteraDouble s0 = node.convert("s0", "J/kmol/K", 0.0);
+    CanteraDouble cp0 = node.convert("cp0", "J/kmol/K", 0.0);
     thermo.setParameters(T0, h0, s0, cp0);
 }
 
 void setupNasa9Poly(Nasa9PolyMultiTempRegion& thermo, const AnyMap& node)
 {
     setupSpeciesThermo(thermo, node);
-    vector<double> Tranges = node.convertVector("temperature-ranges", "K", 2, 999);
-    const auto& data = node["data"].asVector<vector<double>>(Tranges.size()-1);
-    map<double, vector<double>> regions;
+    vector<CanteraDouble> Tranges = node.convertVector("temperature-ranges", "K", 2, 999);
+    const auto& data = node["data"].asVector<vector<CanteraDouble>>(Tranges.size()-1);
+    map<CanteraDouble, vector<CanteraDouble>> regions;
     for (size_t i = 0; i < data.size(); i++) {
         if (data[i].size() != 9) {
             throw CanteraError("setupNasa9Poly", "Wrong number of coefficients "
@@ -170,10 +170,10 @@ void setupMu0(Mu0Poly& thermo, const AnyMap& node)
         thermo.setMaxTemp(node.convert("T-max", "K"));
     }
     bool dimensionless = node.getBool("dimensionless", false);
-    double h0 = node.convert("h0", "J/kmol", 0.0);
-    map<double, double> T_mu;
+    CanteraDouble h0 = node.convert("h0", "J/kmol", 0.0);
+    map<CanteraDouble, CanteraDouble> T_mu;
     for (const auto& [T_str, mu] : node["data"]) {
-        double T = node.units().convertTo(fpValueCheck(T_str), "K");
+        CanteraDouble T = node.units().convertTo(fpValueCheck(T_str), "K");
         if (dimensionless) {
             T_mu[T] = mu.asDouble() * GasConstant * T;
         } else {

@@ -68,19 +68,19 @@ public:
     // Successful returns are indicated by a return value of 0.
     int calculateDistributionFunction();
 
-    void setLinearGrid(double& kTe_max, size_t& ncell);
+    void setLinearGrid(CanteraDouble& kTe_max, size_t& ncell);
 
     void setGridCache();
 
-    vector<double> getGridEdge() const {
+    vector<CanteraDouble> getGridEdge() const {
         return m_gridEdge;
     }
 
-    vector<double> getEEDFEdge() const {
+    vector<CanteraDouble> getEEDFEdge() const {
         return m_f0_edge;
     }
 
-    double getElectronMobility() const {
+    CanteraDouble getElectronMobility() const {
         return m_electronMobility;
     }
 
@@ -89,31 +89,31 @@ protected:
     //! Formerly options for the EEDF solver
 
     //! The first step size
-    double m_delta0 = 1e14;
+    CanteraDouble m_delta0 = 1e14;
 
     //! Maximum number of iterations
     size_t m_maxn = 200;
 
     //! The factor for step size change
-    double m_factorM = 4.0;
+    CanteraDouble m_factorM = 4.0;
 
     //! The number of points in the EEDF grid
     size_t m_points = 150;
 
     //! Error tolerance for convergence
-    double m_rtol = 1e-5;
+    CanteraDouble m_rtol = 1e-5;
 
     //! The growth model of EEDF
     std::string m_growth = "temporal";
 
     //! The threshold for species mole fractions
-    double m_moleFractionThreshold = 0.01;
+    CanteraDouble m_moleFractionThreshold = 0.01;
 
     //! The first guess for the EEDF
     std::string m_firstguess = "maxwell";
 
     //! The initial electron temperature [eV]
-    double m_init_kTe = 2.0;
+    CanteraDouble m_init_kTe = 2.0;
 
     //! Pointer to the PlasmaPhase object used to initialize this object.
     /*!
@@ -128,12 +128,12 @@ protected:
     void converge(Eigen::VectorXd& f0);
 
     //! An iteration of solving electron energy distribution function
-    Eigen::VectorXd iterate(const Eigen::VectorXd& f0, double delta);
+    Eigen::VectorXd iterate(const Eigen::VectorXd& f0, CanteraDouble delta);
 
     //! The integral in [a, b] of \f$x u(x) \exp[g (x_0 - x)]\f$
     //! assuming that u is linear with u(a) = u0 and u(b) = u1
-    double integralPQ(double a, double b, double u0, double u1,
-                       double g, double x0);
+    CanteraDouble integralPQ(CanteraDouble a, CanteraDouble b, CanteraDouble u0, CanteraDouble u1,
+                       CanteraDouble g, CanteraDouble x0);
 
     //! Vector g is used by matrix_P() and matrix_Q().
     /**
@@ -141,7 +141,7 @@ protected:
      * g_i = \frac{1}{\epsilon_{i+1} - \epsilon_{i-1}} \ln(\frac{F_{0, i+1}}{F_{0, i-1}})
      * \f]
      */
-    vector<double> vector_g(const Eigen::VectorXd& f0);
+    vector<CanteraDouble> vector_g(const Eigen::VectorXd& f0);
 
     //! The matrix of scattering-out.
     /**
@@ -150,7 +150,7 @@ protected:
      * \epsilon \sigma_k exp[(\epsilon_i - \epsilon)g_i] d \epsilon
      * \f]
      */
-    Eigen::SparseMatrix<double> matrix_P(const vector<double>& g, size_t k);
+    Eigen::SparseMatrix<CanteraDouble> matrix_P(const vector<CanteraDouble>& g, size_t k);
 
     //! The matrix of scattering-in
     /**
@@ -169,7 +169,7 @@ protected:
      * \epsilon_2 = \min(\max(\epsilon_{i+1/2}+u_k, \epsilon_{j-1/2}),\epsilon_{j+1/2})
      * \f]
      */
-    Eigen::SparseMatrix<double> matrix_Q(const vector<double>& g, size_t k);
+    Eigen::SparseMatrix<CanteraDouble> matrix_Q(const vector<CanteraDouble>& g, size_t k);
 
     //! Matrix A (Ax = b) of the equation of EEDF, which is discretized by the exponential scheme
     //! of Scharfetter and Gummel,
@@ -181,18 +181,18 @@ protected:
      * \f]
      * where \f$ z_{i+1/2} = \tilde{w}_{i+1/2} / \tilde{D}_{i+1/2} \f$ (Peclet number).
      */
-    Eigen::SparseMatrix<double> matrix_A(const Eigen::VectorXd& f0);
+    Eigen::SparseMatrix<CanteraDouble> matrix_A(const Eigen::VectorXd& f0);
 
     //! Reduced net production frequency. Equation (10) of ref. [1]
     //! divided by N.
     //! @param f0 EEDF
-    double netProductionFrequency(const Eigen::VectorXd& f0);
+    CanteraDouble netProductionFrequency(const Eigen::VectorXd& f0);
 
     //! Diffusivity
-    double electronDiffusivity(const Eigen::VectorXd& f0);
+    CanteraDouble electronDiffusivity(const Eigen::VectorXd& f0);
 
     //! Mobility
-    double electronMobility(const Eigen::VectorXd& f0);
+    CanteraDouble electronMobility(const Eigen::VectorXd& f0);
 
     //! Initialize species indices associated with cross-section data
     void initSpeciesIndexCrossSections();
@@ -213,16 +213,16 @@ protected:
     //!
     //! @param f     Vector representing the function values (EEDF)
     //! @param grid  Vector representing the energy grid corresponding to f
-    double norm(const Eigen::VectorXd& f, const Eigen::VectorXd& grid);
+    CanteraDouble norm(const Eigen::VectorXd& f, const Eigen::VectorXd& grid);
 
     //! Electron mobility [m²/V·s]
-    double m_electronMobility;
+    CanteraDouble m_electronMobility;
 
     //! Grid of electron energy (cell center) [eV]
     Eigen::VectorXd m_gridCenter;
 
     //! Grid of electron energy (cell boundary i-1/2) [eV]
-    vector<double> m_gridEdge;
+    vector<CanteraDouble> m_gridEdge;
 
     //! Location of cell j for grid cache
     vector<vector<size_t>> m_j;
@@ -231,26 +231,26 @@ protected:
     vector<vector<size_t>> m_i;
 
     //! Cross section at the boundaries of the overlap of cell i and j
-    vector<vector<vector<double>>> m_sigma;
+    vector<vector<vector<CanteraDouble>>> m_sigma;
 
     //! The energy boundaries of the overlap of cell i and j
-    vector<vector<vector<double>>> m_eps;
+    vector<vector<vector<CanteraDouble>>> m_eps;
 
     //! normalized electron energy distribution function
     Eigen::VectorXd m_f0;
 
     //! EEDF at grid edges (cell boundaries)
-    vector<double> m_f0_edge;
+    vector<CanteraDouble> m_f0_edge;
 
     //! Total electron cross section on the cell center of energy grid
-    vector<double> m_totalCrossSectionCenter;
+    vector<CanteraDouble> m_totalCrossSectionCenter;
 
     //! Total electron cross section on the cell boundary (i-1/2) of
     //! energy grid
-    vector<double> m_totalCrossSectionEdge;
+    vector<CanteraDouble> m_totalCrossSectionEdge;
 
     //! vector of total elastic cross section weighted with mass ratio
-    vector<double> m_sigmaElastic;
+    vector<CanteraDouble> m_sigmaElastic;
 
     //! list of target species indices in global Cantera numbering (1 index per cs)
     vector<size_t> m_kTargets;
@@ -265,16 +265,16 @@ protected:
     vector<size_t> m_k_lg_Targets;
 
     //! Mole fraction of targets
-    vector<double> m_X_targets;
+    vector<CanteraDouble> m_X_targets;
 
     //! Previous mole fraction of targets used to compute eedf
-    vector<double> m_X_targets_prev;
+    vector<CanteraDouble> m_X_targets_prev;
 
     //! in factor. This is used for calculating the Q matrix of
     //! scattering-in processes.
     vector<int> m_inFactor;
 
-    double m_gamma;
+    CanteraDouble m_gamma;
 
     //! flag of having an EEDF
     bool m_has_EEDF;

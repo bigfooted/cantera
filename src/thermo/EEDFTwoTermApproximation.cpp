@@ -17,7 +17,7 @@
 namespace Cantera
 {
 
-typedef Eigen::SparseMatrix<double> SparseMat;
+typedef Eigen::SparseMatrix<CanteraDouble> SparseMat;
 
 EEDFTwoTermApproximation::EEDFTwoTermApproximation(PlasmaPhase* s)
 {
@@ -28,7 +28,7 @@ EEDFTwoTermApproximation::EEDFTwoTermApproximation(PlasmaPhase* s)
     m_gamma = pow(2.0 * ElectronCharge / ElectronMass, 0.5);
 }
 
-void EEDFTwoTermApproximation::setLinearGrid(double& kTe_max, size_t& ncell)
+void EEDFTwoTermApproximation::setLinearGrid(CanteraDouble& kTe_max, size_t& ncell)
 {
     m_points = ncell;
     m_gridCenter.resize(m_points);
@@ -68,8 +68,8 @@ int EEDFTwoTermApproximation::calculateDistributionFunction()
     converge(m_f0);
 
     // write the EEDF at grid edges
-    vector<double> f(m_f0.data(), m_f0.data() + m_f0.rows() * m_f0.cols());
-    vector<double> x(m_gridCenter.data(), m_gridCenter.data() + m_gridCenter.rows() * m_gridCenter.cols());
+    vector<CanteraDouble> f(m_f0.data(), m_f0.data() + m_f0.rows() * m_f0.cols());
+    vector<CanteraDouble> x(m_gridCenter.data(), m_gridCenter.data() + m_gridCenter.rows() * m_gridCenter.cols());
     for (size_t i = 0; i < m_points + 1; i++) {
         m_f0_edge[i] = linearInterp(m_gridEdge[i], x, f);
     }
@@ -83,9 +83,9 @@ int EEDFTwoTermApproximation::calculateDistributionFunction()
 
 void EEDFTwoTermApproximation::converge(Eigen::VectorXd& f0)
 {
-    double err0 = 0.0;
-    double err1 = 0.0;
-    double delta = m_delta0;
+    CanteraDouble err0 = 0.0;
+    CanteraDouble err1 = 0.0;
+    CanteraDouble delta = m_delta0;
 
     if (m_maxn == 0) {
         throw CanteraError("EEDFTwoTermApproximation::converge",
@@ -120,14 +120,14 @@ void EEDFTwoTermApproximation::converge(Eigen::VectorXd& f0)
     }
 }
 
-Eigen::VectorXd EEDFTwoTermApproximation::iterate(const Eigen::VectorXd& f0, double delta)
+Eigen::VectorXd EEDFTwoTermApproximation::iterate(const Eigen::VectorXd& f0, CanteraDouble delta)
 {
     // CQM multiple call to vector_* and matrix_*
     // probably extremely ineficient
     // must be refactored!!
 
     SparseMat PQ(m_points, m_points);
-    vector<double> g = vector_g(f0);
+    vector<CanteraDouble> g = vector_g(f0);
 
     for (size_t k : m_phase->kInelastic()) {
         SparseMat Q_k = matrix_Q(g, k);
@@ -171,18 +171,18 @@ Eigen::VectorXd EEDFTwoTermApproximation::iterate(const Eigen::VectorXd& f0, dou
     return f1;
 }
 
-double EEDFTwoTermApproximation::integralPQ(double a, double b, double u0, double u1,
-                                            double g, double x0)
+CanteraDouble EEDFTwoTermApproximation::integralPQ(CanteraDouble a, CanteraDouble b, CanteraDouble u0, CanteraDouble u1,
+                                            CanteraDouble g, CanteraDouble x0)
 {
-    double A1;
-    double A2;
+    CanteraDouble A1;
+    CanteraDouble A2;
     if (g != 0.0) {
-        double expm1a = expm1(g * (-a + x0));
-        double expm1b = expm1(g * (-b + x0));
-        double ag = a * g;
-        double ag1 = ag + 1;
-        double bg = b * g;
-        double bg1 = bg + 1;
+        CanteraDouble expm1a = expm1(g * (-a + x0));
+        CanteraDouble expm1b = expm1(g * (-b + x0));
+        CanteraDouble ag = a * g;
+        CanteraDouble ag1 = ag + 1;
+        CanteraDouble bg = b * g;
+        CanteraDouble bg1 = bg + 1;
         A1 = (expm1a * ag1 + ag - expm1b * bg1 - bg) / (g*g);
         A2 = (expm1a * (2 * ag1 + ag * ag) + ag * (ag + 2) -
               expm1b * (2 * bg1 + bg * bg) - bg * (bg + 2)) / (g*g*g);
@@ -192,48 +192,48 @@ double EEDFTwoTermApproximation::integralPQ(double a, double b, double u0, doubl
     }
 
     // The interpolation formula of u(x) = c0 + c1 * x
-    double c0 = (a * u1 - b * u0) / (a - b);
-    double c1 = (u0 - u1) / (a - b);
+    CanteraDouble c0 = (a * u1 - b * u0) / (a - b);
+    CanteraDouble c1 = (u0 - u1) / (a - b);
 
     return c0 * A1 + c1 * A2;
 }
 
-vector<double> EEDFTwoTermApproximation::vector_g(const Eigen::VectorXd& f0)
+vector<CanteraDouble> EEDFTwoTermApproximation::vector_g(const Eigen::VectorXd& f0)
 {
-    vector<double> g(m_points, 0.0);
-    const double f_min = 1e-300;  // Smallest safe floating-point value
+    vector<CanteraDouble> g(m_points, 0.0);
+    const CanteraDouble f_min = 1e-300;  // Smallest safe floating-point value
 
     // Handle first point (i = 0)
-    double f1 = std::max(f0(1), f_min);
-    double f0_ = std::max(f0(0), f_min);
+    CanteraDouble f1 = std::max(f0(1), f_min);
+    CanteraDouble f0_ = std::max(f0(0), f_min);
     g[0] = log(f1 / f0_) / (m_gridCenter[1] - m_gridCenter[0]);
 
     // Handle last point (i = N)
     size_t N = m_points - 1;
-    double fN = std::max(f0(N), f_min);
-    double fNm1 = std::max(f0(N - 1), f_min);
+    CanteraDouble fN = std::max(f0(N), f_min);
+    CanteraDouble fNm1 = std::max(f0(N - 1), f_min);
     g[N] = log(fN / fNm1) / (m_gridCenter[N] - m_gridCenter[N - 1]);
 
     // Handle interior points
     for (size_t i = 1; i < N; ++i) {
-        double f_up   = std::max(f0(i + 1), f_min);
-        double f_down = std::max(f0(i - 1), f_min);
+        CanteraDouble f_up   = std::max(f0(i + 1), f_min);
+        CanteraDouble f_down = std::max(f0(i - 1), f_min);
         g[i] = log(f_up / f_down) / (m_gridCenter[i + 1] - m_gridCenter[i - 1]);
     }
     return g;
 }
 
-SparseMat EEDFTwoTermApproximation::matrix_P(const vector<double>& g, size_t k)
+SparseMat EEDFTwoTermApproximation::matrix_P(const vector<CanteraDouble>& g, size_t k)
 {
     SparseTriplets tripletList;
     for (size_t n = 0; n < m_eps[k].size(); n++) {
-        double eps_a = m_eps[k][n][0];
-        double eps_b = m_eps[k][n][1];
-        double sigma_a = m_sigma[k][n][0];
-        double sigma_b = m_sigma[k][n][1];
+        CanteraDouble eps_a = m_eps[k][n][0];
+        CanteraDouble eps_b = m_eps[k][n][1];
+        CanteraDouble sigma_a = m_sigma[k][n][0];
+        CanteraDouble sigma_b = m_sigma[k][n][1];
         auto j = static_cast<SparseMat::StorageIndex>(m_j[k][n]);
-        double r = integralPQ(eps_a, eps_b, sigma_a, sigma_b, g[j], m_gridCenter[j]);
-        double p = m_gamma * r;
+        CanteraDouble r = integralPQ(eps_a, eps_b, sigma_a, sigma_b, g[j], m_gridCenter[j]);
+        CanteraDouble p = m_gamma * r;
 
         tripletList.emplace_back(j, j, p);
     }
@@ -242,18 +242,18 @@ SparseMat EEDFTwoTermApproximation::matrix_P(const vector<double>& g, size_t k)
     return P;
 }
 
-SparseMat EEDFTwoTermApproximation::matrix_Q(const vector<double>& g, size_t k)
+SparseMat EEDFTwoTermApproximation::matrix_Q(const vector<CanteraDouble>& g, size_t k)
 {
     SparseTriplets tripletList;
     for (size_t n = 0; n < m_eps[k].size(); n++) {
-        double eps_a = m_eps[k][n][0];
-        double eps_b = m_eps[k][n][1];
-        double sigma_a = m_sigma[k][n][0];
-        double sigma_b = m_sigma[k][n][1];
+        CanteraDouble eps_a = m_eps[k][n][0];
+        CanteraDouble eps_b = m_eps[k][n][1];
+        CanteraDouble sigma_a = m_sigma[k][n][0];
+        CanteraDouble sigma_b = m_sigma[k][n][1];
         auto i = static_cast<SparseMat::StorageIndex>(m_i[k][n]);
         auto j = static_cast<SparseMat::StorageIndex>(m_j[k][n]);
-        double r = integralPQ(eps_a, eps_b, sigma_a, sigma_b, g[j], m_gridCenter[j]);
-        double q = m_inFactor[k] * m_gamma * r;
+        CanteraDouble r = integralPQ(eps_a, eps_b, sigma_a, sigma_b, g[j], m_gridCenter[j]);
+        CanteraDouble q = m_inFactor[k] * m_gamma * r;
 
         tripletList.emplace_back(i, j, q);
     }
@@ -264,46 +264,46 @@ SparseMat EEDFTwoTermApproximation::matrix_Q(const vector<double>& g, size_t k)
 
 SparseMat EEDFTwoTermApproximation::matrix_A(const Eigen::VectorXd& f0)
 {
-    vector<double> a0(m_points + 1);
-    vector<double> a1(m_points + 1);
+    vector<CanteraDouble> a0(m_points + 1);
+    vector<CanteraDouble> a1(m_points + 1);
     size_t N = m_points - 1;
     // Scharfetter-Gummel scheme
-    double nu = netProductionFrequency(f0);
+    CanteraDouble nu = netProductionFrequency(f0);
     a0[0] = NAN;
     a1[0] = NAN;
     a0[N+1] = NAN;
     a1[N+1] = NAN;
 
-    double nDensity = m_phase->molarDensity() * Avogadro;
-    double alpha;
-    double E = m_phase->electricField();
+    CanteraDouble nDensity = m_phase->molarDensity() * Avogadro;
+    CanteraDouble alpha;
+    CanteraDouble E = m_phase->electricField();
     if (m_growth == "spatial") {
-        double mu = electronMobility(f0);
-        double D = electronDiffusivity(f0);
+        CanteraDouble mu = electronMobility(f0);
+        CanteraDouble D = electronDiffusivity(f0);
         alpha = (mu * E - sqrt(pow(mu * E, 2) - 4 * D * nu * nDensity)) / 2.0 / D / nDensity;
     } else {
         alpha = 0.0;
     }
 
-    double sigma_tilde;
-    double omega = 2 * Pi * m_phase->electricFieldFrequency();
+    CanteraDouble sigma_tilde;
+    CanteraDouble omega = 2 * Pi * m_phase->electricFieldFrequency();
     for (size_t j = 1; j < m_points; j++) {
         if (m_growth == "temporal") {
             sigma_tilde = m_totalCrossSectionEdge[j] + nu / pow(m_gridEdge[j], 0.5) / m_gamma;
         } else {
             sigma_tilde = m_totalCrossSectionEdge[j];
         }
-        double q = omega / (nDensity * m_gamma * pow(m_gridEdge[j], 0.5));
-        double W = -m_gamma * m_gridEdge[j] * m_gridEdge[j] * m_sigmaElastic[j];
-        double F = sigma_tilde * sigma_tilde / (sigma_tilde * sigma_tilde + q * q);
-        double DA = m_gamma / 3.0 * pow(E / nDensity, 2.0) * m_gridEdge[j];
-        double DB = m_gamma * m_phase->temperature() * Boltzmann / ElectronCharge * m_gridEdge[j] * m_gridEdge[j] * m_sigmaElastic[j];
-        double D = DA / sigma_tilde * F + DB;
+        CanteraDouble q = omega / (nDensity * m_gamma * pow(m_gridEdge[j], 0.5));
+        CanteraDouble W = -m_gamma * m_gridEdge[j] * m_gridEdge[j] * m_sigmaElastic[j];
+        CanteraDouble F = sigma_tilde * sigma_tilde / (sigma_tilde * sigma_tilde + q * q);
+        CanteraDouble DA = m_gamma / 3.0 * pow(E / nDensity, 2.0) * m_gridEdge[j];
+        CanteraDouble DB = m_gamma * m_phase->temperature() * Boltzmann / ElectronCharge * m_gridEdge[j] * m_gridEdge[j] * m_sigmaElastic[j];
+        CanteraDouble D = DA / sigma_tilde * F + DB;
         if (m_growth == "spatial") {
             W -= m_gamma / 3.0 * 2 * alpha * E / nDensity * m_gridEdge[j] / sigma_tilde;
         }
 
-        double z = W * (m_gridCenter[j] - m_gridCenter[j-1]) / D;
+        CanteraDouble z = W * (m_gridCenter[j] - m_gridCenter[j-1]) / D;
         if (!std::isfinite(z)) {
             throw CanteraError("matrix_A", "Non-finite Peclet number encountered");
         }
@@ -349,9 +349,9 @@ SparseMat EEDFTwoTermApproximation::matrix_A(const Eigen::VectorXd& f0)
             G.insert(i, i) = 2.0 / 3.0 * (pow(m_gridEdge[i+1], 1.5) - pow(m_gridEdge[i], 1.5)) * nu;
         }
     } else if (m_growth == "spatial") {
-        double nDensity = m_phase->molarDensity() * Avogadro;
+        CanteraDouble nDensity = m_phase->molarDensity() * Avogadro;
         for (size_t i = 0; i < m_points; i++) {
-            double sigma_c = 0.5 * (m_totalCrossSectionEdge[i] + m_totalCrossSectionEdge[i + 1]);
+            CanteraDouble sigma_c = 0.5 * (m_totalCrossSectionEdge[i] + m_totalCrossSectionEdge[i + 1]);
             G.insert(i, i) = - alpha * m_gamma / 3 * (alpha * (pow(m_gridEdge[i + 1], 2) - pow(m_gridEdge[i], 2)) / sigma_c / 2
                  - E / nDensity * (m_gridEdge[i + 1] / m_totalCrossSectionEdge[i + 1] - m_gridEdge[i] / m_totalCrossSectionEdge[i]));
         }
@@ -359,10 +359,10 @@ SparseMat EEDFTwoTermApproximation::matrix_A(const Eigen::VectorXd& f0)
     return A + G;
 }
 
-double EEDFTwoTermApproximation::netProductionFrequency(const Eigen::VectorXd& f0)
+CanteraDouble EEDFTwoTermApproximation::netProductionFrequency(const Eigen::VectorXd& f0)
 {
-    double nu = 0.0;
-    vector<double> g = vector_g(f0);
+    CanteraDouble nu = 0.0;
+    vector<CanteraDouble> g = vector_g(f0);
 
     for (size_t k = 0; k < m_phase->nCollisions(); k++) {
         if (m_phase->collisionRate(k)->kind() == "ionization" ||
@@ -378,35 +378,35 @@ double EEDFTwoTermApproximation::netProductionFrequency(const Eigen::VectorXd& f
     return nu;
 }
 
-double EEDFTwoTermApproximation::electronDiffusivity(const Eigen::VectorXd& f0)
+CanteraDouble EEDFTwoTermApproximation::electronDiffusivity(const Eigen::VectorXd& f0)
 {
-    vector<double> y(m_points, 0.0);
-    double nu = netProductionFrequency(f0);
+    vector<CanteraDouble> y(m_points, 0.0);
+    CanteraDouble nu = netProductionFrequency(f0);
     for (size_t i = 0; i < m_points; i++) {
         if (m_gridCenter[i] != 0.0) {
             y[i] = m_gridCenter[i] * f0(i) /
                    (m_totalCrossSectionCenter[i] + nu / m_gamma / pow(m_gridCenter[i], 0.5));
         }
     }
-    double nDensity = m_phase->molarDensity() * Avogadro;
+    CanteraDouble nDensity = m_phase->molarDensity() * Avogadro;
     auto f = Eigen::Map<const Eigen::ArrayXd>(y.data(), y.size());
     auto x = Eigen::Map<const Eigen::ArrayXd>(m_gridCenter.data(), m_gridCenter.size());
     return 1./3. * m_gamma * simpson(f, x) / nDensity;
 }
 
-double EEDFTwoTermApproximation::electronMobility(const Eigen::VectorXd& f0)
+CanteraDouble EEDFTwoTermApproximation::electronMobility(const Eigen::VectorXd& f0)
 {
-    double nu = netProductionFrequency(f0);
-    vector<double> y(m_points + 1, 0.0);
+    CanteraDouble nu = netProductionFrequency(f0);
+    vector<CanteraDouble> y(m_points + 1, 0.0);
     for (size_t i = 1; i < m_points; i++) {
         // calculate df0 at i-1/2
-        double df0 = (f0(i) - f0(i-1)) / (m_gridCenter[i] - m_gridCenter[i-1]);
+        CanteraDouble df0 = (f0(i) - f0(i-1)) / (m_gridCenter[i] - m_gridCenter[i-1]);
         if (m_gridEdge[i] != 0.0) {
             y[i] = m_gridEdge[i] * df0 /
                    (m_totalCrossSectionEdge[i] + nu / m_gamma / pow(m_gridEdge[i], 0.5));
         }
     }
-    double nDensity = m_phase->molarDensity() * Avogadro;
+    CanteraDouble nDensity = m_phase->molarDensity() * Avogadro;
     auto f = ConstMappedVector(y.data(), y.size());
     auto x = ConstMappedVector(m_gridEdge.data(), m_gridEdge.size());
     return -1./3. * m_gamma * simpson(f, x) / nDensity;
@@ -468,7 +468,7 @@ void EEDFTwoTermApproximation::updateCrossSections()
 // Update the species mole fractions used for EEDF computation
 void EEDFTwoTermApproximation::updateMoleFractions()
 {
-    double tmp_sum = 0.0;
+    CanteraDouble tmp_sum = 0.0;
     for (size_t k = 0; k < m_X_targets.size(); k++) {
         m_X_targets[k] = m_phase->moleFraction(m_k_lg_Targets[k]);
         tmp_sum = tmp_sum + m_phase->moleFraction(m_k_lg_Targets[k]);
@@ -508,7 +508,7 @@ void EEDFTwoTermApproximation::calculateTotalElasticCrossSection()
         auto& y = m_phase->collisionRate(k)->crossSections();
         // Note:
         // moleFraction(m_kTargets[k]) <=> m_X_targets[m_klocTargets[k]]
-        double mass_ratio = ElectronMass / (m_phase->molecularWeight(m_kTargets[k]) / Avogadro);
+        CanteraDouble mass_ratio = ElectronMass / (m_phase->molecularWeight(m_kTargets[k]) / Avogadro);
         for (size_t i = 0; i < m_points; i++) {
             m_sigmaElastic[i] += 2.0 * mass_ratio * m_X_targets[m_klocTargets[k]] *
                                  linearInterp(m_gridEdge[i], x, y);
@@ -530,14 +530,14 @@ void EEDFTwoTermApproximation::setGridCache()
         auto& collision = m_phase->collisionRate(k);
         auto& x = collision->energyLevels();
         auto& y = collision->crossSections();
-        vector<double> eps1(m_points + 1);
+        vector<CanteraDouble> eps1(m_points + 1);
         int shiftFactor = (collision->kind() == "ionization") ? 2 : 1;
 
         for (size_t i = 0; i < m_points + 1; i++) {
             eps1[i] = clip(shiftFactor * m_gridEdge[i] + collision->threshold(),
                            m_gridEdge[0] + 1e-9, m_gridEdge[m_points] - 1e-9);
         }
-        vector<double> nodes = eps1;
+        vector<CanteraDouble> nodes = eps1;
         for (size_t i = 0; i < m_points + 1; i++) {
             if (m_gridEdge[i] >= eps1[0] && m_gridEdge[i] <= eps1[m_points]) {
                 nodes.push_back(m_gridEdge[i]);
@@ -552,7 +552,7 @@ void EEDFTwoTermApproximation::setGridCache()
         std::sort(nodes.begin(), nodes.end());
         auto last = std::unique(nodes.begin(), nodes.end());
         nodes.resize(std::distance(nodes.begin(), last));
-        vector<double> sigma0(nodes.size());
+        vector<CanteraDouble> sigma0(nodes.size());
         for (size_t i = 0; i < nodes.size(); i++) {
             sigma0[i] = linearInterp(nodes[i], x, y);
         }
@@ -587,7 +587,7 @@ void EEDFTwoTermApproximation::setGridCache()
     }
 }
 
-double EEDFTwoTermApproximation::norm(const Eigen::VectorXd& f, const Eigen::VectorXd& grid)
+CanteraDouble EEDFTwoTermApproximation::norm(const Eigen::VectorXd& f, const Eigen::VectorXd& grid)
 {
     string m_quadratureMethod = "simpson";
     Eigen::VectorXd p(f.size());

@@ -32,13 +32,13 @@ struct InterfaceData : public BlowersMaselData
 
     bool update(const ThermoPhase& bulk, const Kinetics& kin) override;
 
-    void update(double T) override;
+    void update(CanteraDouble T) override;
 
-    void update(double T, const vector<double>& values) override;
+    void update(CanteraDouble T, const vector<CanteraDouble>& values) override;
 
     using BlowersMaselData::update;
 
-    virtual void perturbTemperature(double deltaT);
+    virtual void perturbTemperature(CanteraDouble deltaT);
 
     void resize(size_t nSpecies, size_t nReactions, size_t nPhases) override {
         coverages.resize(nSpecies, 0.);
@@ -50,13 +50,13 @@ struct InterfaceData : public BlowersMaselData
         ready = true;
     }
 
-    double sqrtT = NAN; //!< square root of temperature
+    CanteraDouble sqrtT = NAN; //!< square root of temperature
 
-    vector<double> coverages; //!< surface coverages
-    vector<double> logCoverages; //!< logarithm of surface coverages
-    vector<double> electricPotentials; //!< electric potentials of phases
-    vector<double> standardChemPotentials; //!< standard state chemical potentials
-    vector<double> standardConcentrations; //!< standard state concentrations
+    vector<CanteraDouble> coverages; //!< surface coverages
+    vector<CanteraDouble> logCoverages; //!< logarithm of surface coverages
+    vector<CanteraDouble> electricPotentials; //!< electric potentials of phases
+    vector<CanteraDouble> standardChemPotentials; //!< standard state chemical potentials
+    vector<CanteraDouble> standardConcentrations; //!< standard state concentrations
 };
 
 
@@ -117,8 +117,8 @@ public:
     //! Add a coverage dependency for species *sp*, with exponential dependence
     //! *a*, power-law exponent *m*, and activation energy dependence *e*,
     //! where *e* is in Kelvin, that is, energy divided by the molar gas constant.
-    virtual void addCoverageDependence(const string& sp, double a, double m,
-                                       const vector<double>& e);
+    virtual void addCoverageDependence(const string& sp, CanteraDouble a, CanteraDouble m,
+                                       const vector<CanteraDouble>& e);
 
     //! Boolean indicating whether rate uses exchange current density formulation
     bool exchangeCurrentDensityFormulation() {
@@ -159,10 +159,10 @@ public:
      *  @warning  The updated calculation of voltage corrections is an experimental
      *      part of the %Cantera API and may be changed or removed without notice.
      */
-    double voltageCorrection() const {
+    CanteraDouble voltageCorrection() const {
         // Calculate reaction rate correction. Only modify those with a non-zero
         // activation energy.
-        double correction = 1.;
+        CanteraDouble correction = 1.;
         if (m_deltaPotential_RT != 0.) {
             // Comments preserved from previous implementation:
             // Below we decrease the activation energy below zero.
@@ -177,7 +177,7 @@ public:
             // Comment preserved from previous implementation:
             // We need to have the straight chemical reaction rate constant to
             // come out of this calculation.
-            double tmp = exp(-m_beta * m_deltaGibbs0_RT);
+            CanteraDouble tmp = exp(-m_beta * m_deltaGibbs0_RT);
             tmp /= m_prodStandardConcentrations * Faraday;
             correction *= tmp;
         }
@@ -199,7 +199,7 @@ public:
     }
 
     //! Return the charge transfer beta parameter
-    double beta() const {
+    CanteraDouble beta() const {
         if (m_chargeTransfer) {
             return m_beta;
         }
@@ -211,7 +211,7 @@ public:
      *  @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    double siteDensity() const {
+    CanteraDouble siteDensity() const {
         return m_siteDensity;
     }
 
@@ -224,40 +224,40 @@ public:
      *  @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    void setSiteDensity(double siteDensity) {
+    void setSiteDensity(CanteraDouble siteDensity) {
         m_siteDensity = siteDensity;
     }
 
 protected:
-    double m_siteDensity; //!< Site density [kmol/m^2]
-    double m_acov; //!< Coverage contribution to pre-exponential factor
-    double m_ecov; //!< Coverage contribution to activation energy
-    double m_mcov; //!< Coverage term in reaction rate
+    CanteraDouble m_siteDensity; //!< Site density [kmol/m^2]
+    CanteraDouble m_acov; //!< Coverage contribution to pre-exponential factor
+    CanteraDouble m_ecov; //!< Coverage contribution to activation energy
+    CanteraDouble m_mcov; //!< Coverage term in reaction rate
     bool m_chargeTransfer; //!< Boolean indicating use of electrochemistry
     bool m_exchangeCurrentDensityFormulation; //! Electrochemistry only
-    double m_beta; //!< Forward value of apparent electrochemical transfer coefficient
-    double m_deltaPotential_RT; //!< Normalized electric potential energy change
-    double m_deltaGibbs0_RT; //!< Normalized standard state Gibbs free energy change
-    double m_prodStandardConcentrations; //!< Products of standard concentrations
+    CanteraDouble m_beta; //!< Forward value of apparent electrochemical transfer coefficient
+    CanteraDouble m_deltaPotential_RT; //!< Normalized electric potential energy change
+    CanteraDouble m_deltaGibbs0_RT; //!< Normalized standard state Gibbs free energy change
+    CanteraDouble m_prodStandardConcentrations; //!< Products of standard concentrations
 
     //! Map from coverage dependencies stored in this object to the index of the
     //! coverage species in the Kinetics object
     map<size_t, size_t> m_indices;
     vector<string> m_cov; //!< Vector holding names of coverage species
-    vector<double> m_ac; //!< Vector holding coverage-specific exponential dependence
+    vector<CanteraDouble> m_ac; //!< Vector holding coverage-specific exponential dependence
     //! Vector holding coverage-specific activation energy dependence as a
     //! 5-membered array of polynomial coefficients starting from 0th-order to
     //! 4th-order coefficients
-    vector<vector<double>> m_ec;
+    vector<vector<CanteraDouble>> m_ec;
     vector<bool> m_lindep; //!< Vector holding boolean for linear dependence
-    vector<double> m_mc; //!< Vector holding coverage-specific power-law exponents
+    vector<CanteraDouble> m_mc; //!< Vector holding coverage-specific power-law exponents
 
 private:
     //! Pairs of species index and multipliers to calculate enthalpy change
-    vector<pair<size_t, double>> m_stoichCoeffs;
+    vector<pair<size_t, CanteraDouble>> m_stoichCoeffs;
 
     //! Pairs of phase index and net electric charges (same order as m_stoichCoeffs)
-    vector<pair<size_t, double>> m_netCharges;
+    vector<pair<size_t, CanteraDouble>> m_netCharges;
 };
 
 
@@ -309,7 +309,7 @@ public:
     }
 
     //! Get exponent applied to site density (sticking order)
-    double stickingOrder() {
+    CanteraDouble stickingOrder() {
         return m_surfaceOrder;
     }
 
@@ -321,12 +321,12 @@ public:
      *  @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    void setStickingOrder(double order) {
+    void setStickingOrder(CanteraDouble order) {
         m_surfaceOrder = order;
     }
 
     //! Get the molecular weight of the sticking species
-    double stickingWeight() {
+    CanteraDouble stickingWeight() {
         return GasConstant / (2 * Pi * m_multiplier * m_multiplier);
     }
 
@@ -338,7 +338,7 @@ public:
      *  @warning  This method is an experimental part of the %Cantera API and
      *      may be changed or removed without notice.
      */
-    void setStickingWeight(double weight) {
+    void setStickingWeight(CanteraDouble weight) {
         m_multiplier = sqrt(GasConstant / (2 * Pi * weight));
     }
 
@@ -354,9 +354,9 @@ protected:
     bool m_explicitMotzWise; //!< Correction cannot be overriden by default
     string m_stickingSpecies; //!< string identifying sticking species
     bool m_explicitSpecies; //!< Boolean flag
-    double m_surfaceOrder; //!< exponent applied to site density term
-    double m_multiplier; //!< multiplicative factor in rate expression
-    double m_factor; //!< cached factor
+    CanteraDouble m_surfaceOrder; //!< exponent applied to site density term
+    CanteraDouble m_multiplier; //!< multiplicative factor in rate expression
+    CanteraDouble m_factor; //!< cached factor
 };
 
 
@@ -415,8 +415,8 @@ public:
 
     //! Evaluate reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double evalFromStruct(const DataType& shared_data) const {
-        double out = RateType::evalRate(shared_data.logT, shared_data.recipT) *
+    CanteraDouble evalFromStruct(const DataType& shared_data) const {
+        CanteraDouble out = RateType::evalRate(shared_data.logT, shared_data.recipT) *
             std::exp(std::log(10.0) * m_acov - m_ecov * shared_data.recipT + m_mcov);
         if (m_chargeTransfer) {
             out *= voltageCorrection();
@@ -427,21 +427,21 @@ public:
     //! Evaluate derivative of reaction rate with respect to temperature
     //! divided by reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double ddTScaledFromStruct(const DataType& shared_data) const {
+    CanteraDouble ddTScaledFromStruct(const DataType& shared_data) const {
         throw NotImplementedError("InterfaceRate<>::ddTScaledFromStruct");
     }
 
-    double preExponentialFactor() const override {
+    CanteraDouble preExponentialFactor() const override {
         return RateType::preExponentialFactor() *
             std::exp(std::log(10.0) * m_acov + m_mcov);
     }
 
-    double activationEnergy() const override {
+    CanteraDouble activationEnergy() const override {
         return RateType::activationEnergy() + m_ecov * GasConstant;
     }
 
-    void addCoverageDependence(const string& sp, double a, double m,
-                               const vector<double>& e) override
+    void addCoverageDependence(const string& sp, CanteraDouble a, CanteraDouble m,
+                               const vector<CanteraDouble>& e) override
     {
         InterfaceRateBase::addCoverageDependence(sp, a, m, e);
         RateType::setCompositionDependence(true);
@@ -527,9 +527,9 @@ public:
     void validate(const string &equation, const Kinetics& kin) override {
         RateType::validate(equation, kin);
         fmt::memory_buffer err_reactions;
-        double T[] = {200.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0};
+        CanteraDouble T[] = {200.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0};
         for (size_t i=0; i < 6; i++) {
-            double k = RateType::evalRate(log(T[i]), 1 / T[i]);
+            CanteraDouble k = RateType::evalRate(log(T[i]), 1 / T[i]);
             if (k > 1) {
                 fmt_append(err_reactions, "at T = {:.1f}\n", T[i]);
             }
@@ -553,8 +553,8 @@ public:
 
     //! Evaluate reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double evalFromStruct(const DataType& shared_data) const {
-        double out = RateType::evalRate(shared_data.logT, shared_data.recipT) *
+    CanteraDouble evalFromStruct(const DataType& shared_data) const {
+        CanteraDouble out = RateType::evalRate(shared_data.logT, shared_data.recipT) *
             std::exp(std::log(10.0) * m_acov - m_ecov * shared_data.recipT + m_mcov);
         if (m_chargeTransfer) {
             // @todo  the physical interpretation of a 'sticking' charge transfer
@@ -570,16 +570,16 @@ public:
     //! Evaluate derivative of reaction rate with respect to temperature
     //! divided by reaction rate
     //! @param shared_data  data shared by all reactions of a given type
-    double ddTScaledFromStruct(const DataType& shared_data) const {
+    CanteraDouble ddTScaledFromStruct(const DataType& shared_data) const {
         throw NotImplementedError("StickingRate<>::ddTScaledFromStruct");
     }
 
-    double preExponentialFactor() const override {
+    CanteraDouble preExponentialFactor() const override {
         return RateType::preExponentialFactor() *
             std::exp(std::log(10.0) * m_acov + m_mcov);
     }
 
-    double activationEnergy() const override {
+    CanteraDouble activationEnergy() const override {
         return RateType::activationEnergy() + m_ecov * GasConstant;
     }
 };

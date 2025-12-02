@@ -35,7 +35,7 @@ struct SensitivityParameter
 {
     size_t local; //!< local parameter index
     size_t global; //!< global parameter index
-    double value; //!< nominal value of the parameter
+    CanteraDouble value; //!< nominal value of the parameter
     SensParameterType type; //!< type of sensitivity parameter
 };
 
@@ -100,21 +100,21 @@ public:
     //! @{
 
     //! Set the initial reactor volume.
-    virtual void setInitialVolume(double vol) {
+    virtual void setInitialVolume(CanteraDouble vol) {
         throw NotImplementedError("ReactorBase::setInitialVolume",
             "Volume is undefined for reactors of type '{}'.", type());
     }
 
     //! Returns an area associated with a reactor [m²].
     //! Examples: surface area of ReactorSurface or cross section area of FlowReactor.
-    virtual double area() const {
+    virtual CanteraDouble area() const {
         throw NotImplementedError("ReactorBase::area",
             "Area is undefined for reactors of type '{}'.", type());
     }
 
     //! Set an area associated with a reactor [m²].
     //! Examples: surface area of ReactorSurface or cross section area of FlowReactor.
-    virtual void setArea(double a) {
+    virtual void setArea(CanteraDouble a) {
         throw NotImplementedError("ReactorBase::setArea",
             "Area is undefined for reactors of type '{}'.", type());
     }
@@ -203,7 +203,7 @@ public:
     /**
      * Initialize the reactor. Called automatically by ReactorNet::initialize.
      */
-    virtual void initialize(double t0 = 0.0) {
+    virtual void initialize(CanteraDouble t0 = 0.0) {
         throw NotImplementedError("ReactorBase::initialize");
     }
 
@@ -220,7 +220,7 @@ public:
 
     //! Return the residence time (s) of the contents of this reactor, based
     //! on the outlet mass flow rates and the mass of the reactor contents.
-    double residenceTime();
+    CanteraDouble residenceTime();
 
     //! @name Solution components
     //!
@@ -229,12 +229,12 @@ public:
     //! @{
 
     //! Returns the current volume (m^3) of the reactor.
-    double volume() const {
+    CanteraDouble volume() const {
         return m_vol;
     }
 
     //! Returns the current density (kg/m^3) of the reactor's contents.
-    double density() const {
+    CanteraDouble density() const {
         if (m_state.empty()) {
             throw CanteraError("ReactorBase::density",
                                "Reactor state empty and/or contents not defined.");
@@ -243,7 +243,7 @@ public:
     }
 
     //! Returns the current temperature (K) of the reactor's contents.
-    double temperature() const {
+    CanteraDouble temperature() const {
         if (m_state.empty()) {
             throw CanteraError("ReactorBase::temperature",
                                "Reactor state empty and/or contents not defined.");
@@ -252,22 +252,22 @@ public:
     }
 
     //! Returns the current enthalpy (J/kg) of the reactor's contents.
-    double enthalpy_mass() const {
+    CanteraDouble enthalpy_mass() const {
         return m_enthalpy;
     }
 
     //! Returns the current pressure (Pa) of the reactor.
-    double pressure() const {
+    CanteraDouble pressure() const {
         return m_pressure;
     }
 
     //! Returns the mass (kg) of the reactor's contents.
-    double mass() const {
+    CanteraDouble mass() const {
         return m_mass;
     }
 
     //! Return the vector of species mass fractions.
-    const double* massFractions() const {
+    const CanteraDouble* massFractions() const {
         if (m_state.empty()) {
             throw CanteraError("ReactorBase::massFractions",
                                "Reactor state empty and/or contents not defined.");
@@ -276,7 +276,7 @@ public:
     }
 
     //! Return the mass fraction of the *k*-th species.
-    double massFraction(size_t k) const {
+    CanteraDouble massFraction(size_t k) const {
         if (m_state.empty()) {
             throw CanteraError("ReactorBase::massFraction",
                                "Reactor state empty and/or contents not defined.");
@@ -309,11 +309,11 @@ protected:
     size_t m_nsp = 0;
 
     ThermoPhase* m_thermo = nullptr;
-    double m_vol = 0.0; //!< Current volume of the reactor [m^3]
-    double m_mass = 0.0; //!< Current mass of the reactor [kg]
-    double m_enthalpy = 0.0; //!< Current specific enthalpy of the reactor [J/kg]
-    double m_pressure = 0.0; //!< Current pressure in the reactor [Pa]
-    vector<double> m_state;
+    CanteraDouble m_vol = 0.0; //!< Current volume of the reactor [m^3]
+    CanteraDouble m_mass = 0.0; //!< Current mass of the reactor [kg]
+    CanteraDouble m_enthalpy = 0.0; //!< Current specific enthalpy of the reactor [J/kg]
+    CanteraDouble m_pressure = 0.0; //!< Current pressure in the reactor [Pa]
+    vector<CanteraDouble> m_state;
     vector<FlowDevice*> m_inlet, m_outlet;
 
     vector<WallBase*> m_wall;

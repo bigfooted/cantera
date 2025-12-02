@@ -62,8 +62,8 @@ void ElectronCollisionPlasmaRate::setParameters(const AnyMap& node, const UnitSt
         m_product = node["product"].asString();
     }
 
-    m_energyLevels = node["energy-levels"].asVector<double>();
-    m_crossSections = node["cross-sections"].asVector<double>(m_energyLevels.size());
+    m_energyLevels = node["energy-levels"].asVector<CanteraDouble>();
+    m_crossSections = node["cross-sections"].asVector<CanteraDouble>(m_energyLevels.size());
     m_threshold = node.getDouble("threshold", 0.0);
 }
 
@@ -77,23 +77,23 @@ void ElectronCollisionPlasmaRate::getParameters(AnyMap& node) const {
 }
 
 void ElectronCollisionPlasmaRate::updateInterpolatedCrossSection(
-    const vector<double>& sharedLevels) {
+    const vector<CanteraDouble>& sharedLevels) {
     m_crossSectionsInterpolated.clear();
     m_crossSectionsInterpolated.reserve(sharedLevels.size());
-    for (double level : sharedLevels) {
+    for (CanteraDouble level : sharedLevels) {
         m_crossSectionsInterpolated.emplace_back(linearInterp(level,
                                             m_energyLevels, m_crossSections));
     }
 }
 
-double ElectronCollisionPlasmaRate::evalFromStruct(
+CanteraDouble ElectronCollisionPlasmaRate::evalFromStruct(
     const ElectronCollisionPlasmaData& shared_data)
 {
     // Interpolate cross-sections data to the energy levels of
     // the electron energy distribution function when the EEDF from the phase changes
     if (m_levelNumber != shared_data.levelNumber) {
         m_crossSectionsInterpolated.clear();
-        for (double level : shared_data.energyLevels) {
+        for (CanteraDouble level : shared_data.energyLevels) {
             m_crossSectionsInterpolated.push_back(linearInterp(level,
                                                   m_energyLevels, m_crossSections));
         }
@@ -125,7 +125,7 @@ double ElectronCollisionPlasmaRate::evalFromStruct(
 }
 
 void ElectronCollisionPlasmaRate::modifyRateConstants(
-    const ElectronCollisionPlasmaData& shared_data, double& kf, double& kr)
+    const ElectronCollisionPlasmaData& shared_data, CanteraDouble& kf, CanteraDouble& kr)
 {
     if (kr == 0.0) {
         // The reverse rate constant is only for reversible reactions
@@ -137,7 +137,7 @@ void ElectronCollisionPlasmaRate::modifyRateConstants(
     // the electron energy distribution function
     if (m_levelNumberSuperelastic != shared_data.levelNumber) {
         // super elastic collision energy levels and cross-sections
-        vector<double> superElasticEnergyLevels{0.0};
+        vector<CanteraDouble> superElasticEnergyLevels{0.0};
         m_crossSectionsOffset.resize(shared_data.energyLevels.size());
         for (size_t i = 1; i < m_energyLevels.size(); i++) {
             // The energy levels are offset by the first energy level (threshold)
@@ -204,7 +204,7 @@ void ElectronCollisionPlasmaRate::setContext(const Reaction& rxn, const Kinetics
                 if (p == electronName) {
                     continue;
                 }
-                double q = thermo.charge(thermo.speciesIndex(p, true));
+                CanteraDouble q = thermo.charge(thermo.speciesIndex(p, true));
                 if (q > 0) {
                     m_kind = "ionization";
                 } else if (q < 0) {

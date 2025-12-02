@@ -54,17 +54,17 @@ ReactorSurface::ReactorSurface(shared_ptr<Solution> soln,
     m_surf->getCoverages(m_cov.data());
 }
 
-double ReactorSurface::area() const
+CanteraDouble ReactorSurface::area() const
 {
     return m_area;
 }
 
-void ReactorSurface::setArea(double a)
+void ReactorSurface::setArea(CanteraDouble a)
 {
     m_area = a;
 }
 
-void ReactorSurface::setCoverages(const double* cov)
+void ReactorSurface::setCoverages(const CanteraDouble* cov)
 {
     copy(cov, cov + m_cov.size(), m_cov.begin());
 }
@@ -81,7 +81,7 @@ void ReactorSurface::setCoverages(const string& cov)
     m_surf->getCoverages(m_cov.data());
 }
 
-void ReactorSurface::getCoverages(double* cov) const
+void ReactorSurface::getCoverages(CanteraDouble* cov) const
 {
     copy(m_cov.begin(), m_cov.end(), cov);
 }
@@ -112,7 +112,7 @@ void ReactorSurface::addSensitivityReaction(size_t rxn)
         SensitivityParameter{rxn, p, 1.0, SensParameterType::reaction});
 }
 
-void ReactorSurface::setSensitivityParameters(const double* params)
+void ReactorSurface::setSensitivityParameters(const CanteraDouble* params)
 {
     for (auto& p : m_sensParams) {
         p.value = m_kinetics->multiplier(p.local);

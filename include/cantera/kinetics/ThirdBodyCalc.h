@@ -20,8 +20,8 @@ class ThirdBodyCalc
 {
 public:
     //! Install reaction that uses third-body effects in ThirdBodyCalc manager
-    void install(size_t rxnNumber, const map<size_t, double>& efficiencies,
-                 double default_efficiency, bool mass_action) {
+    void install(size_t rxnNumber, const map<size_t, CanteraDouble>& efficiencies,
+                 CanteraDouble default_efficiency, bool mass_action) {
         m_reaction_index.push_back(rxnNumber);
         m_default.push_back(default_efficiency);
 
@@ -46,7 +46,7 @@ public:
     //! Resize the sparse coefficient matrix
     void resizeCoeffs(size_t nSpc, size_t nRxn) {
         // Sparse Efficiency coefficient matrix
-        Eigen::SparseMatrix<double> efficiencies;
+        Eigen::SparseMatrix<CanteraDouble> efficiencies;
         efficiencies.setZero();
         efficiencies.resize(nRxn, nSpc);
         efficiencies.reserve(m_efficiencyList.size());
@@ -54,7 +54,7 @@ public:
             m_efficiencyList.begin(), m_efficiencyList.end());
 
         // derivative matrix multipliers
-        vector<Eigen::Triplet<double>> triplets;
+        vector<Eigen::Triplet<CanteraDouble>> triplets;
         triplets.reserve(m_reaction_index.size() * nSpc);
         for (size_t i = 0; i < m_default.size(); i++) {
             if (m_default[i] != 0) {
@@ -65,16 +65,16 @@ public:
                 }
             }
         }
-        Eigen::SparseMatrix<double> defaults(nRxn, nSpc);
+        Eigen::SparseMatrix<CanteraDouble> defaults(nRxn, nSpc);
         defaults.reserve(triplets.size());
         defaults.setFromTriplets(triplets.begin(), triplets.end());
         m_multipliers = efficiencies + defaults;
     }
 
     //! Update third-body concentrations in full vector
-    void update(const vector<double>& conc, double ctot, double* concm) const {
+    void update(const vector<CanteraDouble>& conc, CanteraDouble ctot, CanteraDouble* concm) const {
         for (size_t i = 0; i < m_reaction_index.size(); i++) {
-            double sum = 0.0;
+            CanteraDouble sum = 0.0;
             for (size_t j = 0; j < m_species[i].size(); j++) {
                 sum += m_eff[i][j] * conc[m_species[i][j]];
             }
@@ -83,7 +83,7 @@ public:
     }
 
     //! Multiply output with effective third-body concentration
-    void multiply(double* output, const double* concm) {
+    void multiply(CanteraDouble* output, const CanteraDouble* concm) {
         for (size_t i = 0; i < m_mass_action_index.size(); i++) {
             size_t ix = m_reaction_index[m_mass_action_index[i]];
             output[ix] *= concm[ix];
@@ -94,13 +94,13 @@ public:
     /*!
      *  @param product   Product of law of mass action and rate terms.
      */
-    Eigen::SparseMatrix<double> derivatives(const double* product) {
+    Eigen::SparseMatrix<CanteraDouble> derivatives(const CanteraDouble* product) {
         Eigen::Map<const Eigen::VectorXd> mapped(product, m_multipliers.rows());
         return mapped.asDiagonal() * m_multipliers;
     }
 
     //! Scale entries involving third-body collider in law of mass action by factor
-    void scale(const double* in, double* out, double factor) const {
+    void scale(const CanteraDouble* in, CanteraDouble* out, CanteraDouble factor) const {
         for (size_t i = 0; i < m_mass_action_index.size(); i++) {
             size_t ix = m_reaction_index[m_mass_action_index[i]];
             out[ix] = factor * in[ix];
@@ -109,8 +109,8 @@ public:
 
     //! Scale entries involving third-body collider in rate expression
     //! by third-body concentration and factor
-    void scaleM(const double* in, double* out,
-                const double* concm, double factor) const
+    void scaleM(const CanteraDouble* in, CanteraDouble* out,
+                const CanteraDouble* concm, CanteraDouble factor) const
     {
         for (size_t i = 0; i < m_no_mass_action_index.size(); i++) {
             size_t ix = m_reaction_index[m_no_mass_action_index[i]];
@@ -139,17 +139,17 @@ protected:
     vector<vector<size_t>> m_species;
 
     //! m_eff[i][j] is the efficiency of the j-th species in reaction i.
-    vector<vector<double>> m_eff;
+    vector<vector<CanteraDouble>> m_eff;
 
     //! The default efficiency for each reaction
-    vector<double> m_default;
+    vector<CanteraDouble> m_default;
 
     //! Sparse efficiency matrix (compensated for defaults)
     //! Each triplet corresponds to (reaction index, species index, efficiency)
-    vector<Eigen::Triplet<double>> m_efficiencyList;
+    vector<Eigen::Triplet<CanteraDouble>> m_efficiencyList;
 
     //! Sparse derivative multiplier matrix
-    Eigen::SparseMatrix<double> m_multipliers;
+    Eigen::SparseMatrix<CanteraDouble> m_multipliers;
 };
 
 }

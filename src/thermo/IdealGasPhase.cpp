@@ -22,43 +22,43 @@ IdealGasPhase::IdealGasPhase(const string& inputFile, const string& id_)
 
 // Molar Thermodynamic Properties of the Solution ------------------
 
-double IdealGasPhase::entropy_mole() const
+CanteraDouble IdealGasPhase::entropy_mole() const
 {
     return GasConstant * (mean_X(entropy_R_ref()) - sum_xlogx() - std::log(pressure() / refPressure()));
 }
 
-double IdealGasPhase::cp_mole() const
+CanteraDouble IdealGasPhase::cp_mole() const
 {
     return GasConstant * mean_X(cp_R_ref());
 }
 
-double IdealGasPhase::cv_mole() const
+CanteraDouble IdealGasPhase::cv_mole() const
 {
     return cp_mole() - GasConstant;
 }
 
-double IdealGasPhase::soundSpeed() const {
+CanteraDouble IdealGasPhase::soundSpeed() const {
     return sqrt(
         cp_mole() / cv_mole() * GasConstant / meanMolecularWeight() * temperature()
     );
 }
 
-double IdealGasPhase::standardConcentration(size_t k) const
+CanteraDouble IdealGasPhase::standardConcentration(size_t k) const
 {
     return pressure() / RT();
 }
 
-void IdealGasPhase::getActivityCoefficients(double* ac) const
+void IdealGasPhase::getActivityCoefficients(CanteraDouble* ac) const
 {
     for (size_t k = 0; k < m_kk; k++) {
         ac[k] = 1.0;
     }
 }
 
-void IdealGasPhase::getStandardChemPotentials(double* muStar) const
+void IdealGasPhase::getStandardChemPotentials(CanteraDouble* muStar) const
 {
     getGibbs_ref(muStar);
-    double tmp = log(pressure() / refPressure()) * RT();
+    CanteraDouble tmp = log(pressure() / refPressure()) * RT();
     for (size_t k = 0; k < m_kk; k++) {
         muStar[k] += tmp; // add RT*ln(P/P_0)
     }
@@ -66,49 +66,49 @@ void IdealGasPhase::getStandardChemPotentials(double* muStar) const
 
 //  Partial Molar Properties of the Solution --------------
 
-void IdealGasPhase::getChemPotentials(double* mu) const
+void IdealGasPhase::getChemPotentials(CanteraDouble* mu) const
 {
     getStandardChemPotentials(mu);
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(SmallNumber, moleFraction(k));
+        CanteraDouble xx = std::max(SmallNumber, moleFraction(k));
         mu[k] += RT() * log(xx);
     }
 }
 
-void IdealGasPhase::getPartialMolarEnthalpies(double* hbar) const
+void IdealGasPhase::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
-    const vector<double>& _h = enthalpy_RT_ref();
+    const vector<CanteraDouble>& _h = enthalpy_RT_ref();
     scale(_h.begin(), _h.end(), hbar, RT());
 }
 
-void IdealGasPhase::getPartialMolarEntropies(double* sbar) const
+void IdealGasPhase::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
-    const vector<double>& _s = entropy_R_ref();
+    const vector<CanteraDouble>& _s = entropy_R_ref();
     scale(_s.begin(), _s.end(), sbar, GasConstant);
-    double logp = log(pressure() / refPressure());
+    CanteraDouble logp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
-        double xx = std::max(SmallNumber, moleFraction(k));
+        CanteraDouble xx = std::max(SmallNumber, moleFraction(k));
         sbar[k] += GasConstant * (-logp - log(xx));
     }
 }
 
-void IdealGasPhase::getPartialMolarIntEnergies(double* ubar) const
+void IdealGasPhase::getPartialMolarIntEnergies(CanteraDouble* ubar) const
 {
-    const vector<double>& _h = enthalpy_RT_ref();
+    const vector<CanteraDouble>& _h = enthalpy_RT_ref();
     for (size_t k = 0; k < m_kk; k++) {
         ubar[k] = RT() * (_h[k] - 1.0);
     }
 }
 
-void IdealGasPhase::getPartialMolarCp(double* cpbar) const
+void IdealGasPhase::getPartialMolarCp(CanteraDouble* cpbar) const
 {
-    const vector<double>& _cp = cp_R_ref();
+    const vector<CanteraDouble>& _cp = cp_R_ref();
     scale(_cp.begin(), _cp.end(), cpbar, GasConstant);
 }
 
-void IdealGasPhase::getPartialMolarVolumes(double* vbar) const
+void IdealGasPhase::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
-    double vol = 1.0 / molarDensity();
+    CanteraDouble vol = 1.0 / molarDensity();
     for (size_t k = 0; k < m_kk; k++) {
         vbar[k] = vol;
     }
@@ -116,46 +116,46 @@ void IdealGasPhase::getPartialMolarVolumes(double* vbar) const
 
 // Properties of the Standard State of the Species in the Solution --
 
-void IdealGasPhase::getEnthalpy_RT(double* hrt) const
+void IdealGasPhase::getEnthalpy_RT(CanteraDouble* hrt) const
 {
-    const vector<double>& _h = enthalpy_RT_ref();
+    const vector<CanteraDouble>& _h = enthalpy_RT_ref();
     copy(_h.begin(), _h.end(), hrt);
 }
 
-void IdealGasPhase::getEntropy_R(double* sr) const
+void IdealGasPhase::getEntropy_R(CanteraDouble* sr) const
 {
-    const vector<double>& _s = entropy_R_ref();
+    const vector<CanteraDouble>& _s = entropy_R_ref();
     copy(_s.begin(), _s.end(), sr);
-    double tmp = log(pressure() / refPressure());
+    CanteraDouble tmp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
         sr[k] -= tmp;
     }
 }
 
-void IdealGasPhase::getGibbs_RT(double* grt) const
+void IdealGasPhase::getGibbs_RT(CanteraDouble* grt) const
 {
-    const vector<double>& gibbsrt = gibbs_RT_ref();
+    const vector<CanteraDouble>& gibbsrt = gibbs_RT_ref();
     copy(gibbsrt.begin(), gibbsrt.end(), grt);
-    double tmp = log(pressure() / refPressure());
+    CanteraDouble tmp = log(pressure() / refPressure());
     for (size_t k = 0; k < m_kk; k++) {
         grt[k] += tmp;
     }
 }
 
-void IdealGasPhase::getIntEnergy_RT(double* urt) const
+void IdealGasPhase::getIntEnergy_RT(CanteraDouble* urt) const
 {
     getIntEnergy_RT_ref(urt);
 }
 
-void IdealGasPhase::getCp_R(double* cpr) const
+void IdealGasPhase::getCp_R(CanteraDouble* cpr) const
 {
-    const vector<double>& _cpr = cp_R_ref();
+    const vector<CanteraDouble>& _cpr = cp_R_ref();
     copy(_cpr.begin(), _cpr.end(), cpr);
 }
 
-void IdealGasPhase::getStandardVolumes(double* vol) const
+void IdealGasPhase::getStandardVolumes(CanteraDouble* vol) const
 {
-    double tmp = 1.0 / molarDensity();
+    CanteraDouble tmp = 1.0 / molarDensity();
     for (size_t k = 0; k < m_kk; k++) {
         vol[k] = tmp;
     }
@@ -163,47 +163,47 @@ void IdealGasPhase::getStandardVolumes(double* vol) const
 
 // Thermodynamic Values for the Species Reference States ---------
 
-void IdealGasPhase::getEnthalpy_RT_ref(double* hrt) const
+void IdealGasPhase::getEnthalpy_RT_ref(CanteraDouble* hrt) const
 {
-    const vector<double>& _h = enthalpy_RT_ref();
+    const vector<CanteraDouble>& _h = enthalpy_RT_ref();
     copy(_h.begin(), _h.end(), hrt);
 }
 
-void IdealGasPhase::getGibbs_RT_ref(double* grt) const
+void IdealGasPhase::getGibbs_RT_ref(CanteraDouble* grt) const
 {
-    const vector<double>& gibbsrt = gibbs_RT_ref();
+    const vector<CanteraDouble>& gibbsrt = gibbs_RT_ref();
     copy(gibbsrt.begin(), gibbsrt.end(), grt);
 }
 
-void IdealGasPhase::getGibbs_ref(double* g) const
+void IdealGasPhase::getGibbs_ref(CanteraDouble* g) const
 {
-    const vector<double>& gibbsrt = gibbs_RT_ref();
+    const vector<CanteraDouble>& gibbsrt = gibbs_RT_ref();
     scale(gibbsrt.begin(), gibbsrt.end(), g, RT());
 }
 
-void IdealGasPhase::getEntropy_R_ref(double* er) const
+void IdealGasPhase::getEntropy_R_ref(CanteraDouble* er) const
 {
-    const vector<double>& _s = entropy_R_ref();
+    const vector<CanteraDouble>& _s = entropy_R_ref();
     copy(_s.begin(), _s.end(), er);
 }
 
-void IdealGasPhase::getIntEnergy_RT_ref(double* urt) const
+void IdealGasPhase::getIntEnergy_RT_ref(CanteraDouble* urt) const
 {
-    const vector<double>& _h = enthalpy_RT_ref();
+    const vector<CanteraDouble>& _h = enthalpy_RT_ref();
     for (size_t k = 0; k < m_kk; k++) {
         urt[k] = _h[k] - 1.0;
     }
 }
 
-void IdealGasPhase::getCp_R_ref(double* cprt) const
+void IdealGasPhase::getCp_R_ref(CanteraDouble* cprt) const
 {
-    const vector<double>& _cpr = cp_R_ref();
+    const vector<CanteraDouble>& _cpr = cp_R_ref();
     copy(_cpr.begin(), _cpr.end(), cprt);
 }
 
-void IdealGasPhase::getStandardVolumes_ref(double* vol) const
+void IdealGasPhase::getStandardVolumes_ref(CanteraDouble* vol) const
 {
-    double tmp = RT() / m_p0;
+    CanteraDouble tmp = RT() / m_p0;
     for (size_t k = 0; k < m_kk; k++) {
         vol[k] = tmp;
     }
@@ -226,22 +226,22 @@ bool IdealGasPhase::addSpecies(shared_ptr<Species> spec)
     return added;
 }
 
-void IdealGasPhase::setToEquilState(const double* mu_RT)
+void IdealGasPhase::setToEquilState(const CanteraDouble* mu_RT)
 {
-    const vector<double>& grt = gibbs_RT_ref();
+    const vector<CanteraDouble>& grt = gibbs_RT_ref();
 
     // Within the method, we protect against inf results if the exponent is too
     // high.
     //
     // If it is too low, we set the partial pressure to zero. This capability is
     // needed by the elemental potential method.
-    double pres = 0.0;
+    CanteraDouble pres = 0.0;
     for (size_t k = 0; k < m_kk; k++) {
-        double tmp = -grt[k] + mu_RT[k];
+        CanteraDouble tmp = -grt[k] + mu_RT[k];
         if (tmp < -600.) {
             m_pp[k] = 0.0;
         } else if (tmp > 300.0) {
-            double tmp2 = tmp / 300.;
+            CanteraDouble tmp2 = tmp / 300.;
             tmp2 *= tmp2;
             m_pp[k] = m_p0 * exp(300.) * tmp2;
         } else {
@@ -258,7 +258,7 @@ void IdealGasPhase::updateThermo() const
 {
     static const int cacheId = m_cache.getId();
     CachedScalar cached = m_cache.getScalar(cacheId);
-    double tnow = temperature();
+    CanteraDouble tnow = temperature();
 
     // If the temperature has changed since the last time these
     // properties were computed, recompute them.

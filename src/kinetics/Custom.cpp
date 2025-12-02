@@ -29,7 +29,7 @@ void CustomFunc1Rate::validate(const string& equation, const Kinetics& kin)
     }
 }
 
-double CustomFunc1Rate::evalFromStruct(const ArrheniusData& shared_data) const
+CanteraDouble CustomFunc1Rate::evalFromStruct(const ArrheniusData& shared_data) const
 {
     if (m_ratefunc) {
         return m_ratefunc->eval(shared_data.temperature);

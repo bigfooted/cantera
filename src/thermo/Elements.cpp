@@ -34,7 +34,7 @@ namespace Cantera
 struct atomicWeightData {
     string symbol; //!< Element symbol, first letter capitalized
     string fullName; //!< Element full name, first letter lowercase
-    double atomicWeight; //!< Element atomic weight in kg / kg-mol, if known. -1 if no stable isotope
+    CanteraDouble atomicWeight; //!< Element atomic weight in kg / kg-mol, if known. -1 if no stable isotope
 };
 
 /**
@@ -48,7 +48,7 @@ struct atomicWeightData {
 struct isotopeWeightData {
     string symbol; //!< Isotope symbol, first letter capitalized
     string fullName; //!< Isotope full name, first letter lowercase
-    double atomicWeight; //!< Isotope atomic weight in kg / kg-mol
+    CanteraDouble atomicWeight; //!< Isotope atomic weight in kg / kg-mol
     int atomicNumber; //!< Isotope atomic number
 };
 
@@ -229,8 +229,8 @@ const vector<string>& elementNames() {
     return values;
 }
 
-map<string, double> mapAtomicWeights() {
-    map<string, double> symMap;
+map<string, CanteraDouble> mapAtomicWeights() {
+    map<string, CanteraDouble> symMap;
 
     for (auto const& atom : atomicWeightTable) {
         symMap.emplace(atom.symbol, atom.atomicWeight);
@@ -243,15 +243,15 @@ map<string, double> mapAtomicWeights() {
     return symMap;
 }
 
-const map<string, double>& elementWeights() {
-    const static map<string, double> symMap = mapAtomicWeights();
+const map<string, CanteraDouble>& elementWeights() {
+    const static map<string, CanteraDouble> symMap = mapAtomicWeights();
     return symMap;
 }
 
-double getElementWeight(const string& ename)
+CanteraDouble getElementWeight(const string& ename)
 {
     const auto& elementMap = elementWeights();
-    double elementWeight = 0.0;
+    CanteraDouble elementWeight = 0.0;
     string symbol = trimCopy(ename);
     auto search = elementMap.find(symbol);
     if (search != elementMap.end()) {
@@ -272,13 +272,13 @@ double getElementWeight(const string& ename)
     throw CanteraError("getElementWeight", "element not found: " + ename);
 }
 
-double getElementWeight(int atomicNumber)
+CanteraDouble getElementWeight(int atomicNumber)
 {
     int num = static_cast<int>(numElementsDefined());
     if (atomicNumber > num || atomicNumber < 1) {
         throw IndexError("getElementWeight", "atomicWeightTable", atomicNumber, num);
     }
-    double elementWeight = atomicWeightTable[atomicNumber - 1].atomicWeight;
+    CanteraDouble elementWeight = atomicWeightTable[atomicNumber - 1].atomicWeight;
     if (elementWeight < 0.0) {
         throw CanteraError("getElementWeight",
             "element '{}' has no stable isotopes", getElementName(atomicNumber));

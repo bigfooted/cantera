@@ -16,12 +16,12 @@
 namespace Cantera
 {
 
-double vcs_l2norm(const vector<double>& vec)
+CanteraDouble vcs_l2norm(const vector<CanteraDouble>& vec)
 {
     if (vec.empty()) {
         return 0.0;
     }
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (const auto& val : vec) {
         sum += val * val;
     }
@@ -86,10 +86,10 @@ const char* vcs_speciesType_string(int speciesStatus, int length)
     }
 }
 
-bool vcs_doubleEqual(double d1, double d2)
+bool vcs_doubleEqual(CanteraDouble d1, CanteraDouble d2)
 {
-    double denom = fabs(d1) + fabs(d2) + 1.0;
-    double fac = fabs(d1 - d2) / denom;
+    CanteraDouble denom = fabs(d1) + fabs(d2) + 1.0;
+    CanteraDouble fac = fabs(d1 - d2) / denom;
     if (fac > 1.0E-10) {
         return false;
     }

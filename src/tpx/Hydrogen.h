@@ -21,31 +21,31 @@ public:
         m_formula = "H2";
     }
 
-    double MolWt() override;
-    double Tcrit() override;
-    double Pcrit() override;
-    double Vcrit() override;
-    double Tmin() override;
-    double Tmax() override;
+    CanteraDouble MolWt() override;
+    CanteraDouble Tcrit() override;
+    CanteraDouble Pcrit() override;
+    CanteraDouble Vcrit() override;
+    CanteraDouble Tmin() override;
+    CanteraDouble Tmax() override;
 
-    double Pp() override;
-    double up() override;
-    double sp() override;
+    CanteraDouble Pp() override;
+    CanteraDouble up() override;
+    CanteraDouble sp() override;
 
     //! Saturation pressure. Equation s3 in Reynolds TPSI.
-    double Psat() override;
+    CanteraDouble Psat() override;
 
 protected:
     //! Liquid density. Equation D4 in Reynolds TPSI.
-    double ldens() override;
+    CanteraDouble ldens() override;
 
 private:
-    double C(int i, double rt, double rt2);
-    double Cprime(int i, double rt, double rt2, double rt3);
-    double I(int i, double egrho);
-    double H(int i, double egrho);
-    double W(int i, double egrho);
-    double icv(int i, double x, double xlg);
+    CanteraDouble C(int i, CanteraDouble rt, CanteraDouble rt2);
+    CanteraDouble Cprime(int i, CanteraDouble rt, CanteraDouble rt2, CanteraDouble rt3);
+    CanteraDouble I(int i, CanteraDouble egrho);
+    CanteraDouble H(int i, CanteraDouble egrho);
+    CanteraDouble W(int i, CanteraDouble egrho);
+    CanteraDouble icv(int i, CanteraDouble x, CanteraDouble xlg);
 };
 
 }

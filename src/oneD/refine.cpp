@@ -18,7 +18,7 @@ Refiner::Refiner(Domain1D& domain) :
     m_active.resize(m_nv, true);
 }
 
-void Refiner::setCriteria(double ratio, double slope, double curve, double prune)
+void Refiner::setCriteria(CanteraDouble ratio, CanteraDouble slope, CanteraDouble curve, CanteraDouble prune)
 {
     if (ratio < 2.0) {
         throw CanteraError("Refiner::setCriteria",
@@ -40,7 +40,7 @@ void Refiner::setCriteria(double ratio, double slope, double curve, double prune
     m_prune = prune;
 }
 
-int Refiner::analyze(size_t n, const double* z, const double* x)
+int Refiner::analyze(size_t n, const CanteraDouble* z, const CanteraDouble* x)
 {
     if (n >= m_npmax) {
         throw CanteraError("Refiner::analyze", "max number of grid points reached ({}).", m_npmax);
@@ -67,10 +67,10 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
     m_nv = m_domain->nComponents();
 
     // find locations where cell size ratio is too large.
-    vector<double> val(n);
-    vector<double> slope(n-1);
+    vector<CanteraDouble> val(n);
+    vector<CanteraDouble> slope(n-1);
 
-    vector<double> dz(n-1); // Store the right-looking grid spacings
+    vector<CanteraDouble> dz(n-1); // Store the right-looking grid spacings
     for (size_t j = 0; j < n-1; j++) {
         dz[j] = z[j+1] - z[j];
     }
@@ -89,14 +89,14 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             }
 
             // find the range of values and slopes of component i over the domain
-            double valMin = *min_element(val.begin(), val.end());
-            double valMax = *max_element(val.begin(), val.end());
-            double slopeMin = *min_element(slope.begin(), slope.end());
-            double slopeMax = *max_element(slope.begin(), slope.end());
+            CanteraDouble valMin = *min_element(val.begin(), val.end());
+            CanteraDouble valMax = *max_element(val.begin(), val.end());
+            CanteraDouble slopeMin = *min_element(slope.begin(), slope.end());
+            CanteraDouble slopeMax = *max_element(slope.begin(), slope.end());
 
             // max absolute values of val and slope
-            double valMagnitude = std::max(fabs(valMax), fabs(valMin));
-            double slopeMagnitude = std::max(fabs(slopeMax), fabs(slopeMin));
+            CanteraDouble valMagnitude = std::max(fabs(valMax), fabs(valMin));
+            CanteraDouble slopeMagnitude = std::max(fabs(slopeMax), fabs(slopeMin));
 
             // refine based on component i only if the range of val is greater than a
             // fraction 'min_range' of max |val|. This eliminates components that
@@ -104,9 +104,9 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             if (valMax - valMin > m_min_range*valMagnitude) {
                 // maximum allowable difference in value between adjacent points. Based
                 // on the global min and max values of the component over the domain.
-                double max_change = m_slope*(valMax - valMin);
+                CanteraDouble max_change = m_slope*(valMax - valMin);
                 for (size_t j = 0; j < n-1; j++) {
-                    double ratio = fabs(val[j+1] - val[j]) / (max_change + m_thresh);
+                    CanteraDouble ratio = fabs(val[j+1] - val[j]) / (max_change + m_thresh);
                     if (ratio > 1.0 && dz[j] >= 2 * m_gridmin) {
                         m_insertPts.insert(j);
                         m_componentNames.insert(name);
@@ -126,12 +126,12 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
             // background.
             if (slopeMax - slopeMin > m_min_range*slopeMagnitude) {
                 // maximum allowable difference in slope between adjacent points.
-                double max_change = m_curve*(slopeMax - slopeMin);
+                CanteraDouble max_change = m_curve*(slopeMax - slopeMin);
                 for (size_t j = 0; j < n-2; j++) {
                     // Using the solution component absolute tolerance (m_thresh),
                     // an absolute tolerance for the change in slope can be estimated
                     // for an interval dz as m_thresh/dz.
-                    double ratio = fabs(slope[j+1] - slope[j]) / (max_change + m_thresh/dz[j]);
+                    CanteraDouble ratio = fabs(slope[j+1] - slope[j]) / (max_change + m_thresh/dz[j]);
                     if (ratio > 1.0 && dz[j] >= 2*m_gridmin && dz[j+1] >= 2*m_gridmin) {
                         m_componentNames.insert(name);
                         m_insertPts.insert(j);
@@ -208,7 +208,7 @@ int Refiner::analyze(size_t n, const double* z, const double* x)
     return int(m_insertPts.size());
 }
 
-double Refiner::value(const double* x, size_t n, size_t j)
+CanteraDouble Refiner::value(const CanteraDouble* x, size_t n, size_t j)
 {
     return x[m_domain->index(n,j)];
 }

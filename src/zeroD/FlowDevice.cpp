@@ -43,16 +43,16 @@ FlowDevice::FlowDevice(shared_ptr<ReactorBase> r0, shared_ptr<ReactorBase> r1,
     }
 }
 
-double FlowDevice::evalPressureFunction()
+CanteraDouble FlowDevice::evalPressureFunction()
 {
-    double delta_P = in().pressure() - out().pressure();
+    CanteraDouble delta_P = in().pressure() - out().pressure();
     if (m_pfunc) {
         return m_pfunc->eval(delta_P);
     }
     return delta_P;
 }
 
-double FlowDevice::evalTimeFunction()
+CanteraDouble FlowDevice::evalTimeFunction()
 {
     if (m_tfunc) {
         return m_tfunc->eval(m_time);
@@ -60,7 +60,7 @@ double FlowDevice::evalTimeFunction()
     return 1.;
 }
 
-double FlowDevice::outletSpeciesMassFlowRate(size_t k)
+CanteraDouble FlowDevice::outletSpeciesMassFlowRate(size_t k)
 {
     if (k >= m_nspout) {
         return 0.0;
@@ -72,7 +72,7 @@ double FlowDevice::outletSpeciesMassFlowRate(size_t k)
     return m_mdot * m_in->massFraction(ki);
 }
 
-double FlowDevice::enthalpy_mass()
+CanteraDouble FlowDevice::enthalpy_mass()
 {
     return m_in->enthalpy_mass();
 }

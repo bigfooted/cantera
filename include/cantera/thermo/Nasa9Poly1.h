@@ -69,15 +69,15 @@ public:
      * @param coeffs       Vector of coefficients used to set the
      *                     parameters for the standard state.
      */
-    Nasa9Poly1(double tlow, double thigh, double pref, const double* coeffs);
+    Nasa9Poly1(CanteraDouble tlow, CanteraDouble thigh, CanteraDouble pref, const CanteraDouble* coeffs);
 
     //! Set the array of 9 polynomial coefficients
-    void setParameters(const vector<double>& coeffs);
+    void setParameters(const vector<CanteraDouble>& coeffs);
 
     int reportType() const override;
 
     size_t temperaturePolySize() const override { return 7; }
-    void updateTemperaturePoly(double T, double* T_poly) const override;
+    void updateTemperaturePoly(CanteraDouble T, CanteraDouble* T_poly) const override;
 
     /**
      * @copydoc SpeciesThermoInterpType::updateProperties
@@ -91,11 +91,11 @@ public:
      *   - tt[5] = 1.0/(t*t);
      *   - tt[6] = std::log(t);
      */
-    void updateProperties(const double* tt, double* cp_R, double* h_RT,
-                          double* s_R) const override;
+    void updateProperties(const CanteraDouble* tt, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                          CanteraDouble* s_R) const override;
 
-    void updatePropertiesTemp(const double temp, double* cp_R, double* h_RT,
-                              double* s_R) const override;
+    void updatePropertiesTemp(const CanteraDouble temp, CanteraDouble* cp_R, CanteraDouble* h_RT,
+                              CanteraDouble* s_R) const override;
 
     //! This utility function reports back the type of parameterization and all
     //! of the parameters for the species
@@ -115,14 +115,14 @@ public:
      *       - coeffs[2] is max temperature
      *       - coeffs[3+i] from i =0,9 are the coefficients themselves
      */
-    void reportParameters(size_t& n, int& type, double& tlow, double& thigh,
-                          double& pref, double* const coeffs) const override;
+    void reportParameters(size_t& n, int& type, CanteraDouble& tlow, CanteraDouble& thigh,
+                          CanteraDouble& pref, CanteraDouble* const coeffs) const override;
 
     void getParameters(AnyMap& thermo) const override;
 
 protected:
     //! array of polynomial coefficients
-    vector<double> m_coeff;
+    vector<CanteraDouble> m_coeff;
 };
 
 }

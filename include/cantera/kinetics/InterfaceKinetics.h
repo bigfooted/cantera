@@ -70,7 +70,7 @@ public:
      * @param n phase Index in this kinetics object.
      * @param V Electric potential (volts)
      */
-    void setElectricPotential(int n, double V);
+    void setElectricPotential(int n, CanteraDouble V);
 
     //! @name Reaction Rates Of Progress
     //! @{
@@ -82,24 +82,24 @@ public:
      *   where deltaG is the electrochemical potential difference between
      *   products minus reactants.
      */
-    void getEquilibriumConstants(double* kc) override;
+    void getEquilibriumConstants(CanteraDouble* kc) override;
 
-    void getDeltaGibbs(double* deltaG) override;
+    void getDeltaGibbs(CanteraDouble* deltaG) override;
 
-    void getDeltaElectrochemPotentials(double* deltaM) override;
-    void getDeltaEnthalpy(double* deltaH) override;
-    void getDeltaEntropy(double* deltaS) override;
+    void getDeltaElectrochemPotentials(CanteraDouble* deltaM) override;
+    void getDeltaEnthalpy(CanteraDouble* deltaH) override;
+    void getDeltaEntropy(CanteraDouble* deltaS) override;
 
-    void getDeltaSSGibbs(double* deltaG) override;
-    void getDeltaSSEnthalpy(double* deltaH) override;
-    void getDeltaSSEntropy(double* deltaS) override;
+    void getDeltaSSGibbs(CanteraDouble* deltaG) override;
+    void getDeltaSSEnthalpy(CanteraDouble* deltaH) override;
+    void getDeltaSSEntropy(CanteraDouble* deltaS) override;
 
     //! @}
     //! @name Reaction Mechanism Informational Query Routines
     //! @{
 
-    void getFwdRateConstants(double* kfwd) override;
-    void getRevRateConstants(double* krev, bool doIrreversible=false) override;
+    void getFwdRateConstants(CanteraDouble* kfwd) override;
+    void getRevRateConstants(CanteraDouble* krev, bool doIrreversible=false) override;
 
     //! @}
     //! @name Reaction Mechanism Construction
@@ -124,7 +124,7 @@ public:
     void resizeSpecies() override;
     bool addReaction(shared_ptr<Reaction> r, bool resize=true) override;
     void modifyReaction(size_t i, shared_ptr<Reaction> rNew) override;
-    void setMultiplier(size_t i, double f) override;
+    void setMultiplier(size_t i, CanteraDouble f) override;
     //! @}
 
     //! Internal routine that updates the Rates of Progress of the reactions
@@ -172,8 +172,8 @@ public:
      * @param maxErrTestFails   the maximum permissible number of error test failures
      *                           If not supplied, uses the default value in CVODES (7).
      */
-    void advanceCoverages(double tstep, double rtol=1.e-7,
-                          double atol=1.e-14, double maxStepSize=0,
+    void advanceCoverages(CanteraDouble tstep, CanteraDouble rtol=1.e-7,
+                          CanteraDouble atol=1.e-14, CanteraDouble maxStepSize=0,
                           size_t maxSteps=20000, size_t maxErrTestFails=7);
 
     //! Solve for the pseudo steady-state of the surface problem
@@ -195,7 +195,7 @@ public:
      *             system is solved directly.
      */
     void solvePseudoSteadyStateProblem(int ifuncOverride = -1,
-                                       double timeScaleOverride = 1.0);
+                                       CanteraDouble timeScaleOverride = 1.0);
 
     void setIOFlag(int ioFlag);
 
@@ -271,19 +271,19 @@ public:
     //! Gets the interface current for the ith phase
     /*!
     * @param iphase Phase Id
-    * @return The double specifying the interface current. The interface current
+    * @return The CanteraDouble specifying the interface current. The interface current
     *         is useful when charge transfer reactions occur at an interface. It
     *         is defined here as the net positive charge entering the phase
     *         specified by the Phase Id. (Units: A/m^2 for a surface reaction,
     *         A/m for an edge reaction).
     */
-    double interfaceCurrent(const size_t iphase);
+    CanteraDouble interfaceCurrent(const size_t iphase);
 
     void setDerivativeSettings(const AnyMap& settings) override;
     void getDerivativeSettings(AnyMap& settings) const override;
-    Eigen::SparseMatrix<double> fwdRatesOfProgress_ddCi() override;
-    Eigen::SparseMatrix<double> revRatesOfProgress_ddCi() override;
-    Eigen::SparseMatrix<double> netRatesOfProgress_ddCi() override;
+    Eigen::SparseMatrix<CanteraDouble> fwdRatesOfProgress_ddCi() override;
+    Eigen::SparseMatrix<CanteraDouble> revRatesOfProgress_ddCi() override;
+    Eigen::SparseMatrix<CanteraDouble> netRatesOfProgress_ddCi() override;
 
 protected:
     //! @name Internal service methods
@@ -295,15 +295,15 @@ protected:
 
 
     //! Multiply rate with inverse equilibrium constant
-    void applyEquilibriumConstants(double* rop);
+    void applyEquilibriumConstants(CanteraDouble* rop);
 
     //! Process mole fraction derivative
     //! @param stoich  stoichiometry manager
     //! @param in  rate expression used for the derivative calculation
     //! @return a sparse matrix of derivative contributions for each reaction of
     //! dimensions nTotalReactions by nTotalSpecies
-    Eigen::SparseMatrix<double> calculateCompositionDerivatives(StoichManagerN& stoich,
-                                            const vector<double>& in);
+    Eigen::SparseMatrix<CanteraDouble> calculateCompositionDerivatives(StoichManagerN& stoich,
+                                            const vector<CanteraDouble>& in);
 
     //! Helper function ensuring that all rate derivatives can be calculated
     //! @param name  method name used for error output
@@ -314,7 +314,7 @@ protected:
     //! @}
 
     //! Temporary work vector of length m_kk
-    vector<double> m_grt;
+    vector<CanteraDouble> m_grt;
 
     bool m_redo_rates = false;
 
@@ -330,7 +330,7 @@ protected:
      * ThermoPhase objects in the class, and the order of the species within
      * each ThermoPhase class.
      */
-    vector<double> m_conc;
+    vector<CanteraDouble> m_conc;
 
     //! Array of activity concentrations for each species in the kinetics object
     /*!
@@ -344,7 +344,7 @@ protected:
      * ThermoPhase objects in the class, and the order of the species within
      * each ThermoPhase class.
      */
-    vector<double> m_actConc;
+    vector<CanteraDouble> m_actConc;
 
     //! Vector of standard state chemical potentials for all species
     /*!
@@ -353,7 +353,7 @@ protected:
      *
      * Length = m_kk. Units = J/kmol.
      */
-    vector<double> m_mu0;
+    vector<CanteraDouble> m_mu0;
 
     //! Vector of chemical potentials for all species
     /*!
@@ -362,7 +362,7 @@ protected:
      *
      * Length = m_kk. Units = J/kmol.
      */
-    vector<double> m_mu;
+    vector<CanteraDouble> m_mu;
 
     //! Vector of standard state electrochemical potentials modified by a
     //! standard concentration term.
@@ -376,14 +376,14 @@ protected:
      * for the species. Frequently, for solid species, Cs is equal to 1.
      * However, for gases Cs is P/RT. Length = m_kk. Units = J/kmol.
      */
-    vector<double> m_mu0_Kc;
+    vector<CanteraDouble> m_mu0_Kc;
 
     //! Vector of phase electric potentials
     /*!
      * Temporary vector containing the potential of each phase in the kinetics
      * object. length = number of phases. Units = Volts.
      */
-    vector<double> m_phi;
+    vector<CanteraDouble> m_phi;
 
     //! Pointer to the single surface phase
     SurfPhase* m_surf = nullptr;
@@ -399,7 +399,7 @@ protected:
     bool m_ROP_ok = false;
 
     //! Current temperature of the data
-    double m_temp = 0.0;
+    CanteraDouble m_temp = 0.0;
 
     //! Int flag to indicate that some phases in the kinetics mechanism are
     //! non-existent.
@@ -456,8 +456,8 @@ protected:
     size_t m_nDim = 2;
 
     //! Buffers for partial rop results with length nReactions()
-    vector<double> m_rbuf0;
-    vector<double> m_rbuf1;
+    vector<CanteraDouble> m_rbuf0;
+    vector<CanteraDouble> m_rbuf1;
 
     //! A flag used to neglect rate coefficient coverage dependence in derivative
     //! formation
@@ -465,7 +465,7 @@ protected:
     //! A flag used to neglect electrochemical contributions in derivative formation
     bool m_jac_skip_electrochemistry = false;
     //! Relative tolerance used in developing numerical portions of specific derivatives
-    double m_jac_rtol_delta = 1e-8;
+    CanteraDouble m_jac_rtol_delta = 1e-8;
     //! A flag stating if the object uses electrochemistry
     bool m_has_electrochemistry = false;
     //! A flag stating if the object has coverage dependent rates

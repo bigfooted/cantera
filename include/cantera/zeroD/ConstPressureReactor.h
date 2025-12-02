@@ -29,13 +29,13 @@ public:
         return "ConstPressureReactor";
     }
 
-    void getState(double* y) override;
+    void getState(CanteraDouble* y) override;
 
-    void initialize(double t0=0.0) override;
-    void eval(double t, double* LHS, double* RHS) override;
+    void initialize(CanteraDouble t0=0.0) override;
+    void eval(CanteraDouble t, CanteraDouble* LHS, CanteraDouble* RHS) override;
     vector<size_t> steadyConstraints() const override;
 
-    void updateState(double* y) override;
+    void updateState(CanteraDouble* y) override;
 
     //! Return the index in the solution vector for this reactor of the
     //! component named *nm*. Possible values for *nm* are "mass", "enthalpy",
@@ -43,9 +43,9 @@ public:
     //! species.
     size_t componentIndex(const string& nm) const override;
     string componentName(size_t k) override;
-    double upperBound(size_t k) const override;
-    double lowerBound(size_t k) const override;
-    void resetBadValues(double* y) override;
+    CanteraDouble upperBound(size_t k) const override;
+    CanteraDouble lowerBound(size_t k) const override;
+    void resetBadValues(CanteraDouble* y) override;
 };
 
 }

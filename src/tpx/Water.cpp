@@ -10,25 +10,25 @@ using namespace Cantera;
 
 namespace tpx
 {
-static const double Tmn=273.16;
-static const double Tmx=1600.0;
-static const double M=18.016;
-static const double Tc=647.286;
-static const double Pc=22.089e6;
-static const double Roc=317.0;
-static const double To=273.16;
-static const double R=461.51;
-static const double E=4.8E-3;
-static const double Ta=1000.0;
-static const double tauc=1.544912;
-static const double Tp=338.15;
-static const double aww=0.01;
-static const double Roa1=634.0;
-static const double Roaj=1000.0;
-static const double u0=2375470.875;
-static const double s0=6697.356635;
+static const CanteraDouble Tmn=273.16;
+static const CanteraDouble Tmx=1600.0;
+static const CanteraDouble M=18.016;
+static const CanteraDouble Tc=647.286;
+static const CanteraDouble Pc=22.089e6;
+static const CanteraDouble Roc=317.0;
+static const CanteraDouble To=273.16;
+static const CanteraDouble R=461.51;
+static const CanteraDouble E=4.8E-3;
+static const CanteraDouble Ta=1000.0;
+static const CanteraDouble tauc=1.544912;
+static const CanteraDouble Tp=338.15;
+static const CanteraDouble aww=0.01;
+static const CanteraDouble Roa1=634.0;
+static const CanteraDouble Roaj=1000.0;
+static const CanteraDouble u0=2375470.875;
+static const CanteraDouble s0=6697.356635;
 
-static const double A[10][7]= {{
+static const CanteraDouble A[10][7]= {{
         2.9492937E-2,-5.1985860E-3,
         6.8335354E-3,-1.5641040E-4,
         -6.3972405E-3, -3.9661401E-3, -6.9048554E-4
@@ -59,37 +59,37 @@ static const double A[10][7]= {{
     }
 };
 
-static const double F[]= {-7.4192420, 2.9721E-1,-1.155286E-1,8.685635E-3,
+static const CanteraDouble F[]= {-7.4192420, 2.9721E-1,-1.155286E-1,8.685635E-3,
                           1.0940980E-3, -4.39993E-3, 2.5206580E-3, -5.2186840E-4
                          };
 
-static const double D[]= {3.6711257,-2.8512396E1,2.2265240E2,-8.8243852E2,
+static const CanteraDouble D[]= {3.6711257,-2.8512396E1,2.2265240E2,-8.8243852E2,
                           2.0002765E3,-2.6122557E3,1.8297674E3,-5.3350520E2
                          };
 
-static const double G[]= {4.6E4,1.011249E3,8.3893E-1,-2.19989E-4,2.466619E-7,
+static const CanteraDouble G[]= {4.6E4,1.011249E3,8.3893E-1,-2.19989E-4,2.466619E-7,
                           -9.704700E-11
                          };
 
-static const double taua[] = {1.544912, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5};
+static const CanteraDouble taua[] = {1.544912, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5};
 
-double water::C(int i)
+CanteraDouble water::C(int i)
 {
-    double tau = Ta/T;
+    CanteraDouble tau = Ta/T;
     return (i == 0 ? R*T : R*T*(tau - tauc)*pow(tau - taua[i],i-1));
 }
 
-double water::Cprime(int i)
+CanteraDouble water::Cprime(int i)
 {
-    double tau = Ta/T;
+    CanteraDouble tau = Ta/T;
     return (i == 0 ? R : (i == 1 ? -R*tauc :
                           -R*pow(tau - taua[i],i-2)*(tauc*(tau - taua[i])
                                   + (i-1)*tau*(tau - tauc))));
 }
 
-double water::I(int j)
+CanteraDouble water::I(int j)
 {
-    double factor, sum, rho_aj;
+    CanteraDouble factor, sum, rho_aj;
     rho_aj = (j == 0 ? Roa1 : Roaj);
     sum = 0.0;
     factor = Rho - rho_aj;
@@ -102,9 +102,9 @@ double water::I(int j)
     return Rho*sum;
 }
 
-double water::H(int j)
+CanteraDouble water::H(int j)
 {
-    double factor, sum, rho_aj;
+    CanteraDouble factor, sum, rho_aj;
     rho_aj = (j == 0 ? Roa1 : Roaj);
     sum = 0.0;
     factor = Rho - rho_aj;
@@ -119,26 +119,26 @@ double water::H(int j)
     return Rho*Rho*sum;
 }
 
-double water::up()
+CanteraDouble water::up()
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     int i;
     for (i=0; i<7; i++) {
         sum += (C(i) - T*Cprime(i))*I(i);
     }
     for (i=1; i<6; i++) {
-        sum += G[i]*(pow(T,i) - pow(To,i))/double(i);
+        sum += G[i]*(pow(T,i) - pow(To,i))/CanteraDouble(i);
     }
     sum += G[0]*log(T/To) + u0;
     return sum + m_energy_offset;
 }
 
-double water::sp()
+CanteraDouble water::sp()
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     int i;
     for (i=2; i<6; i++) {
-        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/double(i-1);
+        sum += G[i]*(pow(T,i-1) - pow(To,i-1))/CanteraDouble(i-1);
     }
     sum += G[1]*log(T/To);
     sum -= G[0]*(1.0/T - 1.0/To);
@@ -149,64 +149,64 @@ double water::sp()
     return sum + m_entropy_offset;
 }
 
-double water::Pp()
+CanteraDouble water::Pp()
 {
-    double P = Rho*R*T;
+    CanteraDouble P = Rho*R*T;
     for (int i=0; i<7; i++) {
         P += C(i)*H(i);
     }
     return P;
 }
 
-double water::Psat()
+CanteraDouble water::Psat()
 {
-    double log, sum=0;
+    CanteraDouble log, sum=0;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("water::Psat",
                            "Temperature out of range. T = {}", T);
     }
     for (int i=1; i<=8; i++) {
-        sum += F[i-1]*pow(aww*(T-Tp),double(i-1)); // DGG mod
+        sum += F[i-1]*pow(aww*(T-Tp),CanteraDouble(i-1)); // DGG mod
     }
     log = (Tc/T-1)*sum;
     return exp(log)*Pc;
 }
 
-double water::ldens()
+CanteraDouble water::ldens()
 {
-    double sum=0;
+    CanteraDouble sum=0;
     int i;
     if ((T < Tmn) || (T > Tc)) {
         throw CanteraError("water::ldens",
                            "Temperature out of range. T = {}", T);
     }
     for (i=0; i<8; i++) {
-        sum+=D[i]*pow(1.0 - T/Tc, double(i+1)/3.0);
+        sum+=D[i]*pow(1.0 - T/Tc, CanteraDouble(i+1)/3.0);
     }
     return Roc*(1+sum);
 }
 
-double water::Tcrit()
+CanteraDouble water::Tcrit()
 {
     return Tc;
 }
-double water::Pcrit()
+CanteraDouble water::Pcrit()
 {
     return Pc;
 }
-double water::Vcrit()
+CanteraDouble water::Vcrit()
 {
     return 1.0/Roc;
 }
-double water::Tmin()
+CanteraDouble water::Tmin()
 {
     return Tmn;
 }
-double water::Tmax()
+CanteraDouble water::Tmax()
 {
     return Tmx;
 }
-double water::MolWt()
+CanteraDouble water::MolWt()
 {
     return M;
 }

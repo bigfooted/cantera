@@ -191,7 +191,7 @@ public:
      *
      * @param vbar  Output vector of partial molar volumes. Length: m_kk.
      */
-    void getPartialMolarVolumes(double* vbar) const override;
+    void getPartialMolarVolumes(CanteraDouble* vbar) const override;
 
     /**
      * Overloads the calcDensity() method of IdealSolidSoln to also consider non-ideal
@@ -223,7 +223,7 @@ protected:
      *  @returns          Linear interpolation of tabulated data at the current
      *                    mole fraction x.
      */
-    double interpolate(const double x, const vector<double>& inputData) const;
+    CanteraDouble interpolate(const CanteraDouble x, const vector<CanteraDouble>& inputData) const;
 
     //! Numerical derivative of the molar volume table
     /*!
@@ -235,23 +235,23 @@ protected:
      *  @param  derivedData  Output vector of tabulated data that is numerically
      *                       derived with respect to the mole fraction.
      */
-    void diff(const vector<double>& inputData, vector<double>& derivedData) const;
+    void diff(const vector<CanteraDouble>& inputData, vector<CanteraDouble>& derivedData) const;
 
     //! Current tabulated species index
     size_t m_kk_tab = npos;
 
     //! Tabulated contribution to h0[m_kk_tab] at the current composition
-    mutable double m_h0_tab;
+    mutable CanteraDouble m_h0_tab;
 
     //! Tabulated contribution to s0[m_kk_tab] at the current composition
-    mutable double m_s0_tab;
+    mutable CanteraDouble m_s0_tab;
 
     //! Vector for storing tabulated thermo
-    vector<double> m_molefrac_tab;
-    vector<double> m_enthalpy_tab;
-    vector<double> m_entropy_tab;
-    vector<double> m_molar_volume_tab;
-    vector<double> m_derived_molar_volume_tab;
+    vector<CanteraDouble> m_molefrac_tab;
+    vector<CanteraDouble> m_enthalpy_tab;
+    vector<CanteraDouble> m_entropy_tab;
+    vector<CanteraDouble> m_molar_volume_tab;
+    vector<CanteraDouble> m_derived_molar_volume_tab;
 
 private:
     void _updateThermo() const override;

@@ -34,7 +34,7 @@ Sim1D::Sim1D(vector<shared_ptr<Domain1D>>& domains) :
     }
 }
 
-void Sim1D::_setValue(size_t dom, size_t comp, size_t localPoint, double value)
+void Sim1D::_setValue(size_t dom, size_t comp, size_t localPoint, CanteraDouble value)
 {
     size_t iloc = domain(dom).loc() + domain(dom).index(comp, localPoint);
     AssertThrowMsg(iloc < m_state->size(), "Sim1D::setValue",
@@ -42,7 +42,7 @@ void Sim1D::_setValue(size_t dom, size_t comp, size_t localPoint, double value)
     (*m_state)[iloc] = value;
 }
 
-double Sim1D::_value(size_t dom, size_t comp, size_t localPoint) const
+CanteraDouble Sim1D::_value(size_t dom, size_t comp, size_t localPoint) const
 {
     size_t iloc = domain(dom).loc() + domain(dom).index(comp, localPoint);
     AssertThrowMsg(iloc < m_state->size(), "Sim1D::value",
@@ -50,7 +50,7 @@ double Sim1D::_value(size_t dom, size_t comp, size_t localPoint) const
     return (*m_state)[iloc];
 }
 
-double Sim1D::_workValue(size_t dom, size_t comp, size_t localPoint) const
+CanteraDouble Sim1D::_workValue(size_t dom, size_t comp, size_t localPoint) const
 {
     size_t iloc = domain(dom).loc() + domain(dom).index(comp, localPoint);
     AssertThrowMsg(iloc < m_state->size(), "Sim1D::workValue",
@@ -110,11 +110,11 @@ void Sim1D::save(const string& fname, const string& name, const string& desc,
 void Sim1D::saveResidual(const string& fname, const string& name,
                          const string& desc, bool overwrite, int compression)
 {
-    vector<double> res(m_state->size(), -999);
+    vector<CanteraDouble> res(m_state->size(), -999);
     OneDim::eval(npos, m_state->data(), &res[0], 0.0);
     // Temporarily put the residual into m_state, since this is the vector that the
     // save() function reads.
-    vector<double> backup(*m_state);
+    vector<CanteraDouble> backup(*m_state);
     *m_state = res;
     save(fname, name, desc, overwrite, compression);
     *m_state = backup;
@@ -188,14 +188,14 @@ AnyMap legacyH5(shared_ptr<SolutionArray> arr, const AnyMap& header={})
     }
 
     if (header.hasKey("fixed_temperature")) {
-        double temp = header.getDouble("fixed_temperature", -1.);
-        auto profile = arr->getComponent("T").as<vector<double>>();
+        CanteraDouble temp = header.getDouble("fixed_temperature", -1.);
+        auto profile = arr->getComponent("T").as<vector<CanteraDouble>>();
         int ix = 0;
         while (profile[ix] <= temp && ix < arr->size()) {
             ix++;
         }
         if (ix != 0) {
-            auto grid = arr->getComponent("grid").as<vector<double>>();
+            auto grid = arr->getComponent("grid").as<vector<CanteraDouble>>();
             out["fixed-point"]["location"] = grid[ix - 1];
             out["fixed-point"]["temperature"] = temp;
         }
@@ -316,7 +316,7 @@ void Sim1D::restoreSteadySolution()
     }
     *m_state = m_xlast_ss;
     for (size_t n = 0; n < nDomains(); n++) {
-        vector<double>& z = m_grid_last_ss[n];
+        vector<CanteraDouble>& z = m_grid_last_ss[n];
         domain(n).setupGrid(z.size(), z.data());
     }
 }
@@ -387,7 +387,7 @@ int Sim1D::refine(int loglevel)
 {
     int added = 0;
     int discarded = 0;
-    vector<double> znew, xnew;
+    vector<CanteraDouble> znew, xnew;
     vector<size_t> dsize;
 
     m_xlast_ss = *m_state;
@@ -428,14 +428,14 @@ int Sim1D::refine(int loglevel)
                 // for this new point
                 if (r.newPointNeeded(m) && m + 1 < npnow) {
                     // add new point at midpoint
-                    double zmid = 0.5*(d.z(m) + d.z(m+1));
+                    CanteraDouble zmid = 0.5*(d.z(m) + d.z(m+1));
                     znew.push_back(zmid);
                     added++;
 
                     // for each component, linearly interpolate the solution to this
                     // point
                     for (size_t i = 0; i < comp; i++) {
-                        double xmid = 0.5*(_value(n, i, m) + _value(n, i, m+1));
+                        CanteraDouble xmid = 0.5*(_value(n, i, m) + _value(n, i, m+1));
                         xnew.push_back(xmid);
                     }
                 }
@@ -489,12 +489,12 @@ void Sim1D::writeDebugInfo(const string& header_suffix, const string& message,
     }
 }
 
-int Sim1D::setFixedTemperature(double t)
+int Sim1D::setFixedTemperature(CanteraDouble t)
 {
     int np = 0;
-    vector<double> znew, xnew;
-    double zfixed = 0.0;
-    double z1 = 0.0, z2 = 0.0;
+    vector<CanteraDouble> znew, xnew;
+    CanteraDouble zfixed = 0.0;
+    CanteraDouble z1 = 0.0, z2 = 0.0;
     vector<size_t> dsize;
 
     for (size_t n = 0; n < nDomains(); n++) {
@@ -509,10 +509,10 @@ int Sim1D::setFixedTemperature(double t)
         if (d_free && d_free->isFree()) {
             for (size_t m = 0; m < npnow - 1; m++) {
                 bool fixedpt = false;
-                double t1 = _value(n, c_offset_T, m);
-                double t2 = _value(n, c_offset_T, m + 1);
+                CanteraDouble t1 = _value(n, c_offset_T, m);
+                CanteraDouble t2 = _value(n, c_offset_T, m + 1);
                 // threshold to avoid adding new point too close to existing point
-                double thresh = min(1., 1.e-1 * (t2 - t1));
+                CanteraDouble thresh = min(1., 1.e-1 * (t2 - t1));
                 z1 = d.z(m);
                 z2 = d.z(m + 1);
                 if (fabs(t - t1) <= thresh) {
@@ -548,11 +548,11 @@ int Sim1D::setFixedTemperature(double t)
                 // add new point at zfixed (mfixed is not npos)
                 znew.push_back(zfixed);
                 np++;
-                double interp_factor = (zfixed - z2) / (z1 - z2);
+                CanteraDouble interp_factor = (zfixed - z2) / (z1 - z2);
                 // for each component, linearly interpolate
                 // the solution to this point
                 for (size_t i = 0; i < comp; i++) {
-                    double xmid = interp_factor*(
+                    CanteraDouble xmid = interp_factor*(
                         _value(n, i, m) - _value(n, i, m+1)) + _value(n,i,m+1);
                     xnew.push_back(xmid);
                 }
@@ -580,9 +580,9 @@ int Sim1D::setFixedTemperature(double t)
     return np;
 }
 
-double Sim1D::fixedTemperature()
+CanteraDouble Sim1D::fixedTemperature()
 {
-    double t_fixed = std::numeric_limits<double>::quiet_NaN();
+    CanteraDouble t_fixed = std::numeric_limits<CanteraDouble>::quiet_NaN();
     for (size_t n = 0; n < nDomains(); n++) {
         Flow1D* d = dynamic_cast<Flow1D*>(&domain(n));
         if (d && d->isFree() && d->m_tfixed > 0) {
@@ -593,9 +593,9 @@ double Sim1D::fixedTemperature()
     return t_fixed;
 }
 
-double Sim1D::fixedTemperatureLocation()
+CanteraDouble Sim1D::fixedTemperatureLocation()
 {
-    double z_fixed = std::numeric_limits<double>::quiet_NaN();
+    CanteraDouble z_fixed = std::numeric_limits<CanteraDouble>::quiet_NaN();
     for (size_t n = 0; n < nDomains(); n++) {
         Flow1D* d = dynamic_cast<Flow1D*>(&domain(n));
         if (d && d->isFree() && d->m_tfixed > 0) {
@@ -606,7 +606,7 @@ double Sim1D::fixedTemperatureLocation()
     return z_fixed;
 }
 
-void Sim1D::setLeftControlPoint(double temperature)
+void Sim1D::setLeftControlPoint(CanteraDouble temperature)
 {
     bool two_point_domain_found = false;
     for (size_t n = 0; n < nDomains(); n++) {
@@ -626,7 +626,7 @@ void Sim1D::setLeftControlPoint(double temperature)
         }
         two_point_domain_found = true;
 
-        double current_val, next_val;
+        CanteraDouble current_val, next_val;
         for (size_t m = 0; m < np-1; m++) {
             current_val = _value(n,c_offset_T,m);
             next_val = _value(n,c_offset_T,m+1);
@@ -657,7 +657,7 @@ void Sim1D::setLeftControlPoint(double temperature)
     }
 }
 
-void Sim1D::setRightControlPoint(double temperature)
+void Sim1D::setRightControlPoint(CanteraDouble temperature)
 {
     bool two_point_domain_found = false;
     for (size_t n = 0; n < nDomains(); n++) {
@@ -677,7 +677,7 @@ void Sim1D::setRightControlPoint(double temperature)
         }
         two_point_domain_found = true;
 
-        double current_val, next_val;
+        CanteraDouble current_val, next_val;
         for (size_t m = np-1; m > 0; m--) {
             current_val = _value(n,c_offset_T,m);
             next_val = _value(n,c_offset_T,m-1);
@@ -709,8 +709,8 @@ void Sim1D::setRightControlPoint(double temperature)
 
 }
 
-void Sim1D::setRefineCriteria(int dom, double ratio,
-                              double slope, double curve, double prune)
+void Sim1D::setRefineCriteria(int dom, CanteraDouble ratio,
+                              CanteraDouble slope, CanteraDouble curve, CanteraDouble prune)
 {
     if (dom >= 0) {
         domain(dom).setRefineCriteria(ratio, slope, curve, prune);
@@ -721,7 +721,7 @@ void Sim1D::setRefineCriteria(int dom, double ratio,
     }
 }
 
-vector<double> Sim1D::getRefineCriteria(int dom)
+vector<CanteraDouble> Sim1D::getRefineCriteria(int dom)
 {
    if (dom >= 0) {
        return domain(dom).getRefineCriteria();
@@ -731,7 +731,7 @@ vector<double> Sim1D::getRefineCriteria(int dom)
    }
 }
 
-void Sim1D::setGridMin(int dom, double gridmin)
+void Sim1D::setGridMin(int dom, CanteraDouble gridmin)
 {
     if (dom >= 0) {
         Refiner& r = domain(dom).refiner();
@@ -768,7 +768,7 @@ void Sim1D::evalSSJacobian()
     OneDim::evalSSJacobian(m_state->data(), m_xnew.data());
 }
 
-void Sim1D::solveAdjoint(const double* b, double* lambda)
+void Sim1D::solveAdjoint(const CanteraDouble* b, CanteraDouble* lambda)
 {
     for (auto& D : m_dom) {
         D->forceFullUpdate(true);

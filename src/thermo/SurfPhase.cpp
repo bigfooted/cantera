@@ -25,7 +25,7 @@ SurfPhase::SurfPhase(const string& infile, const string& id_)
     initThermoFile(infile, id_);
 }
 
-double SurfPhase::enthalpy_mole() const
+CanteraDouble SurfPhase::enthalpy_mole() const
 {
     if (m_n0 <= 0.0) {
         return 0.0;
@@ -34,15 +34,15 @@ double SurfPhase::enthalpy_mole() const
     return mean_X(m_h0);
 }
 
-double SurfPhase::intEnergy_mole() const
+CanteraDouble SurfPhase::intEnergy_mole() const
 {
     return enthalpy_mole();
 }
 
-double SurfPhase::entropy_mole() const
+CanteraDouble SurfPhase::entropy_mole() const
 {
     _updateThermo();
-    double s = 0.0;
+    CanteraDouble s = 0.0;
     for (size_t k = 0; k < m_kk; k++) {
         s += moleFraction(k) * (m_s0[k] -
             GasConstant * log(std::max(concentration(k) * size(k)/m_n0, SmallNumber)));
@@ -50,18 +50,18 @@ double SurfPhase::entropy_mole() const
     return s;
 }
 
-double SurfPhase::cp_mole() const
+CanteraDouble SurfPhase::cp_mole() const
 {
     _updateThermo();
     return mean_X(m_cp0);
 }
 
-double SurfPhase::cv_mole() const
+CanteraDouble SurfPhase::cv_mole() const
 {
     return cp_mole();
 }
 
-void SurfPhase::getPartialMolarEnthalpies(double* hbar) const
+void SurfPhase::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     getEnthalpy_RT(hbar);
     for (size_t k = 0; k < m_kk; k++) {
@@ -69,7 +69,7 @@ void SurfPhase::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void SurfPhase::getPartialMolarEntropies(double* sbar) const
+void SurfPhase::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     getEntropy_R(sbar);
     getActivityConcentrations(m_work.data());
@@ -79,7 +79,7 @@ void SurfPhase::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void SurfPhase::getPartialMolarCp(double* cpbar) const
+void SurfPhase::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     getCp_R(cpbar);
     for (size_t k = 0; k < m_kk; k++) {
@@ -89,18 +89,18 @@ void SurfPhase::getPartialMolarCp(double* cpbar) const
 
 // HKM 9/1/11  The partial molar volumes returned here are really partial molar areas.
 //             Partial molar volumes for this phase should actually be equal to zero.
-void SurfPhase::getPartialMolarVolumes(double* vbar) const
+void SurfPhase::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     getStandardVolumes(vbar);
 }
 
-void SurfPhase::getStandardChemPotentials(double* mu0) const
+void SurfPhase::getStandardChemPotentials(CanteraDouble* mu0) const
 {
     _updateThermo();
     copy(m_mu0.begin(), m_mu0.end(), mu0);
 }
 
-void SurfPhase::getChemPotentials(double* mu) const
+void SurfPhase::getChemPotentials(CanteraDouble* mu) const
 {
     _updateThermo();
     copy(m_mu0.begin(), m_mu0.end(), mu);
@@ -110,68 +110,68 @@ void SurfPhase::getChemPotentials(double* mu) const
     }
 }
 
-void SurfPhase::getActivityConcentrations(double* c) const
+void SurfPhase::getActivityConcentrations(CanteraDouble* c) const
 {
     getConcentrations(c);
 }
 
-double SurfPhase::standardConcentration(size_t k) const
+CanteraDouble SurfPhase::standardConcentration(size_t k) const
 {
     return m_n0/size(k);
 }
 
-double SurfPhase::logStandardConc(size_t k) const
+CanteraDouble SurfPhase::logStandardConc(size_t k) const
 {
     return m_logn0 - m_logsize[k];
 }
 
-void SurfPhase::getGibbs_RT(double* grt) const
+void SurfPhase::getGibbs_RT(CanteraDouble* grt) const
 {
     _updateThermo();
     scale(m_mu0.begin(), m_mu0.end(), grt, 1.0/RT());
 }
 
-void SurfPhase::getEnthalpy_RT(double* hrt) const
+void SurfPhase::getEnthalpy_RT(CanteraDouble* hrt) const
 {
     _updateThermo();
     scale(m_h0.begin(), m_h0.end(), hrt, 1.0/RT());
 }
 
-void SurfPhase::getEntropy_R(double* sr) const
+void SurfPhase::getEntropy_R(CanteraDouble* sr) const
 {
     _updateThermo();
     scale(m_s0.begin(), m_s0.end(), sr, 1.0/GasConstant);
 }
 
-void SurfPhase::getCp_R(double* cpr) const
+void SurfPhase::getCp_R(CanteraDouble* cpr) const
 {
     _updateThermo();
     scale(m_cp0.begin(), m_cp0.end(), cpr, 1.0/GasConstant);
 }
 
-void SurfPhase::getStandardVolumes(double* vol) const
+void SurfPhase::getStandardVolumes(CanteraDouble* vol) const
 {
     for (size_t k = 0; k < m_kk; k++) {
         vol[k] = 0.0;
     }
 }
 
-void SurfPhase::getGibbs_RT_ref(double* grt) const
+void SurfPhase::getGibbs_RT_ref(CanteraDouble* grt) const
 {
     getGibbs_RT(grt);
 }
 
-void SurfPhase::getEnthalpy_RT_ref(double* hrt) const
+void SurfPhase::getEnthalpy_RT_ref(CanteraDouble* hrt) const
 {
     getEnthalpy_RT(hrt);
 }
 
-void SurfPhase::getEntropy_R_ref(double* sr) const
+void SurfPhase::getEntropy_R_ref(CanteraDouble* sr) const
 {
     getEntropy_R(sr);
 }
 
-void SurfPhase::getCp_R_ref(double* cprt) const
+void SurfPhase::getCp_R_ref(CanteraDouble* cprt) const
 {
     getCp_R(cprt);
 }
@@ -188,14 +188,14 @@ bool SurfPhase::addSpecies(shared_ptr<Species> spec)
         m_speciesSize.push_back(spec->size);
         m_logsize.push_back(log(spec->size));
         if (m_kk == 1) {
-            vector<double> cov{1.0};
+            vector<CanteraDouble> cov{1.0};
             setCoverages(cov.data());
         }
     }
     return added;
 }
 
-void SurfPhase::setSiteDensity(double n0)
+void SurfPhase::setSiteDensity(CanteraDouble n0)
 {
     if (n0 <= 0.0) {
         throw CanteraError("SurfPhase::setSiteDensity",
@@ -206,9 +206,9 @@ void SurfPhase::setSiteDensity(double n0)
     compositionChanged(); // trigger update of density
 }
 
-void SurfPhase::setCoverages(const double* theta)
+void SurfPhase::setCoverages(const CanteraDouble* theta)
 {
-    double sum = 0.0;
+    CanteraDouble sum = 0.0;
     for (size_t k = 0; k < m_kk; k++) {
         sum += theta[k] / size(k);
     }
@@ -222,10 +222,10 @@ void SurfPhase::setCoverages(const double* theta)
     setMoleFractions(m_work.data());
 }
 
-void SurfPhase::setCoveragesNoNorm(const double* theta)
+void SurfPhase::setCoveragesNoNorm(const CanteraDouble* theta)
 {
-    double sum = 0.0;
-    double sum2 = 0.0;
+    CanteraDouble sum = 0.0;
+    CanteraDouble sum2 = 0.0;
     for (size_t k = 0; k < m_kk; k++) {
         sum += theta[k] / size(k);
         sum2 += theta[k];
@@ -240,10 +240,10 @@ void SurfPhase::setCoveragesNoNorm(const double* theta)
     setMoleFractions_NoNorm(m_work.data());
 }
 
-void SurfPhase::getCoverages(double* theta) const
+void SurfPhase::getCoverages(CanteraDouble* theta) const
 {
-    double sum_X = 0.0;
-    double sum_X_s = 0.0;
+    CanteraDouble sum_X = 0.0;
+    CanteraDouble sum_X_s = 0.0;
     getMoleFractions(theta);
     for (size_t k = 0; k < m_kk; k++) {
         sum_X += theta[k];
@@ -261,10 +261,10 @@ void SurfPhase::setCoveragesByName(const string& cov)
 
 void SurfPhase::setCoveragesByName(const Composition& cov)
 {
-    vector<double> cv(m_kk, 0.0);
+    vector<CanteraDouble> cv(m_kk, 0.0);
     bool ifound = false;
     for (size_t k = 0; k < m_kk; k++) {
-        double c = getValue(cov, speciesName(k), 0.0);
+        CanteraDouble c = getValue(cov, speciesName(k), 0.0);
         if (c > 0.0) {
             ifound = true;
             cv[k] = c;
@@ -282,7 +282,7 @@ void SurfPhase::setState(const AnyMap& state) {
         if (state["coverages"].is<string>()) {
             setCoveragesByName(state["coverages"].asString());
         } else {
-            setCoveragesByName(state["coverages"].asMap<double>());
+            setCoveragesByName(state["coverages"].asMap<CanteraDouble>());
         }
     }
     ThermoPhase::setState(state);
@@ -292,8 +292,8 @@ void SurfPhase::compositionChanged()
 {
     ThermoPhase::compositionChanged();
     getMoleFractions(m_work.data());
-    double q = 0;
-    double sumX = 0;
+    CanteraDouble q = 0;
+    CanteraDouble sumX = 0;
     for (size_t k = 0; k < m_kk; k++) {
         q += m_work[k] * size(k);
         // This term accounts for unnormalized coverages used in calculation of
@@ -305,7 +305,7 @@ void SurfPhase::compositionChanged()
 
 void SurfPhase::_updateThermo(bool force) const
 {
-    double tnow = temperature();
+    CanteraDouble tnow = temperature();
     if (m_tlast != tnow || force) {
         m_spthermo.update(tnow, m_cp0.data(), m_h0.data(), m_s0.data());
         m_tlast = tnow;
@@ -324,7 +324,7 @@ void SurfPhase::initThermo()
     if (m_input.hasKey("site-density")) {
         // Units are kmol/m^2 for surface phases or kmol/m for edge phases
         setSiteDensity(m_input.convert("site-density",
-            Units(1.0, 0, -static_cast<double>(m_ndim), 0, 0, 0, 1)));
+            Units(1.0, 0, -static_cast<CanteraDouble>(m_ndim), 0, 0, 0, 1)));
     }
 }
 
@@ -332,7 +332,7 @@ void SurfPhase::getParameters(AnyMap& phaseNode) const
 {
     ThermoPhase::getParameters(phaseNode);
     phaseNode["site-density"].setQuantity(
-        m_n0, Units(1.0, 0, -static_cast<double>(m_ndim), 0, 0, 0, 1));
+        m_n0, Units(1.0, 0, -static_cast<CanteraDouble>(m_ndim), 0, 0, 0, 1));
 }
 
 EdgePhase::EdgePhase(const string& infile, const string& id_)

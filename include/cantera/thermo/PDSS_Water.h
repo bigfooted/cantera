@@ -57,14 +57,14 @@ public:
 
     // See PDSS.h for documentation of functions overridden from Class PDSS
 
-    double enthalpy_mole() const override;
-    double intEnergy_mole() const override;
-    double entropy_mole() const override;
-    double gibbs_mole() const override;
-    double cp_mole() const override;
-    double cv_mole() const override;
-    double molarVolume() const override;
-    double density() const override;
+    CanteraDouble enthalpy_mole() const override;
+    CanteraDouble intEnergy_mole() const override;
+    CanteraDouble entropy_mole() const override;
+    CanteraDouble gibbs_mole() const override;
+    CanteraDouble cp_mole() const override;
+    CanteraDouble cv_mole() const override;
+    CanteraDouble molarVolume() const override;
+    CanteraDouble density() const override;
 
     //! @}
     //! @name Properties of the Reference State of the Species in the Solution
@@ -78,22 +78,22 @@ public:
      *
      * @param temp  Temperature (Kelvin)
      */
-    double pref_safe(double temp) const;
+    CanteraDouble pref_safe(CanteraDouble temp) const;
 
-    double gibbs_RT_ref() const override;
-    double enthalpy_RT_ref() const override;
-    double entropy_R_ref() const override;
-    double cp_R_ref() const override;
-    double molarVolume_ref() const override;
+    CanteraDouble gibbs_RT_ref() const override;
+    CanteraDouble enthalpy_RT_ref() const override;
+    CanteraDouble entropy_R_ref() const override;
+    CanteraDouble cp_R_ref() const override;
+    CanteraDouble molarVolume_ref() const override;
 
     //! @}
     //! @name Mechanical Equation of State Properties
     //! @{
 
-    double pressure() const override;
-    void setPressure(double pres) override;
-    void setTemperature(double temp) override;
-    void setState_TP(double temp, double pres) override;
+    CanteraDouble pressure() const override;
+    void setPressure(CanteraDouble pres) override;
+    void setTemperature(CanteraDouble temp) override;
+    void setState_TP(CanteraDouble temp, CanteraDouble pres) override;
 
     //! Set the density of the water phase
     /*!
@@ -101,9 +101,9 @@ public:
      *
      * @param dens Density of the water (kg/m3)
      */
-    void setDensity(double dens);
+    void setDensity(CanteraDouble dens);
 
-    double thermalExpansionCoeff() const override;
+    CanteraDouble thermalExpansionCoeff() const override;
 
     //! Return the derivative of the volumetric thermal expansion coefficient.
     //! Units: 1/K2.
@@ -113,7 +113,7 @@ public:
      * \beta = \frac{1}{v}\left(\frac{\partial v}{\partial T}\right)_P
      * @f]
      */
-    double dthermalExpansionCoeffdT() const;
+    CanteraDouble dthermalExpansionCoeffdT() const;
 
     //! Returns the isothermal compressibility. Units: 1/Pa.
     /*!
@@ -126,16 +126,16 @@ public:
      * \kappa_T = \frac{1}{\rho}\left(\frac{\partial \rho}{\partial P}\right)_T
      * @f]
      */
-    double isothermalCompressibility() const;
+    CanteraDouble isothermalCompressibility() const;
 
     //! @}
     //! @name Miscellaneous properties of the standard state
     //! @{
 
-    double critTemperature() const override;
-    double critPressure() const override;
-    double critDensity() const override;
-    double satPressure(double t) override;
+    CanteraDouble critTemperature() const override;
+    CanteraDouble critPressure() const override;
+    CanteraDouble critDensity() const override;
+    CanteraDouble satPressure(CanteraDouble t) override;
 
     //! Get a pointer to a changeable WaterPropsIAPWS object
     WaterPropsIAPWS* getWater() {
@@ -174,7 +174,7 @@ private:
      * Density is the independent variable here, but it's hidden behind the
      * object's interface.
      */
-    double m_dens;
+    CanteraDouble m_dens;
 
     //! state of the fluid
     /*!
@@ -193,14 +193,14 @@ private:
      *  This is added to all internal energy and enthalpy results.
      *  units = J kmol-1.
      */
-    double EW_Offset = 0.0;
+    CanteraDouble EW_Offset = 0.0;
 
     /**
      *  Offset constant used to obtain consistency with NIST convention.
      *  This is added to all internal entropy results.
      *  units = J kmol-1 K-1.
      */
-    double SW_Offset = 0.0;
+    CanteraDouble SW_Offset = 0.0;
 
 public:
     /**

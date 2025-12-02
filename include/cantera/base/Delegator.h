@@ -135,13 +135,13 @@ public:
         *m_funcs_v_b[name] = makeDelegate(func, when, *m_funcs_v_b[name]);
     }
 
-    //! set delegates for member functions with the signature `void(double)`
-    void setDelegate(const string& name, const function<void(double)>& func,
+    //! set delegates for member functions with the signature `void(CanteraDouble)`
+    void setDelegate(const string& name, const function<void(CanteraDouble)>& func,
                      const string& when)
     {
         if (!m_funcs_v_d.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
-                "for function named '{}' with signature 'void(double)'.", name);
+                "for function named '{}' with signature 'void(CanteraDouble)'.", name);
         }
         *m_funcs_v_d[name] = makeDelegate(func, when, *m_funcs_v_d[name]);
     }
@@ -185,70 +185,70 @@ public:
         *m_funcs_v_csr_vp[name] = makeDelegate(func, when, *m_funcs_v_csr_vp[name]);
     }
 
-    //! Set delegates for member functions with the signature `void(double*)`
+    //! Set delegates for member functions with the signature `void(CanteraDouble*)`
     void setDelegate(const string& name,
-                     const function<void(std::array<size_t, 1>, double*)>& func,
+                     const function<void(std::array<size_t, 1>, CanteraDouble*)>& func,
                      const string& when)
     {
         if (!m_funcs_v_dp.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
-                "for function named '{}' with signature 'void(double*)'.", name);
+                "for function named '{}' with signature 'void(CanteraDouble*)'.", name);
         }
         *m_funcs_v_dp[name] = makeDelegate(func, when, *m_funcs_v_dp[name]);
     }
 
-    //! Set delegates for member functions with the signature `void(double, double*)`
+    //! Set delegates for member functions with the signature `void(CanteraDouble, CanteraDouble*)`
     void setDelegate(
         const string& name,
-        const function<void(std::array<size_t, 1>, double, double*)>& func,
+        const function<void(std::array<size_t, 1>, CanteraDouble, CanteraDouble*)>& func,
         const string& when)
     {
         if (!m_funcs_v_d_dp.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
-                "for function named '{}' with signature 'void(double, double*)'.",
+                "for function named '{}' with signature 'void(CanteraDouble, CanteraDouble*)'.",
                 name);
         }
         *m_funcs_v_d_dp[name] = makeDelegate(func, when, *m_funcs_v_d_dp[name]);
     }
 
     //! Set delegates for member functions with the signature
-    //! `void(double, double*, double*)`
+    //! `void(CanteraDouble, CanteraDouble*, CanteraDouble*)`
     void setDelegate(
         const string& name,
-        const function<void(std::array <size_t, 2>, double, double*, double*)>& func,
+        const function<void(std::array <size_t, 2>, CanteraDouble, CanteraDouble*, CanteraDouble*)>& func,
         const string& when)
     {
         if (!m_funcs_v_d_dp_dp.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
                 "for function named '{}' with signature "
-                "'void(double, double*, double*)'.", name);
+                "'void(CanteraDouble, CanteraDouble*, CanteraDouble*)'.", name);
         }
         *m_funcs_v_d_dp_dp[name] = makeDelegate(func, when, *m_funcs_v_d_dp_dp[name]);
     }
 
     //! Set delegates for member functions with the signature
-    //! `void(double*, double*, double*)`
+    //! `void(CanteraDouble*, CanteraDouble*, CanteraDouble*)`
     void setDelegate(
         const string& name,
-        const function<void(std::array<size_t, 3>, double*, double*, double*)>& func,
+        const function<void(std::array<size_t, 3>, CanteraDouble*, CanteraDouble*, CanteraDouble*)>& func,
         const string& when)
     {
         if (!m_funcs_v_dp_dp_dp.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
                 "for function named '{}' with signature "
-                "'void(double*, double*, double*)'.", name);
+                "'void(CanteraDouble*, CanteraDouble*, CanteraDouble*)'.", name);
         }
         *m_funcs_v_dp_dp_dp[name] = makeDelegate(func, when, *m_funcs_v_dp_dp_dp[name]);
     }
 
-    //! set delegates for member functions with the signature `double(void*)`
+    //! set delegates for member functions with the signature `CanteraDouble(void*)`
     void setDelegate(const string& name,
-                     const function<int(double&, void*)>& func,
+                     const function<int(CanteraDouble&, void*)>& func,
                      const string& when)
     {
         if (!m_funcs_d_vp.count(name)) {
             throw NotImplementedError("Delegator::setDelegate",
-                "for function named '{}' with signature 'double(void*)'.", name);
+                "for function named '{}' with signature 'CanteraDouble(void*)'.", name);
         }
         *m_funcs_d_vp[name] = makeDelegate(name, func, when, m_base_d_vp[name]);
     }
@@ -313,9 +313,9 @@ protected:
         m_funcs_v_b[name] = &target;
     }
 
-    //! Install a function with the signature `void(double)` as being delegatable
-    void install(const string& name, function<void(double)>& target,
-                 const function<void(double)>& func)
+    //! Install a function with the signature `void(CanteraDouble)` as being delegatable
+    void install(const string& name, function<void(CanteraDouble)>& target,
+                 const function<void(CanteraDouble)>& func)
     {
         target = func;
         m_funcs_v_d[name] = &target;
@@ -348,47 +348,47 @@ protected:
         m_funcs_v_csr_vp[name] = &target;
     }
 
-    //! Install a function with the signature `void(double*)` as being delegatable
+    //! Install a function with the signature `void(CanteraDouble*)` as being delegatable
     void install(const string& name,
-                 function<void(std::array<size_t, 1>, double*)>& target,
-                 const function<void(std::array<size_t, 1>, double*)>& func)
+                 function<void(std::array<size_t, 1>, CanteraDouble*)>& target,
+                 const function<void(std::array<size_t, 1>, CanteraDouble*)>& func)
     {
         target = func;
         m_funcs_v_dp[name] = &target;
     }
 
-    //! Install a function with the signature `void(double, double*)` as being delegatable
+    //! Install a function with the signature `void(CanteraDouble, CanteraDouble*)` as being delegatable
     void install(const string& name,
-                 function<void(std::array<size_t, 1>, double, double*)>& target,
-                 const function<void(std::array<size_t, 1>, double, double*)>& func)
+                 function<void(std::array<size_t, 1>, CanteraDouble, CanteraDouble*)>& target,
+                 const function<void(std::array<size_t, 1>, CanteraDouble, CanteraDouble*)>& func)
     {
         target = func;
         m_funcs_v_d_dp[name] = &target;
     }
 
-    //! Install a function with the signature `void(double, double*, double*)` as being
+    //! Install a function with the signature `void(CanteraDouble, CanteraDouble*, CanteraDouble*)` as being
     //! delegatable
     void install(const string& name,
-                 function<void(std::array<size_t, 2>, double, double*, double*)>& target,
-                 const function<void(std::array<size_t, 2>, double, double*, double*)>& func)
+                 function<void(std::array<size_t, 2>, CanteraDouble, CanteraDouble*, CanteraDouble*)>& target,
+                 const function<void(std::array<size_t, 2>, CanteraDouble, CanteraDouble*, CanteraDouble*)>& func)
     {
         target = func;
         m_funcs_v_d_dp_dp[name] = &target;
     }
 
     //! Install a function with the signature
-    //! `void(double*, double*, double*)` as being delegatable
+    //! `void(CanteraDouble*, CanteraDouble*, CanteraDouble*)` as being delegatable
     void install(const string& name,
-                 function<void(std::array<size_t, 3>, double*, double*, double*)>& target,
-                 const function<void(std::array<size_t, 3>, double*, double*, double*)>& base)
+                 function<void(std::array<size_t, 3>, CanteraDouble*, CanteraDouble*, CanteraDouble*)>& target,
+                 const function<void(std::array<size_t, 3>, CanteraDouble*, CanteraDouble*, CanteraDouble*)>& base)
     {
         target = base;
         m_funcs_v_dp_dp_dp[name] = &target;
     }
 
-    //! Install a function with the signature `double(void*)` as being delegatable
-    void install(const string& name, function<double(void*)>& target,
-                 const function<double(void*)>& func)
+    //! Install a function with the signature `CanteraDouble(void*)` as being delegatable
+    void install(const string& name, function<CanteraDouble(void*)>& target,
+                 const function<CanteraDouble(void*)>& func)
     {
         target = func;
         m_funcs_d_vp[name] = &target;
@@ -509,7 +509,7 @@ protected:
     //!
     //! - `v` for `void`
     //! - `b` for `bool`
-    //! - `d` for `double`
+    //! - `d` for `CanteraDouble`
     //! - `s` for `string`
     //! - `sz` for `size_t`
     //! - `AM` for `AnyMap`
@@ -522,20 +522,20 @@ protected:
     // Delegates with no return value
     map<string, function<void()>*> m_funcs_v;
     map<string, function<void(bool)>*> m_funcs_v_b;
-    map<string, function<void(double)>*> m_funcs_v_d;
+    map<string, function<void(CanteraDouble)>*> m_funcs_v_d;
     map<string, function<void(AnyMap&)>*> m_funcs_v_AMr;
     map<string, function<void(const AnyMap&, const UnitStack&)>*> m_funcs_v_cAMr_cUSr;
     map<string, function<void(const string&, void*)>*> m_funcs_v_csr_vp;
-    map<string, function<void(std::array<size_t, 1>, double*)>*> m_funcs_v_dp;
-    map<string, function<void(std::array<size_t, 1>, double, double*)>*> m_funcs_v_d_dp;
+    map<string, function<void(std::array<size_t, 1>, CanteraDouble*)>*> m_funcs_v_dp;
+    map<string, function<void(std::array<size_t, 1>, CanteraDouble, CanteraDouble*)>*> m_funcs_v_d_dp;
     map<string,
-        function<void(std::array<size_t, 2>, double, double*, double*)>*> m_funcs_v_d_dp_dp;
+        function<void(std::array<size_t, 2>, CanteraDouble, CanteraDouble*, CanteraDouble*)>*> m_funcs_v_d_dp_dp;
     map<string,
-        function<void(std::array<size_t, 3>, double*, double*, double*)>*> m_funcs_v_dp_dp_dp;
+        function<void(std::array<size_t, 3>, CanteraDouble*, CanteraDouble*, CanteraDouble*)>*> m_funcs_v_dp_dp_dp;
 
     // Delegates with a return value
-    map<string, function<double(void*)>> m_base_d_vp;
-    map<string, function<double(void*)>*> m_funcs_d_vp;
+    map<string, function<CanteraDouble(void*)>> m_base_d_vp;
+    map<string, function<CanteraDouble(void*)>*> m_funcs_d_vp;
 
     map<string, function<string(size_t)>> m_base_s_sz;
     map<string, function<string(size_t)>*> m_funcs_s_sz;

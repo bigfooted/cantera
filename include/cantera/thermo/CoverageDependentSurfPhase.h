@@ -148,12 +148,12 @@ public:
         //! [J/kmol] in order of 1st-order, 2nd-order, 3rd-order, and 4th-order
         //! coefficients (@f$ c^{(1)}, c^{(2)}, c^{(3)}, \text{ and } c^{(4)} @f$
         //! in the linear or the polynomial dependency model)
-        vector<double> enthalpy_coeffs;
+        vector<CanteraDouble> enthalpy_coeffs;
         //! array of polynomial coefficients describing coverage-dependent entropy
         //! [J/kmol/K] in order of 1st-order, 2nd-order, 3rd-order, and 4th-order
         //! coefficients (@f$ c^{(1)}, c^{(2)}, c^{(3)}, \text{ and } c^{(4)} @f$
         //! in the linear or the polynomial dependency model)
-        vector<double> entropy_coeffs;
+        vector<CanteraDouble> entropy_coeffs;
         //! boolean indicating whether the dependency is linear
         bool isLinear;
     };
@@ -179,9 +179,9 @@ public:
         //! a target species
         size_t j;
         //! map of <coverage[dimensionless], enthalpy[J/kmol]> pairs
-        map<double, double> enthalpy_map;
+        map<CanteraDouble, CanteraDouble> enthalpy_map;
         //! map of <coverage[dimensionless], entropy[J/kmol/K]> pairs
-        map<double, double> entropy_map;
+        map<CanteraDouble, CanteraDouble> entropy_map;
         //! boolean indicating whether the dependency is piecewise-linear
         bool isPiecewise;
     };
@@ -204,10 +204,10 @@ public:
         size_t j;
         //! coefficient @f$ c^{(a)} @f$ [J/kmol/K] in the coverage-dependent
         //! heat capacity model
-        double coeff_a;
+        CanteraDouble coeff_a;
         //! coefficient @f$ c^{(b)} @f$ [J/kmol/K] in the coverage-dependent
         //! heat capacity model
-        double coeff_b;
+        CanteraDouble coeff_b;
     };
 
     //! Construct and initialize a CoverageDependentSurfPhase ThermoPhase object
@@ -240,10 +240,10 @@ public:
     //! \theta^{ref} @f$. With coverage fixed at a reference value,
     //! reference state properties are effectively only dependent on temperature.
     //! @{
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getEntropy_R_ref(double* sr) const override;
-    void getCp_R_ref(double* cpr) const override;
-    void getGibbs_RT_ref(double* grt) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getEntropy_R_ref(CanteraDouble* sr) const override;
+    void getCp_R_ref(CanteraDouble* cpr) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
     //! @}
 
     //! @name Methods calculating standard state thermodynamic properties
@@ -259,7 +259,7 @@ public:
      *            + \int_{298}^{T} c^{cov}_{p,k}(T,\theta)dT}{RT}
      * @f]
      */
-    void getEnthalpy_RT(double* hrt) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
 
     //! Get the nondimensionalized standard state entropy vector.
     /*!
@@ -270,7 +270,7 @@ public:
      *            - \ln\left(\frac{1}{\theta_{ref}}\right)
      * @f]
      */
-    void getEntropy_R(double* sr) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
 
     //! Get the nondimensionalized standard state heat capacity vector.
     /*!
@@ -279,7 +279,7 @@ public:
      *          = \frac{c^{ref}_{p,k}(T) + c^{cov}_{p,k}(T,\theta)}{RT}
      * @f]
      */
-    void getCp_R(double* cpr) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
 
     //! Get the nondimensionalized standard state gibbs free energy vector.
     /*!
@@ -288,7 +288,7 @@ public:
      *          = \frac{h^o_k(T,\theta)}{RT} + \frac{s^o_k(T,\theta)}{R}
      * @f]
      */
-    void getGibbs_RT(double* grt) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
 
     //! Get the standard state chemical potential vector. Units: J/kmol.
     /*!
@@ -296,7 +296,7 @@ public:
      *      \mu^o_k(T,\theta) = h^o_k(T,\theta) + Ts^o_k(T,\theta)
      * @f]
      */
-    void getStandardChemPotentials(double* mu0) const override;
+    void getStandardChemPotentials(CanteraDouble* mu0) const override;
     //! @}
 
     //! @name Methods calculating partial molar thermodynamic properties
@@ -310,7 +310,7 @@ public:
      *      \tilde{h}_k(T,\theta) = h^o_k(T,\theta)
      * @f]
      */
-    void getPartialMolarEnthalpies(double* hbar) const override;
+    void getPartialMolarEnthalpies(CanteraDouble* hbar) const override;
 
     //! Get the partial molar entropy vector. Units: J/kmol/K.
     /*!
@@ -318,7 +318,7 @@ public:
      *      \tilde{s}_k(T,\theta) = s^o_k(T,\theta) - R\ln(\theta_k)
      * @f]
      */
-    void getPartialMolarEntropies(double* sbar) const override;
+    void getPartialMolarEntropies(CanteraDouble* sbar) const override;
 
     //! Get the partial molar heat capacity vector. Units: J/kmol/K.
     /*!
@@ -326,7 +326,7 @@ public:
      *      \tilde{c}_{p,k}(T,\theta) = c^o_{p,k}(T,\theta)
      * @f]
      */
-    void getPartialMolarCp(double* cpbar) const override;
+    void getPartialMolarCp(CanteraDouble* cpbar) const override;
 
     //! Get the chemical potential vector. Units: J/kmol.
     /*!
@@ -334,7 +334,7 @@ public:
      *      \mu_k(T,\theta) = \mu^o_k(T,\theta) + RT\ln(\theta_k)
      * @f]
      */
-    void getChemPotentials(double* mu) const override;
+    void getChemPotentials(CanteraDouble* mu) const override;
     //! @}
 
     //! @name Methods calculating Phase thermodynamic properties
@@ -349,7 +349,7 @@ public:
      *      \hat h(T,\theta) = \sum_k \theta_k \tilde{h}_k(T,\theta)
      * @f]
      */
-    double enthalpy_mole() const override;
+    CanteraDouble enthalpy_mole() const override;
 
     //! Return the solution's molar entropy. Units: J/kmol/K
     /*!
@@ -357,7 +357,7 @@ public:
      *      \hat s(T,\theta) = \sum_k \theta_k \tilde{s}_k(T,\theta)
      * @f]
      */
-    double entropy_mole() const override;
+    CanteraDouble entropy_mole() const override;
 
     //! Return the solution's molar heat capacity. Units: J/kmol/K
     /*!
@@ -365,40 +365,40 @@ public:
      *      \hat{c_p}(T,\theta) = \sum_k \theta_k \tilde{c_p}_k(T,\theta)
      * @f]
      */
-    double cp_mole() const override;
+    CanteraDouble cp_mole() const override;
     //! @}
 
 protected:
     //! Temporary storage for the coverages.
-    mutable vector<double> m_cov;
+    mutable vector<CanteraDouble> m_cov;
 
     //! Temporary storage for the coverage-dependent enthalpies.
-    mutable vector<double> m_h_cov;
+    mutable vector<CanteraDouble> m_h_cov;
 
     //! Temporary storage for the coverage-dependent entropies.
-    mutable vector<double> m_s_cov;
+    mutable vector<CanteraDouble> m_s_cov;
 
     //! Temporary storage for the coverage-dependent heat capacities.
-    mutable vector<double> m_cp_cov;
+    mutable vector<CanteraDouble> m_cp_cov;
 
     //! Temporary storage for the coverage-dependent chemical potentials.
-    mutable vector<double> m_mu_cov;
+    mutable vector<CanteraDouble> m_mu_cov;
 
     //! Temporary storage for the sum of reference state enthalpies and
     //! coverage-dependent enthalpies.
-    mutable vector<double> m_enthalpy;
+    mutable vector<CanteraDouble> m_enthalpy;
 
     //! Temporary storage for the sum of reference state entropies and
     //! coverage-dependent entropies.
-    mutable vector<double> m_entropy;
+    mutable vector<CanteraDouble> m_entropy;
 
     //! Temporary storage for the sum of reference state heat capacities and
     //! coverage-dependent heat capacities.
-    mutable vector<double> m_heatcapacity;
+    mutable vector<CanteraDouble> m_heatcapacity;
 
     //! Temporary storage for the sum of reference state chemical potentials
     //! and coverage-dependent chemical potentials.
-    mutable vector<double> m_chempot;
+    mutable vector<CanteraDouble> m_chempot;
 
     //! Array of enthalpy and entropy coverage dependency parameters used in
     //! the linear and polynomial dependency equations.
@@ -414,7 +414,7 @@ protected:
 private:
     //! Storage for the user-defined reference state coverage which has to be
     //! greater than 0.0 and less than or equal to 1.0. default = 1.0.
-    double m_theta_ref;
+    CanteraDouble m_theta_ref;
 
     //! Last value of the state number processed.
     mutable int m_stateNumlast;

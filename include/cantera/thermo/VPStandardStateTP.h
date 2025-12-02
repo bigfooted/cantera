@@ -68,14 +68,14 @@ public:
     //! recalculated unless the temperature or pressure changes.
     //! @{
 
-    void getStandardChemPotentials(double* mu) const override;
-    void getEnthalpy_RT(double* hrt) const override;
-    void getEntropy_R(double* sr) const override;
-    void getGibbs_RT(double* grt) const override;
-    void getIntEnergy_RT(double* urt) const override;
-    void getCp_R(double* cpr) const override;
-    void getStandardVolumes(double* vol) const override;
-    virtual const vector<double>& getStandardVolumes() const;
+    void getStandardChemPotentials(CanteraDouble* mu) const override;
+    void getEnthalpy_RT(CanteraDouble* hrt) const override;
+    void getEntropy_R(CanteraDouble* sr) const override;
+    void getGibbs_RT(CanteraDouble* grt) const override;
+    void getIntEnergy_RT(CanteraDouble* urt) const override;
+    void getCp_R(CanteraDouble* cpr) const override;
+    void getStandardVolumes(CanteraDouble* vol) const override;
+    virtual const vector<CanteraDouble>& getStandardVolumes() const;
     //! @}
 
     //! Set the temperature of the phase
@@ -85,7 +85,7 @@ public:
      *
      * @param temp  Temperature (kelvin)
      */
-    void setTemperature(const double temp) override;
+    void setTemperature(const CanteraDouble temp) override;
 
     //! Set the internally stored pressure (Pa) at constant temperature and
     //! composition
@@ -95,7 +95,7 @@ public:
      *
      *  @param p input Pressure (Pa)
      */
-    void setPressure(double p) override;
+    void setPressure(CanteraDouble p) override;
 
     //! Set the temperature and pressure at the same time
     /*!
@@ -105,7 +105,7 @@ public:
      *  @param T  temperature (kelvin)
      *  @param pres pressure (pascal)
      */
-    void setState_TP(double T, double pres) override;
+    void setState_TP(CanteraDouble T, CanteraDouble pres) override;
 
     //! Returns the current pressure of the phase
     /*!
@@ -114,7 +114,7 @@ public:
      *
      * @returns the pressure in pascals.
      */
-    double pressure() const override {
+    CanteraDouble pressure() const override {
         return m_Pcurrent;
     }
 
@@ -134,8 +134,8 @@ public:
      */
     virtual void updateStandardStateThermo() const;
 
-    double minTemp(size_t k=npos) const override;
-    double maxTemp(size_t k=npos) const override;
+    CanteraDouble minTemp(size_t k=npos) const override;
+    CanteraDouble maxTemp(size_t k=npos) const override;
 
 
 protected:
@@ -188,12 +188,12 @@ public:
     //! routine _updateRefStateThermo().
     //! @{
 
-    void getEnthalpy_RT_ref(double* hrt) const override;
-    void getGibbs_RT_ref(double* grt) const override;
-    void getGibbs_ref(double* g) const override;
-    void getEntropy_R_ref(double* er) const override;
-    void getCp_R_ref(double* cprt) const override;
-    void getStandardVolumes_ref(double* vol) const override;
+    void getEnthalpy_RT_ref(CanteraDouble* hrt) const override;
+    void getGibbs_RT_ref(CanteraDouble* grt) const override;
+    void getGibbs_ref(CanteraDouble* g) const override;
+    void getEntropy_R_ref(CanteraDouble* er) const override;
+    void getCp_R_ref(CanteraDouble* cprt) const override;
+    void getStandardVolumes_ref(CanteraDouble* vol) const override;
 
     //! @}
     //! @name Initialization Methods - For Internal use
@@ -227,21 +227,21 @@ protected:
      *
      *  units = Pascals
      */
-    double m_Pcurrent = OneAtm;
+    CanteraDouble m_Pcurrent = OneAtm;
 
     //! The minimum temperature at which data for all species is valid
-    double m_minTemp = 0.0;
+    CanteraDouble m_minTemp = 0.0;
 
     //! The maximum temperature at which data for all species is valid
-    double m_maxTemp = BigNumber;
+    CanteraDouble m_maxTemp = BigNumber;
 
     //! The last temperature at which the standard state thermodynamic
     //! properties were calculated at.
-    mutable double m_Tlast_ss = -1.0;
+    mutable CanteraDouble m_Tlast_ss = -1.0;
 
     //! The last pressure at which the Standard State thermodynamic properties
     //! were calculated at.
-    mutable double m_Plast_ss = -1.0;
+    mutable CanteraDouble m_Plast_ss = -1.0;
 
     //! Storage for the PDSS objects for the species
     /*!
@@ -252,42 +252,42 @@ protected:
 
     //! Vector containing the species reference enthalpies at T = m_tlast
     //! and P = p_ref.
-    mutable vector<double> m_h0_RT;
+    mutable vector<CanteraDouble> m_h0_RT;
 
     //! Vector containing the species reference constant pressure heat
     //! capacities at T = m_tlast and P = p_ref.
-    mutable vector<double> m_cp0_R;
+    mutable vector<CanteraDouble> m_cp0_R;
 
     //! Vector containing the species reference Gibbs functions at T = m_tlast
     //! and P = p_ref.
-    mutable vector<double> m_g0_RT;
+    mutable vector<CanteraDouble> m_g0_RT;
 
     //! Vector containing the species reference entropies at T = m_tlast
     //! and P = p_ref.
-    mutable vector<double> m_s0_R;
+    mutable vector<CanteraDouble> m_s0_R;
 
     //! Vector containing the species reference molar volumes
-    mutable vector<double> m_V0;
+    mutable vector<CanteraDouble> m_V0;
 
     //! Vector containing the species Standard State enthalpies at T = m_tlast
     //! and P = m_plast.
-    mutable vector<double> m_hss_RT;
+    mutable vector<CanteraDouble> m_hss_RT;
 
     //! Vector containing the species Standard State constant pressure heat
     //! capacities at T = m_tlast and P = m_plast.
-    mutable vector<double> m_cpss_R;
+    mutable vector<CanteraDouble> m_cpss_R;
 
     //! Vector containing the species Standard State Gibbs functions at T =
     //! m_tlast and P = m_plast.
-    mutable vector<double> m_gss_RT;
+    mutable vector<CanteraDouble> m_gss_RT;
 
     //! Vector containing the species Standard State entropies at T = m_tlast
     //! and P = m_plast.
-    mutable vector<double> m_sss_R;
+    mutable vector<CanteraDouble> m_sss_R;
 
     //! Vector containing the species standard state volumes at T = m_tlast and
     //! P = m_plast
-    mutable vector<double> m_Vss;
+    mutable vector<CanteraDouble> m_Vss;
 };
 }
 

@@ -25,9 +25,9 @@ namespace Cantera
 {
 
 namespace {
-double A_Debye_default = 1.172576; // units = sqrt(kg/gmol)
-double B_Debye_default = 3.28640E9; // units = sqrt(kg/gmol) / m
-double maxIionicStrength_default = 30.0;
+CanteraDouble A_Debye_default = 1.172576; // units = sqrt(kg/gmol)
+CanteraDouble B_Debye_default = 3.28640E9; // units = sqrt(kg/gmol) / m
+CanteraDouble maxIionicStrength_default = 30.0;
 }
 
 DebyeHuckel::DebyeHuckel(const string& inputFile, const string& id_)
@@ -57,22 +57,22 @@ void DebyeHuckel::calcDensity()
 
 // ------- Activities and Activity Concentrations
 
-void DebyeHuckel::getActivityConcentrations(double* c) const
+void DebyeHuckel::getActivityConcentrations(CanteraDouble* c) const
 {
-    double c_solvent = standardConcentration();
+    CanteraDouble c_solvent = standardConcentration();
     getActivities(c);
     for (size_t k = 0; k < m_kk; k++) {
         c[k] *= c_solvent;
     }
 }
 
-double DebyeHuckel::standardConcentration(size_t k) const
+CanteraDouble DebyeHuckel::standardConcentration(size_t k) const
 {
-    double mvSolvent = providePDSS(0)->molarVolume();
+    CanteraDouble mvSolvent = providePDSS(0)->molarVolume();
     return 1.0 / mvSolvent;
 }
 
-void DebyeHuckel::getActivities(double* ac) const
+void DebyeHuckel::getActivities(CanteraDouble* ac) const
 {
     _updateStandardStateThermo();
 
@@ -82,11 +82,11 @@ void DebyeHuckel::getActivities(double* ac) const
     for (size_t k = 1; k < m_kk; k++) {
         ac[k] = m_molalities[k] * exp(m_lnActCoeffMolal[k]);
     }
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     ac[0] = exp(m_lnActCoeffMolal[0]) * xmolSolvent;
 }
 
-void DebyeHuckel::getMolalityActivityCoefficients(double* acMolality) const
+void DebyeHuckel::getMolalityActivityCoefficients(CanteraDouble* acMolality) const
 {
     _updateStandardStateThermo();
     A_Debye_TP(-1.0, -1.0);
@@ -99,9 +99,9 @@ void DebyeHuckel::getMolalityActivityCoefficients(double* acMolality) const
 
 // ------ Partial Molar Properties of the Solution -----------------
 
-void DebyeHuckel::getChemPotentials(double* mu) const
+void DebyeHuckel::getChemPotentials(CanteraDouble* mu) const
 {
-    double xx;
+    CanteraDouble xx;
 
     // First get the standard chemical potentials in molar form. This requires
     // updates of standard state as a function of T and P
@@ -110,7 +110,7 @@ void DebyeHuckel::getChemPotentials(double* mu) const
     // Update the activity coefficients. This also updates the internal molality
     // array.
     s_update_lnMolalityActCoeff();
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     for (size_t k = 1; k < m_kk; k++) {
         xx = std::max(m_molalities[k], SmallNumber);
         mu[k] += RT() * (log(xx) + m_lnActCoeffMolal[k]);
@@ -119,7 +119,7 @@ void DebyeHuckel::getChemPotentials(double* mu) const
     mu[0] += RT() * (log(xx) + m_lnActCoeffMolal[0]);
 }
 
-void DebyeHuckel::getPartialMolarEnthalpies(double* hbar) const
+void DebyeHuckel::getPartialMolarEnthalpies(CanteraDouble* hbar) const
 {
     // Get the nondimensional standard state enthalpies
     getEnthalpy_RT(hbar);
@@ -132,7 +132,7 @@ void DebyeHuckel::getPartialMolarEnthalpies(double* hbar) const
     // Check to see whether activity coefficients are temperature
     // dependent. If they are, then calculate the their temperature
     // derivatives and add them into the result.
-    double dAdT = dA_DebyedT_TP();
+    CanteraDouble dAdT = dA_DebyedT_TP();
     if (dAdT != 0.0) {
         // Update the activity coefficients, This also update the
         // internally stored molalities.
@@ -144,7 +144,7 @@ void DebyeHuckel::getPartialMolarEnthalpies(double* hbar) const
     }
 }
 
-void DebyeHuckel::getPartialMolarEntropies(double* sbar) const
+void DebyeHuckel::getPartialMolarEntropies(CanteraDouble* sbar) const
 {
     // Get the standard state entropies at the temperature and pressure of the
     // solution.
@@ -161,19 +161,19 @@ void DebyeHuckel::getPartialMolarEntropies(double* sbar) const
 
     // First we will add in the obvious dependence on the T term out front of
     // the log activity term
-    double mm;
+    CanteraDouble mm;
     for (size_t k = 1; k < m_kk; k++) {
         mm = std::max(SmallNumber, m_molalities[k]);
         sbar[k] -= GasConstant * (log(mm) + m_lnActCoeffMolal[k]);
     }
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     mm = std::max(SmallNumber, xmolSolvent);
     sbar[0] -= GasConstant *(log(mm) + m_lnActCoeffMolal[0]);
 
     // Check to see whether activity coefficients are temperature dependent. If
     // they are, then calculate the their temperature derivatives and add them
     // into the result.
-    double dAdT = dA_DebyedT_TP();
+    CanteraDouble dAdT = dA_DebyedT_TP();
     if (dAdT != 0.0) {
         s_update_dlnMolalityActCoeff_dT();
         for (size_t k = 0; k < m_kk; k++) {
@@ -182,7 +182,7 @@ void DebyeHuckel::getPartialMolarEntropies(double* sbar) const
     }
 }
 
-void DebyeHuckel::getPartialMolarVolumes(double* vbar) const
+void DebyeHuckel::getPartialMolarVolumes(CanteraDouble* vbar) const
 {
     getStandardVolumes(vbar);
 
@@ -194,7 +194,7 @@ void DebyeHuckel::getPartialMolarVolumes(double* vbar) const
     }
 }
 
-void DebyeHuckel::getPartialMolarCp(double* cpbar) const
+void DebyeHuckel::getPartialMolarCp(CanteraDouble* cpbar) const
 {
     getCp_R(cpbar);
     for (size_t k = 0; k < m_kk; k++) {
@@ -204,7 +204,7 @@ void DebyeHuckel::getPartialMolarCp(double* cpbar) const
     // Check to see whether activity coefficients are temperature dependent. If
     // they are, then calculate the their temperature derivatives and add them
     // into the result.
-    double dAdT = dA_DebyedT_TP();
+    CanteraDouble dAdT = dA_DebyedT_TP();
     if (dAdT != 0.0) {
         // Update the activity coefficients, This also update the internally
         // stored molalities.
@@ -274,7 +274,7 @@ void DebyeHuckel::setDebyeHuckelModel(const string& model) {
     }
 }
 
-void DebyeHuckel::setA_Debye(double A)
+void DebyeHuckel::setA_Debye(CanteraDouble A)
 {
     if (A < 0) {
         m_form_A_Debye = A_DEBYE_WATER;
@@ -284,7 +284,7 @@ void DebyeHuckel::setA_Debye(double A)
     }
 }
 
-void DebyeHuckel::setB_dot(double bdot)
+void DebyeHuckel::setB_dot(CanteraDouble bdot)
 {
     if (m_formDH == DHFORM_BETAIJ || m_formDH == DHFORM_DILUTE_LIMIT ||
             m_formDH == DHFORM_PITZER_BETAIJ) {
@@ -301,7 +301,7 @@ void DebyeHuckel::setB_dot(double bdot)
     }
 }
 
-void DebyeHuckel::setDefaultIonicRadius(double value)
+void DebyeHuckel::setDefaultIonicRadius(CanteraDouble value)
 {
     m_Aionic_default = value;
     for (size_t k = 0; k < m_kk; k++) {
@@ -311,7 +311,7 @@ void DebyeHuckel::setDefaultIonicRadius(double value)
     }
 }
 
-void DebyeHuckel::setBeta(const string& sp1, const string& sp2, double value)
+void DebyeHuckel::setBeta(const string& sp1, const string& sp2, CanteraDouble value)
 {
     size_t k1 = speciesIndex(sp1, true);
     size_t k2 = speciesIndex(sp2, true);
@@ -418,7 +418,7 @@ void DebyeHuckel::getParameters(AnyMap& phaseNode) const
     if (!isnan(m_Aionic_default)) {
         activityNode["default-ionic-radius"].setQuantity(m_Aionic_default, "m");
     }
-    for (double B_dot : m_B_Dot) {
+    for (CanteraDouble B_dot : m_B_Dot) {
         if (B_dot != 0.0) {
             activityNode["B-dot"] = B_dot;
             break;
@@ -498,14 +498,14 @@ void DebyeHuckel::getSpeciesParameters(const string& name, AnyMap& speciesNode) 
 }
 
 
-double DebyeHuckel::A_Debye_TP(double tempArg, double presArg) const
+CanteraDouble DebyeHuckel::A_Debye_TP(CanteraDouble tempArg, CanteraDouble presArg) const
 {
-    double T = temperature();
-    double A;
+    CanteraDouble T = temperature();
+    CanteraDouble A;
     if (tempArg != -1.0) {
         T = tempArg;
     }
-    double P = pressure();
+    CanteraDouble P = pressure();
     if (presArg != -1.0) {
         P = presArg;
     }
@@ -524,17 +524,17 @@ double DebyeHuckel::A_Debye_TP(double tempArg, double presArg) const
     return A;
 }
 
-double DebyeHuckel::dA_DebyedT_TP(double tempArg, double presArg) const
+CanteraDouble DebyeHuckel::dA_DebyedT_TP(CanteraDouble tempArg, CanteraDouble presArg) const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     if (tempArg != -1.0) {
         T = tempArg;
     }
-    double P = pressure();
+    CanteraDouble P = pressure();
     if (presArg != -1.0) {
         P = presArg;
     }
-    double dAdT;
+    CanteraDouble dAdT;
     switch (m_form_A_Debye) {
     case A_DEBYE_CONST:
         dAdT = 0.0;
@@ -548,17 +548,17 @@ double DebyeHuckel::dA_DebyedT_TP(double tempArg, double presArg) const
     return dAdT;
 }
 
-double DebyeHuckel::d2A_DebyedT2_TP(double tempArg, double presArg) const
+CanteraDouble DebyeHuckel::d2A_DebyedT2_TP(CanteraDouble tempArg, CanteraDouble presArg) const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     if (tempArg != -1.0) {
         T = tempArg;
     }
-    double P = pressure();
+    CanteraDouble P = pressure();
     if (presArg != -1.0) {
         P = presArg;
     }
-    double d2AdT2;
+    CanteraDouble d2AdT2;
     switch (m_form_A_Debye) {
     case A_DEBYE_CONST:
         d2AdT2 = 0.0;
@@ -572,17 +572,17 @@ double DebyeHuckel::d2A_DebyedT2_TP(double tempArg, double presArg) const
     return d2AdT2;
 }
 
-double DebyeHuckel::dA_DebyedP_TP(double tempArg, double presArg) const
+CanteraDouble DebyeHuckel::dA_DebyedP_TP(CanteraDouble tempArg, CanteraDouble presArg) const
 {
-    double T = temperature();
+    CanteraDouble T = temperature();
     if (tempArg != -1.0) {
         T = tempArg;
     }
-    double P = pressure();
+    CanteraDouble P = pressure();
     if (presArg != -1.0) {
         P = presArg;
     }
-    double dAdP;
+    CanteraDouble dAdP;
     switch (m_form_A_Debye) {
     case A_DEBYE_CONST:
         dAdP = 0.0;
@@ -598,7 +598,7 @@ double DebyeHuckel::dA_DebyedP_TP(double tempArg, double presArg) const
 
 // ---------- Other Property Functions
 
-double DebyeHuckel::AionicRadius(int k) const
+CanteraDouble DebyeHuckel::AionicRadius(int k) const
 {
     return m_Aionic[k];
 }
@@ -616,11 +616,11 @@ bool DebyeHuckel::addSpecies(shared_ptr<Species> spec)
         m_B_Dot.push_back(0.0);
 
         // NAN will be replaced with default value
-        double Aionic = NAN;
+        CanteraDouble Aionic = NAN;
 
         // Guess electrolyte species type based on charge properties
         int est = cEST_nonpolarNeutral;
-        double stoichCharge = spec->charge;
+        CanteraDouble stoichCharge = spec->charge;
         if (fabs(spec->charge) > 0.0001) {
             est = cEST_chargedSpecies;
         }
@@ -651,45 +651,45 @@ bool DebyeHuckel::addSpecies(shared_ptr<Species> spec)
     return added;
 }
 
-double DebyeHuckel::_nonpolarActCoeff(double IionicMolality)
+CanteraDouble DebyeHuckel::_nonpolarActCoeff(CanteraDouble IionicMolality)
 {
      // These are coefficients to describe the increase in activity coeff for
      // non-polar molecules due to the electrolyte becoming stronger (the so-
      // called salt-out effect)
-    const static double npActCoeff[] = {0.1127, -0.01049, 1.545E-3};
-    double I2 = IionicMolality * IionicMolality;
-    double l10actCoeff =
+    const static CanteraDouble npActCoeff[] = {0.1127, -0.01049, 1.545E-3};
+    CanteraDouble I2 = IionicMolality * IionicMolality;
+    CanteraDouble l10actCoeff =
         npActCoeff[0] * IionicMolality +
         npActCoeff[1] * I2 +
         npActCoeff[2] * I2 * IionicMolality;
     return pow(10.0 , l10actCoeff);
 }
 
-double DebyeHuckel::_osmoticCoeffHelgesonFixedForm() const
+CanteraDouble DebyeHuckel::_osmoticCoeffHelgesonFixedForm() const
 {
-    const double a0 = 1.454;
-    const double b0 = 0.02236;
-    const double c0 = 9.380E-3;
-    const double d0 = -5.362E-4;
-    double Is = m_IionicMolalityStoich;
+    const CanteraDouble a0 = 1.454;
+    const CanteraDouble b0 = 0.02236;
+    const CanteraDouble c0 = 9.380E-3;
+    const CanteraDouble d0 = -5.362E-4;
+    CanteraDouble Is = m_IionicMolalityStoich;
     if (Is <= 0.0) {
         return 0.0;
     }
-    double Is2 = Is * Is;
-    double bhat = 1.0 + a0 * sqrt(Is);
-    double func = bhat - 2.0 * log(bhat) - 1.0/bhat;
-    double v1 = m_A_Debye / (a0 * a0 * a0 * Is) * func;
-    double oc = 1.0 - v1 + b0 * Is / 2.0 + 2.0 * c0 * Is2 / 3.0
+    CanteraDouble Is2 = Is * Is;
+    CanteraDouble bhat = 1.0 + a0 * sqrt(Is);
+    CanteraDouble func = bhat - 2.0 * log(bhat) - 1.0/bhat;
+    CanteraDouble v1 = m_A_Debye / (a0 * a0 * a0 * Is) * func;
+    CanteraDouble oc = 1.0 - v1 + b0 * Is / 2.0 + 2.0 * c0 * Is2 / 3.0
                 + 3.0 * d0 * Is2 * Is / 4.0;
     return oc;
 }
 
-double DebyeHuckel::_lnactivityWaterHelgesonFixedForm() const
+CanteraDouble DebyeHuckel::_lnactivityWaterHelgesonFixedForm() const
 {
     // Update the internally stored vector of molalities
     calcMolalities();
-    double oc = _osmoticCoeffHelgesonFixedForm();
-    double sum = 0.0;
+    CanteraDouble oc = _osmoticCoeffHelgesonFixedForm();
+    CanteraDouble sum = 0.0;
     for (size_t k = 1; k < m_kk; k++) {
         sum += std::max(m_molalities[k], 0.0);
     }
@@ -701,7 +701,7 @@ double DebyeHuckel::_lnactivityWaterHelgesonFixedForm() const
 
 void DebyeHuckel::s_update_lnMolalityActCoeff() const
 {
-    double z_k, zs_k1, zs_k2;
+    CanteraDouble z_k, zs_k1, zs_k2;
 
     // Update the internally stored vector of molalities
     calcMolalities();
@@ -742,18 +742,18 @@ void DebyeHuckel::s_update_lnMolalityActCoeff() const
     m_A_Debye = A_Debye_TP();
 
     // Calculate a safe value for the mole fraction of the solvent
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     xmolSolvent = std::max(8.689E-3, xmolSolvent);
 
     int est;
-    double ac_nonPolar = 1.0;
-    double numTmp = m_A_Debye * sqrt(m_IionicMolality);
-    double denomTmp = m_B_Debye * sqrt(m_IionicMolality);
-    double coeff;
-    double lnActivitySolvent = 0.0;
-    double tmp;
-    double tmpLn;
-    double y, yp1, sigma;
+    CanteraDouble ac_nonPolar = 1.0;
+    CanteraDouble numTmp = m_A_Debye * sqrt(m_IionicMolality);
+    CanteraDouble denomTmp = m_B_Debye * sqrt(m_IionicMolality);
+    CanteraDouble coeff;
+    CanteraDouble lnActivitySolvent = 0.0;
+    CanteraDouble tmp;
+    CanteraDouble tmpLn;
+    CanteraDouble y, yp1, sigma;
     switch (m_formDH) {
     case DHFORM_DILUTE_LIMIT:
         for (size_t k = 0; k < m_kk; k++) {
@@ -854,7 +854,7 @@ void DebyeHuckel::s_update_lnMolalityActCoeff() const
             m_lnActCoeffMolal[k] =
                 - z_k * z_k * numTmp / (1.0 + denomTmp);
             for (size_t j = 0; j < m_kk; j++) {
-                double beta = m_Beta_ij.value(k, j);
+                CanteraDouble beta = m_Beta_ij.value(k, j);
                 m_lnActCoeffMolal[k] += 2.0 * m_molalities[j] * beta;
             }
         }
@@ -924,9 +924,9 @@ void DebyeHuckel::s_update_lnMolalityActCoeff() const
 
 void DebyeHuckel::s_update_dlnMolalityActCoeff_dT() const
 {
-    double z_k, coeff, tmp, y, yp1, sigma, tmpLn;
+    CanteraDouble z_k, coeff, tmp, y, yp1, sigma, tmpLn;
     // First we store dAdT explicitly here
-    double dAdT = dA_DebyedT_TP();
+    CanteraDouble dAdT = dA_DebyedT_TP();
     if (dAdT == 0.0) {
         for (size_t k = 0; k < m_kk; k++) {
             m_dlnActCoeffMolaldT[k] = 0.0;
@@ -935,12 +935,12 @@ void DebyeHuckel::s_update_dlnMolalityActCoeff_dT() const
     }
 
     // Calculate a safe value for the mole fraction of the solvent
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     xmolSolvent = std::max(8.689E-3, xmolSolvent);
-    double sqrtI = sqrt(m_IionicMolality);
-    double numdAdTTmp = dAdT * sqrtI;
-    double denomTmp = m_B_Debye * sqrtI;
-    double d_lnActivitySolvent_dT = 0;
+    CanteraDouble sqrtI = sqrt(m_IionicMolality);
+    CanteraDouble numdAdTTmp = dAdT * sqrtI;
+    CanteraDouble denomTmp = m_B_Debye * sqrtI;
+    CanteraDouble d_lnActivitySolvent_dT = 0;
 
     switch (m_formDH) {
     case DHFORM_DILUTE_LIMIT:
@@ -1034,9 +1034,9 @@ void DebyeHuckel::s_update_dlnMolalityActCoeff_dT() const
 
 void DebyeHuckel::s_update_d2lnMolalityActCoeff_dT2() const
 {
-    double z_k, coeff, tmp, y, yp1, sigma, tmpLn;
-    double dAdT = dA_DebyedT_TP();
-    double d2AdT2 = d2A_DebyedT2_TP();
+    CanteraDouble z_k, coeff, tmp, y, yp1, sigma, tmpLn;
+    CanteraDouble dAdT = dA_DebyedT_TP();
+    CanteraDouble d2AdT2 = d2A_DebyedT2_TP();
     if (d2AdT2 == 0.0 && dAdT == 0.0) {
         for (size_t k = 0; k < m_kk; k++) {
             m_d2lnActCoeffMolaldT2[k] = 0.0;
@@ -1045,11 +1045,11 @@ void DebyeHuckel::s_update_d2lnMolalityActCoeff_dT2() const
     }
 
     // Calculate a safe value for the mole fraction of the solvent
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     xmolSolvent = std::max(8.689E-3, xmolSolvent);
-    double sqrtI = sqrt(m_IionicMolality);
-    double numd2AdT2Tmp = d2AdT2 * sqrtI;
-    double denomTmp = m_B_Debye * sqrtI;
+    CanteraDouble sqrtI = sqrt(m_IionicMolality);
+    CanteraDouble numd2AdT2Tmp = d2AdT2 * sqrtI;
+    CanteraDouble denomTmp = m_B_Debye * sqrtI;
 
     switch (m_formDH) {
     case DHFORM_DILUTE_LIMIT:
@@ -1140,9 +1140,9 @@ void DebyeHuckel::s_update_d2lnMolalityActCoeff_dT2() const
 
 void DebyeHuckel::s_update_dlnMolalityActCoeff_dP() const
 {
-    double z_k, coeff, tmp, y, yp1, sigma, tmpLn;
+    CanteraDouble z_k, coeff, tmp, y, yp1, sigma, tmpLn;
     int est;
-    double dAdP = dA_DebyedP_TP();
+    CanteraDouble dAdP = dA_DebyedP_TP();
     if (dAdP == 0.0) {
         for (size_t k = 0; k < m_kk; k++) {
             m_dlnActCoeffMolaldP[k] = 0.0;
@@ -1151,11 +1151,11 @@ void DebyeHuckel::s_update_dlnMolalityActCoeff_dP() const
     }
 
     // Calculate a safe value for the mole fraction of the solvent
-    double xmolSolvent = moleFraction(0);
+    CanteraDouble xmolSolvent = moleFraction(0);
     xmolSolvent = std::max(8.689E-3, xmolSolvent);
-    double sqrtI = sqrt(m_IionicMolality);
-    double numdAdPTmp = dAdP * sqrtI;
-    double denomTmp = m_B_Debye * sqrtI;
+    CanteraDouble sqrtI = sqrt(m_IionicMolality);
+    CanteraDouble numdAdPTmp = dAdP * sqrtI;
+    CanteraDouble denomTmp = m_B_Debye * sqrtI;
 
     switch (m_formDH) {
     case DHFORM_DILUTE_LIMIT:

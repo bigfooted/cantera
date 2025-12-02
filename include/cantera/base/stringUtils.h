@@ -25,7 +25,7 @@ namespace Cantera
  * @param fmt   Format to be used (printf style) for each element
  * @param sep   Separator
  */
-string vec2str(const vector<double>& v, const string& fmt="%g", const string& sep=", ");
+string vec2str(const vector<CanteraDouble>& v, const string& fmt="%g", const string& sep=", ");
 
 //! Strip non-printing characters wherever they are
 /*!
@@ -39,7 +39,7 @@ string stripnonprint(const string& s);
 /*!
  * Elements present in *names* but not in the composition string will have
  * a value of 0. Elements present in the composition string but not in *names*
- * will generate an exception. The composition is a double. Example:
+ * will generate an exception. The composition is a CanteraDouble. Example:
  *
  * Input is
  *
@@ -60,18 +60,18 @@ string stripnonprint(const string& s);
 Composition parseCompString(const string& ss,
                             const vector<string>& names=vector<string>());
 
-//! Translate a string into one double value
+//! Translate a string into one CanteraDouble value
 /*!
  * No error checking is done on the conversion.
  *
- * @param val   String value of the double
- * @returns     a double
+ * @param val   String value of the CanteraDouble
+ * @returns     a CanteraDouble
  */
-double fpValue(const string& val);
+CanteraDouble fpValue(const string& val);
 
-//! Translate a string into one double value, with error checking
+//! Translate a string into one CanteraDouble value, with error checking
 /*!
- * fpValueCheck is a wrapper around the C++ stringstream double parser. It
+ * fpValueCheck is a wrapper around the C++ stringstream CanteraDouble parser. It
  * does quite a bit more error checking than atof() or strtod(), and is quite
  * a bit more restrictive.
  *
@@ -88,9 +88,9 @@ double fpValue(const string& val);
  * It always use the C locale, regardless of any locale settings.
  *
  * @param val   String representation of the number
- * @returns     a double
+ * @returns     a CanteraDouble
  */
-double fpValueCheck(const string& val);
+CanteraDouble fpValueCheck(const string& val);
 
 //! This function separates a string up into tokens according to the location of
 //! white space.
