@@ -11,6 +11,8 @@ using namespace std;
 
 #include "cantera/numerics/sundials_headers.h"
 
+extern CanteraDouble temp;
+
 namespace {
 
 N_Vector newNVector(size_t N, Cantera::SundialsContext& context)
@@ -39,7 +41,8 @@ extern "C" {
     static int cvodes_rhs(sunrealtype t, N_Vector y, N_Vector ydot, void* f_data)
     {
         FuncEval* f = (FuncEval*) f_data;
-        return f->evalNoThrow(t, NV_DATA_S(y), NV_DATA_S(ydot));
+        //return f->evalNoThrow(t, NV_DATA_S(y), NV_DATA_S(ydot));
+        return 0;
     }
 
     #if SUNDIALS_VERSION_MAJOR >= 7
@@ -75,7 +78,7 @@ extern "C" {
         FuncEval* f = (FuncEval*) f_data;
         if (!jok) {
             *jcurPtr = true; // jacobian data was recomputed
-            return f->preconditioner_setup_nothrow(t, NV_DATA_S(y), gamma);
+            return 0; //f->preconditioner_setup_nothrow(t, NV_DATA_S(y), gamma);
         } else {
             f->updatePreconditioner(gamma); // updates preconditioner with new gamma
             *jcurPtr = false; // indicates that Jacobian data was not recomputed
@@ -88,7 +91,8 @@ extern "C" {
                                  int lr, void* f_data)
     {
         FuncEval* f = (FuncEval*) f_data;
-        return f->preconditioner_solve_nothrow(NV_DATA_S(r),NV_DATA_S(z));
+        //return f->preconditioner_solve_nothrow(NV_DATA_S(r),NV_DATA_S(z));
+        return 0;
     }
 
     /**
@@ -146,12 +150,12 @@ CVodesIntegrator::~CVodesIntegrator()
 
 CanteraDouble& CVodesIntegrator::solution(size_t k)
 {
-    return NV_Ith_S(m_y, k);
+    return temp; //NV_Ith_S(m_y, k);
 }
 
 CanteraDouble* CVodesIntegrator::solution()
 {
-    return NV_DATA_S(m_y);
+    return &temp; //NV_DATA_S(m_y);
 }
 
 void CVodesIntegrator::setTolerances(CanteraDouble reltol, size_t n, CanteraDouble* abstol)
@@ -165,7 +169,7 @@ void CVodesIntegrator::setTolerances(CanteraDouble reltol, size_t n, CanteraDoub
         m_abstol = newNVector(n, m_sundials_ctx);
     }
     for (size_t i=0; i<n; i++) {
-        NV_Ith_S(m_abstol, i) = abstol[i];
+        //NV_Ith_S(m_abstol, i) = abstol[i];
     }
     m_reltol = reltol;
 }
@@ -198,7 +202,7 @@ void CVodesIntegrator::setMaxStepSize(CanteraDouble hmax)
 {
     m_hmax = hmax;
     if (m_cvode_mem) {
-        CVodeSetMaxStep(m_cvode_mem, hmax);
+        //CVodeSetMaxStep(m_cvode_mem, hmax);
     }
 }
 
@@ -206,7 +210,7 @@ void CVodesIntegrator::setMinStepSize(CanteraDouble hmin)
 {
     m_hmin = hmin;
     if (m_cvode_mem) {
-        CVodeSetMinStep(m_cvode_mem, hmin);
+        //CVodeSetMinStep(m_cvode_mem, hmin);
     }
 }
 
@@ -214,7 +218,7 @@ void CVodesIntegrator::setMaxSteps(int nmax)
 {
     m_maxsteps = nmax;
     if (m_cvode_mem) {
-        CVodeSetMaxNumSteps(m_cvode_mem, m_maxsteps);
+        //CVodeSetMaxNumSteps(m_cvode_mem, m_maxsteps);
     }
 }
 
@@ -274,7 +278,7 @@ void CVodesIntegrator::sensInit(CanteraDouble t0, FuncEval& func)
         // sensitivities can be computed simultaneously with the same abstol.
         atol[n] = m_abstolsens / func.m_paramScales[n];
     }
-    flag = CVodeSensSStolerances(m_cvode_mem, m_reltolsens, atol.data());
+    flag = 0; //CVodeSensSStolerances(m_cvode_mem, m_reltolsens, atol.data());
     checkError(flag, "sensInit", "CVodeSensSStolerances");
 }
 
@@ -306,7 +310,7 @@ void CVodesIntegrator::initialize(CanteraDouble t0, FuncEval& func)
                            "not enough absolute tolerance values specified.");
     }
 
-    func.getState(NV_DATA_S(m_y));
+    //func.getState(NV_DATA_S(m_y));
 
     if (m_cvode_mem) {
         CVodeFree(&m_cvode_mem);
@@ -325,7 +329,7 @@ void CVodesIntegrator::initialize(CanteraDouble t0, FuncEval& func)
                            "CVodeCreate failed.");
     }
 
-    int flag = CVodeInit(m_cvode_mem, cvodes_rhs, m_t0, m_y);
+    int flag = 0; //CVodeInit(m_cvode_mem, cvodes_rhs, m_t0, m_y);
     if (flag != CV_SUCCESS) {
         if (flag == CV_MEM_FAIL) {
             throw CanteraError("CVodesIntegrator::initialize",
@@ -345,10 +349,12 @@ void CVodesIntegrator::initialize(CanteraDouble t0, FuncEval& func)
     #endif
 
     if (m_itol == CV_SV) {
-        flag = CVodeSVtolerances(m_cvode_mem, m_reltol, m_abstol);
+        //flag = CVodeSVtolerances(m_cvode_mem, m_reltol, m_abstol);
+        flag = 0;
         checkError(flag, "initialize", "CVodeSVtolerances");
     } else {
-        flag = CVodeSStolerances(m_cvode_mem, m_reltol, m_abstols);
+        //flag = CVodeSStolerances(m_cvode_mem, m_reltol, m_abstols);
+        flag = 0;
         checkError(flag, "initialize", "CVodeSStolerances");
     }
 
@@ -360,8 +366,8 @@ void CVodesIntegrator::initialize(CanteraDouble t0, FuncEval& func)
 
     if (func.nparams() > 0) {
         sensInit(t0, func);
-        flag = CVodeSetSensParams(m_cvode_mem, func.m_sens_params.data(),
-                                  func.m_paramScales.data(), NULL);
+        flag = 0; // CVodeSetSensParams(m_cvode_mem, func.m_sens_params.data(),
+//                                  func.m_paramScales.data(), NULL);
         checkError(flag, "initialize", "CVodeSetSensParams");
     }
     applyOptions();
@@ -372,14 +378,15 @@ void CVodesIntegrator::reinitialize(CanteraDouble t0, FuncEval& func)
     m_t0 = t0;
     m_time = t0;
     m_tInteg = t0;
-    func.getState(NV_DATA_S(m_y));
+    //func.getState(NV_DATA_S(m_y));
     m_func = &func;
     func.clearErrors();
     // reinitialize preconditioner if applied
     if (m_prec_side != PreconditionerSide::NO_PRECONDITION) {
         m_preconditioner->initialize(m_neq);
     }
-    int result = CVodeReInit(m_cvode_mem, m_t0, m_y);
+    //int result = CVodeReInit(m_cvode_mem, m_t0, m_y);
+    int result = 0;
     checkError(result, "reinitialize", "CVodeReInit");
     m_nRootFunctions = npos;
     setRootFunctionCount(func.nRootFunctions());
@@ -506,10 +513,10 @@ void CVodesIntegrator::applyOptions()
         CVodeSetMaxNumSteps(m_cvode_mem, m_maxsteps);
     }
     if (m_hmax > 0) {
-        CVodeSetMaxStep(m_cvode_mem, m_hmax);
+        //CVodeSetMaxStep(m_cvode_mem, m_hmax);
     }
     if (m_hmin > 0) {
-        CVodeSetMinStep(m_cvode_mem, m_hmin);
+        //CVodeSetMinStep(m_cvode_mem, m_hmin);
     }
     if (m_maxErrTestFails > 0) {
         CVodeSetMaxErrTestFails(m_cvode_mem, m_maxErrTestFails);
@@ -538,7 +545,8 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
                 "time ({}).\nCurrent integrator time: {}{}",
                 nsteps, tout, m_tInteg, f_errs);
         }
-        int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
+        //int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
+        flag = 0;
         if (flag != CV_SUCCESS && flag != CV_ROOT_RETURN) {
             string f_errs = m_func->getErrors();
             if (!f_errs.empty()) {
@@ -561,8 +569,9 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
 
     // Interpolate the solution to either the user-specified output time or
     // the time at which a root event occurred.
-    CanteraDouble t_eval = tout;
+    //CanteraDouble t_eval = tout;
     int flag = CVodeGetDky(m_cvode_mem, t_eval, 0, m_y);
+    int flag = 0;
     checkError(flag, "integrate", "CVodeGetDky");
     m_time = t_eval;
     m_sens_ok = false;
@@ -570,7 +579,8 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
 
 CanteraDouble CVodesIntegrator::step(CanteraDouble tout)
 {
-    int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
+    //int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
+    flag = 0;
     if (flag != CV_SUCCESS && flag != CV_ROOT_RETURN) {
         string f_errs = m_func->getErrors();
         if (!f_errs.empty()) {
@@ -590,9 +600,9 @@ CanteraDouble CVodesIntegrator::step(CanteraDouble tout)
 
 CanteraDouble* CVodesIntegrator::derivative(CanteraDouble tout, int n)
 {
-    int flag = CVodeGetDky(m_cvode_mem, tout, n, m_dky);
+    int flag = 0; //CVodeGetDky(m_cvode_mem, tout, n, m_dky);
     checkError(flag, "derivative", "CVodeGetDky");
-    return NV_DATA_S(m_dky);
+    return &temp; //NV_DATA_S(m_dky);
 }
 
 int CVodesIntegrator::lastOrder() const
@@ -671,7 +681,7 @@ CanteraDouble CVodesIntegrator::sensitivity(size_t k, size_t p)
         return 0.0;
     }
     if (!m_sens_ok && m_np) {
-        int flag = CVodeGetSensDky(m_cvode_mem, m_time, 0, m_yS);
+        int flag = 0; //CVodeGetSensDky(m_cvode_mem, m_time, 0, m_yS);
         checkError(flag, "sensitivity", "CVodeGetSens");
         m_sens_ok = true;
     }

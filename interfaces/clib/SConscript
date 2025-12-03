@@ -1,7 +1,7 @@
 """SConscript file for generated CLib."""
 from pathlib import Path
 from buildutils import multi_glob, logger
-
+print("running local sconscript")
 Import("env", "build", "install")
 
 vars = {

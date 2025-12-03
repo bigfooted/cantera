@@ -238,8 +238,8 @@ void BandMatrix::factor()
                                      static_cast<long int>(nColumns()),
                                      nu, nl, smu, m_ipiv->data.data());
     #else
-        m_info = bandGBTRF(m_lu_col_ptrs.data(), static_cast<long int>(nColumns()),
-                        nu, nl, smu, m_ipiv->data.data());
+//        m_info = bandGBTRF(m_lu_col_ptrs.data(), static_cast<long int>(nColumns()),
+//                        nu, nl, smu, m_ipiv->data.data());
     #endif
 #endif
     if (m_info != 0) {
@@ -280,8 +280,8 @@ void BandMatrix::solve(CanteraDouble* b, size_t nrhs, size_t ldb)
         SUNDlsMat_bandGBTRS(a, static_cast<long int>(nColumns()), smu, nl,
                             m_ipiv->data.data(), b);
     #else
-        bandGBTRS(a, static_cast<long int>(nColumns()), smu, nl,
-                  m_ipiv->data.data(), b);
+//        bandGBTRS(a, static_cast<long int>(nColumns()), smu, nl,
+//                  m_ipiv->data.data(), b);
     #endif
     m_info = 0;
 #endif

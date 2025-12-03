@@ -2,6 +2,10 @@
 
 ## Basic Instructions
 
+Nijso says:
+use conda environment ct-env
+also load gnu/12.3.0
+
 To compile using the default options, run `scons build` followed by
 `scons install`.
 
