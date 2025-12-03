@@ -40,7 +40,7 @@ recipes:
 - name: rtol
 - name: atol
 - name: setupGrid  # Changed in Cantera 3.2
-  wraps: setupGrid(const vector<double>&)
+  wraps: setupGrid(const vector<CanteraDouble>&)
 - name: setupUniformGrid  # New in Cantera 3.2
 - name: setID
 - name: grid
@@ -50,7 +50,7 @@ recipes:
 - name: setMoleFractionsByName
   wraps: setMoleFractions(const string&)
 - name: setMoleFractions
-  wraps: setMoleFractions(const double*)
+  wraps: setMoleFractions(const CanteraDouble*)
 - name: mdot
 - name: temperature
 - name: spreadRate

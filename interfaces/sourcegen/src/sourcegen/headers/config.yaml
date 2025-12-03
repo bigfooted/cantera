@@ -19,11 +19,11 @@ ret_type_crosswalk:
   int: int32_t
   size_t: int32_t
   shared_ptr<T>: int32_t
-  double: double
+  CanteraDouble: double
   string: char*
-  double*: double*
-  const double*: double*
-  vector<double>: double*
+  CanteraDouble*: double*
+  const CanteraDouble*: double*
+  vector<CanteraDouble>: double*
 
 # Parameter type crosswalks
 par_type_crosswalk:
@@ -34,7 +34,7 @@ par_type_crosswalk:
   int*: int32_t*
   vector<int>: int32_t*
   vector<shared_ptr<T>>: int32_t*
-  double: double
-  double*: double*
-  vector<double>: double*
+  CanteraDouble: double
+  CanteraDouble*: double*
+  vector<CanteraDouble>: double*
   string: char*

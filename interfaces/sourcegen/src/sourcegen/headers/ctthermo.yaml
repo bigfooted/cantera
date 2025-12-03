@@ -100,41 +100,41 @@ recipes:
 - name: getPartialMolarCp
 - name: getPartialMolarVolumes
 - name: setState_TPX  # New in Cantera 3.2
-  wraps: setState_TPX(double, double, const double*)
+  wraps: setState_TPX(CanteraDouble, CanteraDouble, const CanteraDouble*)
 - name: setState_TPX_byName  # New in Cantera 3.2
-  wraps: setState_TPX(double, double, const string&)
+  wraps: setState_TPX(CanteraDouble, CanteraDouble, const string&)
 - name: setState_TPY  # New in Cantera 3.2
-  wraps: setState_TPY(double, double, const double*)
+  wraps: setState_TPY(CanteraDouble, CanteraDouble, const CanteraDouble*)
 - name: setState_TPY_byName  # New in Cantera 3.2
-  wraps: setState_TPY(double, double, const string&)
+  wraps: setState_TPY(CanteraDouble, CanteraDouble, const string&)
 - name: setState_TP  # Renamed in Cantera 3.2 (previously set_TP)
 - name: setState_TD  # Renamed in Cantera 3.2 (previously set_TD)
 - name: setState_DP  # Renamed in Cantera 3.2 (previously set_DP)
 - name: setState_HP  # Renamed in Cantera 3.2 (previously set_HP)
-  wraps: setState_HP(double, double)
+  wraps: setState_HP(CanteraDouble, CanteraDouble)
 - name: setState_UV  # Renamed in Cantera 3.2 (previously set_UV)
-  wraps: setState_UV(double, double)
+  wraps: setState_UV(CanteraDouble, CanteraDouble)
 - name: setState_SV  # Renamed in Cantera 3.2 (previously set_SV)
-  wraps: setState_SV(double, double)
+  wraps: setState_SV(CanteraDouble, CanteraDouble)
 - name: setState_SP  # Renamed in Cantera 3.2 (previously set_SP)
-  wraps: setState_SP(double, double)
+  wraps: setState_SP(CanteraDouble, CanteraDouble)
 - name: setState_ST  # Renamed in Cantera 3.2 (previously set_ST)
-  wraps: setState_ST(double, double)
+  wraps: setState_ST(CanteraDouble, CanteraDouble)
 - name: setState_TV  # Renamed in Cantera 3.2 (previously set_TV)
-  wraps: setState_TV(double, double)
+  wraps: setState_TV(CanteraDouble, CanteraDouble)
 - name: setState_PV  # Renamed in Cantera 3.2 (previously set_PV)
-  wraps: setState_PV(double, double)
+  wraps: setState_PV(CanteraDouble, CanteraDouble)
 - name: setState_UP  # Renamed in Cantera 3.2 (previously set_UP)
-  wraps: setState_UP(double, double)
+  wraps: setState_UP(CanteraDouble, CanteraDouble)
 - name: setState_VH  # Renamed in Cantera 3.2 (previously set_VH)
-  wraps: setState_VH(double, double)
+  wraps: setState_VH(CanteraDouble, CanteraDouble)
 - name: setState_TH  # Renamed in Cantera 3.2 (previously set_TH)
-  wraps: setState_TH(double, double)
+  wraps: setState_TH(CanteraDouble, CanteraDouble)
 - name: setState_SH  # Renamed in Cantera 3.2 (previously set_SH)
-  wraps: setState_SH(double, double)
+  wraps: setState_SH(CanteraDouble, CanteraDouble)
 - name: equilibrate
   wraps:
-    ThermoPhase::equilibrate(const string&, const string&, double, int, int, int)
+    ThermoPhase::equilibrate(const string&, const string&, CanteraDouble, int, int, int)
 - name: critTemperature
 - name: critPressure
 - name: critDensity
@@ -152,19 +152,19 @@ recipes:
 - name: setCoveragesByName
   wraps: setCoveragesByName(const string&)
 - name: setEquivalenceRatio
-  wraps: setEquivalenceRatio(double, const string&, const string&)
+  wraps: setEquivalenceRatio(CanteraDouble, const string&, const string&)
 - name: report
 - name: print
   brief: Print a summary of the state of the phase to the logger.
   what: method
-  declaration: int32_t thermo_print(int32_t handle, int32_t showThermo, double threshold)
+  declaration: int32_t thermo_print(int32_t handle, int32_t showThermo, CanteraDouble threshold)
   parameters:
     handle: Handle to queried ThermoPhase object.
     showThermo: If true, extra information is printed out about the thermodynamic state of the system.
     threshold: Show information about species with mole fractions greater than
   returns: Zero for success or -1 for exception handling.
   uses:
-  - virtual string ThermoPhase::report(bool, double)
+  - virtual string ThermoPhase::report(bool, CanteraDouble)
   code: |-
     bool show = (showThermo != 0);
     writelog(ThermoPhaseCabinet::at(handle)->report(show, threshold));

@@ -11,7 +11,7 @@ recipes:
   uses: domain
 - name: show
 - name: setTimeStep
-  wraps: setTimeStep(double, const vector<int>&)
+  wraps: setTimeStep(CanteraDouble, const vector<int>&)
 - name: getInitialSoln
 - name: solve
 - name: refine
@@ -24,7 +24,7 @@ recipes:
 - name: writeStats
 - name: domainIndex
 - name: eval
-  wraps: eval(double*, double*, double, int)
+  wraps: eval(CanteraDouble*, CanteraDouble*, CanteraDouble, int)
 - name: setMaxJacAge
   wraps: setJacAge
 - name: setFixedTemperature

@@ -13,7 +13,7 @@ recipes:
 - name: setTolerances
 - name: setSensitivityTolerances
 - name: advance
-  wraps: advance(double)
+  wraps: advance(CanteraDouble)
 - name: step
 - name: time
 - name: rtol

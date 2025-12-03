@@ -10,7 +10,7 @@ derived: {}  # Specialization/prefix dictionary
 recipes:
 - name: new
 - name: addPhase
-  wraps: addPhase(shared_ptr<ThermoPhase>, double)
+  wraps: addPhase(shared_ptr<ThermoPhase>, CanteraDouble)
 - name: init
 - name: updatePhases
 - name: nElements
@@ -48,7 +48,7 @@ recipes:
 - name: speciesMoles
 - name: elementMoles
 - name: equilibrate
-  wraps: equilibrate(int, const char*, double, int, int, int)
+  wraps: equilibrate(int, const char*, CanteraDouble, int, int, int)
 - name: getChemPotentials
 - name: enthalpy
 - name: entropy

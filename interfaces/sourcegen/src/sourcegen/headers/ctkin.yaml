@@ -61,7 +61,7 @@ recipes:
   code: |-
     return static_cast<int32_t>(KineticsCabinet::at(handle)->kineticsSpeciesIndex(nm, true));
 - name: advanceCoverages
-  wraps: advanceCoverages(double)
+  wraps: advanceCoverages(CanteraDouble)
 - name: getDeltaEnthalpy  # Changed in Cantera 3.2 (previously part of getDelta)
 - name: getDeltaGibbs  # Changed in Cantera 3.2 (previously part of getDelta)
 - name: getDeltaEntropy  # Changed in Cantera 3.2 (previously part of getDelta)
