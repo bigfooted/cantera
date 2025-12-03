@@ -545,8 +545,7 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
                 "time ({}).\nCurrent integrator time: {}{}",
                 nsteps, tout, m_tInteg, f_errs);
         }
-        //int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
-        flag = 0;
+        int flag = 0; // CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
         if (flag != CV_SUCCESS && flag != CV_ROOT_RETURN) {
             string f_errs = m_func->getErrors();
             if (!f_errs.empty()) {
@@ -569,9 +568,8 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
 
     // Interpolate the solution to either the user-specified output time or
     // the time at which a root event occurred.
-    //CanteraDouble t_eval = tout;
-    int flag = CVodeGetDky(m_cvode_mem, t_eval, 0, m_y);
-    int flag = 0;
+    CanteraDouble t_eval = tout;
+    int flag = 0; // CVodeGetDky(m_cvode_mem, t_eval, 0, m_y);
     checkError(flag, "integrate", "CVodeGetDky");
     m_time = t_eval;
     m_sens_ok = false;
@@ -579,8 +577,7 @@ void CVodesIntegrator::integrate(CanteraDouble tout)
 
 CanteraDouble CVodesIntegrator::step(CanteraDouble tout)
 {
-    //int flag = CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
-    flag = 0;
+    int flag = 0; // CVode(m_cvode_mem, tout, m_y, &m_tInteg, CV_ONE_STEP);
     if (flag != CV_SUCCESS && flag != CV_ROOT_RETURN) {
         string f_errs = m_func->getErrors();
         if (!f_errs.empty()) {
