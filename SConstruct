@@ -2014,7 +2014,9 @@ if env['f90_interface'] == 'y':
 # CLib needs to come before src so generated code is available but we don't want
 # to run this for scons doxygen and scons sphinx
 if not {"doxygen", "sphinx"} & set(COMMAND_LINE_TARGETS):
-    SConscript("interfaces/clib/SConscript")
+    # Do not generate clib for ad mode
+    if env['ad_mode'] == 'none':
+        SConscript("interfaces/clib/SConscript")
 
 VariantDir('build/src', 'src', duplicate=0)
 SConscript('build/src/SConscript')
@@ -2039,10 +2041,12 @@ SConscript('build/samples/cxx/SConscript')
 install(env.RecursiveInstall, '$inst_sampledir/cxx',
         'samples/cxx', exclude=sampledir_excludes)
 
-# Install C samples
-SConscript("build/samples/clib/SConscript")
-install(env.RecursiveInstall, "$inst_sampledir/clib",
-        "samples/clib", exclude=sampledir_excludes)
+# Do not generate clib for ad mode
+if env['ad_mode'] == 'none':
+    # Install C samples
+    SConscript("build/samples/clib/SConscript")
+    install(env.RecursiveInstall, "$inst_sampledir/clib",
+            "samples/clib", exclude=sampledir_excludes)
 
 if env['f90_interface'] == 'y':
     SConscript('build/samples/f77/SConscript')

@@ -62,7 +62,7 @@ void PlasmaPhase::updateElectronEnergyDistribution()
         auto ierr = m_eedfSolver->calculateDistributionFunction();
         if (ierr == 0) {
             auto y = m_eedfSolver->getEEDFEdge();
-            m_electronEnergyDist = Eigen::Map<const Eigen::ArrayXd>(y.data(), m_nPoints);
+            m_electronEnergyDist = Eigen::Map<const ArrayXd>(y.data(), m_nPoints);
         } else {
             throw CanteraError("PlasmaPhase::updateElectronEnergyDistribution",
                 "Call to calculateDistributionFunction failed.");
@@ -468,7 +468,7 @@ bool PlasmaPhase::updateInterpolatedCrossSection(size_t i)
         return false;
     }
     vector<CanteraDouble> levels(m_nPoints);
-    Eigen::Map<Eigen::ArrayXd>(levels.data(), m_nPoints) = m_electronEnergyLevels;
+    Eigen::Map<ArrayXd>(levels.data(), m_nPoints) = m_electronEnergyLevels;
     m_collisionRates[i]->updateInterpolatedCrossSection(levels);
     m_interp_cs_ready[i] = true;
     return true;
@@ -537,7 +537,7 @@ void PlasmaPhase::updateElasticElectronEnergyLossCoefficient(size_t i)
     size_t k = m_targetSpeciesIndices[i];
 
     // Map cross sections to Eigen::ArrayXd
-    auto cs_array = Eigen::Map<const Eigen::ArrayXd>(
+    auto cs_array = Eigen::Map<const ArrayXd>(
         m_collisionRates[i]->crossSectionInterpolated().data(),
         m_collisionRates[i]->crossSectionInterpolated().size()
     );
@@ -546,7 +546,7 @@ void PlasmaPhase::updateElasticElectronEnergyLossCoefficient(size_t i)
     CanteraDouble mass_ratio = ElectronMass / molecularWeight(k) * Avogadro;
 
     // Calculate the rate using Simpson's rule or trapezoidal rule
-    Eigen::ArrayXd f0_plus = m_electronEnergyDist + Boltzmann * temperature() /
+    ArrayXd f0_plus = m_electronEnergyDist + Boltzmann * temperature() /
                                 ElectronCharge * m_electronEnergyDistDiff;
     m_elasticElectronEnergyLossCoefficients[i] = 2.0 * mass_ratio * gamma *
         numericalQuadrature(

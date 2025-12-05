@@ -200,6 +200,9 @@ public:
 
     explicit AnyValue(CanteraDouble value);
     AnyValue& operator=(CanteraDouble value);
+#if AD_ENABLED
+    AnyValue& operator=(CanteraDoublePassive value);
+#endif
     //! Return the held value as a `CanteraDouble`, if it is a `CanteraDouble` or a `long int`.
     CanteraDouble& asDouble();
     const CanteraDouble& asDouble() const;

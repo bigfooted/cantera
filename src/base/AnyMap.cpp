@@ -864,6 +864,13 @@ AnyValue &AnyValue::operator=(CanteraDouble value) {
     return *this;
 }
 
+#if AD_ENABLED
+AnyValue &AnyValue::operator=(CanteraDoublePassive value) {
+    *this = (CanteraDouble)value;
+    return *this;
+}
+#endif
+
 CanteraDouble& AnyValue::asDouble() {
     return as<CanteraDouble>();
 }

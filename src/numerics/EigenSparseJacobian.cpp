@@ -53,7 +53,7 @@ void EigenSparseJacobian::updateTransient(CanteraDouble rdt, int* mask)
     // set matrix to steady Jacobian
     m_matrix.setFromTriplets(m_jac_trips.begin(), m_jac_trips.end());
     // update transient diagonal terms
-    Eigen::VectorXd diag = Eigen::Map<Eigen::VectorXi>(mask, m_dim).cast<CanteraDouble>();
+    VectorXd diag = Eigen::Map<Eigen::VectorXi>(mask, m_dim).cast<CanteraDouble>();
     m_matrix -= rdt * diag.matrix().asDiagonal();
     factorize();
 }
@@ -68,7 +68,7 @@ Eigen::SparseMatrix<CanteraDouble> EigenSparseJacobian::jacobian()
 void EigenSparseJacobian::printPreconditioner() {
     std::stringstream ss;
     Eigen::IOFormat HeavyFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-    ss << Eigen::MatrixXd(m_matrix).format(HeavyFmt);
+    ss << MatrixXd(m_matrix).format(HeavyFmt);
     writelog(ss.str());
 }
 
@@ -76,7 +76,7 @@ void EigenSparseJacobian::printJacobian() {
     std::stringstream ss;
     Eigen::SparseMatrix<CanteraDouble> jacobian(m_dim, m_dim);
     jacobian.setFromTriplets(m_jac_trips.begin(), m_jac_trips.end());
-    ss << Eigen::MatrixXd(jacobian);
+    ss << MatrixXd(jacobian);
     writelog(ss.str());
 }
 

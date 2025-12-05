@@ -332,7 +332,15 @@ inline auto clip(const T& value, const L& lower, const U& upper)
 //! Sign of a number. Returns -1 if x < 0, 1 if x > 0 and 0 if x == 0.
 //! @ingroup mathTemplates
 template <typename T> int sign(T x) {
+#if AD_ENABLED
+    if constexpr (codi::ExpressionTraits::isExpression<T>) {
+        return sign(x.getValue());
+    } else {
+#endif
     return (T(0) < x) - (x < T(0));
+#if AD_ENABLED
+    }
+#endif
 }
 
 //! Convert a type name to a human readable string, using `boost::core::demangle` if

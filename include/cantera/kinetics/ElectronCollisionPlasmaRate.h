@@ -244,7 +244,7 @@ private:
     //! threshold energy (the first energy level).
     //! This is used for the calculation of the super-elastic collision reaction
     //! rate coefficient.
-    Eigen::ArrayXd m_crossSectionsOffset;
+    ArrayXd m_crossSectionsOffset;
 };
 
 }

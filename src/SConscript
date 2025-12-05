@@ -77,33 +77,34 @@ for subdir, extensions, setup in libs:
 
 generated_file_nodes = []
 
-# Handle generated CLib separately, as generated files have different location
-auto_path = Path(Dir("#interfaces/sourcegen/src/sourcegen/headers").abspath)
-yaml_files = list(auto_path.glob("ct*.yaml"))
+if env['ad_mode'] == 'none':
+    # Handle generated CLib separately, as generated files have different location
+    auto_path = Path(Dir("#interfaces/sourcegen/src/sourcegen/headers").abspath)
+    yaml_files = list(auto_path.glob("ct*.yaml"))
 
-env2 = localenv.Clone()
-env2.Append(CCFLAGS=env2["pch_flags"])
-# Need to update include paths, where second entry is for application.h
-env2.Prepend(CPPPATH=["#interfaces/clib/include", "#src/base"])
+    env2 = localenv.Clone()
+    env2.Append(CCFLAGS=env2["pch_flags"])
+    # Need to update include paths, where second entry is for application.h
+    env2.Prepend(CPPPATH=["#interfaces/clib/include", "#src/base"])
 
-objects = []
-for yaml_file in yaml_files:
-    # compile with explicit source and target files
-    base_name = yaml_file.stem
-    source_file = Dir("#interfaces/clib/src").File(f"{base_name}.cpp")
-    target_file = Dir("#build/src/clib").File(f"{base_name}.os")
-    obj = env2.SharedObject(
-        target_file,
-        source_file)
+    objects = []
+    for yaml_file in yaml_files:
+        # compile with explicit source and target files
+        base_name = yaml_file.stem
+        source_file = Dir("#interfaces/clib/src").File(f"{base_name}.cpp")
+        target_file = Dir("#build/src/clib").File(f"{base_name}.os")
+        obj = env2.SharedObject(
+            target_file,
+            source_file)
 
-    env2.Depends(obj, env2["config_h_target"])
-    if pch:
-        env2.Requires(obj, pch)
+        env2.Depends(obj, env2["config_h_target"])
+        if pch:
+            env2.Requires(obj, pch)
 
-    generated_file_nodes.append(source_file)
-    objects.append(obj)
+        generated_file_nodes.append(source_file)
+        objects.append(obj)
 
-libraryTargets.extend(objects)
+    libraryTargets.extend(objects)
 
 # Handling of extensions written in Python
 if env["python_package"] == "y":

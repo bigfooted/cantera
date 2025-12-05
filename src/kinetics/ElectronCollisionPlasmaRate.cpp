@@ -105,17 +105,17 @@ CanteraDouble ElectronCollisionPlasmaRate::evalFromStruct(
         m_crossSectionsInterpolated.size(), shared_data.distribution.size());
 
     // Map cross sections to Eigen::ArrayXd
-    auto cs_array = Eigen::Map<const Eigen::ArrayXd>(
+    auto cs_array = Eigen::Map<const ArrayXd>(
         m_crossSectionsInterpolated.data(), m_crossSectionsInterpolated.size()
     );
 
     // Map energyLevels in Eigen::ArrayXd
-    auto eps = Eigen::Map<const Eigen::ArrayXd>(
+    auto eps = Eigen::Map<const ArrayXd>(
         shared_data.energyLevels.data(), shared_data.energyLevels.size()
     );
 
     // Map energyLevels in Eigen::ArrayXd
-    auto distribution = Eigen::Map<const Eigen::ArrayXd>(
+    auto distribution = Eigen::Map<const ArrayXd>(
         shared_data.distribution.data(), shared_data.distribution.size()
     );
 
@@ -154,12 +154,12 @@ void ElectronCollisionPlasmaRate::modifyRateConstants(
     }
 
     // Map energyLevels in Eigen::ArrayXd
-    auto eps = Eigen::Map<const Eigen::ArrayXd>(
+    auto eps = Eigen::Map<const ArrayXd>(
         shared_data.energyLevels.data(), shared_data.energyLevels.size()
     );
 
     // Map energyLevels in Eigen::ArrayXd
-    auto distribution = Eigen::Map<const Eigen::ArrayXd>(
+    auto distribution = Eigen::Map<const ArrayXd>(
         shared_data.distribution.data(), shared_data.distribution.size()
     );
 

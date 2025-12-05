@@ -114,7 +114,7 @@ public:
     //! Get electron energy levels.
     //! @param  levels The vector of electron energy levels (eV). Length: #m_nPoints
     void getElectronEnergyLevels(CanteraDouble* levels) const {
-        Eigen::Map<Cantera::ArrayXd>(levels, m_nPoints) = m_electronEnergyLevels;
+        Eigen::Map<ArrayXd>(levels, m_nPoints) = m_electronEnergyLevels;
     }
 
     //! Set discretized electron energy distribution.
@@ -131,7 +131,7 @@ public:
     //! @param  distrb The vector of electron energy distribution.
     //!                Length: #m_nPoints.
     void getElectronEnergyDistribution(CanteraDouble* distrb) const {
-        Eigen::Map<Cantera::ArrayXd>(distrb, m_nPoints) = m_electronEnergyDist;
+        Eigen::Map<ArrayXd>(distrb, m_nPoints) = m_electronEnergyDist;
     }
 
     //! Set the shape factor of isotropic electron energy distribution.
@@ -478,7 +478,7 @@ protected:
     //CanteraDouble m_ionDegree = 0.0;
 
     //! Electron energy distribution Difference dF/dε (V^-5/2)
-    Eigen::ArrayXd m_electronEnergyDistDiff;
+    ArrayXd m_electronEnergyDistDiff;
 
     //! Elastic electron energy loss coefficients (eV m3/s)
     /*! The elastic electron energy loss coefficient for species k is,
