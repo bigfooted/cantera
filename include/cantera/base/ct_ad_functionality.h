@@ -37,14 +37,7 @@ template <> struct fmt::formatter<CanteraDouble> : fmt::formatter<double> {
   }
 };
 
-template <typename R, typename Exp, template<typename> class Op> struct fmt::formatter<codi::UnaryExpression<R, Exp, Op>> : fmt::formatter<double> {
-
-  auto format(const CanteraDouble& p, format_context& ctx) const {
-    return fmt::formatter<double>::format(p.getValue(), ctx);
-  }
-};
-
-template <typename R, typename Exp1, typename Exp2, template<typename> class Op> struct fmt::formatter<codi::BinaryExpression<R, Exp1, Exp2, Op>> : fmt::formatter<double> {
+template <typename R, template<typename> class Op, typename ... Exps> struct fmt::formatter<codi::ComputeExpression<R, Op, Exps...>> : fmt::formatter<double> {
 
   auto format(const CanteraDouble& p, format_context& ctx) const {
     return fmt::formatter<double>::format(p.getValue(), ctx);
